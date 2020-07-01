@@ -3,21 +3,41 @@ output_yaml:
   - _output.yml
 ---
 
-# One Parameter {#confidence-intervals}
+# One Parameter {#one-parameter}
+
+```{r include=FALSE}
+# First code chunk is always the libraries we need for the chapter but which we
+# don't use in code which students see. Test add.
+
+library(tufte)
+library(gt) 
+
+# I doubt we need all of these.
+
+library(patchwork)
+```
 
 
-<!-- Test1 -->
+<!-- First, do we really need all the penny stuff? Is it pedagogically useful? I am honestly unsure. On one hand, it seems fairly well-done. Why not keep it, and introduce these confusing concepts to students twice? On other hand, we could just delete it. Cutting text is an editor's most important task. Whether we keep it or not, the next part will be an examination of qscores. -->
 
-<!-- Get git pictures -->
+<!-- Second, the qscores sections begins with an exploratory data analysis, as newly discussed in style.Rmd. Then, filter for just "2018F", do set.seed(9) and take a sample of size 50 (without replacement) and only keep a few variables: course_name, department, rating. Then, use the bootstraps to estimate a confidence interval for the mean of rating for that semester.  With that done, we can have some fun. -->
 
-<!-- 0) Get rid of all kable(). Use gt() instead. -->
+<!-- a) We can see how good that confidence interval is because we have all the data. We know the rating for all the courses from 2018F so we can see what the true mean was. Did our 95% confidence interval include the mean? It should! -->
+
+<!-- b) We can replicate this experiment 1,000 times. Sample, with replacement, 50 classes from 2018F. Use the bootstrap to calculate a confidence interval for the mean. This should include the mean about 950 of the 1,000. But it will fail about 500 times! And that is cool to show. -->
+
+<!-- c) Discuss how this exercise is still useful even if we begin with all our data. That is, don't sample. Just use all the classes from 2018F. Then, do the bootstrap to get a confidence interval. Note that the interval will be --- how much? --- smaller than the ones we got above, because we are using 7 times as much data. But it is also weird. I know exactly what the mean is! I have the entire Rubin Table! I don't need a confidence interval for the mean.  -->
+
+<!-- d) That is both true, and false. If all you truly care about is the mean for 2018F then, it is true, you are done. But that is generally not the case! The Rubin Table is often bigger than you might initially think. You might also be interested in data from 2017 (which has occured but which may not be available to you) or from 2021, which has not even happened yet. Your Rubin Table includes rows for all those classes. They are just missing. So, you use the model that you have to estimate stuff for the data that you don't. What is yiur best guess for the mean in 2017 or in 2021? How confident are you are that estimate? What is your 50/50 prediction interval? -->
+
+<!-- e) Relatedly, what if I told you that your 2018F data did not include one class (or ten classes), which was (were) dropped at random from the data by mistake. What is your guess as to the rating of that single class, or the rating of the average of the 10 classes or the highest of the 10 classes? What is your confidence interval for that? Want to bet? -->
+
+<!-- All of this allows us to hit all the themes from style.Rmd even though we are only estimating one parameter. I think that this is enough for one chapter, especially if we keep the pennies around. No need to get into other data sets. -->
+
 
 <!-- 2) Need to get rid of `rep_sample_n()` and replace with `rsample:boostraps()`. Example usage [here](https://juliasilge.com/blog/beer-production/). Do this first, just to get warmed up. Make sure everything still works! Consult this [useful tutorial](https://www.danielphadley.com/bootstrap_tutto/) for the bootstraps function. We can keep everything else with the penny example the same, for now. -->
 
-<!-- 3) Clean up "absurd hack" table code. -->
-
 <!-- 4) After completing the current penny example, show how we can estimate other estimands --- the median, 3rd biggest, et cetera --- in exactly the same way. All the same procedures apply in these cases. Obviously, we can go much faster and don't have to do them all. Key is to see that there are many things (and their uncertainty) which we can estimate. The mean is just one of them. We can still just use our standard Bayesian interpretation for all these estimands and uncertainty intervals. -->
-
 
 <!-- 3) Refer back to the probability chapter. Note that it ends with the estimating of a single parameter, the p associated with a coin. You want to remind readers of what they have already learned and also move a little bit further. Read the set of notes at the start of chapter 6.  -->
 
@@ -89,35 +109,15 @@ Create graphic illustrating two-step process of 1) construct bootstrap distribut
 and then 2) based on bootstrap dist'n create CI?
 -->
 
-### Needed packages {-}
+## Pennies activity {#resampling-tactile}
 
-Let's load all the packages needed for this chapter (this assumes you've already installed them). Recall from our discussion in Section \@ref(tidyverse-package) that loading the **tidyverse** package by running `library(tidyverse)` loads the following commonly used data science packages all at once:
+As we did in Chapter \@ref(sampling), we'll begin with a hands-on tactile activity. We almost always need the **tidyverse** package.
 
-* **ggplot2** for data visualization
-* **dplyr** for data wrangling
-* **tidyr** for converting data to tidy format
-* **readr** for importing spreadsheet data into R
-* As well as the more advanced **purrr**, **tibble**, **stringr**, and **forcats** packages
-
-If needed, read Section \@ref(packages) for information on how to install and load R packages. 
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 ```
 
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
-# Packages needed internally, but not in the text
-library(knitr)
-library(kableExtra)
-library(patchwork)
-library(purrr)
-```
-
-
-
-## Pennies activity {#resampling-tactile}
-
-As we did in Chapter \@ref(sampling), we'll begin with a hands-on tactile activity.
 
 ### What is the average year on US pennies in 2019?
 
@@ -170,39 +170,20 @@ Here our population is $N$ = whatever the number of pennies are being used in th
 
 We summarize the correspondence between the sampling urn exercise in Chapter \@ref(sampling) and our pennies exercise in Table \@ref(tab:table-ch8-b).
 
-```{r, echo=FALSE, message=FALSE}
-# DK: The below is an absurd hack. Create a proper gt table directly. Then, you
-# can delete the data directory.
 
-# The following Google Doc is published to CSV and loaded using read_csv():
-# https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
+```{r, echo=FALSE}
 
-if(!file.exists("07-one-parameter/data/sampling_scenarios.rds")){
-  sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>% 
-    read_csv(na = "") %>% 
-    slice(1:5)
-  write_rds(sampling_scenarios, "07-one-parameter/data/sampling_scenarios.rds")
-} else {
-  sampling_scenarios <- read_rds("07-one-parameter/data/sampling_scenarios.rds")
-}
+absurd_hack <- tibble(Scenario = c("1", "2", "3", "4", "5", "6"), 
+                      Population_parameter = c("Population Proportion", "Population mean", "Difference in population proportions", "Difference in Pupulation means", "Population regression slope", "Population regression coefficient"),
+                      Notation = c("$$p$$", "$$\\mu $$", "$$p_1 - p_2$$", "$$\\mu_1 - \\mu_2$$", "$$\\beta_1$$", "$$\\beta_0$$"), 
+                      Point_Estimate = c("Sample Proportion","Sample mean", "Difference in sample proportions", "Difference in sample means", "Fitted regression slope", "Fitted regression intercept"),
+                      Symbol = c("$$\\widehat{p}$$", "$$\\overline{x}$$ or $$\\widehat{\\mu}$$", "$$\\widehat{p}_1 - \\widehat{p}_2$$", "$$\\overline{x}_1 - \\overline{x}_2$$", "$$b_1$$ or $$\\widehat{\\beta}_1$$", "\\$$b_0$$ or $$\\widehat{\\beta}_0$$")) %>%  gt() %>%  fmt_markdown(columns = TRUE)
+absurd_hack
 
-sampling_scenarios %>%  
-  # Only first two scenarios
-  filter(Scenario <= 2) %>% 
-  kable(
-    caption = "Scenarios of sampling for inference", 
-    booktabs = TRUE,
-    escape = FALSE,
-    linesep = ""
-  ) %>% 
-  kable_styling(font_size = ifelse(knitr:::is_latex_output(), 10, 16),
-                latex_options = c("hold_position")) %>%
-  column_spec(1, width = "0.5in") %>% 
-  column_spec(2, width = "0.7in") %>%
-  column_spec(3, width = "1in") %>%
-  column_spec(4, width = "1.1in") %>% 
-  column_spec(5, width = "1in")
 ```
+
+
+
 
 Going back to our 50 sampled pennies in Figure \@ref(fig:resampling-exercise-c), the point estimate of interest is the sample mean $\overline{x}$ of `r x_bar %>% pull(mean_year) %>% round(2)`. This quantity is an *estimate* of the population mean year of *all* US pennies $\mu$.
 
@@ -686,7 +667,9 @@ Imagine we want to forecast the high temperature in Seoul, South Korea on August
 
 We need this wider range to allow for the possibility of anomalous weather, like a freak cold spell or an extreme heat wave. So a range of temperatures we could be near certain about would be between 32&deg;F - 110&deg;F (0&deg;C - 43&deg;C). On the other hand, if we could tolerate being a little less confident, we could narrow this range to between 70&deg;F - 85&deg;F (21&deg;C - 30&deg;C). 
 
-<!-- DK: Is it a good idea to go back to the urn example here? Why not just stick with pennies? Or perhaps it is important to connect the previous chapter to this one, to see how our new knowledge of confidence intervals applies in the urn case. Even if we do keep it, this part definitely goes much too fast. First, remind people about the urn. Then, do one sample and show how we can build a confidence interval from that, at a given confidence level. Then show how we build it for different confidence levels. Then do it 10 times for each confidence level. Or something like that. -->
+<!-- Is it a good idea to go back to the urn example here? Why not just stick with pennies? Or perhaps it is important to connect the previous chapter to this one, to see how our new knowledge of confidence intervals applies in the urn case. Even if we do keep it, this part definitely goes much too fast. First, remind people about the urn. Then, do one sample and show how we can build a confidence interval from that, at a given confidence level. Then show how we build it for different confidence levels. Then do it 10 times for each confidence level. Or something like that. 
+
+-->
 
 Let's revisit our sampling urn from Chapter \@ref(sampling). Let's compare $10 \cdot 3 = 30$ confidence intervals for $p$ based on three different confidence levels: 80%, 95%, and 99%. 
 
@@ -708,7 +691,7 @@ perc_cis_80 <- urn %>%
 perc_cis_80
 ```
 
-<!-- DK: Is this the first time we are using nest? If so, it is going way too fast! -->
+<!-- Is this the first time we are using nest? If so, it is going way too fast! And nest() has more options now in dplyr 1.0. -->
 
 Next, we'll construct a confidence interval for each one.  This will require `nest`ing the data by sample and then `map`ping to construct each confidence interval.  Let's grab 1,000 bootstrap replicates for each sample:
 
@@ -798,21 +781,16 @@ percentile_cis_by_level <- bind_rows(perc_cis_80, perc_cis_95, perc_cis_99)
 
 Observe that as the confidence level increases from 80% to 95% to 99%, the confidence intervals tend to get wider as seen in Table \@ref(tab:perc-cis-average-width) where we compare their average widths.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
+library(gt)
 percentile_cis_by_level %>% 
   mutate(width = upper - lower) %>% 
   group_by(confidence_level) %>% 
   summarize(`Mean width` = mean(width)) %>% 
   rename(`Confidence level` = confidence_level) %>% 
-  kable(
-    digits = 3,
-    caption = "Average width of 80, 95, and 99\\% confidence intervals", 
-    booktabs = TRUE,
-    longtable = TRUE,
-    linesep = ""
-  ) %>% 
-  kable_styling(font_size = ifelse(knitr:::is_latex_output(), 10, 16),
-                latex_options = c("hold_position", "repeat_header"))
+  gt() %>%
+  tab_header("Average width of 80, 95, and 99% confidence intervals") %>%
+  fmt_number(columns = "Mean width", decimals = 3)
 ```
 
 So in order to have a higher confidence level, our confidence intervals must be wider. Ideally, we would have both a high confidence level and narrow confidence intervals. However, we cannot have it both ways. If we want to _be more confident_, we need to allow for wider intervals. Conversely, if we would like a narrow interval, we must tolerate a lower confidence level. 
@@ -820,6 +798,8 @@ So in order to have a higher confidence level, our confidence intervals must be 
 The moral of the story is: \index{confidence interval!impact of confidence level on interval width} **Higher confidence levels tend to produce wider confidence intervals.**  When looking at Table \@ref(tab:perc-cis-average-width) it is important to keep in mind that we kept the sample size fixed at $n = 50$. Thus, all $10 \cdot 3 = 30$ random samples from the `urn` had the same sample size. What happens if instead we took samples of different sizes? Recall that we did this in Subsection \@ref(different-shovels) using virtual shovels with 25, 50, and 100 slots.
 
 ### Fitting multiple models using `map()`
+
+
 
 Note that we have used the same code three times.  That means we should write a function!  Let's adapt the code from the last section to take 10 samples of an arbitrary size and then construct confidence intervals of an arbitrary level:
 
@@ -941,16 +921,8 @@ percentile_cis_by_n %>%
   group_by(sample_size) %>% 
   summarize(`Mean width` = mean(width)) %>% 
   rename(`Sample size` = sample_size) %>% 
-  kable(
-    digits = 3,
-    caption = "Average width of 95\\% confidence intervals based on $n = 25$, $50$, and $100$", 
-    booktabs = TRUE,
-    longtable = TRUE,
-    escape = FALSE,
-    linesep = ""
-  ) %>% 
-  kable_styling(font_size = ifelse(knitr:::is_latex_output(), 10, 16),
-                latex_options = c("hold_position", "repeat_header"))
+  gt() %>%
+  tab_header("Average width of 95% confidence intervals based on $n = 25, $50, and $100")
 ```
 
 The moral of the story is: \index{confidence interval!impact of sample size on interval width} **Larger sample sizes tend to produce narrower confidence intervals.**   Recall that this was a key message in Subsection \@ref(moral-of-the-story). As we used larger and larger shovels for our samples, the sample proportions red, $\widehat{p}$, tended to vary less. In other words, our estimates got more and more *precise*. 
@@ -1041,19 +1013,18 @@ In addition to using `lm()`, we can also use bootsrapping to extract confidence 
 To use bootstrapping, we will need the **tidyverse** and **rsample** packages. The **rsample** package gives us commands to use for bootstrapping. For the purpose of this example, let's try to find the confidence interval for the mean income in our trains dataset from Chapter 3. 
 
 ```{r}
-library(tidyverse)
-library(rsample)
-library(PPBDS.data)
-
-train_samples <- bootstraps(trains, times = 1000)
-
-derive_mean_income <- function(splits) {
- x <- analysis(splits)
- return(mean(x$income))
-}
-
-train_samples$mean_income <- map_dbl(train_samples$splits, derive_mean_income)
-quantile(train_samples$mean_income, probs = c(.025, .975))
+# library(tidyverse)
+# library(rsample)
+# 
+# train_samples <- bootstraps(trains, times = 1000)
+# 
+# derive_mean_income <- function(splits) {
+#  x <- analysis(splits)
+#  return(mean(x$income))
+# }
+# 
+# train_samples$mean_income <- map_dbl(train_samples$splits, derive_mean_income)
+# quantile(train_samples$mean_income, probs = c(.025, .975))
 
 ```
 
@@ -1063,18 +1034,18 @@ To find the confidence interval for the mean income in our train dataset, we fir
 If we want to find a different statistic like the median income, we can essentially do the same thing but edit the function to derive the median income. 
 
 ```{r}
-library(tidyverse)
-library(rsample)
-
-train_samples <- bootstraps(trains, times = 1000)
-
-derive_median_income <- function(splits) {
- x <- analysis(splits)
- return(median(x$income))
-}
-
-train_samples$median_income <- map_dbl(train_samples$splits, derive_median_income)
-quantile(train_samples$median_income, probs = c(.025, .975))
+# library(tidyverse)
+# library(rsample)
+# 
+# train_samples <- bootstraps(trains, times = 1000)
+# 
+# derive_median_income <- function(splits) {
+#  x <- analysis(splits)
+#  return(median(x$income))
+# }
+# 
+# train_samples$median_income <- map_dbl(train_samples$splits, derive_median_income)
+# quantile(train_samples$median_income, probs = c(.025, .975))
 
 
 ```
@@ -1144,34 +1115,35 @@ Just like with our sampling urn, the population parameter here will involve prop
 <!-- This connects to the issue of similarity in terminology across chapters. seed is bad to use -->
 
 ```{r, echo=FALSE, message=FALSE}
+# work on this
 # The following Google Doc is published to CSV and loaded using read_csv():
 # https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
 
-if(!file.exists("07-one-parameter/data/sampling_scenarios.rds")){
-  sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>% 
-    read_csv(na = "") %>% 
-    slice(1:5)
-  write_rds(sampling_scenarios, "07-one-parameter/data/sampling_scenarios.rds")
-} else {
-  sampling_scenarios <- read_rds("07-one-parameter/data/sampling_scenarios.rds")
-}
-
-sampling_scenarios %>% 
-  # Only first two scenarios
-  filter(Scenario <= 3) %>% 
-  kable(
-    caption = "Scenarios of sampling for inference", 
-    booktabs = TRUE,
-    escape = FALSE,
-    linesep = ""
-  ) %>% 
-  kable_styling(font_size = ifelse(knitr:::is_latex_output(), 10, 16),
-                latex_options = c("hold_position")) %>%
-  column_spec(1, width = "0.5in") %>% 
-  column_spec(2, width = "1.5in") %>%
-  column_spec(3, width = "0.65in") %>%
-  column_spec(4, width = "1.6in") %>% 
-  column_spec(5, width = "0.65in")
+# if(!file.exists("07-one-parameter/data/sampling_scenarios.rds")){
+#   sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>% 
+#     read_csv(na = "") %>% 
+#     slice(1:5)
+#   # write_rds(sampling_scenarios, "07-one-parameter/data/sampling_scenarios.rds")
+# } else {
+#   sampling_scenarios <- read_rds("07-one-parameter/data/sampling_scenarios.rds")
+# }
+# 
+# sampling_scenarios %>% 
+#   # Only first two scenarios
+#   filter(Scenario <= 3) %>% 
+#   kable(
+#     caption = "Scenarios of sampling for inference", 
+#     booktabs = TRUE,
+#     escape = FALSE,
+#     linesep = ""
+#   ) %>% 
+#   kable_styling(font_size = ifelse(knitr:::is_latex_output(), 10, 16),
+#                 latex_options = c("hold_position")) %>%
+#   column_spec(1, width = "0.5in") %>% 
+#   column_spec(2, width = "1.5in") %>%
+#   column_spec(3, width = "0.65in") %>%
+#   column_spec(4, width = "1.6in") %>% 
+#   column_spec(5, width = "0.65in")
 ```
 
 This is known as a *two-sample* inference\index{two-sample inference} situation since we have two separate samples. Based on their two-samples of size $n_{seed}$ = 34 and $n_{control}$ = 16, the point estimate is
@@ -1462,17 +1434,12 @@ Second, let's now compare the spread of the two distributions: they are somewhat
 ```{r, echo=FALSE, message=FALSE}
 tibble(
   `Distribution type` = c("Sampling distribution", "Bootstrap distribution"),
-  `Standard error` = c(se_samp, se_boot)
+  `Standard Error` = c(se_samp, se_boot)
 ) %>% 
-  kable(
-    caption = "Comparing standard errors", 
-    digits = 3, 
-    booktabs = TRUE,
-    escape = FALSE,
-    linesep = ""
-  ) %>% 
-  kable_styling(font_size = ifelse(knitr:::is_latex_output(), 10, 16),
-                latex_options = c("hold_position", "repeat_header"))
+  gt() %>%
+  tab_header(title = "Comparing standard errors") %>%
+  fmt_number(columns = "Standard Error", decimals = 3)
+
 ```
 
 Notice that the bootstrap distribution's standard error is a rather good *approximation* to the sampling distribution's standard error. This leads us to our second lesson about bootstrapping:

@@ -1,34 +1,33 @@
 # Summer 
 
-For Mak
-
 ## TODO
 
-1) Can the `site: bookdown::bookdown_site` designation go someplace other than index.Rmd? I think that anything you mess with and/or hack in building the book belongs in output.yml. We should never edit index.Rmd unless we are making a permanent change.
+1) Set up "Productivity" branch and pull request some fixes! Put any images or data you keep in other/.
 
-2) Fill in details (like links) and advice about Stanford format below. 
+2) How do we get it to fail noisily if one chapter fails? `knitr::include_graphics()` does not seem to produce an error when we build the book. How do we test?  
 
-3) Fill in details (and links) about how to install to Netifly below. 
-
-4) Update steps below, like "structure" section.
-
-5) Crimson as a color scheme? Will have to manually edit CSS after we build the book with hex #c90016 (official Harvard crimson color). Stanford style doesn't allow us to change the color theme when we build the book.
-
-6) Two versions of the book: released and development. Probably involves a branch for the released.
-
+3) Think about the bib/ directory. We need to fix our citations. Automate the citation of whatever packages we are using. The references are a mess, put together from 3 different original sources. First, there a bib directory, with three files in it. Second, within index.Rmd there was a call to knitr::write_bib, which is a famously dangerous and confusing function. I guess that this creates packages.bib. (I have since deleted this.) Third, there is the links.md file, which is supposed to replace a lot of the references like @R-readr, mainly in chapter 2. That seems not to work at all. Come up with a plan to deal with all these. Deal with bibliography. Our source books use very different approaches. write_bib() is infamous for making trouble. I like the way that MD writes out new versions of citations associated with R packages that have been updated. Seems like all chapters generate references at the end. That is fine, but it should be standardized. Or do all those references belong at the end?
 
 ## Book Building
 
-* [*Bookdown*](https://bookdown.org/yihui/bookdown/) is the key reference. Note that you need to uncomment the `site: bookdown::bookdown_site` in index.Rmd in order for thus build command to work.  Then restart RStudio so that the Build tab appears. We usually build the book by pressing the "Build Book" button under the Build panel. 
+* [*Bookdown*](https://bookdown.org/yihui/bookdown/) is the key reference. Note that you need to uncomment the `html:` in _bookdown.yml in order for thus build command to work (This means selecting the order of Rmd files to knit). We usually build the book by pressing the "Build Book" button under the Build panel. 
 
-* We are using the Stanford example. Details? Delete style.css?
+* We are using the Stanford example.
+  + Make sure the **msmbstyle** package is installed
+  + `msmbstyle::msmb_html_book` in the _output.yml file outputs to the Stanford format
+  + To set the book color to crimson:
+    + go to docs/libs/msmb-css-0/msmb.css
+    + Find `#1881c2` and replace all with `#c90016`
+    + Find `24,129,194` and replce with `201,0,23`
+    + Save the file. No need to rebuild the book.
 
 * We deploy to Netifly. This assumes you have a Netifly account already.
+  + Follow instructions [here](https://cerebralmastication.com/2019/05/11/publishing-bookdown-to-netlify-automagically/)
 
 * For structure, we decided to have a single _output.yml file, which each chapter must include as so:
 ---
 output_yaml:
-  - ../_output.yml
+  - _output.yml
 ---
 
 
@@ -50,24 +49,15 @@ output_yaml:
 
 * Consider using notes: https://desiree.rbind.io/post/2019/making-tip-boxes-with-bookdown-and-rmarkdown/
 
-* Think about the bib/ directory. We need to fix our citations. Automate the citation of whatever packages we are using. The references are a mess, put together from 3 different original sources. First, there a bib directory, with three files in it. Second, within index.Rmd there was a call to knitr::write_bib, which is a famously dangerous and confusing function. I guess that this creates packages.bib. (I have since deleted this.) Third, there is the links.md file, which is supposed to replace a lot of the references like @R-readr, mainly in chapter 2. That seems not to work at all. Come up with a plan to deal with all these.
-
 * Think about packages. Note that the [545 book](https://github.com/rstudio-education/stat545) uses a fairly sophisticated plan, involving the new **renv** package.
 
-
 * Can you rebuild just a single chapter and then commit/push it? Right now, I have to rebuild the whole thing each time I want to make a single change. Takes too long.
-
 
 * How do we centralize the loading of packages? What is our plan for loading libraries and removing them when they are no longer need? Chapter 11 contained an annoying bug: rvest and purrr both have pluck() as a function. Need to ensure that you get the purrr version if you need it. Bug only showed up when Chapter 5 (with rvest loaded) was used in the build. Organize packages. What are all the packages we need? How do we ensure that we cite them all, as we should? Where do we load them? Again, there must be best practices for stuff like this. Only use high quality packages, and recommend the same to readers. When are different packages introduced? Where is this written down? Need to be intentional about what we introduced outside of the tidyverse --- janitor, ggthemes, reprex, fs, skimr, gt, googlesheets4, infer, gtsummary --- and when we do it. One annoyance is that new contributors have to try to compile the book a dozen times before it will work because there is no way to know, ahead of time, which packages are required. Make the book an R package?
 
 * Consider the use of before_chapter_script: "_common.R" in the DS _bookdown.yml as well as the associated _common.R file. Is this an approach we should copy? The lack of this why I can't get all the DS chapters to work. Combine _common.R, common.R and index.Rmd information into one place. Need to figure out how this works in bookdown. I think we need one file which only runs once when you make the book. That files does a bunch of stuff involving copying over files. But you don't maintain state after running that file, so any new functions are lost. Then you have a second file, like _common.R, which is run at the start of compiling each chapter.
 
 * The book has lots of references, especially to other chapters. Many of these don't work because the referred-to chapters don't exist. We need a thorough clean up.
-
-* Deal with bibliography. Our source books use very different approaches. write_bib() is infamous for making trouble. I like the way that MD writes out new versions of citations associated with R packages that have been updated.
-
-* Seems like all chapters generate references at the end. That is fine, but it should be standardized. Or do all those references belong at the end?
-
 
 
 ## Other Items
