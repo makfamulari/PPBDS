@@ -12,18 +12,38 @@ library(gt)
 library(tufte)
 ```
 
+<!-- DK: I am considering some major changes in this chapter. What if this were a chapter of "Pitfalls", or some such? That would allow us to cover all the remain problems before doing our final tour of models in chapters 11 and 12. It also would make those chapters more parallel in construction.
+
+What might go in this chapter in that event?
+
+Overfitting/underfitting. It would be nice to nail all the complexities of this down. Should we even bother to explore it in chapter 9?
+
+Tidymodels syntax. Again, get this settled before the "graduation exercise" of chapters 11/12.
+
+M and S errors. This stuff is so important that it deserves placement in the main body of the book. Also, the governors data provides a great example to work with. Just use Gelman's blog post!
+
+Estimating causal relationships which are somewhere between purely observational and perfect experiments: regression discontinuity designs, difference-in-difference and so on.
+
+Dealing with parameter uncertainty correctly. That is, in previous chapters, we treated the betas as estimated perfectly. We did not incorporate uncertainty in their estimation into our prediction intervals. (Unless we did that with rstanarm in chapter 9. Or maybe this is a reason to save rstanarm for this chapter.)
+
+Perhaps all this is enough to both fill this chapter and set the stage for 11 and 12.
+
+-->
+
 
 <!-- 1. Replace Texas data with qscores: rating ~ hours. Keep all that material and verbiage. Add key items from style.Rmd, e.g., parameter uncertainty, unmodelled variation and so on. -->
 
-<!-- 2. Use a different model, like loess, to solve the exact same problem. Go through the same review, but more quickly. Not everything will work. For example, there are no parameter estimates for loess, or at least none that are easily visible. -->
+<!-- 2. Use a different model, like loess, to solve the exact same problem. Go through the same overview, but more quickly. Not everything will work. For example, there are no parameter estimates for loess, or at least none that are easily visible. -->
 
-<!-- 3. How do we decide? lm() or loess() or something? Incorporate (i.e., copy and paste) chapter 14 material. Don't do anything with tidymodel syntax. All that falls to chapter 11. But you are explaing every concept. -->
+<!-- 3. How do we decide? lm() or loess() or something? Incorporate (i.e., copy and paste) chapter 14 material. Don't do anything with tidymodel syntax. All that falls to chapter 11. But you are explaining every concept. -->
 
 <!-- 4. We need a Rubin Causal Model section.  Set up a Zoom with Cass to discuss. She is a good source for information about how to make nice looking tables and about how to think about the issue. We might use qscores and just pretend/assume random assignment or we might use a different data set. Key is to set up a Rubin Table in which the potential outcomes are clear. For example, what would my rating be in a assigned 5 hours of work? What about 10 hours? 15 hours? Each of these is a differnt treatment and, therefore, generates a different potential outcome. -->
 
 <!-- 5. Show the technology for creating multiple models. Instead of a single linear model connecting rating to hours, maybe the relationship is different in different divisions or in different departments or in different class enrollment buckets. Show how to explore this. The governor example in the book is not bad. But nor is it good. -->
 
 <!-- 6. We explicitly avoid talking about Bayesian models here because we are only estimating a one or two parameters in each of the models above. So, there is no occasion for pooling, or any of the other Bayesian magic. But you can see how estimating a 100 rating ~ hours models, one for each department, lends itself to a Bayesian approach. On to chapter 11. -->
+
+<!-- In loess section, grab a copy of this xkcd and use it: https://xkcd.com/2048/ -->
 
 
 <!-- Packages: tidyverse, broom -->
@@ -406,7 +426,7 @@ evals_ch11 %>%
   select(term, estimate, conf.low, conf.high)
 ```
 
-Recall from our discussion in Chapter \@ref{wrangling} that we can use "." to refer to the tibble that has been passed in by the proceeding pipe. In this case, that is the `eval_ch11` tibble. Using "." to refer to the passed-down tibble will be a trick which we use again and again in the coming chapters.
+Recall from our discussion in Chapter \@ref(tidyverse) that we can use "." to refer to the tibble that has been passed in by the proceeding pipe. In this case, that is the `eval_ch11` tibble. Using "." to refer to the passed-down tibble will be a trick which we use again and again in the coming chapters.
 
 You may wonder why this code does not work:
 
@@ -969,7 +989,7 @@ $$
 \sum_{i=1}^{n}(y_i - \widehat{y}_i)^2
 $$
 
-Let's use our data wrangling tools from Chapter \@ref(wrangling) to compute the sum of squared residuals exactly:
+Let's use our data wrangling tools from Chapter \@ref(tidyverse) to compute the sum of squared residuals exactly:
 
 ```{r}
 # Fit regression model:
