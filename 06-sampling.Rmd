@@ -857,7 +857,7 @@ knitr::include_graphics("06-sampling/images/accuracy_vs_precision.jpg")
 
 If we were to bet money on the proportion of the red balls in the next shovel taken from the urn, and we could perform virtual simulations beforehand, how would we go about it? We want the most *accurate* and *precise* estimate. Of the simulations covered in this chapter, we have established that the largest shovel size (100) performed many times is most approppriate for this goal. Let's look at the histogram for the shovel with 100 slots with 1000 repetitions.
 
-```{r}
+```{r echo = FALSE}
 virtual_prop_red_100 %>%
   ggplot(aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
@@ -882,7 +882,7 @@ Now, let's revisit our bet: if the proportion of red balls in the next shovel fa
 
 The proportion of red balls that occurs most frequenty in our model *does* exist in the margin between 35% and 40%. That sounds great then, right? Not so fast.
 
-This is where **parameter uncertainty** comes into play. Though our model is valid and we see that the most common proportion does exist in this parameter, the proportion of red balls falls in between the proposed margins about 40% of the time. That's great! But if we think about this a bit more, this means that, in about 60% of the simulations, the proportion of red balls *does not* fall in the proposed margins. The odds are not in our favor.
+This is where **parameter uncertainty** comes into play. Though our model is valid and we see that the most common proportion does exist in this parameter, the proportion of red balls falls in between the proposed margins about 40% of the time. That's great! But if we think about this a bit more, this means that, in about 60% of the simulations, the proportion of red balls *does not* fall in the proposed margins. In other words, though the most likely value of the estimand is between 35% and 40%, it is *more* likely that the estimand falls above or below these margins. The odds are not in our favor.
 
 Let's imagine that we argue that the parameters are extended to the propotion of red balls being between 30% and 40%. Now, the parameters suggest that we would be correct around 70% of the time. Do we take this bet?
 
@@ -890,7 +890,9 @@ It depends on how willing we are to risk 100 dollars. If we consider **predictio
 
 **Unmodeled variation** further complicates our decision. Randomness is always possible! 
 
-To recap: the **estimand**, our proportion of red balls in the next shovel, is difficult to predict due to **unmodeled variation** and **prediction uncertainty**, even though our **model structure** is precise and accurate. Considering **parameter uncertainty** ensures that we are not overly confident in our model; even if we know the most likely margin, the area outside of the margin may be a better bet! At the end of the day, even if we can endlessly sample and ensure model validity, taking the bet is always a risk!
+To recap: the **estimand**, our proportion of red balls in the next shovel, is difficult to predict due to **unmodeled variation** and **prediction uncertainty**, even though our **model structure** is precise and accurate. Considering **parameter uncertainty** ensures that we are not overly confident in our model; even if we know the most likely margin, the area outside of the margin may be a better bet! 
+
+At the end of the day, even if we can endlessly sample and ensure model validity, taking the bet is always a risk.
 
 ### The moral of the story {#moral-of-the-story}
 
@@ -1054,7 +1056,9 @@ knitr::include_graphics("06-sampling/images/CLT_video_preview.png")
 
 ## Rubin Causal Model
 
-Now that we have mastered sampling, let's consider how these scenarios connect to the Rubin Causal Model (RCM). For the most part, they don't! 
+Now that we have mastered sampling, let's consider how these scenarios connect to the Rubin Causal Model (RCM). 
+
+For the most part, they don't! 
 
 Remember the RCM's slogan: *No causation without manipulation*. In both the urn example and our Obama poll, we are not manipulating our units (the balls and the opinions of the pollees, respectively). There are not a control and treatment condition to compare; there is no causal effect to measure. Therefore, the RCM cannot be directly applied to these scenarios. 
 
@@ -1121,11 +1125,11 @@ However, as has been emphasized before, real-life sampling is far more complex t
 
 Here is an excerpt from the NPR article on the poll:
 
-"According to a new Harvard University Institute of Politics poll (IOP), just 41 percent of millennials — adults ages 18-29 — approve of Obama's job performance, his lowest-ever standing among the group and an 11-point drop from April."
+> "According to a new Harvard University Institute of Politics poll (IOP), just 41 percent of millennials — adults ages 18-29 — approve of Obama's job performance, his lowest-ever standing among the group and an 11-point drop from April."
 
 Now, let's look at the details on the method of sampling: 
 
-"The online survey of 2,089 adults was conducted from Oct. 30 to Nov. 11, just weeks after the federal government shutdown ended and the problems surrounding the implementation of the Affordable Care Act began to take center stage. The poll's margin of error was plus or minus 2.1 percentage points."
+> "The online survey of 2,089 adults was conducted from Oct. 30 to Nov. 11, just weeks after the federal government shutdown ended and the problems surrounding the implementation of the Affordable Care Act began to take center stage. The poll's margin of error was plus or minus 2.1 percentage points."
 
 What about millenials that do not use the internet? What about people that do not use the online platform the survey operated on? What about people that do not speak English or Spanish, the two languages that the IOP offers in their surveys? These millenials are **censored** from the study due to its sampling mechanism. 
 
