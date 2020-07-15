@@ -435,7 +435,6 @@ virtual_histogram +
 
 Once again, the most frequently occurring proportions of red balls occur between 35% and 40%. Every now and then, we obtain proportions as low as between 20% and 25%, and others as high as between 55% and 60%. These are rare, however. Furthermore, observe that we now have a much more symmetric and smoother bell-shaped distribution. This distribution is, in fact, approximated well by a normal distribution. At this point we recommend you read the "Normal distribution" section (Appendix \@ref(appendix-normal-curve)) for a brief discussion on the properties of the normal distribution.
 
-<!-- Gambling might flow naturally here. -->
 
 ### The effect of different shovel sizes {#different-shovels}
 
@@ -856,9 +855,42 @@ So random sampling ensures our point estimates are *accurate*, while on the othe
 knitr::include_graphics("06-sampling/images/accuracy_vs_precision.jpg")
 ```
 
-<!-- DRAFT: Let's apply these ideas to gambling. If we were to bet money on the proportion of the red balls in the urn, and we could perform virtual simulations beforehand, we would want the most *accurate* and most *precise* estimate. Here, our *estimand*, the thing we want to know, would be the proportion of red balls in the urn. INCORP DISCUSSION OF PREDICTION UNCERTAINTY, UNMODELED VARIATION, PARAMETER UNCERTAINTY, MODEL STRUCTURE. -->
+If we were to bet money on the proportion of the red balls in the next shovel taken from the urn, and we could perform virtual simulations beforehand, how would we go about it? We want the most *accurate* and *precise* estimate. Of the simulations covered in this chapter, we have established that the largest shovel size (100) performed many times is most approppriate for this goal. Let's look at the histogram for the shovel with 100 slots with 1000 repetitions.
 
-<!-- MF: Stick with urn example for gambling? Something less predictable & involving more unknowns might be better for explanining model structure, paramater uncertainty, prediction uncertainty, etc. On the other hand, I don't want this chapter to get too lengthy.  -->
+```{r}
+virtual_prop_red_100 %>%
+  ggplot(aes(x = prop_red)) +
+  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
+  labs(x = "Proportion of 100 balls that were red", title = "Proportion of Red Balls With 100 Shovel Slots") 
+```
+
+Now, let's say that we are presented the following bet: if the proportion of red balls in the next shovel falls between 35 and 40%, we win and get 100 dollars! But if it falls anywhere above or below that margin, we lose and must pay 100 dollars. Do we take the bet? First, let's analyze the situation. 
+
+Our **estimand**, the thing we want to know, would be the proportion of red balls in the urn. If we had hand-picked and manually counted each ball and its color identity, the estimand would be a matter of arithmitic. Since we don't have the time to do so, we must find our estimand using other methods (like the sampling above).
+
+Our **model structure**, using the large shovel and performing the sample 1000 times, ensures an accurate and precise model on which we may make our prediction. It closely resembles the real-life situation, estimating the proportion of red balls in an urn, and we may therefore assume the model is valid.
+
+<!-- MF: I feel like my explanations of parameter uncertainty & unmodeled variation are too similar. Is there another way to do this? -->
+
+**Parameter uncertainty** states that, even when our model structure is valid, we must estimate the parameters. We can never perfectly estimate the proportion of red balls. In this situation, we must decide if the parameters (a proportion between 35% and 40%) are generous enough to risk our money.
+
+**Unmodeled variation**, the idea that, no matter how accurate our model is, some randomness is intrinsic. It is possible, though unlikely, that the next shovel would have a proportion below 20%, despite the fact that our model does not show this possibility!
+
+**Prediction uncertainty** highlights our ability, or lack thereof, to predict the future. As stated above, even with very helpful simulations, it's possible that the actual proportion of red balls in the next shovel is not shown on the histogram above. 
+
+Now, let's revisit our bet: if the proportion of red balls in the next shovel falls between 35% and 40%, we win and get 100 dollars. If it falls anywhere above or below that margin, we lose and must pay 100 dollars. Now that we understand the strengths and weaknesses of the model, do we take the deal? 
+
+The proportion of red balls that occurs most frequenty in our model *does* exist in the margin between 35% and 40%. That sounds great then, right? Not so fast.
+
+This is where **parameter uncertainty** comes into play. Though our model is valid and we see that the most common proportion does exist in this parameter, the proportion of red balls falls in between the proposed margins about 40% of the time. That's great! But if we think about this a bit more, this means that, in about 60% of the simulations, the proportion of red balls *does not* fall in the proposed margins. The odds are not in our favor.
+
+Let's imagine that we argue that the parameters are extended to the propotion of red balls being between 30% and 40%. Now, the parameters suggest that we would be correct around 70% of the time. Do we take this bet?
+
+It depends on how willing we are to risk 100 dollars. If we consider **prediction uncertainty**, we might hesitate. Even if we have proof that the proportion of red balls lies between 30% and 40% in our samples the majority of the time, there is always the possibility that the proportion falls outside of these margins. After all, our sampling proves that the proportion falls out of these margins **30%** of the time!
+
+**Unmodeled variation** further complicates our decision. Randomness is always possible! 
+
+To recap: the **estimand**, our proportion of red balls in the next shovel, is difficult to predict due to **unmodeled variation** and **prediction uncertainty**, even though our **model structure** is precise and accurate. Considering **parameter uncertainty** ensures that we are not overly confident in our model; even if we know the most likely margin, the area outside of the margin may be a better bet! At the end of the day, even if we can endlessly sample and ensure model validity, taking the bet is always a risk!
 
 ### The moral of the story {#moral-of-the-story}
 
