@@ -5,23 +5,26 @@ output_yaml:
 
 # Sampling {#sampling}
 
-<!-- Priorities: -->
-
-<!-- MF: Test to see if my git connection is working. -->
+<!-- Priorities: --> 
 
 <!-- 1) Fix "`summarise()` ungrouping output (override with `.groups`" -->
 
 <!-- 2) Replace kable() with gt(). -->
 
-<!-- 3) Fix references. (Look for ?? in html) -->
+<!-- 3) Fix missing references. (Look for ?? in html). Maybe just drop references to figures. can you figure out how to do them? Keep references to section. -->
 
-<!-- 4) Do the fig.height and fig.width do anything useful. If not, delete. -->
+<!-- 4) Do the fig.height do anything useful. If not, delete. -->
 
-<!-- 2) Set up Zoom with Cass about "sampling mechanism," which is just like the "assignment mechanism." How did some beads get sampled and some did not? Bias and censoring are relevant topics here. Every problem has a Preceptor Table highlighting what God would know, what we know, and then how we form a pdf about what we don't know. (Read chapter 3 for background.) This is even so with sampling! Until we sample a bead, it is a "?". Then, it resolves to red/white. After drawing our sample, we make inferences about the other beads. In one sense, we are inferring the value of p. In another, we are guessing what each of the "?" is, at least in expectation. But we can then also capture uncertainty! Each bead might be red or white, regardless of p. And there is uncertainty about p as well. This is the first time we are seeing both model uncertainty --- what is p? --- and predictive uncertainty --- what color is the next bead? -->
+<!-- 5) Change Preceptor Table. Should have two columns: "ID" and "color". Talk about Ideal, Actual and Reduced (sort of, all the rows with questio marks are "exchangeable") Preceptor Tables. Just have a posterior for p, just like Vivian. Then you have a posterior for a specific prediction question. Example: Use a new paddle to draw out 50 beads 1,000 times. What is a good 95% confidence interval for number of red beads? (Discuss with Tahmid.) -->
 
-<!-- 3) Set up Zoom with Vivian. Draw direct connection to her coin example. -->
+<!-- 6) Read bok/themes.Rmd. Do you have a math portion? Probably not. -->
 
-<!-- How about an urn with more than two colors? An urn with an income is written on the bead? -->
+<!-- 7) Set up Zoom with Cass about "sampling mechanism," which is just like the "assignment mechanism." How did some beads get sampled and some did not? Bias and censoring are relevant topics here. Re-running the experiment and comparing the new results to our predictions, derived from the Predictive Preceptor Table, is how we confirm that our conclusions are correct. -->
+
+<!-- 8) Set up Zoom with Vivian. Draw direct connection to her coin example. Advice about how to create your joint distribution. -->
+
+<!-- 9) Set up Zoom with Tahmid. Talk about how your discussion of Tables connects to his. Maybe you don't discuss  the Fitted and Prediction Preceptor Tables-->
+
 
 <!-- Key issues for summer 2020. -->
 
@@ -54,6 +57,9 @@ output_yaml:
 <!-- Discuss hypothesis tests and why we hate them. See themes.Rmd for details. -->
 
 <!-- Also interesting to think about tables which we know are finite but we don't ever know how many rows, like number of living people in US right now (i.e., includes planes landing? someone whose heart has stopped beating but has not been "pronounced" dead?)  -->
+
+<!-- How about an urn with more than two colors? An urn with an income is written on the bead? -->
+
 
 <!-- Might also use Topic 16 from the Workshop here, or save it for the next chapter. -->
 
@@ -92,7 +98,6 @@ One way to answer this question would be to perform an exhaustive count: remove 
 
 Instead of performing an exhaustive count, let's insert a shovel into the urn as seen in Figure \@ref(fig:sampling-exercise-2). Using the shovel, let's remove $5 \cdot 10 = 50$ balls, as seen in Figure \@ref(fig:sampling-exercise-3). Here, we are taking a *random sample* of the total population of balls. 
 
-
 ```{r, echo=FALSE, fig.cap="Inserting a shovel into the urn."}
 knitr::include_graphics("06-sampling/images/sampling_bowl_2.jpg")
 ```
@@ -103,11 +108,6 @@ knitr::include_graphics("06-sampling/images/sampling_bowl_3_cropped.jpg")
 ```
 
 Observe that 17 of the 50 sampled balls are red and thus 17/50 = 0.34 = 34% of the shovel's balls are red. We can view the proportion of balls that are red in this shovel as a guess of the proportion of balls that are red in the entire urn. While not as exact as doing an exhaustive count of all the balls in the urn, our guess of 34% took much less time and energy to make. 
-<<<<<<< HEAD
-
-However, say, we started this activity over from the beginning. In other words, we replace the 50 balls back into the urn and start over. Would we remove exactly 17 red balls again? Would our guess at the proportion of the urn's balls that are red be exactly 34% again? Maybe? 
-
-What if we repeated this activity several times following the process shown in Figure \@ref(fig:sampling-exercise-3b)? Would we obtain exactly 17 red balls each time? In other words, would our guess at the proportion of the urn's balls that are red be exactly 34% every time? Surely not. 
 
 However, say, we started this activity over from the beginning. In other words, we replace the 50 balls back into the urn and start over. Would we remove exactly 17 red balls again? Would our guess at the proportion of the urn's balls that are red be exactly 34% again? Maybe? 
 
@@ -130,10 +130,8 @@ Each of our 33 groups of friends will do the following:
 - Return the balls into the urn.
 - Mix the contents of the urn a little to not let a previous group's results influence the next group's. 
 
-
 ```{r, echo=FALSE, fig.show='hold', fig.cap="Repeating sampling activity 33 times."}
 # Need new picture
-
 knitr::include_graphics(c("06-sampling/images/tactile_2_a.jpg", "06-sampling/images/tactile_2_b.jpg", "06-sampling/images/tactile_2_c.jpg"))
 ```
 
@@ -144,7 +142,6 @@ knitr::include_graphics("06-sampling/images/tactile_3_a.jpg")
 ```
 
 Recall from Section \@ref(histograms) that histograms allow us to visualize the *distribution* of a numerical variable. In particular, where the center of the values falls and how the values vary. A partially completed histogram of the first 10 out of 33 groups of friends' results can be seen in Figure \@ref(fig:sampling-exercise-5).
-
 
 ```{r, echo=FALSE, fig.cap="Hand-drawn histogram of first 10 out of 33 proportions."}
 knitr::include_graphics("06-sampling/images/tactile_3_c.jpg")
@@ -159,9 +156,8 @@ Observe the following in the histogram in Figure \@ref(fig:sampling-exercise-5):
 
 Let's construct this same hand-drawn histogram in R using your data visualization skills that you honed in Chapter \@ref(viz). First, let's create an object, `tactile_sample_urn` that saves the results from our 33 groups of friends. Run the following to display the tibble:
 
-<!-- MF: Should this be hidden and created internally, or should it remain displayed as is the case for the urn object later in this chapter? -->
 
-```{r}
+```{r, echo=FALSE}
 tactile_sample_urn <- tibble(group = c("Ilyas, Yohan", "Ellie, Terrance", "Mark, Ramses", 
                                       "Sophie, Brian", "Maeve, Josh", "Sanjana, Yuko", 
                                       "Nam, Joshua", "Siobhan, Jane", "Caroline, Edna",
@@ -182,7 +178,6 @@ tactile_sample_urn <- tibble(group = c("Ilyas, Yohan", "Ellie, Terrance", "Mark,
   mutate(red_balls = as.numeric(red_balls)) %>% 
   mutate(prop_red = red_balls/50) %>% 
   mutate(replicate = 1:33)
-
 tactile_sample_urn
 ```
 
@@ -198,8 +193,7 @@ tactile_sample_urn %>%
        title = "Distribution of 33 proportions red") 
 ```
 
-
-```{r, echo=FALSE, fig.cap="Distribution of 33 proportions based on 33 samples of size 50."}
+```{r, echo=FALSE, fig.cap="Distribution of 33 proportions based on 33 samples of size 50.", fig.height=3.1}
 tactile_histogram <- ggplot(tactile_sample_urn, aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white")
 tactile_histogram + 
@@ -237,14 +231,11 @@ Let's start by performing the virtual analog of the tactile sampling exercise we
 For reference, `sample-frac()` merely re-arranges the rows of the tibble. We use `set.seed()` to ensure that the balls in our virtual urn are always in the same order. This makes certain that the figures in the book match their written descriptions. 
 
 ```{r, echo=TRUE}
-
 set.seed(9)
-
 urn <- tibble(color = c(rep("red", 900), rep("white", 1500))) %>%
   sample_frac() %>% 
   mutate(ball_ID = 1:2400) %>% 
   select(ball_ID, color)
-
 urn  
 ```
 
@@ -305,9 +296,8 @@ Second, let's compute the number of balls out of 50 that are red using the `summ
 ```{r}
 virtual_shovel %>% 
   mutate(is_red = (color == "red")) %>% 
-  summarize(num_red = sum(is_red), .groups = FALSE)
+  summarize(num_red = sum(is_red))
 ```
-
 ```{r, echo=FALSE}
 n_red_virtual_shovel <- virtual_shovel %>% 
   mutate(is_red = (color == "red")) %>% 
@@ -402,7 +392,6 @@ facet_compare <- bind_rows(
   facet_wrap(~ type) +
   labs(x = "Proportion of 50 balls that were red", 
          title = "Comparing distributions") 
-
 facet_compare
 ```
 
@@ -455,9 +444,6 @@ Once again, the most frequently occurring proportions of red balls occur between
 
 Now say instead of just one shovel, you have three choices of shovels to extract a sample of balls with: shovels of size 25, 50, and 100.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
 
 ```{r, echo=FALSE, fig.align='center', fig.cap="Three shovels to extract three different sample sizes."}
 knitr::include_graphics("06-sampling/images/three_shovels.png")
@@ -476,61 +462,42 @@ Run each of the following code segments individually and then compare the three 
 ```{r, eval=FALSE}
 # Segment 1: sample size = 25 ------------------------------
 # 1.a) Virtually use shovel 1,000 times
-
 virtual_samples_25 <- urn %>% 
   rep_sample_n(size = 25, reps = 1000)
-
 # 1.b) Compute resulting 1,000 replicates of proportion red
-
 virtual_prop_red_25 <- virtual_samples_25 %>% 
   group_by(replicate) %>% 
   summarize(red = sum(color == "red")) %>% 
   mutate(prop_red = red / 25)
-
 # 1.c) Plot distribution via a histogram
-
 virtual_prop_red_25 %>%
   ggplot(aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
   labs(x = "Proportion of 25 balls that were red", title = "25") 
-
-
 # Segment 2: sample size = 50 ------------------------------
 # 2.a) Virtually use shovel 1,000 times
-
 virtual_samples_50 <- urn %>% 
   rep_sample_n(size = 50, reps = 1000)
-
 # 2.b) Compute resulting 1,000 replicates of proportion red
-
 virtual_prop_red_50 <- virtual_samples_50 %>% 
   group_by(replicate) %>% 
   summarize(red = sum(color == "red")) %>% 
   mutate(prop_red = red / 50)
-
 # 2.c) Plot distribution via a histogram
-
 virtual_prop_red_50 %>%
   ggplot(aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
   labs(x = "Proportion of 50 balls that were red", title = "50")  
-
-
 # Segment 3: sample size = 100 ------------------------------
 # 3.a) Virtually using shovel with 100 slots 1,000 times
-
 virtual_samples_100 <- urn %>% 
   rep_sample_n(size = 100, reps = 1000)
-
 # 3.b) Compute resulting 1,000 replicates of proportion red
-
 virtual_prop_red_100 <- virtual_samples_100 %>% 
   group_by(replicate) %>% 
   summarize(red = sum(color == "red")) %>% 
   mutate(prop_red = red / 100)
-
 # 3.c) Plot distribution via a histogram
-
 virtual_prop_red_100 %>%
   ggplot(aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
@@ -542,52 +509,39 @@ For easy comparison, we present the three resulting histograms in a single row w
 ```{r, echo=FALSE, fig.height=3, fig.cap="Comparing the distributions of proportion red for different sample sizes."}
 # DK: What is the purpose of all this file exist checking? Should we just be
 # creating all this on the fly, probably with a set.seed?
-
 # n = 25
-
 set.seed(9)
-
 virtual_samples_25 <- urn %>% 
   rep_sample_n(size = 25, reps = 1000)
-
 virtual_prop_red_25 <- virtual_samples_25 %>% 
   group_by(replicate) %>% 
   summarize(red = sum(color == "red")) %>% 
   mutate(prop_red = red / 25) %>% 
   mutate(n = 25)
-
 # n = 50
-
 virtual_samples_50 <- urn %>% 
   rep_sample_n(size = 50, reps = 1000)
-
 virtual_prop_red_50 <- virtual_samples_50 %>% 
   group_by(replicate) %>% 
   summarize(red = sum(color == "red")) %>% 
   mutate(prop_red = red / 50) %>% 
   mutate(n = 50)
-
 # n = 100
-
 virtual_samples_100 <- urn %>% 
   rep_sample_n(size = 100, reps = 1000)
-
 virtual_prop_red_100 <- virtual_samples_100 %>% 
   group_by(replicate) %>% 
   summarize(red = sum(color == "red")) %>% 
   mutate(prop_red = red / 100) %>% 
   mutate(n = 100)
-
 virtual_prop <- bind_rows(virtual_prop_red_25, 
                           virtual_prop_red_50, 
                           virtual_prop_red_100)
-
 comparing_sampling_distributions <- ggplot(virtual_prop, aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
   labs(x = "Proportion of shovel's balls that are red", 
        title = "Comparing distributions of proportions red for three different shovel sizes.") +
   facet_wrap(~ n) 
-
 comparing_sampling_distributions
 ```
 
@@ -597,17 +551,12 @@ We can be numerically explicit about the amount of variation in our three sets o
 
 ```{r, eval=FALSE}
 # n = 25
-
 virtual_prop_red_25 %>% 
   summarize(sd = sd(prop_red))
-
 # n = 50
-
 virtual_prop_red_50 %>% 
   summarize(sd = sd(prop_red))
-
 # n = 100
-
 virtual_prop_red_100 %>% 
   summarize(sd = sd(prop_red))
 ```
@@ -619,7 +568,6 @@ comparing_n_table <- virtual_prop %>%
   group_by(n) %>% 
   summarize(sd = sd(prop_red)) %>% 
   rename(`Number of slots in shovel` = n, `Standard deviation of proportions red` = sd) 
-
 comparing_n_table  %>% 
   kable(
     digits = 3,
@@ -640,7 +588,6 @@ Note that in the last section, we ran more or less the same code three times, bu
 ```{r, eval = FALSE}
 virtual_samples_25 <- urn %>% 
   rep_sample_n(size = 25, reps = 1000)
-
 virtual_prop_red_25 <- virtual_samples_25 %>% 
   group_by(replicate) %>% 
   summarize(red = sum(color == "red")) %>% 
@@ -655,7 +602,6 @@ First, let's create `use_shovel()`
 use_shovel <- function(x, size, reps) {
   x %>% rep_sample_n(size = size, reps = reps)
 }
-
 use_shovel(x = urn, size = 25, reps = 1000)
 ```
 
@@ -670,7 +616,6 @@ prop_red <- function(x, size, reps) {
     summarize(red = sum(color == "red")) %>%
     mutate(prop_red = red / size)
 }
-
 prop_red(x = urn, size = 25, reps = 1000)
 ```
 
@@ -702,7 +647,6 @@ shovels <- shovels %>%
                                 ~ prop_red(x = urn, 
                                            size = .x, 
                                            reps = 1000)))
-
 glimpse(shovels)
 ```
 
@@ -711,7 +655,6 @@ Adding another `map_*` function will let us get the standard deviations of our e
 ```{r}
 shovels <- shovels %>% 
   mutate(prop_red_sd = map_dbl(prop_red_results, ~ pull(., prop_red) %>% sd()))
-
 glimpse(shovels)
 ```
 
@@ -729,8 +672,6 @@ shovels_100 <- tibble(shovel_size = 1:100) %>%
                                            reps = 1000))) %>% 
   mutate(prop_red_sd = map_dbl(prop_red_results, 
                                ~ pull(., prop_red) %>% sd()))
-
-
 glimpse(shovels_100)
 ```
 
@@ -805,7 +746,7 @@ Note that last word we wrote in bold: **infer**. The act of "inferring" means to
 
 Now, for some important statistical definitions related to sampling. As a refresher of our 1,000 repeated/replicated virtual samples of size $n$ = 25, $n$ = 50, and $n$ = 100 in Section \@ref(sampling-simulation), let's display Figure \@ref(fig:comparing-sampling-distributions) again as Figure \@ref(fig:comparing-sampling-distributions-1b).  
 
-```{r, echo=FALSE, fig.cap="Previously seen three distributions of the sample proportion $\\widehat{p}$."}
+```{r, echo=FALSE, fig.cap="Previously seen three distributions of the sample proportion $\\widehat{p}$.", fig.height=3.1}
 comparing_sampling_distributions
 ```
 
@@ -838,7 +779,6 @@ p_hat_compare <- virtual_prop %>%
   labs(x = expression(paste("Sample proportion ", hat(p))), 
        title = expression(paste("Sampling distributions of ", hat(p), " based on n = 25, 50, 100.")) ) +
   facet_wrap(~ n)
-
 if(knitr::is_latex_output()){
   p_hat_compare  +
   theme(
@@ -848,7 +788,6 @@ if(knitr::is_latex_output()){
 } else {
   p_hat_compare
 }
-
 ```
 
 Furthermore, let's display the graph of standard errors for $n = 1$ to $n = 100$ using our new terminology, notation, and definitions relating to sampling.
@@ -889,7 +828,10 @@ Our **estimand**, the thing we want to know, would be the proportion of red ball
 
 Our **model structure**, using the large shovel and performing the sample 1000 times, ensures an accurate and precise model on which we may make our prediction. It closely resembles the real-life situation, estimating the proportion of red balls in an urn, and we may therefore assume the model is valid.
 
-<!-- MF: I feel like my explanations of parameter uncertainty & unmodeled variation are too similar. Is there another way to do this? -->
+<!-- outcome = model + random stuff; 
+color of bead = p + random stuff 
+# of red = p * size of paddle + random stuff
+-->
 
 **Parameter uncertainty** states that, even when our model structure is valid, we must estimate the parameters. We can never perfectly estimate the proportion of red balls. In this situation, we must decide if the parameters (a proportion between 35% and 40%) are generous enough to risk our money.
 
@@ -949,7 +891,6 @@ samp_distn_compare <- virtual_prop %>%
                                 " based on n = 25, 50, 100.")) ) +
   facet_wrap(~ n) +
   geom_vline(xintercept = p, col = "red", size = 1)
-
 if(knitr::is_latex_output()){
   samp_distn_compare  +
   theme(
@@ -980,7 +921,6 @@ On December 4, 2013, National Public Radio in the US reported on a poll of Presi
 > After voting for him in large numbers in 2008 and 2012, young Americans are souring on President Obama.
 > 
 > According to a new Harvard University Institute of Politics poll, just 41 percent of millennials — adults ages 18-29 — approve of Obama's job performance, his lowest-ever standing among the group and an 11-point drop from April.
-
 Let's tie elements of the real-life poll in this new article with our "tactile" and "virtual" urn activity from Sections \@ref(sampling-activity) and \@ref(sampling-simulation) using the terminology, notations, and definitions we learned in Section \@ref(sampling-framework). You'll see that our sampling activity with the urn is an idealized version of what pollsters are trying to do in real life. 
 
 First, who is the **(Study) Population** of $N$ individuals or observations of interest? 
@@ -1075,15 +1015,16 @@ knitr::include_graphics("06-sampling/images/CLT_video_preview.png")
 
 
 ## Rubin Causal Model
+
 Now that we have mastered sampling, let's consider how these scenarios connect to the Rubin Causal Model (RCM). 
 
 For the most part, they don't! 
 
 Remember the RCM's slogan: *No causation without manipulation*. In both the urn example and our Obama poll, we are not manipulating our units (the balls and the opinions of the pollees, respectively). There are not a control and treatment condition to compare; there is no causal effect to measure. Therefore, the RCM cannot be directly applied to these scenarios. 
 
-## Preceptor Tables
+However, the **Rubin Table** can be applied to sampling. How? Let's find out.
 
-### The Actual Preceptor Table: What We Know
+### What We Know
 
 When we sample 25 balls from our urn, we are taking a random sample of balls, finding the proportion that are red, and generalizing to estimate the total proportion of red balls in the entire urn. Imagine we use the shovel in our urn and sample 25 balls; the proportion of red balls is found to be 42%. What does this information tell us about Ball 1? Ball 2? Let's visulize this by looking at the first 25 balls of our urn, identified by ball_ID, after taking a random sample. In this table, 1 represents "yes" and 0 represents "no".
 
@@ -1095,7 +1036,6 @@ rubin_table <- tibble(ball_ID = 1:25,
                       white_ball = c("?", "?", "?", "?", "0", "?", "?", "?", "?", 
                                    "?", "?", "?", "?", "1", "?", "?", "?", "?", 
                                    "?", "?", "?", "?", "?", "?", "?"))
-
 rubin_table
 ```
 
@@ -1104,7 +1044,6 @@ Where is all of our data? Well, when we took a sample of 25 balls from the total
 So, given all of these unknown values, what *can* we say about Ball 1? We know the proportion of red balls in our sample is 42%. Does this mean that Ball 1 has a 42% chance of being red? As we learned in Chapter 5, this is not true! Let's delve into why this assumption is wrong. 
 
 We can only claim *for certain* that, of the 25 balls that we sampled (of the total 1500 balls in the urn), 42% were red. If we were making a prediction of the probability of one of our **sampled** balls being red, 42% would be the  correct guess! If we were making a prediction of the probability that an **unsampled** ball was red, the answer of 42% would be incorrect. Let's revisit the histogram of our 1000 virtually sampled proportions using a virtual shovel.
-
 
 ```{r, echo = FALSE}
 virtual_prop_red <- virtual_samples %>% 
@@ -1121,9 +1060,9 @@ virtual_histogram +
 Here, we see a decent amount of variation in the proportion of red balls. In some extreme cases, our proportion was as low as 20% and as high as 60%! If we took either one of these extremes and tried to make an assumption of Ball 1, we would most certainly be incorrect. This is why we run many simulations to make the *best possible prediction*. 
 
 
-### The Ideal Preceptor Table: What We Wish We Knew
+### What we wish we knew
 
-As is the case in the RCM, we wish we knew the values for every single unit in every possible scenario. The analogous ideal here would be a tibble where we know the color identity of every single ball. To compare to our previous Preceptor Table, this is what we wish we knew in regards to our first 25 balls:
+As is the case in the RCM, we wish we knew the values for every single unit in every possible scenario. The analogous ideal here would be a tibble where we know the color identity of every single ball. To compare to our previous Rubin Table, this is what we wish we knew in regards to our first 25 balls:
 
 ```{r, echo = FALSE}
 ideal_rubin_table <- tibble(ball_ID = 1:25,
@@ -1133,28 +1072,21 @@ ideal_rubin_table <- tibble(ball_ID = 1:25,
                       white_ball = c("0", "0", "1", "0", "0", "0", "0", "1", "0", 
                                    "0", "1", "0", "0", "0", "1", "0", "0", "0", 
                                    "1", "1", "0", "1", "1", "1", "1"))
-
 ideal_rubin_table
 ```
 
 Let's say that, after manually going through our entire urn, we find that the **true** and **real** proportion of red balls is exactly 37.5%. We know each ball's color identity in the entire urn. To revisit the terminology of Chapter 5, we would be dealing with P(A|B), the probability of Ball 1 being red given that we know the color_ID of every single ball in the urn. If the proportion of red balls is **exactly** 37.5%, we can say whether Ball 1 is red or not with 100% certainty, since we know the exact number of red and white balls in the urn. 
 
-However, as has been emphasized before, real-life sampling is far more complex than our urn example. The process is **extremely** prone to error. Despite that, most people overestimate the validity of conclusions drawn from sampling. To stress how easy it is for sampling to be manipulated, let's revisit the poll on Obama's approval rating from earlier.
-
-### The Reduced Preceptor Table
-
-### The Prediction Preceptor Table
+However, as has been emphasized before, real-life sampling is far more complex than our urn example. The process is **extremely** prone to error. Despite that, most people overestimate the validity of conclusions drawn from sampling. To stress how easy it is for sampling to be manipulated, let's revisit the poll on Obama's approval rating from earlier. 
 
 ### Sampling is hard to get right!
 
 Here is an excerpt from the NPR article on the poll:
 
 > "According to a new Harvard University Institute of Politics poll (IOP), just 41 percent of millennials — adults ages 18-29 — approve of Obama's job performance, his lowest-ever standing among the group and an 11-point drop from April."
-
 Now, let's look at the details on the method of sampling: 
 
 > "The online survey of 2,089 adults was conducted from Oct. 30 to Nov. 11, just weeks after the federal government shutdown ended and the problems surrounding the implementation of the Affordable Care Act began to take center stage. The poll's margin of error was plus or minus 2.1 percentage points."
-
 What about millenials that do not use the internet? What about people that do not use the online platform the survey operated on? What about people that do not speak English or Spanish, the two languages that the IOP offers in their surveys? These millenials are **censored** from the study due to its sampling mechanism. 
 
 Censored data, in which the observed value of some variable is only partially known, is a large problem in sampling. Would conducting the poll over the phone be less prone to censoring than the internet? Unfortunately, older citizens are far more likely than young citizens to both answer the phone and own landlines, thus skewing the sampled population to an older age. All sampling mechanisms are prone to error. 
@@ -1168,7 +1100,7 @@ All of these issues with the **sampling mechanism** decrease the validity of the
 This brings us to a very important aspect of sampling: **prediction uncertainty**. 
 
 
-<!-- MF: Still wondering how to incorporate RCM into this chapter, since we are not dealing with assignment & two realities (one observed, one not observed) for each ball. Should this section focus on proving that RCM is still relevant, or explaining that RCM can't be applied perfectly to the urn scenario? -->
+
 
 <!-- With a big enough sample, we can probably get a pretty good measure of the average blood pressure for that sample.  Have we solved our problem?  That is, can we now assume that our estimate of the average blood pressure in our sample is a good estimate of the average blood pressure in the U.S. adult population? -->
 
@@ -1230,5 +1162,4 @@ In this chapter, we performed both tactile and virtual sampling exercises to inf
 Recall in our Obama poll case study in Section \@ref(sampling-case-study) that based on this particular sample, the best guess by Kennedy School's Institute of Politics at Harvard University of the U.S. President Obama's approval rating among all young Americans was 41%. However, this isn't the end of the story. If you read the article further, it states:
 
 > The online survey of 2,089 adults was conducted from Oct. 30 to Nov. 11, just weeks after the federal government shutdown ended and the problems surrounding the implementation of the Affordable Care Act began to take center stage. The poll's margin of error was plus or minus 2.1 percentage points.
-
 Note the term *margin of error*, which here is "plus or minus 2.1 percentage points." Most polls won't produce an estimate that's perfectly right; there will always be a certain amount of error caused by *sampling variation*. The margin of error of plus or minus 2.1 percentage points is saying that a typical range of errors for polls of this type is about $\pm$ 2.1%, in words from about 2.1% too small to about 2.1% too big. We can restate this as the interval of $[41\% - 2.1\%, 41\% + 2.1\%] = [37.9\%, 43.1\%]$ (this notation indicates the interval contains all values between 37.9% and 43.1%, including the end points of 37.9% and 43.1%). We'll see in the next chapter that such intervals are known as *confidence intervals*.
