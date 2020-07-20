@@ -178,6 +178,7 @@ tactile_sample_urn <- tibble(group = c("Ilyas, Yohan", "Ellie, Terrance", "Mark,
   mutate(red_balls = as.numeric(red_balls)) %>% 
   mutate(prop_red = red_balls/50) %>% 
   mutate(replicate = 1:33)
+
 tactile_sample_urn
 ```
 
@@ -1022,9 +1023,9 @@ For the most part, they don't!
 
 Remember the RCM's slogan: *No causation without manipulation*. In both the urn example and our Obama poll, we are not manipulating our units (the balls and the opinions of the pollees, respectively). There are not a control and treatment condition to compare; there is no causal effect to measure. Therefore, the RCM cannot be directly applied to these scenarios. 
 
-## Preceptor Tables
+However, the **Rubin Table** can be applied to sampling. How? Let's find out.
 
-### Actual Preceptor Table: What We Know
+### What We Know
 
 When we sample 25 balls from our urn, we are taking a random sample of balls, finding the proportion that are red, and generalizing to estimate the total proportion of red balls in the entire urn. Imagine we use the shovel in our urn and sample 25 balls; the proportion of red balls is found to be 42%. What does this information tell us about Ball 1? Ball 2? Let's visulize this by looking at the first 25 balls of our urn, identified by ball_ID, after taking a random sample. In this table, 1 represents "yes" and 0 represents "no".
 
@@ -1036,6 +1037,7 @@ rubin_table <- tibble(ball_ID = 1:25,
                       white_ball = c("?", "?", "?", "?", "0", "?", "?", "?", "?", 
                                    "?", "?", "?", "?", "1", "?", "?", "?", "?", 
                                    "?", "?", "?", "?", "?", "?", "?"))
+
 rubin_table
 ```
 
@@ -1060,7 +1062,7 @@ virtual_histogram +
 Here, we see a decent amount of variation in the proportion of red balls. In some extreme cases, our proportion was as low as 20% and as high as 60%! If we took either one of these extremes and tried to make an assumption of Ball 1, we would most certainly be incorrect. This is why we run many simulations to make the *best possible prediction*. 
 
 
-### Ideal Preceptor Table: What we wish we knew
+### What we wish we knew
 
 As is the case in the RCM, we wish we knew the values for every single unit in every possible scenario. The analogous ideal here would be a tibble where we know the color identity of every single ball. To compare to our previous Rubin Table, this is what we wish we knew in regards to our first 25 balls:
 
@@ -1072,6 +1074,7 @@ ideal_rubin_table <- tibble(ball_ID = 1:25,
                       white_ball = c("0", "0", "1", "0", "0", "0", "0", "1", "0", 
                                    "0", "1", "0", "0", "0", "1", "0", "0", "0", 
                                    "1", "1", "0", "1", "1", "1", "1"))
+
 ideal_rubin_table
 ```
 
@@ -1079,16 +1082,16 @@ Let's say that, after manually going through our entire urn, we find that the **
 
 However, as has been emphasized before, real-life sampling is far more complex than our urn example. The process is **extremely** prone to error. Despite that, most people overestimate the validity of conclusions drawn from sampling. To stress how easy it is for sampling to be manipulated, let's revisit the poll on Obama's approval rating from earlier. 
 
-### Reduced Preceptor Table
-
 ### Sampling is hard to get right!
 
 Here is an excerpt from the NPR article on the poll:
 
 > "According to a new Harvard University Institute of Politics poll (IOP), just 41 percent of millennials — adults ages 18-29 — approve of Obama's job performance, his lowest-ever standing among the group and an 11-point drop from April."
+
 Now, let's look at the details on the method of sampling: 
 
 > "The online survey of 2,089 adults was conducted from Oct. 30 to Nov. 11, just weeks after the federal government shutdown ended and the problems surrounding the implementation of the Affordable Care Act began to take center stage. The poll's margin of error was plus or minus 2.1 percentage points."
+
 What about millenials that do not use the internet? What about people that do not use the online platform the survey operated on? What about people that do not speak English or Spanish, the two languages that the IOP offers in their surveys? These millenials are **censored** from the study due to its sampling mechanism. 
 
 Censored data, in which the observed value of some variable is only partially known, is a large problem in sampling. Would conducting the poll over the phone be less prone to censoring than the internet? Unfortunately, older citizens are far more likely than young citizens to both answer the phone and own landlines, thus skewing the sampled population to an older age. All sampling mechanisms are prone to error. 
