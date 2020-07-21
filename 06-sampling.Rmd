@@ -74,7 +74,6 @@ library(infer)
 # Packages needed internally, but not in text.
 library(gt)
 library(knitr)
-library(kableExtra)
 library(patchwork)
 ```
 
@@ -291,7 +290,7 @@ Second, let's compute the number of balls out of 50 that are red using the `summ
 ```{r}
 virtual_shovel %>% 
   mutate(is_red = (color == "red")) %>% 
-  summarize(num_red = sum(is_red))
+  summarize(num_red = sum(is_red), .groups = FALSE)
 ```
 ```{r, echo=FALSE}
 n_red_virtual_shovel <- virtual_shovel %>% 
@@ -563,15 +562,16 @@ comparing_n_table <- virtual_prop %>%
   group_by(n) %>% 
   summarize(sd = sd(prop_red)) %>% 
   rename(`Number of slots in shovel` = n, `Standard deviation of proportions red` = sd) 
+
 comparing_n_table  %>% 
-  kable(
-    digits = 3,
-    caption = "Comparing standard deviations of proportions red for three different shovels", 
-    booktabs = TRUE,
-    linesep = ""
+  gt() %>% 
+  tab_header(
+    title = "Comparing standard deviations of proportions red for three different shovels"
   ) %>% 
-  kable_styling(font_size = ifelse(knitr:::is_latex_output(), 10, 16),
-                latex_options = c("hold_position"))
+  fmt_number(
+    columns = "Standard deviation of proportions red",
+    decimals = 3
+  )
 ```
 
 As we observed earlier, as the sample size increases, the variation decreases. In other words, there is less variation in the 1,000 values of the proportion red. So as the sample size increases, our guesses at the true proportion of the urn's balls that are red get more precise. Therefore, our initial assumption that the larger shovel yields the most precise result is correct! 
@@ -1043,7 +1043,7 @@ We can only claim *for certain* that, of the 25 balls that we sampled (of the to
 ```{r, echo = FALSE}
 virtual_prop_red <- virtual_samples %>% 
   group_by(replicate) %>% 
-  summarize(red = sum(color == "red")) %>% 
+  summarize(red = sum(color == "red"), .group = FALSE) %>% 
   mutate(prop_red = red / 50)
 virtual_histogram <- ggplot(virtual_prop_red, aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white")
