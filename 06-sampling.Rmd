@@ -7,8 +7,6 @@ output_yaml:
 
 <!-- Priorities: PAY attention Mak! --> 
 
-<!-- MF: TEST THIS --> 
-
 <!-- 1) Fix "`summarise()` ungrouping output (override with `.groups`" -->
 
 <!-- 2) Replace kable() with gt(). -->
@@ -98,7 +96,7 @@ One way to answer this question would be to perform an exhaustive count: remove 
 
 ### Using the shovel method once 
 
-Instead of performing an exhaustive count, let's insert a shovel into the urn as seen in Figure \@ref(fig:sampling-exercise-2). Using the shovel, let's remove $5 \cdot 10 = 50$ balls, as seen in Figure \@ref(fig:sampling-exercise-3). Here, we are taking a *random sample* of the total population of balls. 
+Instead of performing an exhaustive count, let's insert a shovel into the urn as seen in Figure 6.2. Using the shovel, let's remove $5 \cdot 10 = 50$ balls, as seen in Figure 6.3. Here, we are taking a *random sample* of the total population of balls. 
 
 ```{r, echo=FALSE, fig.cap="Inserting a shovel into the urn."}
 knitr::include_graphics("06-sampling/images/sampling_bowl_2.jpg")
@@ -113,17 +111,11 @@ Observe that 17 of the 50 sampled balls are red and thus 17/50 = 0.34 = 34% of t
 
 However, say, we started this activity over from the beginning. In other words, we replace the 50 balls back into the urn and start over. Would we remove exactly 17 red balls again? Would our guess at the proportion of the urn's balls that are red be exactly 34% again? Maybe? 
 
-What if we repeated this activity several times following the process shown in Figure \@ref(fig:sampling-exercise-3b)? Would we obtain exactly 17 red balls each time? In other words, would our guess at the proportion of the urn's balls that are red be exactly 34% every time? Surely not. 
-
-However, say, we started this activity over from the beginning. In other words, we replace the 50 balls back into the urn and start over. Would we remove exactly 17 red balls again? Would our guess at the proportion of the urn's balls that are red be exactly 34% again? Maybe? 
-
-What if we repeated this activity several times following the process shown in Figure \@ref(fig:sampling-exercise-3b)? Would we obtain exactly 17 red balls each time? In other words, would our guess at the proportion of the urn's balls that are red be exactly 34% every time? Surely not. 
+What if we repeated this activity several times? Would we obtain exactly 17 red balls each time? In other words, would our guess at the proportion of the urn's balls that are red be exactly 34% every time? Surely not. 
 
 The true proportion of red balls in the urn is our **estimand**, the thing we want to know. Here, we are taking a sample and inferring the estimand from that sample. To give us the best odds of inferring the estimand, let's repeat this exercise with the help of 33 groups of friends to understand how the value differs with repetition. 
 
 ### Using the shovel 33 times {#student-shovels}
-
-<!-- Create this dataset on my own. Approximately the same is fine. -->
 
 Each of our 33 groups of friends will do the following: 
 
@@ -134,22 +126,22 @@ Each of our 33 groups of friends will do the following:
 
 ```{r, echo=FALSE, fig.show='hold', fig.cap="Repeating sampling activity 33 times."}
 # Need new picture
-knitr::include_graphics(c("06-sampling/images/tactile_2_a.jpg", "06-sampling/images/tactile_2_b.jpg", "06-sampling/images/tactile_2_c.jpg"))
+knitr::include_graphics(c("06-sampling/images/tactile_2_a.jpg", "06-sampling/images/tactile_2_b.jpg"))
 ```
 
-Each of our 33 groups of friends make note of their proportion of red balls from their sample collected. Each group then marks their proportion of their 50 balls that were red in the appropriate bin in a hand-drawn histogram as seen in Figure \@ref(fig:sampling-exercise-4).
+Each of our 33 groups of friends make note of their proportion of red balls from their sample collected. Each group then marks their proportion of their 50 balls that were red in the appropriate bin in a hand-drawn histogram as seen below.
 
 ```{r, echo=FALSE, fig.cap="Constructing a histogram of proportions."}
 knitr::include_graphics("06-sampling/images/tactile_3_a.jpg")
 ```
 
-Recall from Section \@ref(histograms) that histograms allow us to visualize the *distribution* of a numerical variable. In particular, where the center of the values falls and how the values vary. A partially completed histogram of the first 10 out of 33 groups of friends' results can be seen in Figure \@ref(fig:sampling-exercise-5).
+Recall from Section \@ref(histograms) that histograms allow us to visualize the *distribution* of a numerical variable. In particular, where the center of the values falls and how the values vary. A partially completed histogram of the first 10 out of 33 groups of friends' results can be seen in the figure below.
 
 ```{r, echo=FALSE, fig.cap="Hand-drawn histogram of first 10 out of 33 proportions."}
 knitr::include_graphics("06-sampling/images/tactile_3_c.jpg")
 ```
 
-Observe the following in the histogram in Figure \@ref(fig:sampling-exercise-5):
+Observe the following details in the histogram:
 
 * At the low end, one group removed 50 balls from the urn with proportion red between 0.20 and 0.25.
 * At the high end, another group removed 50 balls from the urn with proportion between 0.45 and 0.5 red.
@@ -186,7 +178,7 @@ tactile_sample_urn
 
 Observe for each `group` that we have their names, the number of `red_balls` they obtained, and the corresponding proportion out of 50 balls that were red named `prop_red`. We also have a `replicate` variable enumerating each of the 33 groups. We chose this name because each row can be viewed as one instance of a replicated (in other words repeated) activity: using the shovel to remove 50 balls and computing the proportion of those balls that are red. 
 
-Let's visualize the distribution of these 33 proportions using `geom_histogram()` with `binwidth = 0.05` in Figure \@ref(fig:samplingdistribution-tactile). This is a computerized and complete version of the partially completed hand-drawn histogram you saw in Figure \@ref(fig:sampling-exercise-5). Note that setting `boundary = 0.4` indicates that we want a binning scheme such that one of the bins' boundary is at 0.4. This helps us to more closely align this histogram with the hand-drawn histogram in Figure \@ref(fig:sampling-exercise-5).
+Let's visualize the distribution of these 33 proportions using `geom_histogram()` with `binwidth = 0.05` in Figure 6.7 below. This is a computerized and complete version of the partially completed hand-drawn histogram you saw earier. Note that setting `boundary = 0.4` indicates that we want a binning scheme such that one of the bins' boundary is at 0.4. This helps us to more closely align this histogram with the hand-drawn histogram.
 
 ```{r, eval=FALSE}
 tactile_sample_urn %>%
@@ -196,7 +188,7 @@ tactile_sample_urn %>%
        title = "Distribution of 33 proportions red") 
 ```
 
-```{r, echo=FALSE, fig.cap="Distribution of 33 proportions based on 33 samples of size 50.", fig.height=3.1}
+```{r, echo=FALSE, fig.cap="Distribution of 33 proportions based on 33 samples of size 50."}
 tactile_histogram <- ggplot(tactile_sample_urn, aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white")
 tactile_histogram + 
@@ -208,7 +200,7 @@ tactile_histogram +
 
 What we just demonstrated in this activity is the statistical concept of **sampling**. We would like to know the proportion of the urn's balls that are red. Because the urn has a large number of balls, performing an exhaustive count of the red and white balls would be time-consuming. We thus extracted a *sample* of 50 balls using the shovel to make an *estimate*. Using this sample of 50 balls, we estimated the proportion of the *urn's* balls that are red to be 34%.
 
-Moreover, because we mixed the balls before each use of the shovel, the samples were randomly drawn. Because each sample was drawn at random, the samples were different from each other. Because the samples were different from each other, we obtained the different proportions red observed in Figure \@ref(fig:samplingdistribution-tactile). This is known as the concept of *sampling variation*. 
+Moreover, because we mixed the balls before each use of the shovel, the samples were randomly drawn. Because each sample was drawn at random, the samples were different from each other. Because the samples were different from each other, we obtained the different proportions red observed in the previous histogram. This is known as the concept of *sampling variation*. 
 
 The purpose of this sampling activity is to develop an understanding of two key concepts relating to sampling: 
 
@@ -229,7 +221,7 @@ In the previous Section \@ref(sampling-activity), we performed a *tactile* sampl
 
 ### Using the virtual shovel once
 
-Let's start by performing the virtual analog of the tactile sampling exercise we performed in Section \@ref(sampling-activity). We first need a virtual analog of the urn seen in Figure \@ref(fig:sampling-exercise-1). To this end, we creat a data frame named `urn`. The rows of `urn` correspond exactly with the contents of the actual urn. 
+Let's start by performing the virtual analog of the tactile sampling exercise we performed in Section \@ref(sampling-activity). We first need a virtual analog of the urn seen in the beginning of our chapter. To this end, we creat a data frame named `urn`. The rows of `urn` correspond exactly with the contents of the actual urn. 
 
 For reference, `sample-frac()` merely re-arranges the rows of the tibble. We use `set.seed()` to ensure that the balls in our virtual urn are always in the same order. This makes certain that the figures in the book match their written descriptions. 
 
@@ -242,9 +234,9 @@ urn <- tibble(color = c(rep("red", 900), rep("white", 1500))) %>%
 urn  
 ```
 
-Observe that `urn` has 2400 rows, telling us that the urn contains 2400 equally sized balls. The first variable `ball_ID` is used as an *identification variable* as discussed in Subsection \@ref(identification-vs-measurement-variables); none of the balls in the actual urn are marked with numbers. The second variable `color` indicates whether a particular virtual ball is red or white. View the contents of the urn in RStudio's data viewer and scroll through the contents to convince yourself that `urn` is indeed a virtual analog of the actual urn in Figure \@ref(fig:sampling-exercise-1).
+Observe that `urn` has 2400 rows, telling us that the urn contains 2400 equally sized balls. The first variable `ball_ID` is used as an *identification variable*; none of the balls in the actual urn are marked with numbers. The second variable `color` indicates whether a particular virtual ball is red or white. View the contents of the urn in RStudio's data viewer and scroll through the contents to convince yourself that `urn` is indeed a virtual analog of the actual urn.
 
-Now that we have a virtual analog of our urn, we now need a virtual analog of the shovel seen in Figure \@ref(fig:sampling-exercise-2) to generate virtual samples of 50 balls. We're going to use the `rep_sample_n()` function included in the **infer** package. This function allows us to take `rep`eated, or `rep`licated, `samples` of size `n`. 
+Now that we have a virtual analog of our urn, we now need a virtual analog of the shovel seen in Figure 6.2 to generate virtual samples of 50 balls. We're going to use the `rep_sample_n()` function included in the **infer** package. This function allows us to take `rep`eated, or `rep`licated, `samples` of size `n`. 
 
 Let's show an example of this function in action. Let's first use the `tibble()` function to manually create a data frame of five fruit called `fruit_basket`. 
 
@@ -335,7 +327,7 @@ virtual_shovel %>%
   mutate(prop_red = num_red / 50)
 ```
 
-Great! `r virtual_shovel_perc_red`% of `virtual_shovel`'s 50 balls were red! So based on this particular sample of 50 balls, our guess at the proportion of the `urn`'s balls that are red is `r virtual_shovel_perc_red`%. But remember from our earlier tactile sampling activity that if we repeat this sampling, we will not necessarily obtain the same value of `r virtual_shovel_perc_red`% again. There will likely be some variation. In fact, our 33 groups of friends computed 33 such proportions whose distribution we visualized in Figure \@ref(fig:sampling-exercise-5). We saw that these estimates *varied*. Let's now perform the virtual analog of having 33 groups of students use the sampling shovel!
+Great! `r virtual_shovel_perc_red`% of `virtual_shovel`'s 50 balls were red! So based on this particular sample of 50 balls, our guess at the proportion of the `urn`'s balls that are red is `r virtual_shovel_perc_red`%. But remember from our earlier tactile sampling activity that if we repeat this sampling, we will not necessarily obtain the same value of `r virtual_shovel_perc_red`% again. There will likely be some variation. In fact, our 33 groups of friends computed 33 such proportions whose distribution we previously visualized. We saw that these estimates *varied*. Let's now perform the virtual analog of having 33 groups of students use the sampling shovel!
 
 ### Using the virtual shovel 33 times
 
@@ -379,9 +371,9 @@ virtual_histogram +
 
 Observe that we occasionally obtained proportions red that are less than 30%. On the other hand, we occasionally  obtained proportions that are greater than 45%. However, the most frequently occurring proportions were between 35% and 40% (for 11 out of 33 samples). Why do we have these differences in proportions red? Because of *sampling variation*. 
 
-Let's now compare our virtual results with our tactile results from the previous section in Figure \@ref(fig:tactile-vs-virtual). Observe that both histograms are somewhat similar in their center and variation, although not identical. These slight differences are again due to random sampling variation. Furthermore, observe that both distributions are somewhat bell-shaped.
+Let's now compare our virtual results with our tactile results from the previous section. Observe that both histograms are somewhat similar in their center and variation, although not identical. These slight differences are again due to random sampling variation. Furthermore, observe that both distributions are somewhat bell-shaped.
 
-```{r, echo=FALSE, fig.cap="Comparing 33 virtual and 33 tactile proportions red.", fig.height=2.9}
+```{r, echo=FALSE, fig.cap="Comparing 33 virtual and 33 tactile proportions red."}
 facet_compare <- bind_rows(
   virtual_prop_red %>% 
     mutate(type = "Virtual sampling"), 
@@ -419,7 +411,7 @@ virtual_prop_red <- virtual_samples %>%
 virtual_prop_red
 ```
 
-Observe that we now have 1,000 replicates of `prop_red`, the proportion of 50 balls that are red. Using the same code as earlier, let's now visualize the distribution of these 1,000 replicates of `prop_red` in a histogram in Figure \@ref(fig:samplingdistribution-virtual-1000).
+Observe that we now have 1,000 replicates of `prop_red`, the proportion of 50 balls that are red. Using the same code as earlier, let's now visualize the distribution of these 1,000 replicates of `prop_red` in a histogram in Figure 6.10 below.
 
 ```{r, eval=FALSE}
 ggplot(virtual_prop_red, aes(x = prop_red)) +
@@ -507,9 +499,9 @@ virtual_prop_red_100 %>%
   labs(x = "Proportion of 100 balls that were red", title = "100") 
 ```
 
-For easy comparison, we present the three resulting histograms in a single row with matching x and y axes in Figure \@ref(fig:comparing-sampling-distributions).
+For easy comparison, we present the three resulting histograms in a single row with matching x and y axes in Figure 6.12 below.
 
-```{r, echo=FALSE, fig.height=3, fig.cap="Comparing the distributions of proportion red for different sample sizes."}
+```{r, echo=FALSE, fig.cap="Comparing the distributions of proportion red for different sample sizes."}
 # DK: What is the purpose of all this file exist checking? Should we just be
 # creating all this on the fly, probably with a set.seed?
 # n = 25
@@ -548,7 +540,7 @@ comparing_sampling_distributions <- ggplot(virtual_prop, aes(x = prop_red)) +
 comparing_sampling_distributions
 ```
 
-Observe that as the sample size increases, the variation of the 1,000 replicates of the proportion of red decreases. In other words, as the sample size increases, there are fewer differences due to sampling variation and the distribution centers more tightly around the same value. Eyeballing Figure \@ref(fig:comparing-sampling-distributions), all three histograms appear to center around roughly 40%.
+Observe that as the sample size increases, the variation of the 1,000 replicates of the proportion of red decreases. In other words, as the sample size increases, there are fewer differences due to sampling variation and the distribution centers more tightly around the same value. Eyeballing Figure 6.12, all three histograms appear to center around roughly 40%.
 
 We can be numerically explicit about the amount of variation in our three sets of 1,000 values of `prop_red` using the *standard deviation*. A standard deviation is a summary statistic that measures the amount of variation within a numerical variable. For all three sample sizes, let's compute the standard deviation of the 1,000 proportions red by running the following data wrangling code that uses the `sd()` summary function.
 
@@ -564,7 +556,7 @@ virtual_prop_red_100 %>%
   summarize(sd = sd(prop_red))
 ```
 
-Let's compare these three measures of distributional variation in Table \@ref(tab:comparing-n).
+Let's compare these three measures of distributional variation in Table 6.1 below.
 
 ```{r, eval=TRUE, echo=FALSE}
 comparing_n_table <- virtual_prop %>% 
@@ -582,7 +574,7 @@ comparing_n_table  %>%
                 latex_options = c("hold_position"))
 ```
 
-As we observed in Figure \@ref(fig:comparing-sampling-distributions), as the sample size increases, the variation decreases. In other words, there is less variation in the 1,000 values of the proportion red. So as the sample size increases, our guesses at the true proportion of the urn's balls that are red get more precise. Therefore, our initial assumption that the larger shovel yields the most precise result is correct! 
+As we observed earlier, as the sample size increases, the variation decreases. In other words, there is less variation in the 1,000 values of the proportion red. So as the sample size increases, our guesses at the true proportion of the urn's balls that are red get more precise. Therefore, our initial assumption that the larger shovel yields the most precise result is correct! 
 
 ### Functions are your friend
 
@@ -694,7 +686,7 @@ This is the power of running many analyses at once using `map_*` functions and l
 
 ## Sampling framework {#sampling-framework}
 
-In both our tactile and our virtual sampling activities, we used sampling for the purpose of estimation. We extracted samples in order to *estimate* the proportion of the urn's balls that are red. We used sampling as a less time-consuming approach than performing an exhaustive count of all the balls. Our virtual sampling activity built up to the results shown in Figure \@ref(fig:comparing-sampling-distributions) and Table \@ref(tab:comparing-n): comparing 1,000 proportions red based on samples of size 25, 50, and 100, and finally expanding that to all the sizes between 1 and 100. This was our first attempt at understanding two key concepts relating to sampling for estimation:
+In both our tactile and our virtual sampling activities, we used sampling for the purpose of estimation. We extracted samples in order to *estimate* the proportion of the urn's balls that are red. We used sampling as a less time-consuming approach than performing an exhaustive count of all the balls. Our virtual sampling activity built up to the results comparing 1,000 proportions red based on samples of size 25, 50, and 100, and finally expanding that to all the sizes between 1 and 100. This was our first attempt at understanding two key concepts relating to sampling for estimation:
 
 1. The effect of *sampling variation* on our estimates.
 1. The effect of sample size on *sampling variation*.
@@ -747,9 +739,9 @@ Note that last word we wrote in bold: **infer**. The act of "inferring" means to
 
 ### Statistical definitions {#sampling-definitions}
 
-Now, for some important statistical definitions related to sampling. As a refresher of our 1,000 repeated/replicated virtual samples of size $n$ = 25, $n$ = 50, and $n$ = 100 in Section \@ref(sampling-simulation), let's display Figure \@ref(fig:comparing-sampling-distributions) again as Figure \@ref(fig:comparing-sampling-distributions-1b).  
+Now, for some important statistical definitions related to sampling. As a refresher of our 1,000 repeated/replicated virtual samples of size $n$ = 25, $n$ = 50, and $n$ = 100 in Section \@ref(sampling-simulation), let's display our figure showing the difference in proportions red according to different shovel sizes.  
 
-```{r, echo=FALSE, fig.cap="Previously seen three distributions of the sample proportion $\\widehat{p}$.", fig.height=3.1}
+```{r, echo=FALSE, fig.cap="Previously seen three distributions of the sample proportion $\\widehat{p}$."}
 comparing_sampling_distributions
 ```
 
@@ -769,7 +761,7 @@ So as the sample size increases, the standard deviation of the proportion of red
 
 Unfortunately, these names confuse many people who are new to statistical inference. For example, it's common for people who are new to statistical inference to call the "sampling distribution" the "sample distribution." Another additional source of confusion is the name "standard deviation" and "standard error." Remember that a standard error is merely a *kind* of standard deviation: the standard deviation of any point estimate from sampling. In other words, all standard errors are standard deviations, but not every standard deviation is necessarily a standard error. 
 
-To help reinforce these concepts, let's re-display Figure \@ref(fig:comparing-sampling-distributions) but using our new terminology, notation, and definitions relating to sampling in Figure \@ref(fig:comparing-sampling-distributions-2). 
+To help reinforce these concepts, let's re-display Figure 6.14 but using our new terminology, notation, and definitions relating to sampling in the figure below.
 
 ```{r, echo=FALSE, fig.cap="Three sampling distributions of the sample proportion $\\widehat{p}$."}
 p_hat_compare <- virtual_prop %>% 
@@ -807,12 +799,12 @@ Remember the key message of this last table: that as the sample size $n$ goes up
 
 ### To gamble or not to gamble?
 
-We also saw in the previous section that as your sample size $n$ increases, your point estimates will vary less and less and be more and more concentrated around the true population parameter. This variation is quantified by the decreasing *standard error*. In other words, the typical error of your point estimates will decrease. In our sampling exercise, as the sample size increased, the variation of our sample proportions $\widehat{p}$ decreased. You can observe this behavior in Figure \@ref(fig:comparing-sampling-distributions-3).  This is also known as having a *precise* estimate. 
+We also saw in the previous section that as your sample size $n$ increases, your point estimates will vary less and less and be more and more concentrated around the true population parameter. This variation is quantified by the decreasing *standard error*. In other words, the typical error of your point estimates will decrease. In our sampling exercise, as the sample size increased, the variation of our sample proportions $\widehat{p}$ decreased. This is also known as having a *precise* estimate. 
 
-So random sampling ensures our point estimates are *accurate*, while on the other hand having a large sample size ensures our point estimates are *precise*. While the terms "accuracy" and "precision" may sound like they mean the same thing, there is a subtle difference. Accuracy describes how "on target" our estimates are, whereas precision describes how "consistent" our estimates are. Figure \@ref(fig:accuracy-vs-precision) illustrates the difference.
+So random sampling ensures our point estimates are *accurate*, while on the other hand having a large sample size ensures our point estimates are *precise*. While the terms "accuracy" and "precision" may sound like they mean the same thing, there is a subtle difference. Accuracy describes how "on target" our estimates are, whereas precision describes how "consistent" our estimates are. The figure below illustrates the difference.
 
 
-```{r, echo=FALSE, fig.cap="Comparing accuracy and precision.", out.width="75%", out.height="75%"}
+```{r, echo=FALSE, fig.cap="Comparing accuracy and precision."}
 knitr::include_graphics("06-sampling/images/accuracy_vs_precision.jpg")
 ```
 
@@ -875,7 +867,7 @@ urn %>%
             sum_not_red = sum(color != "red"))
 ```
 
-Let's re-display our sampling distributions from Figures \@ref(fig:comparing-sampling-distributions) and \@ref(fig:comparing-sampling-distributions-2), but now with a vertical red line marking the true population proportion $p$ of balls that are red = 37.5% in Figure \@ref(fig:comparing-sampling-distributions-3). We see that while there is a certain amount of error in the sample proportions $\widehat{p}$ for all three sampling distributions, on average the $\widehat{p}$ are centered at the true population proportion red $p$.
+Let's re-display our sampling distributions from earlier, but now with a vertical red line marking the true population proportion $p$ of balls that are red = 37.5% in Figure 6.19 below. We see that while there is a certain amount of error in the sample proportions $\widehat{p}$ for all three sampling distributions, on average the $\widehat{p}$ are centered at the true population proportion red $p$.
 
 ```{r, echo=FALSE, fig.cap="Three sampling distributions with population proportion $p$ marked by vertical line."}
 p <- urn %>% 
@@ -1006,7 +998,7 @@ For example, what if Kennedy School's Institute of Politics at Harvard Universit
 
 ### Central Limit Theorem {#sampling-conclusion-central-limit-theorem}
 
-What you visualized in Figures \@ref(fig:comparing-sampling-distributions) and \@ref(fig:comparing-sampling-distributions-2) and summarized in Table \@ref(tab:comparing-n) was a demonstration of a famous theorem, or mathematically proven truth, called the *Central Limit Theorem*. It loosely states that when sample means are based on larger and larger sample sizes, the sampling distribution of these sample means becomes both more and more normally shaped and more and more narrow.
+What you have visualized in this chapter was a demonstration of a famous theorem, or mathematically proven truth, called the *Central Limit Theorem*. It loosely states that when sample means are based on larger and larger sample sizes, the sampling distribution of these sample means becomes both more and more normally shaped and more and more narrow.
 
 In other words, their sampling distribution increasingly follows a *normal distribution* and the variation of these sampling distributions gets smaller, as quantified by their standard errors.
 
