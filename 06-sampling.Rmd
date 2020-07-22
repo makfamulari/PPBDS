@@ -23,7 +23,7 @@ output_yaml:
 
 <!-- 8) Set up Zoom with Vivian. Draw direct connection to her coin example. Advice about how to create your joint distribution. -->
 
-<!-- 9) Set up Zoom with Tahmid. Talk about how your discussion of Tables connects to his. Maybe you don't discuss  the Fitted and Prediction Preceptor Tables-->
+<!-- 9) Set up Zoom with Tahmid. Talk about how your discussion of Tables connects to his. Maybe you don't discuss the Fitted and Prediction Preceptor Tables-->
 
 
 <!-- Key issues for summer 2020. -->
@@ -83,7 +83,7 @@ Let's start with a hands-on activity.
 
 ### What proportion of this urn's balls are red?
 
-Take a look at the urn in Figure \@ref(fig:sampling-exercise-1). It has a certain number of red and a certain number of white balls all of equal size. Furthermore, it appears the urn has been mixed beforehand, as there does not seem to be any coherent pattern to the spatial distribution of the red and white balls.
+Take a look at the urn in Figure 6.1 below. It has a certain number of red and a certain number of white balls all of equal size. Furthermore, it appears the urn has been mixed beforehand, as there does not seem to be any coherent pattern to the spatial distribution of the red and white balls.
 
 Let's now ask ourselves, what proportion of this urn's balls are red? 
 
@@ -147,7 +147,7 @@ Observe the following details in the histogram:
 * However, the most frequently occurring proportions were between 0.30 and 0.35 red, right in the middle of the distribution.
 * The shape of this distribution is somewhat bell-shaped. 
 
-Let's construct this same hand-drawn histogram in R using your data visualization skills that you honed in Chapter \@ref(viz). First, let's create an object, `tactile_sample_urn` that saves the results from our 33 groups of friends. Run the following to display the tibble:
+Let's construct this same hand-drawn histogram in R using your data visualization skills that you honed in Chapter \@ref(visualization). First, let's create an object, `tactile_sample_urn` that saves the results from our 33 groups of friends. Run the following to display the tibble:
 
 
 ```{r, echo=FALSE}
@@ -290,12 +290,12 @@ Second, let's compute the number of balls out of 50 that are red using the `summ
 ```{r}
 virtual_shovel %>% 
   mutate(is_red = (color == "red")) %>% 
-  summarize(num_red = sum(is_red), .groups = FALSE)
+  summarize(num_red = sum(is_red), .groups = 'drop_last')
 ```
 ```{r, echo=FALSE}
 n_red_virtual_shovel <- virtual_shovel %>% 
   mutate(is_red = (color == "red")) %>% 
-  summarize(num_red = sum(is_red)) %>% 
+  summarize(num_red = sum(is_red), .groups = 'drop_last') %>% 
   pull(num_red)
 ```
 
@@ -342,7 +342,7 @@ virtual_samples
 
 Observe in the spreadsheet viewer that the first 50 rows of `replicate` are equal to `1` while the next 50 rows of `replicate` are equal to `2`. This is telling us that the first 50 rows correspond to the first sample of 50 balls while the next 50 rows correspond to the second sample of 50 balls. This pattern continues for all `reps = 33` replicates and thus `virtual_samples` has 33 $\cdot$ 50 = 1650 rows. 
 
-Let's now take `virtual_samples` and compute the resulting 33 proportions red. We'll use the same **dplyr** verbs as before, but this time with an additional `group_by()` of the `replicate` variable. Recall from Section \@ref(groupby) that by assigning the grouping variable "meta-data" before we `summarize()`, we'll obtain 33 different proportions red. We display a preview of the first 10 out of 33 rows:
+Let's now take `virtual_samples` and compute the resulting 33 proportions red. We'll use the same **dplyr** verbs as before, but this time with an additional `group_by()` of the `replicate` variable. Recall that by assigning the grouping variable "meta-data" before we `summarize()`, we'll obtain 33 different proportions red. We display a preview of the first 10 out of 33 rows:
 
 ```{r}
 virtual_prop_red <- virtual_samples %>% 
@@ -352,7 +352,7 @@ virtual_prop_red <- virtual_samples %>%
 virtual_prop_red
 ```
 
-As with our 33 groups of friends' tactile samples, there is variation in the resulting 33 virtual proportions red. Let's visualize this variation in a histogram in Figure \@ref(fig:samplingdistribution-virtual). Note that we add `binwidth = 0.05` and `boundary = 0.4` arguments as well. Recall that setting `boundary = 0.4` ensures a binning scheme with one of the bins' boundaries at 0.4. Since the `binwidth = 0.05` is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, 0.5, etc. as well.
+As with our 33 groups of friends' tactile samples, there is variation in the resulting 33 virtual proportions red. Let's visualize this variation in a histogram in Figure 6.8 below. Note that we add `binwidth = 0.05` and `boundary = 0.4` arguments as well. Recall that setting `boundary = 0.4` ensures a binning scheme with one of the bins' boundaries at 0.4. Since the `binwidth = 0.05` is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, 0.5, etc. as well.
 
 ```{r, eval=FALSE}
 ggplot(virtual_prop_red, aes(x = prop_red)) +
@@ -431,7 +431,7 @@ virtual_histogram +
        title = "Distribution of 1,000 proportions red")
 ``` 
 
-Once again, the most frequently occurring proportions of red balls occur between 35% and 40%. Every now and then, we obtain proportions as low as between 20% and 25%, and others as high as between 55% and 60%. These are rare, however. Furthermore, observe that we now have a much more symmetric and smoother bell-shaped distribution. This distribution is, in fact, approximated well by a normal distribution. At this point we recommend you read the "Normal distribution" section (Appendix \@ref(appendix-normal-curve)) for a brief discussion on the properties of the normal distribution.
+Once again, the most frequently occurring proportions of red balls occur between 35% and 40%. Every now and then, we obtain proportions as low as between 20% and 25%, and others as high as between 55% and 60%. These are rare, however. Furthermore, observe that we now have a much more symmetric and smoother bell-shaped distribution. This distribution is, in fact, approximated well by a normal distribution. 
 
 
 ### The effect of different shovel sizes {#different-shovels}
@@ -1002,7 +1002,7 @@ What you have visualized in this chapter was a demonstration of a famous theorem
 
 In other words, their sampling distribution increasingly follows a *normal distribution* and the variation of these sampling distributions gets smaller, as quantified by their standard errors.
 
-Shuyi Chiou, Casey Dunn, and Pathikrit Bhattacharyya created a 3-minute and 38-second video at <https://youtu.be/jvoxEYmQHNM> explaining this crucial statistical theorem using the average weight of wild bunny rabbits and the average wingspan of dragons as examples. Figure \@ref(fig:CLT-video-preview) shows a preview of this video.
+Shuyi Chiou, Casey Dunn, and Pathikrit Bhattacharyya created a 3-minute and 38-second video at <https://youtu.be/jvoxEYmQHNM> explaining this crucial statistical theorem using the average weight of wild bunny rabbits and the average wingspan of dragons as examples. Figure 6.20 shows a preview of this video.
 
 ```{r, echo=FALSE, fig.cap="Preview of Central Limit Theorem video.", out.width = "75%"}
 knitr::include_graphics("06-sampling/images/CLT_video_preview.png")
