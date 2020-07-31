@@ -1163,57 +1163,6 @@ With everything we know now, is this a good bet? No!
 Like the smart data scientists we are, we know that the parameters are too narrow. 
 
 
-<!-- With a big enough sample, we can probably get a pretty good measure of the average blood pressure for that sample.  Have we solved our problem?  That is, can we now assume that our estimate of the average blood pressure in our sample is a good estimate of the average blood pressure in the U.S. adult population? -->
-
-
-<!-- Well, let's see how many of the missing values we have filled in to our table of the population: -->
-
-<!-- ```{r, echo = FALSE} -->
-<!-- # First, we create a tibble with the values we want for the table -->
-
-<!-- tibble(subject = c("Person 1", "Person 2", "Person 3", "...", "Person N"), -->
-<!--        `Blood Pressure` = c("?", "?", "?", "...", "?")) %>% -->
-
-<!--   # Then, we use the gt function to make it pretty -->
-
-<!--   gt() %>% -->
-<!--   cols_label(subject = md("**Person**")) %>% -->
-<!--   tab_style(cell_borders(sides = "right"), -->
-<!--             location = cells_body(columns = vars(subject))) %>% -->
-<!--   tab_style(cell_text(weight = "bold"), -->
-<!--             location = cells_body(columns = vars(subject))) -->
-<!-- ``` -->
-
-<!-- Alas, since the U.S. population is over 300 million, we can't even see our 1,000 respondents!  If we want to assume that our estimate for our respondents is a good estimate for the population, we need to assume that their blood pressures are, on average, the same as the blood pressures of the people we *didn't* survey. -->
-
-<!-- For that to be true, it means that the *sampling mechanism* can't be related to someone's blood pressure.  For example, let's say that we surveyed 1,000 Harvard undergraduates.  Do we think that Harvard undergraduates have average blood pressure? No! Harvard undergraduates are younger than average, and younger people have lower blood pressures on average. -->
-
-<!-- So we should *randomly* sample the population.  Then, there won't be any systematic relationship between being chosen for our sample and blood pressure.  (There may be a relationship by chance, but taking a bigger sample reduces that possibility.) -->
-
-<!-- But even randomly choosing whom to survey may not totally solve our problem.  Some people may not fill out our survey, after all.  So our table for our survey may look like this: -->
-
-<!-- ```{r, echo = FALSE} -->
-<!-- # First, we create a tibble with the values we want for the table -->
-
-<!-- tibble(subject = c("Respondent 1", "Respondent 2", "Respondent 3", "...", "Respondent 1,000"), -->
-<!--        `Blood Pressure` = c("130", "?", "115", "...", "140")) %>% -->
-
-<!--   # Then, we use the gt function to make it pretty -->
-
-<!--   gt() %>% -->
-<!--   cols_label(subject = md("**Respondent**")) %>% -->
-<!--   tab_style(cell_borders(sides = "right"), -->
-<!--             location = cells_body(columns = vars(subject))) %>% -->
-<!--   tab_style(cell_text(weight = "bold"), -->
-<!--             location = cells_body(columns = vars(subject))) -->
-<!-- ``` -->
-
-<!-- So not only do we have all the ? values in the population table, we also have a ? for one of our survey respondents (Respondent 2). -->
-
-<!-- Can we just fill in the ? for Respondent 2 with the average of the other respondents?  Only if the factors that led Respondent 2 not to answer the survey had nothing to do with blood pressure.  Let's say that poorer respondents were less likely to fill out the survey, for example.  If poorer respondents also had higher blood pressure on average, our estimate of the average blood pressure *among those who answered the survey* will be biased downwards as an estimate for the population, even if we surveyed people at random.  -->
-
-<!-- So missing data is not just a problem for estimating causal effects.  The mechanisms by which you find out some things and don't find out other things are critical to understand when trying to make statistical inferences. -->
-
 ## Conclusion
 
 In this chapter, we performed both tactile and virtual sampling exercises to infer about an unknown proportion. We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion $\hat{p}$ to estimate the population proportion $p$. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well.
