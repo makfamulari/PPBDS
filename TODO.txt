@@ -1,39 +1,30 @@
 # Summer
 
-Is $\widehat{p}$ different from $\hat{p}$? Do we care?
-
-Can we delete the history of a repo? Our repos get large because there are so many large files and changes therein. So, whenever we clone/download, it takes a lot of time, especially with poor internet connections. But we don't care about that history! We will never go back. So, all I care about is the state of the repo today, and then keeping track going forward.
-
-Maybe we should put knitr::opts_chunk$set(cache=TRUE) into common.R so that everything is cached automatically. Wouldn't that speed up the build process, especially for any Github Action?
-
-Maybe library(tufte) and gt (and others?) belong in common.R
+## Next Meeting
 
 ## TODO
 
-0) Document your style.css hacks! At least as well as I did _bookdown.yml.
-  + Done.
+0) Look at other people! https://github.com/moderndive or https://bradleyboehmke.github.io/HOML/. E-mail bradleyboehmke@gmail.com and ask to see his private repo for HOML so you can get ideas.
 
-1) Tell me what to do. Or just do it.
+1) ![](https://www.youtube.com/watch?v=532j-186xEQ) Does not seem to work. Reference: https://bookdown.org/yihui/rmarkdown/learnr-videos.html. Ideally, I want these in side margins. Is include_app() really the right answer? Different for vimeo? What about TikTok?
 
-a) Cause bib/packages.bib to (sort of) automatically update.
-  + Done. Added nocite: '@*' yaml option to index.Rmd. Commented below.
-b) Determine where to place our manual bib file.
-  + Current bib folder is fine.
-c) Describe how these two bib files are put together so that in-line citations in individual chapters work and so that all references cited appear in References.
-  + Fixed in a)
+2) How do we combine PPBDS and PPBDS.data? What are the precise steps, presumably involving a new repo. Play around with options in some other repo. Needs to pass R CMD check, obviously. Needs to allow for Github Actions which confirm book builds for a new PR. One option is PPPBDS.data/inst/primer --- and the book goes there. But can you still build it in RStudio? Or is there another build process which might work? Another option: book is a vignette. Another option is docs/ directory. Or is that no longer a thing? Or should the main repo be the book, with the data tucked inside somehow?
 
-Think about the bib/ directory. We need to fix our citations. Automate the citation of whatever packages we are using. The references are a mess, put together from 3 different original sources. First, there a bib directory, with three files in it. Second, within index.Rmd there was a call to knitr::write_bib, which is a famously dangerous and confusing function. I guess that this creates packages.bib. (I have since deleted this.) Third, there is the links.md file, which is supposed to replace a lot of the references like @R-readr, mainly in chapter 2. That seems not to work at all. Come up with a plan to deal with all these. Deal with bibliography. Our source books use very different approaches. write_bib() is infamous for making trouble. I like the way that MD writes out new versions of citations associated with R packages that have been updated. Seems like all chapters generate references at the end. That is fine, but it should be standardized. Or do all those references belong at the end?
+3) Where should the repo go? Where should the book go? Permanent version and development version. Create a new Github organization? 
 
-2) How to ensure that authors do not check in chapters which fail to knit? Github Actions. One test: Does that chapter knit? Second test: Does the whole book knit?
-  + Initial findings:
-    + Need to install necessary packages for each chapter to knit. How can we figure out which pacakges are needed? This is the most difficult issue as new packages will break our github action. Also there's the issue of dealing with different versions of packages.
-    + No easy way to knit a single chapter - we need to identify the name of the Rmd file for render() to work. However, we can test to build the entire book using `bookdown::render_book(input = "index.Rmd", msmbstyle::msmb_html_book())` or something similar to test if the entire book builds.
-    + Perhaps a useful reference: https://fromthebottomoftheheap.net/2020/04/30/rendering-your-readme-with-github-actions/
+4) Write out instructions for deleting history of a repo. Create new token. Give token correct permissions. Then follow commands in that link.
 
-3) Related question: "Run Document" a tutorial whenever a PR effecting that tutorial is made to davidkane9/PPBDS.data.
-  + This results in the same issues
+5) How do we print it? I like the PDF version of Rafa's [book](https://leanpub.com/datasciencebook) available from Lean Pub. How hard is that to make?
 
-4) Think about: Should we combine PPBDS and PPBDS.data? Related: Should PPBDS be a package?
+
+## DK
+
+Understand bibliography.
+
+ https://fromthebottomoftheheap.net/2020/04/30/rendering-your-readme-with-github-actions/
+ https://github.com/itsyaoyu/github_actions/blob/master/.github/workflows/main.yml
+ https://www.willandskill.se/en/deleting-your-git-commit-history-without-removing-repo-on-github-bitbucket/
+
 
 ## Social Media Plan
 
@@ -83,7 +74,7 @@ nocite: '@*'
 ## Open Questions
 
 
-* How do we print it? I like the PDF version of Rafa's [book](https://leanpub.com/datasciencebook) available from Lean Pub. How hard is that to make?
+
 
 * Is there a way to print out messages during the book building process so that you know where the process is? Recall that we can't (?) use R code chunk names because duplicate code chunk names cause (still?) the process to blow up.
 
@@ -94,8 +85,6 @@ nocite: '@*'
 * Can you rebuild just a single chapter and then commit/push it? Right now, I have to rebuild the whole thing each time I want to make a single change. Takes too long.
 
 * How do we centralize the loading of packages? What is our plan for loading libraries and removing them when they are no longer need? Chapter 11 contained an annoying bug: rvest and purrr both have pluck() as a function. Need to ensure that you get the purrr version if you need it. Bug only showed up when Chapter 5 (with rvest loaded) was used in the build. Organize packages. What are all the packages we need? How do we ensure that we cite them all, as we should? Where do we load them? Again, there must be best practices for stuff like this. Only use high quality packages, and recommend the same to readers. When are different packages introduced? Where is this written down? Need to be intentional about what we introduced outside of the tidyverse --- janitor, ggthemes, reprex, fs, skimr, gt, googlesheets4, infer, gtsummary --- and when we do it. One annoyance is that new contributors have to try to compile the book a dozen times before it will work because there is no way to know, ahead of time, which packages are required. Make the book an R package?
-
-* Consider the use of before_chapter_script: "_common.R" in the DS _bookdown.yml as well as the associated _common.R file. Is this an approach we should copy? The lack of this why I can't get all the DS chapters to work. Combine _common.R, common.R and index.Rmd information into one place. Need to figure out how this works in bookdown. I think we need one file which only runs once when you make the book. That files does a bunch of stuff involving copying over files. But you don't maintain state after running that file, so any new functions are lost. Then you have a second file, like _common.R, which is run at the start of compiling each chapter.
 
 * The book has lots of references, especially to other chapters. Many of these don't work because the referred-to chapters don't exist. We need a thorough clean up.
 
