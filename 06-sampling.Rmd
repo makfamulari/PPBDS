@@ -66,6 +66,18 @@ Despite this variation, we *normally* see estimates that are in the same ballpar
 
 Let's assume our process of sampling is unbiased, representative, and valid, eliminating all possible error with the sampling mechanism. How many people would we need to survey to have a 90% chance of being within 5% of the true approval rating? 
 
+Because we cannot conduct polling, let's look instead at an easier scenario. Observe the urn in Figure 6.1. It has a certain number of red and a certain number of white beads all of equal size. It appears the urn has been mixed beforehand, as there does not seem to be any coherent pattern to the spatial distribution of the red and white beads.
+
+Let's now ask ourselves, what proportion of this urn's beads are red? 
+
+```{r, echo=FALSE, fig.cap="An urn with red and white beads."}
+knitr::include_graphics("06-sampling/images/sampling_bowl_1.jpg")
+```
+
+One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads and the number of white beads, and divide the number of red beads by the total number of beads. However, this would be a long and tedious process. Therefore, we will use sampling!
+
+The final question, derived from the polling example, is how many beads do we have to sample to have a 90% chance of being within 5% of the true proportion of red beads in the entire urn? 
+
 As always, we will need the **tidyverse** package. The **infer** package has a handy function, `rep_sample_n()`, for simulating the process of sampling.
 
 ```{r, message=FALSE, warning=FALSE}
@@ -82,15 +94,9 @@ library(patchwork)
 
 ## Real sampling activity {#sampling-activity}
 
-Take a look at the urn in Figure 6.1. It has a certain number of red and a certain number of white beads all of equal size. It appears the urn has been mixed beforehand, as there does not seem to be any coherent pattern to the spatial distribution of the red and white beads.
-
-Let's now ask ourselves, what proportion of this urn's beads are red? 
-
 ```{r, echo=FALSE, fig.cap="An urn with red and white beads."}
 knitr::include_graphics("06-sampling/images/sampling_bowl_1.jpg")
 ```
-
-One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads and the number of white beads, and divide the number of red beads by the total number of beads. However, this would be a long and tedious process. 
 
 ### Using the shovel method once 
 
@@ -706,7 +712,7 @@ Fifth, a **point estimate (AKA sample statistic)** is a summary statistic comput
 
 Sixth is the idea of **representative sampling**. A sample is said to be a *representative sample* if it roughly *looks like* the population. In other words, are the sample's characteristics a good representation of the population's characteristics? In our sampling activity, are the samples of $n$ beads extracted using our shovels representative of the urn's $N$ = 2400 beads?
 
-Seventh is the idea of **generalizability**. We say a sample is generalizable if any results based on the sample can generalize to the population. In other words, does the value of the point estimate *generalize* to the population? In our sampling activity, can we generalize the sample proportion from our shovels to the entire urn? Using our mathematical notation, this is akin to asking if $\hat{p}$ is a "good guess" of $p$?
+Seventh is the idea of **generalizability**. We say a sample is generalizable if any results based on the sample can generalize to the population. In our sampling activity, can we generalize the sample proportion from our shovels to the entire urn? Using our mathematical notation, this is akin to asking if $\hat{p}$ is a "good guess" of $p$?
 
 Eighth, we say **biased sampling** occurs if certain individuals or observations in a population have a higher chance of being included in a sample than others. We say a sampling procedure is *unbiased* if every observation in a population had an equal chance of being sampled. Had the red beads been much smaller than the white beads, and therefore more prone to falling through the shovel, our sample would have been *biased*. In our sampling activities, since we mixed all $N = 2400$ beads prior to each group's sampling and since each of the equally sized beads had an equal chance of being sampled, our samples were *unbiased*.
 
@@ -736,8 +742,6 @@ Note that last word we wrote in bold: **infer**. The act of "inferring" means to
 ### Statistical definitions {#sampling-definitions}
 
 Now, for some important statistical definitions related to sampling. As a refresher of our 1,000 repeated/replicated virtual samples of size $n$ = 25, $n$ = 50, and $n$ = 100 in Section \@ref(sampling-simulation), let's display our figure showing the difference in proportions red according to different shovel sizes.  
-
-
 
 ```{r, echo=FALSE, fig.cap="Previously seen three distributions of the sample proportion $\\hat{p}$."}
 comparing_sampling_distributions
