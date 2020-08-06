@@ -13,6 +13,7 @@ library(knitr)
 library(tufte)
 library(scales)
 library(gt)
+library(gtsummary)
 library(patchwork)
 
 options(digits = 2)
@@ -25,10 +26,15 @@ options(digits = 2)
 
 # Critical question is whether or not to use/require cache and, if so, where. I
 # am concerned that the cache stuff may cause weird errors when people are just
-# trying to knit their chapters. That makes me nervous . . .
+# trying to knit their chapters. That makes me nervous . . . And, it has caused
+# me enough problems that I have just turned it off for everyone for now. Or are
+# the problems really caused by the fact that there is a directory --- usually
+# junk/ --- where everything gets dumped? Certainly, if there is stuff in junk
+# it ends up automatically linked to whatever individual chapter you are
+# knitting.
 
 # knitr::opts_chunk$set(cache=TRUE)
-# knitr::opts_chunk$set(cache.path = "cache-directory/")
+knitr::opts_chunk$set(cache.path = "cache-directory/")
 
 # Question: Should I delete the cache each time I build the book for release?
 
