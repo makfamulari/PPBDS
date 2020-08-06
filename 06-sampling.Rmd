@@ -10,7 +10,7 @@ output_yaml:
 
 <!-- 0) What fun videos should be added? Memes!!!!!! Fill it with memes! Cartoons. -->
 
-<!-- 1) Start with a problem. How many people do I need to survey to have a 90% chance of getting within 2% of the truth? Power. End the chapter by answering the question. -->
+<!-- 1) Start with a problem. How many people do I need to survey to have a 90% chance of getting within 2% of the truth? Power. End the chapter by answering the question. DONE. -->
 
 <!-- 2) Make a 15 second video, put it on YouTube, add it as as sidemargin. "We don't estimate parameters because we care about parameters. Parameters are imaginary! Like unicorns! [Put finger on forehead and imitate unicorn.] We estimate parameters to build Data Generating Mechanisms. And with a DGM, you can move the world!" NOTE: will do when I can get access to better internet. -->
 
@@ -22,7 +22,6 @@ output_yaml:
 
 <!-- 2) Set up Zoom with Vivian. Draw direct connection to her coin example. Advice about how to create your joint distribution. Do it simple first. Meaning only every 100 beads. Only 25 models. But you can have 51 possible data results of the experiment. We need to provide a Bayes scatterplot which is the next step in complexity from the ones we finished with in chapter 5. The x-axis is the number of red beads pulled in the sample, a number which varies from 0 to 25. (And we can discuss how different paddles would lead to different displays.) The y-axis is the model. -->
 
-<!-- MF: Need clarification on joint distribution after speaking with Vivian. Only every 100 beads? May have to reach out to Ishan instead, since he created that distribution. --> 
 <!-- 3) Set up Zoom with Tahmid. Talk about how your discussion of Tables connects to his. Maybe you don't discuss the Data Generating Mechanism. Or you do? Recall what we are trying to accomplish? What questions did the chapter start with? DONE. -->
 
 
@@ -285,6 +284,7 @@ virtual_shovel %>%
   summarize(num_red = sum(is_red), .groups = 'drop_last') %>% 
   mutate(prop_red = num_red / 50)
 ```
+
 ```{r, echo=FALSE}
 virtual_shovel_prop_red <- virtual_shovel %>% 
   mutate(is_red = color == "red") %>% 
@@ -370,7 +370,9 @@ facet_compare
 
 ### Using the virtual shovel 1,000 times {#shovel-1000-times}
 
-
+```{r, echo=FALSE, fig.cap="So much sampling, so little time."}
+knitr::include_graphics("06-sampling/images/sample_bernie.png")
+```
 
 Now say we want to study the effects of sampling variation not for 33 samples, but rather for a larger number of samples (1000). We have two choices at this point. We could have our groups of friends manually take 1,000 samples of 50 beads and compute the corresponding 1,000 proportions. However, this would be a time-consuming task. This is where computers excel: automating long and repetitive tasks while performing them quite quickly. At this point, we will abandon tactile sampling in favor of only virtual sampling. Let's once again use the `rep_sample_n()` function with sample `size` set to be 50 once again, but this time with the number of replicates `reps` set to `1000`. Be sure to scroll through the contents of `virtual_samples` in RStudio's viewer. 
 
