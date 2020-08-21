@@ -335,6 +335,7 @@ ggplot(virtual_prop_red, aes(x = prop_red)) +
   labs(x = "Proportion of 50 beads that were red", 
        title = "Distribution of 33 proportions red") 
 ```
+
 ```{r, echo=FALSE, fig.cap="Distribution of 33 proportions based on 33 samples of size 50."}
 virtual_histogram <- ggplot(virtual_prop_red, aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white")
@@ -585,6 +586,10 @@ use_shovel(x = urn, size = 25, reps = 1000)
 
 We can now create the object `virtual_samples_25` with the code `virtual_samples_25 <- use_shovel(x = urn, size = 25, reps = 1000)`.  This is far more succinct than our previous code, and it allows us to use a shovel of any size we'd like.
 
+```{r, echo=FALSE, fig.cap="That's right! Functions can be passed into more functions. How fun.", fig.margin = TRUE}
+knitr::include_graphics("06-one-parameter/images/function_meme.png")
+```
+
 Now, we can use our `use_shovel()` function to develop another function, `prop_red()`:
 
 ```{r}
@@ -665,6 +670,10 @@ shovels_100 %>%
 ```
 
 `r margin_note("The formula for standard error is the sample standard deviation (s) divided by the square root of the number of samples (n). This may be written as: SE = s/(√n).")`
+
+```{r, echo=FALSE, fig.cap="To any poets and philosophers confused about this: don't worry! It won't be on a problem set.", fig.margin = TRUE}
+knitr::include_graphics("06-one-parameter/images/meme_math.png")
+```
 
 This is interesting!  You may recognize that the standard deviation of the proportion red is declining at a rate proportional to the square root of the shovel size. This is something you could have discovered by finding a formula in a statistics textbook, but it's easier to understand if you see it for yourself.
 
@@ -774,6 +783,10 @@ Let's now introduce some terminology and notation as well as statistical definit
 
 
 ### Terminology and notation {#terminology-and-notation}
+
+```{r, echo=FALSE, fig.cap="Let Yoda's wisdom dull the pain of this terminology section.", fig.margin = TRUE}
+knitr::include_graphics("06-one-parameter/images/yoda.png")
+```
 
 Here is a list of terminology and mathematical notation relating to sampling.
 
@@ -1270,99 +1283,7 @@ As we just learned, there are often decisions that we, as data scientists, must 
 
 Here's a harder question: given the ease of errors in sampling, how can we say whether our estimates are valid? 
 
-The easiest way to do this would be to re-run the experiment and compare the new results to our predictions. The validity of our predications, derived from the predictive Preceptor Table, is how we confirm that our conclusions are correct. This brings us to our final Preceptor Table.
-
-### Predictive Preceptor Table
-
-<!-- MF: Do I create a predictive Preceptor Table here? Or just discuss it? -->
-
-
-<!-- CB: Something like this might be helpful for predictive? Very similar to Tahmid's chapter.
-
-urn %>%
-  slice(1:8, 2399, 2400) %>%
-  mutate(ID = as.character(ID),
-         color = as.character(color)) %>%
-  add_row(ID = "...", color = "...", .after  = 8) %>%
-  add_row(ID = "Random bead color?", color = "?") %>%
-  gt() %>%
-  cols_label(ID = md("**bead ID**"),
-             color = "Year") %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(ID))) %>%
-  tab_style(cell_text(weight = "bold"),
-            location = cells_body(columns = vars(ID))) %>%
-  cols_align(align = "center", columns = TRUE)  -->
-
-
-## Key Themes
-
-Throughout this book, we will return to a few central themes and apply them to each chapter. These concepts are important for both your overall statistical knowledge and your specific understanding of sampling. 
-
-To understand these concepts as they apply to sampling, let's imagine that we are betting our roommate on the *proportion of red beads in the next shovel (with a shovel size of 100) taken from the urn*. Our roommate proposes that, if the proportion falls between 35 and 40%, we win! If we win, our roommate gives us 100 dollars; if we guess lose, we give our roommate 100 dollars. How would we go about this using what we have learned from this sampling chapter? Let's revisit our key concepts first.
-
-### Validity
-
-Validity encompasses two issues: the map from concept to data and the relevance of the estimand. In other words, our conceptual sampling exercises must help to answer our central question: what is our best guess as to the next proportion of red beads drawn from the urn? 
-
-The data we are analyzing *must* map to the central question we are trying to answer. Though you might think this is obvious, it's often overlooked! The outcome measure should accurately reflect our phenomeon of interest, our **estimand**. Here, the **estimand** is the proportion of red beads in the next shovel taken from the urn. As we have learned, the most **precise** and **accurate** estimate occurs when our sampling is *random* and our sample size is *large*. 
-
-We are taking a bet on the proportion of red beads in the next shovel (with a shovel size of 100) taken from the urn. To ensure a precise and accurate estimate, we must have a large and random sample. Of the tests we have conducted, the option with the least amount of standard deviation is the virtual sampling result from the 100 slot shovel, conducted 1000 times. 
-
-However, to sample properly, we must perfect our **model structure**, our next central theme.
-
-### Model Structure
-
-Model structure is the concept that our model must closely match the analogous real-life circumstance if our results are to be valid. The two most important aspects of model structure include the predictive/causal model difference and realism.
-
-
-First, is our model **predictive** or **causal**? Because there is no causation in our sampling scenario (we are not measuring a causal effect), and because we are **predicting** the next proportion of red beads, we are using a predictive model. 
-
-Now that we know our model type, we must focus on another aspect of model structure: **realism**. Realism accounts for whether the model matches the world. Does our model, using virtual sampling to calculate the proportion of red beads using a large shovel 1000 times, match the given scenario? Yes! Our model is nearly identical to the proposed question: the proportion of red beads in the next shovel. 
-
-However, we must also consider **prediction uncertainty**: our ability, or lack thereof, to predict the future. Prediction uncertainty is rooted in two primary sources: **parameter uncertainty** and **unmodeled variation**. 
-
-### Parameter uncertainty
-
-We must also consider **parameter uncertainty** when making our prediction. Parameter uncertainty is the idea that, even if our model has correct form, we must estimate our parameters. We will never know our parameters perfectly. If we assume that we can estimate the parameters perfectly, we will be over-confident. To understand parameter uncertainty better, let's look at the histogram for the shovel with 100 slots with 1000 repetitions.
-
-```{r, echo=FALSE}
-virtual_prop_red_100 %>%
-  ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
-  labs(x = "Proportion of 100 beads that were red", title = "Proportion of Red Beads With 100 Shovel Slots") 
-```
-
-The most frequent proportion of red beads falls between 35 and 40%. Is this the best parameter for our guess, then? 
-
-Though our intuition might say "yes!", that is actually not a safe bet (unless you want to lose your money, of course). Recall the discussion of posterior predictions from Chapter 5. The best possible forecast is not just the most likely model, even with confidence in our model's validity. In the real world, the best possible forecast will incorporate that uncertainty. We will not pretend that we know, for certain, that $p = 35-40%$. Forecasts which incorporate our uncertainty about parameter values are called **posterior predictions**.
-
-Though our model is valid and we see that the most common proportion does exist in the parameter between .35 and .40, the proportion of red beads falls in between these margins about 40% of the time. That's great! But if we think about this a bit more, this means that, in about 60% of the simulations, the proportion of red beads *does not* fall in the proposed margins. In other words, though the most likely value of the estimand is between 35% and 40%, it is *more* likely that the estimand falls above or below these margins. The odds are not in our favor.
-
-To optimize our chances, we want to be as confident as possible in our parameters, while still making a fair bet. 
-
-### Unmodeled Variation
-
-To further complicate things, we must account for **unmodeled variation**. This idea essentially states that some randomness is intrinsic. In other words, though the proportion of red beads never falls below 10% or above 70% in any of our simulations (see below), it is still technically possible that we get one of those extreme parameters when we draw the next shovel. 
-
-```{r, echo=FALSE}
-virtual_prop_red_100 %>%
-  ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
-  labs(x = "Proportion of 100 beads that were red", title = "Proportion of Red Beads With 100 Shovel Slots") 
-```
-
-### Putting It All Together 
-
-Let's put all of these topics together in terms of our bet.
-
-- Our **estimand**, the thing we want to know, is the proportion of red beads in the next shovel draw. 
-- Our **model structure**, using the large shovel and performing the sample 1000 times, ensures an accurate and precise model on which we may make our prediction. It closely resembles the real-life situation, estimating the proportion of red beads in an urn, and we may therefore assume the model is valid.
-- **Prediction uncertainty** highlights our inability to forecast the future. **Parameter uncertainty** states that, even when our model structure is valid, we must estimate the parameters. We can never perfectly estimate the proportion of red beads. In this situation, we must decide which parameters are generous enough to risk our money. **Unmodeled variation**, the idea that, no matter how accurate our model is, some randomness is intrinsic. It is possible, though unlikely, that the next shovel would have a proportion below 20%, despite the fact that our model does not show this possibility!
-
-With everything we know now, is this a good bet? No!
-
-Like the smart data scientists we are, we know that the parameters are too narrow. 
+The easiest way to do this would be to re-run the experiment and compare the new results to our predictions. The validity of our predications, derived from the predictive Preceptor Table, is how we confirm that our conclusions are correct. 
 
 
 ## Conclusion
