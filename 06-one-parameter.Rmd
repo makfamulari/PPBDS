@@ -688,7 +688,7 @@ We then add the specific results of the experiment, and calculate the conditiona
 $$p(models | data = results-of-experiment)$$
 The rest is just details.
 
-We can do the same thing with our sampling problem. Assume that we know that there are 2,400 beads in the urn, and that all of them are either red or white. Our experiment involves the one time use of a paddle with 50 slots. We have 2,401 models under consideration. There might be zero red beads or one red bead or ... 2,399 red beads or 2,400 red beads. There are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate the joint distribution of models which we are considering and experiment results we might observe. 
+We can do the same thing with our sampling problem. Assume that we know that there are 2,400 beads in the urn, and that all of them are either red or white. Our experiment involves the one time use of a paddle with 50 slots. We have 2,401 models under consideration. There might be zero red beads or one red bead or ... 2,399 red beads or 2,400 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate the joint distribution of models which we are considering and experiment results we might observe. 
 
 <!-- DK: I am somewhat concerned that this is not exactly correct since we really ought to sample what happens when you pick 50 beads out of an urn. This can be approximated with the binomial, which is what we have done here. And, with such big numbers, it is a good approximation. But it is not exactly correct. -->
 
@@ -1022,7 +1022,7 @@ For example, what if Kennedy School's Institute of Politics at Harvard Universit
 
 `r margin_note("What you have visualized in this chapter was a demonstration of a famous theorem, or mathematically proven truth, called the *Central Limit Theorem*. It loosely states that when sample means are based on larger and larger sample sizes, the sampling distribution of these sample means becomes both more and more normally shaped and more and more narrow. In other words, the sampling distribution increasingly follows a *normal distribution* and the variation of these sampling distributions gets smaller, as quantified by their standard errors.")`
 
-### Prudence: Is this relevant?
+### Prudence
 
 ```{r echo=FALSE, fig.margin=TRUE}
 knitr::include_graphics("other/images/prudence.jpg")
@@ -1030,7 +1030,7 @@ knitr::include_graphics("other/images/prudence.jpg")
 
 Recall that prudence, one of our key themes, encompasses two primary issues: the relevance of the estimand and the map from concept to data.
 
-In our polling example, is the estimand, Obama's approval rating, relevant to the research question we want to answer? If we wanted to know Obama's approval rating (and nothing else), yes. But, that's not the case here. The aim of this poll is to draw a conclusion about a voter's likelihood of voting for Obama in the next election *using* the approval rating as a predictive measure for voting behavior.
+In our polling example, is the estimand (Obama's approval rating) relevant to the research question we want to answer? If we wanted to know Obama's approval rating and nothing else, yes. But, that's not the case here. The aim of this poll is to draw a conclusion about a voter's likelihood of voting for Obama in the next election *using* the approval rating as a predictive measure for voting behavior.
 
 Our problem, estimating Obama's electability in young people, is not solved by this poll. If we wanted to know the answer to this problem, we would need to change a few key aspects of the sampling.
 
@@ -1040,15 +1040,42 @@ Second, we need to change the question. The *true* question is not Obama's favor
 
 It is extremely important, but often overlooked, that **the data we are analyzing should map to the research question we are trying to answer**. In our polling example, we've just discovered that the collected data tells us very little about what we really want to know. Both the sample population and the research question are flawed and therefore offer us very little information that is relevant to our key issue: the voting behavior of young Americans in the next election.
 
-### Justice: Math and other problems
+### Justice
+
+```{r, echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/justice.jpg")
+```
+
+From now on, we will ignore the fact that our map from concept to data is flawed. Assume that approval rating is the only thing we want to know. 
 
 First, we must determine if we are modeling (just) for prediction or if we are (also) modeling for causation. Another way of looking at this is are we using a model for prediction or a model for explanation.
 
 When polling on the attitude of young Americans towards Obama, we are not measuring a causal effect. When models are causal, we change the value of one input and figure out what the new output would be, thus allowing us to calculate a causal effect for a specific individual. Here, we are using the attitude of young Americans towards Obama to **predict** the outcome of the next election. 
 
-Disregarding the fact that we now know our central question does not address our main goal, let's consider what a predictive model means in terms of our Preceptor Tables. First, know that in our actual Preceptor Table for this poll, we have the results for 2089 young Americans from a total population of young Americans that exceeds 50 million units (people). That means that, in our actual Preceptor Table, we have more than 50 million rows, with a mere 2089 rows that include an approval rating. 
+Let's consider what a predictive model means in terms of our Preceptor Tables. First, know that in our actual Preceptor Table for this poll, we have the results for 2089 young Americans from a total population of young Americans that exceeds 50 million units (people). That means that, in our actual Preceptor Table, we have more than 50 million rows, with a mere 2089 rows that include an approval rating. 
 
-<!-- DK: Put in a Preceptor Table -->
+```{r, echo = FALSE}
+sample_obama_preceptor <- tibble(ID = c("Citizen 1", "Citizen 2", "...", 
+                                    "Citizen 10000", "Citizen 10001", "...", 
+                                    "Citizen 49999999", "Citizen 50000000"),
+                           approval_rating = c("?", "?", "...", 
+                                               "?", "31", "...",
+                                               "?", "?")) 
+
+obama_preceptor <- sample_obama_preceptor %>% 
+  mutate(ID = as.character(ID),
+         approval_rating = as.character(approval_rating)) %>%
+  gt() %>%
+  cols_label(ID = md("**ID**"),
+             approval_rating = "Approval Rating") %>%
+  tab_style(cell_borders(sides = "right"),
+            location = cells_body(columns = vars(ID))) %>%
+  tab_style(cell_text(weight = "bold"),
+            location = cells_body(columns = vars(ID))) %>%
+  cols_align(align = "center", columns = TRUE)
+
+obama_preceptor
+```
 
 An ideal Preceptor Table for this case would report an approval rating for *every one of our 50 million rows*. It quickly becomes clear, with a popuation size this large, why sampling and generalizing are essential to practical inference. 
 
@@ -1059,11 +1086,12 @@ Recall that an infinite Preceptor Table gives us any information we want to know
 fitted value, error. Check out themes.
 -->
 
-```{r echo=FALSE, fig.margin=TRUE}
-knitr::include_graphics("other/images/justice.jpg")
-```
 
-### Fortitude: Filling in the blanks
+### Fortitude
+
+```{r echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/fortitude.jpg")
+```
 
 Our actual Preceptor Table is riddled with question marks. How do we fill them in?
 
@@ -1073,16 +1101,12 @@ We need a "machine" which generates these predictions, which is the same thing a
 
 The theme of fortitude places an emphasis on two things: the code which brings the model to life and the uncertainty of real life which impacts the model's place in the world. 
 
+What are the odds, if we bring in 10 random young Americans, that at least 2 of them support Obama?
 
-<!-- Bring in DGM for the polling by asking a question like: What are the odds, if a bring in 10 random Americans, that at least 2 of them support Obama? -->
-
-
-```{r echo=FALSE, fig.margin=TRUE}
-knitr::include_graphics("other/images/fortitude.jpg")
-```
+<!-- Expand on this section. -->
 
 
-### Temperance: Be humble
+### Temperance
 
 Temperance is perhaps the most important virtue in data science. Our models are never as good as they appear to be. The world is complex and, even worse, always changing. We must be aware of the *unknown unknowns*, concerned about how *representative* our data/model is to our problem, worried about the realism of our assumptions, and leery of the siren call of testing. In simpler terms, we must be humble. 
 
@@ -1109,11 +1133,11 @@ That being said, even if the model had asked a better question ("How likely are 
 
 ### Rubin Causal Model
 
-Now that we have mastered sampling, let's consider how these scenarios connect to the Rubin Causal Model (RCM). 
+To end this section, let's consider how this polling scenario connects to the Rubin Causal Model (RCM). 
 
-For the most part, they don't! 
+For the most part, it doesn't! Remember the RCM's slogan: *No causation without manipulation*. 
 
-Remember the RCM's slogan: *No causation without manipulation*. In both the urn example and our Obama poll, we are not manipulating our units (the beads and the opinions of the pollees, respectively). There are not a control and treatment condition to compare; there is no causal effect to measure. Therefore, the RCM cannot be directly applied to these scenarios. 
+In both our urn example and the Obama poll, we are not manipulating our units (the beads and the opinions of the pollees, respectively). There are not a control and treatment condition to compare; there is no causal effect to measure. Therefore, the RCM cannot be applied to these scenarios. 
 
 ## Sampling Mechanism
 
@@ -1187,29 +1211,15 @@ Something else we must consider is why some beads **do** get sampled, while othe
 
 Consider this: what does this information tell us, specifically, about Bead 1? Bead 2? We know the proportion of red beads in our sample is 40%. Does this mean that bead 1 has a 40% chance of being red? As we learned in Chapter 5, this is not true! Let's delve into why this assumption is wrong. 
 
-We can only claim *for certain* that, of the 100 beads that we sampled (of the total 2400 beads in the urn), 40% were red. If we were making a prediction of the probability of one of our **sampled** beads being red, 40% would be the correct guess! If we were making a prediction of the probability that an **unsampled** bead was red, the answer of 40% would be incorrect. Let's revisit the histogram of our 1000 virtually sampled proportions using a virtual shovel.
+We can only claim *for certain* that, of the 100 beads that we sampled (of the total 2400 beads in the urn), 40% were red. If we were making a prediction of the probability of one of our **sampled** beads being red, 40% would be the correct guess! If we were making a prediction of the probability that an **unsampled** bead was red, the answer of 40% would be incorrect. 
 
+This is why we run many simulations to make the *best possible prediction*. To make the best possible predicition, our point estimates must be **accurate** and **precise**. What do those two words mean in terms of sampling? Let's find out!
 
-```{r, echo = FALSE, fig.cap = "Histogram showing the proportions of 50 beads that were red in 1000 replications."}
-virtual_prop_red <- virtual_samples %>% 
-  group_by(replicate) %>% 
-  summarize(red = sum(color == "red"), .groups = 'drop_last') %>% 
-  mutate(prop_red = red / 50)
-virtual_histogram <- ggplot(virtual_prop_red, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white")
-virtual_histogram + 
-  labs(x = "Proportion of 50 beads that were red", 
-       title = "Distribution of 1,000 proportions red")
-```
+### Precision versus accuracy (or bias versus variance)
 
-Here, we see a decent amount of variation in the proportion of red beads. In some extreme cases, our proportion was as low as 20% and as high as 60%! If we took either one of these extremes and tried to make an assumption of bead 1, we would most certainly be incorrect. This is why we run many simulations to make the *best possible prediction*. To make the best possible predicition, our point estimates must be **accurate** and **precise**. What do those two words mean in terms of sampling? Let's find out!
-
-### Precision versus accuracy 
-
-We saw in the previous section that as your sample size $n$ increases, your point estimates will vary less and less and be more and more concentrated around the true population parameter. This variation is quantified by the decreasing *standard error*. In other words, the typical error of your point estimates will decrease. In our sampling exercise, as the sample size increased, the variation of our sample proportions $\hat{p}$ decreased. This is also known as having a *precise* estimate. 
+We saw in a previous section that as our sample size $n$ increases, our point estimates will vary less and less and be more and more concentrated around the true population parameter. This variation is quantified by the decreasing *standard error*. In other words, the typical error of your point estimates will decrease. In our sampling exercise, as the sample size increased, the variation of our sample proportions $\hat{p}$ decreased. This is also known as having a *precise* estimate. 
 
 So random sampling ensures our point estimates are *accurate*, while on the other hand having a large sample size ensures our point estimates are *precise*. While the terms "accuracy" and "precision" may sound like they mean the same thing, there is a subtle difference. Accuracy describes how "on target" our estimates are, whereas precision describes how "consistent" our estimates are. The figure below illustrates the difference.
-
 
 ```{r, echo=FALSE, fig.cap="Comparing accuracy and precision."}
 knitr::include_graphics("06-one-parameter/images/accuracy_vs_precision.jpg")
@@ -1218,6 +1228,18 @@ knitr::include_graphics("06-one-parameter/images/accuracy_vs_precision.jpg")
 Now, it's obvious that the best case scenario is the most precise and the most accurate option. However, real-life sampling isn't so easy!
 
 What if we had the option to use a shovel with **200** slots, but it had a minor magnetic property that caused it to pick up slightly more red beads than the 100 slotted shovel? On one hand, the larger shovel gives us increased precision due to a larger sample size. On the other, its magnetic property gives us decreased accuracy due to a sampling bias. Here, as is often the case in the real-world, there is a tradeoff! 
+
+### El Jefe's or Felipe's?
+
+To apply this to a more complex example than an urn, imagine we are conducting a poll to gather information on whether Harvard students prefer El Jefe's Taqueria or Felipe's Taqueria. We are given two options: 1) we can conduct the poll on 200 students walking out of Lamont Library or 2) we can conduct the poll on 500 students walking outside of El Jefe's Taqueria. 
+
+The first scenario provides a more accurate estimate, since Lamont Library ensures an unbiased sample. The second scenario, however, provides a more precise estimate due to the larger sample size. Even though the students **outside** of El Jefe's might not be patrons, it is safe to assume that at least some will be patrons, making our sample somewhat biased. What is the better option? Here, the risk of bias is too high in the second scenario, even if our estimate would be more precise. Choosing the first scenario means sacrificing some precision for the sake of an unbiased result. 
+
+### Shake Shack or Tasty Burger?
+
+Now, let's imagine we are conducting a different poll to gather information on whether Harvard students prefer Tasty Burger or Shake Shack. We are given two different options: 1) we can conduct the poll on 25 students walking out of Widener Library or 2) we can conduct the poll on 600 students walking outside of Tasty Burger. 
+
+Though our first scenario involves polling in a food neutral space (ensuring an unbiased and therefore accurate sample), the sample size is rather small. A sample of 25 students to represent the opinions of over 6000 Harvard students is sacrificing a lot of precision. The second scenario presents the same issue as the Felipe's example: though it is not guaranteed, it is likely that sampling outside of one of our two dining options will result in biased data. However, the significantly larger sample size, which would show the results for almost 10% of the total student population, means that our estimate is likely to be closer to the truth. 
 
 ```{r, echo=FALSE, fig.cap="Which one? Hard choice!", fig.margin = TRUE}
 knitr::include_graphics("06-one-parameter/images/accurate_precise_meme.png")
