@@ -49,9 +49,9 @@ output_yaml:
 
 <!-- Might also use Topic 16 from the Workshop here, or save it for the next chapter. -->
 
-Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will be learning about *sampling*, the beginning of our journey toward inference. When we sample, we take a *portion* of a total population and attempt to draw a conclusion about the portion that is generalizable to the total population. One of the most common forms of sampling in real life is polling. 
+Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will learn about *sampling*, the beginning of our journey toward inference. When we sample, we take a *portion* of a total population and attempt to draw a conclusion about the portion that is generalizable to the total population. 
 
-When we see a headline of the approval rating of a politician, we are **not** being given a number that represents the approval rating of every citizen in the total population. We are looking at an inference based on a much smaller sample of people. If the source is reputable, this sample mirrors the real world as closely as possible. That being said, there will be a lot of variation in the reported approval rating depending on the specific sample taken that day. This is why we see different approval ratings for different news sources.
+When we see a headline of the approval rating of a politician, we are **not** being given a number that represents the approval rating of every citizen in the total population. We are looking at an inference based on a much smaller sample of people. If the source is reputable, this sample mirrors the real world as closely as possible. That being said, there will be variation in the reported approval rating depending on the specific sample taken that day. This is why we see different approval ratings from different news sources.
 
 Despite this variation, we *normally* see estimates that are in the same ballpark. It would be surprising to see two approval ratings that are more than 10% apart on any given day. It is possible, however! There could be a number of reasons for such a large gap, many of which result from errors in the sampling itself. It could also just be a consequence of **sampling variation**. 
 
@@ -104,7 +104,7 @@ knitr::include_graphics("06-one-parameter/images/sampling_bowl_3_cropped.jpg")
 
 Observe that 17 of the 50 sampled beads are red and thus 17/50 = 0.34 = 34% of the shovel's beads are red. We can view the proportion of beads that are red in this shovel as a guess of the proportion of beads that are red in the entire urn. While not as exact as doing an exhaustive count of all the beads in the urn, our guess of 34% took much less time and energy to make. 
 
-However, say, we started this activity over from the beginning, replacing the 50 beads back into the urn and starting over. Would we remove exactly 17 red beads? Would our guess at the proportion of the urn's beads that are red be 34% again? Maybe? 
+However, say, we started this activity over from the beginning, replacing the 50 beads back into the urn and starting over. Would we remove exactly 17 red beads? Maybe? 
 
 What if we repeated this activity *many* times? Would our guess at the proportion of the urn's beads that are red be exactly 34% every time? Surely not. 
 
@@ -143,7 +143,7 @@ Observe the following details in the histogram:
 * However, the most frequently occurring proportions were between 0.30 and 0.35 red, right in the middle of the distribution.
 * The shape of this distribution is somewhat bell-shaped. 
 
-`Tactile_sample_urn` saves the results from our 33 groups of friends. Run the following to display the tibble:
+`Tactile_sample_urn` saves the results from our 33 groups of friends. 
 
 
 ```{r, echo=FALSE}
@@ -173,7 +173,7 @@ tactile_sample_urn
 
 Observe for each `group` that we have their names, the number of `red_beads` they obtained, and the corresponding proportion out of 50 beads that were red named `prop_red`. We also have a `replicate` variable enumerating each of the 33 groups. We chose this name because each row can be viewed as one instance of a replicated activity: using the shovel to remove 50 beads and computing the proportion of those beads that are red. 
 
-Let's visualize the distribution of these 33 proportions using `geom_histogram()` with `binwidth = 0.05` in Figure 6.7 below. This is a computerized and complete version of the partially completed hand-drawn histogram you saw earier. 
+Let's visualize the distribution of these 33 proportions using `geom_histogram()` with `binwidth = 0.05` in Figure 6.7. This is a computerized and complete version of the partially completed hand-drawn histogram you saw earier. 
 
 `r margin_note("Note that setting boundary = 0.4 indicates that we want a binning scheme such that one of the bins' boundary is at 0.4. The other comment, color = 'white', is modifying the color of the boundary for visual clarity. This helps us to more closely align this histogram with the hand-drawn histogram.")`
 
@@ -195,9 +195,9 @@ tactile_histogram +
 
 ### What did we just do?
 
-What we just demonstrated in this activity is the statistical concept of **sampling**. We would like to know the proportion of the urn's beads that are red. Performing an exhaustive count of the red and white beads would be time-consuming. Therefore, we extracted a *sample* of 50 beads using the shovel. Using this sample of 50 beads, we estimated the proportion of the urn's beads that are red to be 34%.
+What we just demonstrated in this activity is the statistical concept of **sampling**. We want to know the proportion of the urn's beads that are red. Performing an exhaustive count of the red and white beads would be time-consuming. Therefore, we extracted a *sample* of 50 beads using the shovel. Using this sample of 50 beads, we estimated the proportion of the urn's beads that are red to be 34%.
 
-Moreover, because we mixed the beads before each use of the shovel, these samples were randomly drawn. Because each sample was drawn at random, the samples were different from each other. Because the samples were different from each other, we obtained the different proportions red observed in the previous histogram. This is known as the concept of *sampling variation*. 
+Moreover, because we mixed the beads before each use of the shovel, the samples were randomly drawn. Because each sample was drawn at random, the samples were different from each other. Because the samples were different from each other, we obtained the different proportions red observed in the previous histogram. This is known as the concept of *sampling variation*. 
 
 The purpose of this sampling activity is to develop an understanding of two key concepts relating to sampling: 
 
@@ -206,15 +206,14 @@ The purpose of this sampling activity is to develop an understanding of two key 
 
 In Section \@ref(sampling-simulation), we'll mimic the hands-on sampling activity we just performed on a computer. This will allow us not only to repeat the sampling exercise much more than 33 times, but it will also allow us to use shovels with different numbers of slots than just 50. 
 
-Afterwards, we'll present you with definitions, terminology, and notation related to sampling in Section \@ref(sampling-framework). As in many disciplines, such necessary background knowledge may seem inaccessible and even confusing at first. However, as with many difficult topics, if you truly understand the underlying concepts and practice, practice, practice, you'll be able to master them.
+Afterwards, we'll present you with definitions, terminology, and notation related to sampling in Section \@ref(sampling-framework). As in many disciplines, such necessary background knowledge may seem confusing at first. However, as with many difficult topics, if you truly understand the underlying concepts and practice, you'll be able to master them.
 
 To tie the contents of this chapter to the real world, we'll present an example of one of the most common uses of sampling: polls. In Section \@ref(sampling-case-study) we'll look at a particular case study: a 2013 poll on then U.S. President Barack Obama's popularity among young Americans, conducted by Kennedy School's Institute of Politics at Harvard University. To close this chapter, we'll generalize the "sampling from a urn" exercise to other sampling scenarios.
 
 
 ## Virtual sampling {#sampling-simulation}
 
-In the previous Section \@ref(sampling-activity), we performed a *tactile* sampling activity by hand. In other words, we used a physical urn of beads and a physical shovel. We performed this sampling activity by hand so that we could develop a firm understanding of the root ideas behind sampling. In this section, we'll mimic this tactile sampling activity with a *virtual* sampling activity using a computer. Here, we'll use a virtual analog to the urn of beads and a virtual analog to the shovel. 
-
+In the previous Section \@ref(sampling-activity), we performed a *tactile* sampling activity. In other words, we used a physical urn of beads and a physical shovel. We performed this sampling activity by hand so that we could develop a firm understanding of the root ideas behind sampling. In this section, we'll mimic this tactile sampling activity with a *virtual* sampling activity using a computer. Here, we'll use a virtual analog to the urn of beads and a virtual analog to the shovel. 
 
 ### Using the virtual shovel once
 
@@ -257,13 +256,14 @@ Observe that for every row where `color == "red"`, the Boolean (logical)  value 
 
 Second, let's compute the number of beads out of 50 that are red using the `summarize()` function. Recall from Section \@ref(summarize) that `summarize()` takes a data frame with many rows and returns a data frame with a single row containing summary statistics, like the `mean()` or `median()`. In this case, we use the `sum()`:
 
-`r margin_note("The .groups = drop_last command in summarize is placed to override summarize's ungrouping default output.")`
+`r margin_note("The .groups = drop_last command is summarize's default behavior. However, if you do not specify the .groups argument, an error message occurs. This is why it is included here.")`
 
 ```{r}
 virtual_shovel %>% 
   mutate(is_red = (color == "red")) %>% 
   summarize(num_red = sum(is_red), .groups = 'drop_last')
 ```
+
 ```{r, echo=FALSE}
 n_red_virtual_shovel <- virtual_shovel %>% 
   mutate(is_red = (color == "red")) %>% 
@@ -303,7 +303,7 @@ Great! `r virtual_shovel_perc_red`% of `virtual_shovel`'s 50 beads were red! So 
 
 ### Using the virtual shovel 33 times
 
-Recall that in our tactile sampling exercise in Section \@ref(sampling-activity), we had 33 groups of students each use the shovel, yielding 33 samples of size 50 beads. We then used these 33 samples to compute 33 proportions. We can perform this repeated/replicated sampling virtually by once again using our virtual shovel function `rep_sample_n()`, adding the `reps = 33` argument. This is telling R that we want to *repeat* the sampling 33 times. 
+In our tactile sampling exercise in Section \@ref(sampling-activity), we had 33 groups of students use the shovel, yielding 33 samples of size 50 beads. We then used these 33 samples to compute 33 proportions. We can perform this repeated/replicated sampling virtually by once again using our virtual shovel function `rep_sample_n()`, adding the `reps = 33` argument. This is telling R that we want to *repeat* the sampling 33 times. 
 
 We'll save these results in a data frame called `virtual_samples`. 
 
@@ -313,7 +313,7 @@ virtual_samples <- urn %>%
 virtual_samples
 ```
 
-Observe that the first 50 rows of `replicate` are equal to `1` while the next 50 rows of `replicate` are equal to `2`. This is telling us that the first 50 rows correspond to the first sample of 50 beads while the next 50 rows correspond to the second sample of 50 beads. This pattern continues for all `reps = 33` replicates and thus `virtual_samples` has 33 $\cdot$ 50 = 1650 rows. 
+Observe that the first 50 rows of `replicate` are equal to `1` while the next 50 rows of `replicate` are equal to `2`. This is telling us that the first 50 rows correspond to the *first* sample of 50 beads while the next 50 rows correspond to the *second* sample of 50 beads. This pattern continues for all `reps = 33` replicates and thus `virtual_samples` has 33 $\cdot$ 50 = 1650 rows. 
 
 Let's now take `virtual_samples` and compute the resulting 33 proportions red. We'll use the same **dplyr** verbs as before, but this time with an additional `group_by()` of the `replicate` variable. Recall that by assigning the grouping variable "meta-data" before we `summarize()`, we'll obtain 33 different proportions red. We display a preview of the first 10 out of 33 rows:
 
@@ -417,13 +417,13 @@ Once again, the most frequently occurring proportions of red beads occur between
 
 ### The effect of different shovel sizes {#different-shovels}
 
-Now say instead of just one shovel, you have three choices of shovels to extract a sample of beads with: shovels of size 25, 50, and 100.
+Instead of just one shovel, imagine we have three choices of shovels to extract a sample of beads with: shovels of size 25, 50, and 100.
 
 ```{r, echo=FALSE, fig.align='center', fig.cap="Three shovels to extract three different sample sizes."}
 knitr::include_graphics("06-one-parameter/images/three_shovels.png")
 ```
 
-If your goal is to estimate the proportion of the urn's beads that are red, which shovel would you choose? In our experience, most people would choose the largest shovel with 100 slots because it would yield the "best" guess of the proportion of the urn's beads that are red. Let's define some criteria for "best" in this subsection.
+If our goal is to estimate the proportion of the urn's beads that are red, which shovel would we choose? 
 
 Using our newly developed tools for virtual sampling, let's unpack the effect of having different sample sizes! In other words, let's use `rep_sample_n()` with `size` set to `25`, `50`, and `100`, respectively, while keeping the number of repeated/replicated samples at 1,000:
 
@@ -558,7 +558,7 @@ comparing_n_table  %>%
 knitr::include_graphics("06-one-parameter/images/big brain.png")
 ```
 
-As we observed earlier, as the sample size increases, the variation decreases. In other words, there is less variation in the 1,000 values of the proportion red. So as the sample size increases, our guesses at the true proportion of the urn's beads that are red get more precise. Therefore, our initial assumption that the larger shovel yields the most precise result is correct! 
+As we observed earlier, as the sample size increases, the variation decreases. In other words, there is less variation in the 1,000 values of the proportion red. So as the sample size increases, our guesses at the true proportion of the urn's beads that are red get more precise. Therefore, the larger the shovel, the more precise the result! 
 
 ### Functions are your friend!
 
@@ -681,6 +681,8 @@ This is the power of running many analyses at once using `map_*` functions and l
 
 ## Returning to our question
 
+<!-- MF: When we actually answer this question, should it address the fact that we know the true proportion of red bead sto be 37.5% as stated earlier in the chapter? If so, would the ultimate solution just build a model showing the # of beads at which we get a proportion red between 32.5 - 42.5 90% of the time? How do we show that? -->
+
 Recall the question we asked at the beginning of our chapter: how many beads must we sample to have a 90% chance of being within 5% of the true proportion of red beads in the entire urn? 
 
 We have looked at a number of different models and their accuracy and precision. To delve into our primary question, we must return to our discussion of distributions: posterior, joint, and marginal. 
@@ -774,7 +776,7 @@ x %>%
 
 ## Sampling framework {#sampling-framework}
 
-In both our tactile and our virtual sampling activities, we used sampling for the purpose of estimation. We extracted samples in order to *estimate* the proportion of the urn's beads that are red. We used sampling as a less time-consuming approach than performing an exhaustive count of all the beads. Our virtual sampling activity built up to the results comparing 1,000 proportions red based on samples of size 25, 50, and 100, and finally expanding that to all the sizes between 1 and 100. This was our first attempt at understanding two key concepts relating to sampling for estimation:
+In both our tactile and our virtual sampling activities, we used sampling for the purpose of estimation. We extracted samples in order to *estimate* the proportion of the urn's beads that are red. Our virtual sampling activity built up to the results comparing 1,000 proportions red based on samples of size 25, 50, and 100, and finally expanding that to all the sizes between 1 and 100. This was our first attempt at understanding two key concepts relating to sampling for estimation:
 
 1. The effect of *sampling variation* on our estimates.
 1. The effect of sample size on *sampling variation*.
@@ -1098,6 +1100,8 @@ An ideal Preceptor Table for this case would report an approval rating for *ever
 
 Recall that an infinite Preceptor Table gives us any information we want to know about all one of our units. Though an infinite Preceptor Table is not practial or even possible in most contexts, it's important to consider how we decrease the size of the infinite Preceptor Table, mostly by assuming that certain rows and columns are "exchangeable". This is where we run into the issue of realism in our polling example. This poll assumes that the columns for "approval rating of Obama" and "who-are-you-planning-to-vote-for" are interchangable. As we've seen, these columns aren't analogs! 
 
+<!-- MF: Is it worth showing an example of a row of the infinite Preceptor Table? For example, do a row for one young American that lists approval rating, gender, party affiliation, etc.? Or is describing the table enough? -->
+
 <!-- Maybe include some notion of the data generating mechanism, which is $y_i ~ binomial(p)$ 
 
 fitted value, error. Check out themes.
@@ -1307,3 +1311,5 @@ Recall in our Obama poll case study in Section \@ref(sampling-case-study) that b
 > The online survey of 2,089 adults was conducted from Oct. 30 to Nov. 11, just weeks after the federal government shutdown ended and the problems surrounding the implementation of the Affordable Care Act began to take center stage. The poll's margin of error was plus or minus 2.1 percentage points.
 
 Note the term *margin of error*, which here is "plus or minus 2.1 percentage points." Most polls won't produce an estimate that's perfectly right; there will always be a certain amount of error caused by *sampling variation*. The margin of error of plus or minus 2.1 percentage points is saying that a typical range of errors for polls of this type is about $\pm$ 2.1%, in words from about 2.1% too small to about 2.1% too big. We can restate this as the interval of $[41\% - 2.1\%, 41\% + 2.1\%] = [37.9\%, 43.1\%]$ (this notation indicates the interval contains all values between 37.9% and 43.1%, including the end points of 37.9% and 43.1%). We'll see in the next chapter that such intervals are known as *confidence intervals*.
+
+<!-- MF: Very random thought but- would it be a good idea to hide a bonus point on a pset (or something similar) in the middle of a particularily wordy section? It would reward students that read the entire chapter. -->
