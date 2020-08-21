@@ -2,38 +2,25 @@
 
 ## Next Meeting
 
-Does bok repo work for you?
-
-ms-errors and simpsons-paradox. What do we do?
-
-Expanding Maria's animation in chapter 5.
-
-How should chapter authors deal with renv.lock?
 
 ## TODO
 
-0) Why do chapters 7 and 8 link to chapter 3 from the TOC on the web? Why are appendicing sections numbered like they are connected to chapter 9? Why did references stop working in chapter 9 (or earlier)?
-  + Chapter 7 and 8 are not working because of duplicate heading names in Chapter 3 (lines 474 and 586). These need to be changed to something other than One Parameter and Two Parameter. THe references page is leading to Chapter 3 b/c of the same reasoning.
-  + I'm not sure why the appendicing section numbering is on chapter 9, still need to dig deeper into that.
-  + The reference labels in Chapter 9 were used incorrectly. You dont need a hashtag when referencing:
+0) How do we find all the broken references? (Bibliography from @kane. Or chapter/figure?) 
 
-  Wrong: \@ref(#one-parameter)
-  Right: \@ref(one-parameter)
+1) Github Action for PPBDS.data produces weird warning.
 
-1) Why aren't all the package references showing up in the bibliography?
-  + This goes back to why I added nocite: '@*' to include everything inside the bib files - You can only choose to have everything show up or only the referenced items using @ to show up, there is no in-between.
-  + We might want to have authors reference a package if they're introducing it (At least this is what moderndive does: https://moderndive.com/5-regression.html search for janitor)
-  + Another solution would be to include a list of packages used like [so](https://moderndive.com/E-appendixE.html) and reference them all there.
+2) Add section to set-up.Rmd to explain (renv::consent()?) how new people need to enable renv for working on the book.
 
-2) Can you get **renv** working in your repo? Then submit a PR.
-https://github.com/EmilHvitfeldt/bookdown-github-actions-netlify/blob/master/.github/workflows/bookdown.yaml
-https://github.com/itsyaoyu/github_actions/blob/master/.github/workflows/main.yml
-  + I have the github action set-up, however there is no way to uncomment the rmd_files: line in _bookdown.yml. This means that the build test will include all Rmd files in the repo at the highest-directory level.
-  + This increases the build time significantly (as these chapters take longer to knit) and currently breaks with a broken randomForest predict function in chapter 12.
-  + TODO: Either move these work-in-progress files to the chapter folders until they're ready to be added to the book or fix the randomForest predict function that is broken. After this is done, the workflow is all ready to run.
+3) Start section with key summary/links associated with things-that-annoy-us-and-we-will-revisit-someday. First item: videos.
+
+4) Better workflow, automatic (with click confirmation) replacement of docs/ after successful check. Two parts: First, change the check so that it builds the book nicely. (Maybe not necessary. Maybe building the book in junk/ is OK?) Second, move the newly created book --- once it is accepted --- to docs/ on the master branch. Should we be taking multiple branches more seriously. Probably.
+
+
 
 
 ## DK
+
+
 
 Understand bibliography.
 
@@ -77,19 +64,7 @@ Add necessary references to the references.bib and ensure that they are called c
 
 ## Book Building
 
-* [*Bookdown*](https://bookdown.org/yihui/bookdown/) is the key reference. Note that you need to uncomment the `html:` in _bookdown.yml in order for thus build command to work (This means selecting the order of Rmd files to knit). We usually build the book by pressing the "Build Book" button under the Build panel.
-
-* We are using the Stanford example.
-  + Make sure the **msmbstyle** package is installed
-  + `msmbstyle::msmb_html_book` in the _output.yml file outputs to the Stanford format
-  + To set the book color to crimson:
-    + go to docs/libs/msmb-css-0/msmb.css
-    + Find `#1881c2` and replace all with `#c90016`
-    + Find `24,129,194` and replce with `201,0,23`
-    + Save the file. No need to rebuild the book.
-
-* We deploy to Github pages in the docs/ directory.. This assumes you have a Netifly account already.
-  + Follow instructions [here](https://cerebralmastication.com/2019/05/11/publishing-bookdown-to-netlify-automagically/)
+* [*Bookdown*](https://bookdown.org/yihui/bookdown/) is the key reference. Build the book by following the instructions in _bookdown.yml. Those instructions end with a deployment to Github Pages via the doc/ directory.
 
 * For structure, we decided to have a single _output.yml file, which each chapter must include as so:
 ---
@@ -102,23 +77,35 @@ output_yaml:
 nocite: '@*'
 ---
 
+* When adding a new package, you must run renv::snapshot() after installing it in the local renv/library directory. This will update renv.lock, I think. But then how are other people supposed to get that update? We need to document how this is working. Don't forget that new contributors need to run renv::consent(), I think.
+
+* We are using the Stanford example.
+  + Make sure the **msmbstyle** package is installed
+  + `msmbstyle::msmb_html_book` in the _output.yml file outputs to the Stanford format
+  + To set the book color to crimson:
+    + go to docs/libs/msmb-css-0/msmb.css
+    + Find `#1881c2` and replace all with `#c90016`
+    + Find `24,129,194` and replce with `201,0,23`
+    + Save the file. No need to rebuild the book.
+
+
+## Things That Annoy Us
+
+These are open projects with annoying details that we will revisit.
+
+* ms-errors and simpsons-paradox. What do we do?
 
 ## Open Questions
 
-* Need to start using tidybayes and ggdist. Can we use these in chapter 5 somehow? https://cran.r-project.org/web/packages/tidybayes/vignettes/tidy-rstanarm.html
+* Need to start using tidybayes and ggdist. https://cran.r-project.org/web/packages/tidybayes/vignettes/tidy-rstanarm.html
 
 
 * Is there a way to print out messages during the book building process so that you know where the process is? Recall that we can't (?) use R code chunk names because duplicate code chunk names cause (still?) the process to blow up.
 
 * Consider using notes: https://desiree.rbind.io/post/2019/making-tip-boxes-with-bookdown-and-rmarkdown/
 
-* Think about packages. Note that the [545 book](https://github.com/rstudio-education/stat545) uses a fairly sophisticated plan, involving the new **renv** package.
-
 * Can you rebuild just a single chapter and then commit/push it? Right now, I have to rebuild the whole thing each time I want to make a single change. Takes too long.
 
-* How do we centralize the loading of packages? What is our plan for loading libraries and removing them when they are no longer need? Chapter 11 contained an annoying bug: rvest and purrr both have pluck() as a function. Need to ensure that you get the purrr version if you need it. Bug only showed up when Chapter 5 (with rvest loaded) was used in the build. Organize packages. What are all the packages we need? How do we ensure that we cite them all, as we should? Where do we load them? Again, there must be best practices for stuff like this. Only use high quality packages, and recommend the same to readers. When are different packages introduced? Where is this written down? Need to be intentional about what we introduced outside of the tidyverse --- janitor, ggthemes, reprex, fs, skimr, gt, googlesheets4, infer, gtsummary --- and when we do it. One annoyance is that new contributors have to try to compile the book a dozen times before it will work because there is no way to know, ahead of time, which packages are required. Make the book an R package?
-
-* The book has lots of references, especially to other chapters. Many of these don't work because the referred-to chapters don't exist. We need a thorough clean up.
 
 
 ## Other Items
@@ -292,6 +279,8 @@ https://rmarkdown.rstudio.com/authoring_shiny_prerendered.HTML
 
 ## Things to Think About For Next Summer
 
+
+
 Drop bootstrap completely and go straight to Bayesian in chapter 7, but demonstrate the good confidence interval coverage of Bayesian models.
 
 styler package
@@ -315,3 +304,5 @@ https://github.com/ucbds-infra/ottr-sample
 https://github.com/allisonhorst/stats-illustrations
 
 https://bookdown.org/yihui/rmarkdown-cookbook/equatiomatic.html
+
+Consider Netifly: https://cerebralmastication.com/2019/05/11/publishing-bookdown-to-netlify-automagically/

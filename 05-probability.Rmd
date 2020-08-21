@@ -5,21 +5,11 @@ output_yaml:
 
 # Probability
 
-<!-- 0) Section headings are in sentence case (with only the first word capitalized, unless it is something always capitalized) rather than title case, which is what they are now. Section heading do not end with a period. -->
+<!-- 1) Make rayshader.R. Creates all images and animations, places them in either images or animations folder. Lots of info and advice for whomever needs to work with this later. ->
 
-<!-- 1a) Add 4th sub-subpart to first part explaining Joint Distributions. Do this at the end of probability distribution part.  Example is one die with 50% likelihood of coming up 6 (and other faces at 10%) and second die 50% likelihood. Don't only care about the total. In this situation, you need a 3d plot. p(A, B) is p(Result of Die 1, Result of Die 2). Just one empirical plot of 100 rolls. Almost done, making 3D graph right now VZ -->
 
-<!-- DK: Update. I think that either plotly (https://plotly.com/r/3d-surface-plots/) or rayshader (https://www.rayshader.com/#3d-plotting-with-rayshader-and-ggplot2) is the way to go. These are the future of 3d plots in R, not plot3D. -->
+<!-- Add Four Cardinal Virtues section at end, with a subsection about each virtue, with the image, just like Cass.  -->
 
-<!-- 1b) Add a section called "Unnormalized distributions" just before "Joint distributions" in the first part. These are just probability distributions with raw counts. In other words, they are not actual probability distributions (since the sum of the values is not 1) but they are easy to turn into probability distributions by dividing all the outcome counts by the sum of all outcome counts. They are handy because, sometimes, you don't want to bother to normalize everything until the end. -->
-
-<!-- 2) Make this point more often: A probability distribution is an object with a domain of outcomes, example: sum of two die. (You don't care which die has what value.) Another example, result of two die and you care which die came which way. Each element in the domain is *mapped* to a probability value, which is a number between 0 and 1 inclusive. The sum of all the mappings equals 1. -->
-
-<!-- 3) Adding three model example. Situation is that there is a bag with two marbles: either both white, both black or one of each. Those are the three models. Then, you take (and then replace) one marble three times. Possible values you can get: three blacks, two blacks, one black, zero blacks. So, we have three models and four possible experimental results. This is the bridge between the simple Bayes example with two models (disease or no) and two possible experiment results (positibe test or negative test) and the N model example. -->
-
-<!-- 4) Change $p$, meaning the probability of heads, to $p_h$ everywhere, This is much clearer. -->
-
-<!-- 5)  The use of $p_h$ allows us to draw a distinction between different concepts. First, we have the probability that the coin will come up heads. This is a single (unknown) number. We use $p_h$ to refer to that number. Second, once you know $p_h$, you also know the probability the coin comes up tails ($p_t$), since $p_t = 1 - p_h$. But neither of these things is a probability distribution! Recall that a probability distribution is a list of outcomes, each mapped to a probability, with all of those values summing to 1. So, a probability of coin outcomes is the set: H = $p_h$ and  T = $p_t$, such that $p_t + p_h = 1$ and both $p_t$ and $p_h$ are greater than or equal to zero. Call this probability distribution $p(coin)$.  (Maybe that is a good distinction. If you are talking about a specific probability, with a single value, like $p_h$, you use a small $p$ with a subscript. If you are talking about the entire probability distribution over a set of outcomes, you use $p(something)$, where the something gives a clue about the set of outcomes. (Still this entire paragraph, clean it up and put it somewhere.) -->
 
 <!-- Parameter means no parathesis. Anytime you talk about a specific p, you must add a subscript, otherwise how do you know what you are talking about. But, at the same time, it is annoying to write long subscripts, like $p_{Bidengets370electorvotes}$, so it is better to just come up with a short subscript, like $p_370$, where the context makes clear what this refers to. -->
 
@@ -88,7 +78,7 @@ knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'))
 
 The central tension, and opportunity, in data science is the interplay between the *data* and the *science*, between our empirical observations and the models which we use to understand them. Probability is the language we use to explore that interplay; it connects models to data, and data to models.
 
-## Probability Distributions
+## Probability distributions
 
 <!-- Read Topic 14 in Bayesian Workshop. Lots of interesting ideas and examples there for this first section of the chapter. Any coding examples should be simple, with  no list-columns and map_* functions. Basic tool we are introducing is doing simulation within a tibble. Consider doing some of the sample problems from STAT 110, many of which are hard to do analytically but easy to do with simulation. -->
 
@@ -99,17 +89,10 @@ knitr::include_graphics("05-probability/images/probability_dice.jpeg")
 
 ```
 
-```{marginfigure}
-
-The opening paragraph of *Workshop Statistics:  Discovery with Data, A Bayesian Approach by James H. Albert and Allan J. Rossman* does a wonderful job of explaining the concept of probability.
-
-  "In the activities to follow, we don’t know if we have a particular disease, if a die being used in the casino is fair, the exact number of fish in our backyard pond, or the number of defectives in a shipment of electronic components. A model is a possible description of this unknown phenomena. In each application, there will be a number of possible models. We assign prior probabilities to these models — these probabilities reflect our opinions about which models are more or less likely to be true. To learn about the correct model, data will be observed. In the activities, the data will consist of the results of a blood test, the results of a roll of the die, the results of a capture-recapture experiment, and the number of defectives observed in a sample. This data will change our opinions about the likelihoods of the different models. Bayes’ rule is the formula which tells us how to compute the new model probabilities."
-
-```
 
 What does it mean that Trump has a *30% chance* of winning re-election this fall? That there is a *90% probability* of rain today? That the die at the casino is *unfair*? If I roll that die 10 times and five of those times I get a three, how likely is it that the die is *unfair*?
 
-Probability is about quantifying uncertainty. We can think of probability as a proportion. The probability of an event occurring is a number from 0 to 1, where 1 means that the event is 100% certain. Throughout this chapter, we will use p() to denote probability distributions. 
+Probability is about quantifying uncertainty. We can think of probability as a proportion. The probability of an event occurring is a number from 0 to 1, where 1 means that the event is 100% certain.
 
 Let's begin with the simplest events: coin flips and dice rolls. If the die and 
 the coins are fair, we can operate under the assumption that all outcomes are 
@@ -117,15 +100,17 @@ equally likely.
 
 This allows us to make the following statements:
 
-* The p(rolling 1 or 2) is 2/6, or 1/3.  
-* The p(rolling 1, 2, 3, 4, 5, or 6) is 1.  
-* The p(flipping a coin and getting tails) is 1/2.
+<!-- What kind of notation should I use for these bullet points? -->
 
-<!-- Be precise about technical terms: outcome and domain. Be more smooth. -->
+* The probability of rolling a 1 or 2 is 2/6, or 1/3.
+* The probability of rolling a 1, 2, 3, 4, 5, or 6 is 1.  
+* The probability of flipping a coin and getting tails is 1/2.
 
-For the purposes of this course, a *probability distribution* is a mathematical object that covers a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1. The sum of all chances equals to 1. The set of possible outcomes --- heads or tails for the coin, 1 through 6 for the die --- can be either discrete or continuous. This set of possible outcomes is the *domain* of the probability distribution. There are three types of probability distributions: mathematical, empirical, and posterior. Let's walk through some examples to better understand each type of probability distribution.
+For the purposes of this course, a *probability distribution* is a mathematical object that covers a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The set of possible outcomes --- heads or tails for the coin, 1 through 6 for the die --- can be either discrete or continuous. This set of outcomes is the *domain* of the probability distribution. There are three types of probability distributions: mathematical, empirical, and posterior. Let's walk through some examples to better understand each type of probability distribution.
 
-### Flipping a coin.
+Before we continue, we should be familiar with the notation used in this chapter. Whenever we are talking about a specific probability (represented by a single value), we will use $p$ with a *subscript*. For instance, $p_h$ = 0.5 denotes the probability of getting heads on a coin toss when the coin is fair. $p_t$ denotes the probability of getting tails on the coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $p$ with *parentheses*. For example, the probability distribution of a coin toss is $p(coin)$. That said, $p(coin)$ is composed of all the two specific probabilities mapped from the domain.
+
+### Flipping a coin
 
 A *mathematical distribution* is based on mathematical formulas. Assuming that the dice is perfectly fair, we should get heads as many times as we get tails.
 
@@ -138,13 +123,13 @@ mydata <- tibble(results = c(rep(0, 50),
 
 ggplot(mydata, aes(x = results)) +
   geom_histogram(aes(y = ..count../sum(..count..)), 
-                 binwidth = 0.5, 
-                 fill = "dark gray", color = "white") +
+                 binwidth = 0.5, color = "white") +
   labs(title = "Mathematical Probability Distribution",
        subtitle = "Flipping One Coin",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails"))
+  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails")) +
+  theme_classic()
 
 ```
 
@@ -168,18 +153,21 @@ mydata <- tibble(results)
 
 ggplot(mydata, aes(x = results)) +
   geom_histogram(aes(y=..count../sum(..count..)), binwidth = 0.5, 
-                 fill = "dark gray", color = "white") +
+                 color = "white") +
   labs(title = "Empirical Probability Distribution",
        subtitle = "Flipping One Coin A Hundred Times",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails"))
+  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails")) +
+  theme_classic()
 
 ```
 
 An *posterior distribution* is based on beliefs and expectations. It displays your belief about things you can't see right now. You may have posterior distributions for events in the past, present, or future.
 
-In the case of the coin toss, the posterior distribution changes depending on your beliefs. For instance, let's say your friend brought a coin to school and asked to bet you. If the result is heads, you have to pay them $5. This makes you suspicious; your posterior distribution would reflect this. You might believe that p(Heads) is 0.95 while p(Tails) is 0.05.
+In the case of the coin toss, the posterior distribution changes depending on your beliefs. For instance, let's say your friend brought a coin to school and asked to bet you. If the result is heads, you have to pay them $5. 
+
+This makes you suspicious; your posterior distribution would reflect this. You might believe that $p_h$ is 0.95 while $p_t$ is 0.05.
 
 ```{r, echo = FALSE}
 
@@ -190,16 +178,17 @@ mydata <- tibble(results = c(rep(0, 95),
 
 ggplot(mydata, aes(x = results)) +
   geom_histogram(aes(y=..count../sum(..count..)), binwidth = 0.5, 
-                 fill = "dark gray", color = "white") +
+                 color = "white") +
   labs(title = "Posterior Probability Distribution",
        subtitle = "Your Beliefs About Flipping One Coin to Bet Your Friend",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails"))
+  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails")) +
+  theme_classic()
 
 ```
 
-### Rolling two die.
+### Rolling two die
 
 Our *mathematical distribution* tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two die at the same time and sum the values, the numbers closes to the middle (ex. 6, 7, 8) are more common sums than numbers at the very edge (ex. 2, 12) because there are more combinations of numbers that add up to the middle values.
 
@@ -219,7 +208,7 @@ mydata <- mydata %>%
 
 ggplot(mydata, aes(x = sum)) +
   geom_histogram(aes(y=..count../sum(..count..)), binwidth = 1, 
-                 fill = "dark gray", color = "white") +
+                 color = "white") +
   labs(title = "Mathematical Probability Distribution",
        subtitle = "Sum from Rolling Two Die",
        x = "Outcome\nSum of Two Die",
@@ -229,7 +218,7 @@ ggplot(mydata, aes(x = sum)) +
 
 ```
 
-We get an *empirical distribution* by running a simulation and rolling two die a hundred times. The result is not as perfect and even as the mathematical distribution, but we can observe that the p(2) and p(12), which are displayed on the left and right most ends of the distribution, are far lower than the p(values near the center of the distribution).
+We get an *empirical distribution* by running a simulation and rolling two die a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. We can observe that the $p_2$ and $p_12$, which are displayed on the left and right most ends of the distribution, are far lower than the $p_6$, for example.
 
 ```{r, echo=FALSE}
 
@@ -249,7 +238,7 @@ mydata <- mydata %>%
 
 ggplot(mydata, aes(x = sum)) +
   geom_histogram(aes(y=..count../sum(..count..)), binwidth = 1, 
-                 fill = "dark gray", color = "white") +
+                 color = "white") +
   labs(title = "Empirical Probability Distribution",
        subtitle = "Sum from Rolling Two Die A Hundred Times",
        x = "Outcome\nSum of Two Die",
@@ -259,19 +248,19 @@ ggplot(mydata, aes(x = sum)) +
 
 ```
 
-The *posterior distribution* for rolling one dice a hundred times will vary based on your expectations. If you take the dice from your Monopoly set, you have reason to believe that the mathematical distribution is true. However, if you walk into a crooked casino and a host asks you to play craps, you might be suspicious. You win by rolling 7's and 11's. You might expect those numbers to very rarely occur. You might also expect values like 2, which are statistically less probable, to occur more frequently.
+The *posterior distribution* for rolling one dice a hundred depends on your expectations. If you take the dice from your Monopoly set, you have reason to believe that the assumptions underlying the mathematical distribution are true. However, if you walk into a crooked casino and a host asks you to play craps, you might be suspicious. In craps, a come-out roll of 7 and 11 is a "natural" and the you win. You might expect those numbers to occur less often than they would with fair dice. Meanwhile, a come-out roll of 2, 3 is bad for someone betting what's known as the "Pass line." You might also expect values like 2 and 3 to occur more frequently. Your posterior distribution might look like this:
 
 ```{r, echo=FALSE}
 
 # Flipping a dice 100 times
 
-mydata <- tibble(results = c(rep(2, 30),rep(3, 15),rep(4, 15),rep(5, 3),
-                             rep(6, 2),rep(7, 1),rep(8, 5),rep(9, 5),
-                             rep(10, 5),rep(11,1),rep(12,3)))
+mydata <- tibble(results = c(rep(2, 17),rep(3, 17),rep(4, 7),rep(5, 7),
+                             rep(6, 7),rep(7, 5),rep(8, 7),rep(9, 7),
+                             rep(10, 7),rep(11,5),rep(12,7)))
 
 ggplot(mydata, aes(x = results)) +
   geom_histogram(aes(y=..count../sum(..count..)), binwidth = 1, 
-                 fill = "dark gray", color = "white") +
+                 color = "white") +
   labs(title = "Posterior Probability Distribution",
        subtitle = "Your Belief About Rolling Two Die at a Crooked Casino",
        x = "Outcome\nSum of Two Die",
@@ -281,11 +270,13 @@ ggplot(mydata, aes(x = results)) +
 
 ```
 
-### Presidential Elections
+Someone less suspcious of the casina would have a posterior distribution which looks more like the mathematical distribution.
 
-Now we let's say we are building probability distributions for political events, like a presidential election. We want to know p(Democrats win x electoral votes), where x represents the range of possible outcomes from 0 to 538.
+### Presidential elections
 
-It would be incredibly naive to create the following *mathematical distribution*. We create a distribution by running a simulation 10,000 times, where the chances of the Democrats winning any given electoral vote is 0.5.
+Now we let's say we are building probability distributions for political events, like a presidential election. We want to know the probability that Democratic candidate wins x electoral votes, where x represents the range of possible outcomes from 0 to 538.
+
+It would be incredibly naive to create the following *mathematical distribution*. We create a distribution by running a simulation 10,000 times, where the chances of the Democratic candidate winning any given state is 0.5.
 
 ```{r, echo=FALSE}
 
@@ -301,13 +292,14 @@ result <- tibble(total = (matrix(rbinom(sims*length(ev),
 ggplot(data = result, aes(total)) +
   geom_histogram(aes(y=..count../sum(..count..)), binwidth = 1) +
   labs(title = "Mathematical Probability Distribution",
+       subtitle = "Presidential Elections",
        y = "Probability",
        x = "Outcome\nElectoral Vote Total for Democratic Candidate") +
   theme_classic()
 
 ```
 
-We know that campaign platforms, donations, charisma, and many other factors will contribute to a candidate's likeability. Elections are more complicated than coin tosses. Some political scientists may try to create algorithms to calculate mathematical probability distributions.
+We know that campaign platforms, donations, charisma, and many other factors will contribute to a candidate's likeability. Elections are more complicated than coin tosses. 
 
 The *empirical distribution* in this case could involve looking into past elections in the United States and counting the number of electoral votes that the Democrats won in each. For the empirical distribution, we create a tibble with electoral vote results from past elections. Looking at elections since 1964, we can observe that the number of electoral votes that the Democrats received in each one is different. Given that we only have 14 entries, it is difficult to draw conclusions or make predictions based off of this empirical distribution.
 
@@ -319,7 +311,7 @@ mydata <- tibble(electoral_votes = c(486,191,17,297,49,13,111,370,379,
                       271,286,365,332,304))
 
 ggplot(mydata, aes(x = electoral_votes)) +
-  geom_histogram(aes(y=..count../sum(..count..)), bins = 100, fill = "gray", color = "white") +
+  geom_histogram(aes(y=..count../sum(..count..)), bins = 100, color = "white") +
   labs(title = "Empirical Probability Distribution",
        subtitle = "Electoral Votes from Previous Elections",
        x = "Outcome\nElectoral Vote Total for Democratic Candidate",
@@ -328,11 +320,40 @@ ggplot(mydata, aes(x = electoral_votes)) +
 
 ```
 
-The *posterior distribution* in the election case is something many data scientists actually devote a lot of time to. Consider this projection from The Economist, which uses various assumptions to generate a forecast. The analysts have developed an algorithm that considers their expectations for each outcome. Here is a posterior from the Economist website. This looks confusing at first because the data analysts have chosen to merge the axes for Republican and Democratic electoral votes. For each electoral result, the height of the bar represents the probability that a given event will occur. However, there is no numbered y-axis telling us what the specific probability of each outcome is.
+The *posterior distribution* in the election case is something data scientists devote a lot of time to. The analysts develop algorithms that consider their expectations for each outcome. Consider this generated using data from *FiveThirtyEight*.
 
-```{r, echo=FALSE, fig.fullwidth = TRUE, caption = "Economist Posterior from August 8, 2020"}
+```{r, echo=FALSE}
+# Some comments about this. Where did you get this data from? Why those columns?
 
-knitr::include_graphics("05-probability/images/economist_posterior_election.png")
+
+posterior_prez <- read.csv("./05-probability/data/election-forecasts-2020/prez_1.csv") %>%
+  select(c(9,11))
+
+ggplot(posterior_prez, aes(total_ev,evprob_chal)) +
+  geom_bar(stat = 'identity') +
+  labs(title = "Posterior Probability Distribution Based on FiveThirtyEight Forecast",
+       subtitle = "Presidential Elections",
+       y = "Probability",
+       x = "Outcome\nElectoral Vote Total for Democratic Candidate",
+       caption = "Data from August 13, 2020") +
+  theme_classic()
+
+```
+
+
+Here is a posterior from the FiveThirtyEight website from August 13, 2020. This was created using the same data as the above distribution, but simply displayed differently. For each electoral result, the height of the bar represents the probability that a given event will occur. However, there is no numbered y-axis telling us what the specific probability of each outcome is.
+
+```{r, echo=FALSE, caption = "FiveThirtyEight Posterior from August 13, 2020"}
+
+knitr::include_graphics("05-probability/images/fivethirtyeight.png")
+
+```
+
+Here is the posterior from *The Economist*, also from August 13, 2020. This looks confusing at first because the data analysts have chosen to merge the axes for Republican and Democratic electoral votes. We can tell that the Economist is more optimistic about Biden's odds in the election compared to Trump's, relative to *FiveThirtyEight*.
+
+```{r, echo=FALSE, fig.fullwidth = TRUE, caption = "Economist Posterior from August 13, 2020"}
+
+knitr::include_graphics("05-probability/images/economist_aug13.png")
 
 ```
 
@@ -342,46 +363,68 @@ There are many political science questions you could explore with posterior dist
 * Present: What is the median height of Harvard students?
 * Future: How many electoral votes will a presidential candidate win?
 
-<!-- We need a continuous distribution. -->
+### Unnormalized distributions
 
-<!-- Add 4th subsubpart to first part explaining Joint Distributions. Do this at the end of probability distribution part.  Example is one die with 50% likelihood of coming up 6 (and other faces at 10%) and second die 50% likelihood. Don't only care about the total. In this situation, you need a 3d plot. p(A, B) is p(Result of Die 1, Result of Die 2). Just one empirical plot of 100 roles. -->
+Remember that probability distributions are mathematical objects that cover a set of outcomes, where each outcome in the domain is mapped to a probability value between 0 and 1 inclusive and the sum of all mappings is 1. Sometimes, you may see distributions similar to probability distributions, only the y-axis displays raw counts instead of proportions. Unnormalized distributions are not probability distributions, but it is easy to convert between the two. You simply divide all the outcome counts on the y-axis by the sum of all outcome counts to "normalize" and unnormalized distribution. Unnormalized distributions are often an intermediary step; it is often handy to work with counts until the very end.
 
-### Joint Distributions
-
-Now we understand that p(A) can represent the probability distribution of outcomes for event A. Let's talk about joint distributions, which can be represented by p(A, B). Joint distributions are also mathematical objects that cover a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 and the sum of all chances equals to 1. The key to a joint distribution is it measures the chance that both events A and B will occur simultaneously.
-
-Let's say that you are rolling two six-sided die simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both die 1000 times. In previous examples involving two die, we cared about the sum of results and not the outcomes of the first versus the second rolls of each simulation. With a joint distributions, the order matters so instead of 11 possible outcomes on the x-axis of our distribution graph (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example should be displayed using a 3D plot.
+For instance, we can generate the following unnormalized distribution for the sum of rolling two die (empirical distribution from running this simulation 100 times). You may notice that the shape of the distribution is the same as the empirical probability distribution we generated earlier, only the y-axis is labeled differently.
 
 ```{r, echo=FALSE}
-mydata <- tibble(die.1 = sample(1:6, size = 1000, prob =
-                                  c(0.1,0.1,0.1,0.1,0.1,0.5), replace = TRUE),
-                 die.2 = sample(1:6, size = 1000, prob =
-                                  c(0.1,0.1,0.1,0.1,0.5,0.1), replace = TRUE)) %>%
-  group_by(die.1, die.2) %>%
-  summarize(total = n()) %>%
-  ungroup() %>%
-  mutate(probability = total/sum(total))
-mydata
+
+set.seed(1)
+
+dice <- c(1:6)
+
+sims <- 100
+
+mydata <- tibble(dice_1 = sample(dice, size = sims, replace = TRUE),
+                 dice_2 = sample(dice, size = sims, replace = TRUE))
+
+mydata <- mydata %>%
+  mutate(sum = (dice_1 + dice_2))
+
+ggplot(mydata, aes(x = sum)) +
+  geom_histogram(binwidth = 1, color = "white") +
+  labs(title = "Empirical Unnormalized Distribution",
+       subtitle = "Sum from Rolling Two Die A Hundred Times",
+       x = "Outcome\nSum of Two Die",
+       y = "Count") +
+  scale_x_continuous(breaks = seq(0,12,1), labels = 0:12) +
+  theme_classic()
+
 ```
 
-The fact that we're talking about joint distributions where we roll two die doesn't change the meaning of a probability distribution. As you can see through the tibble, the sum of the probabilities of all the outcomes is 1.
+<!-- DK: Add normalized density plot. Comment that they look identical, just scaled. -->
 
-```{r}
-sum(mydata$probability)
+<!-- after_stat("density") -->
+
+
+### Joint distributions
+
+<!-- DK: Should be p(A). Discuss p(A, B) -->
+
+Now we understand that $p_A$ can represent the probability distribution of outcomes for event A. Let's talk about joint distributions, which can be represented by $p_{A, B}$. Joint distributions are also mathematical objects that cover a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 and the sum of all chances equals to 1. The key to a joint distribution is it measures the chance that both events A and B will occur simultaneously.
+
+Let's say that you are rolling two six-sided die simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both die 1000 times. In previous examples involving two die, we cared about the sum of results and not the outcomes of the first versus the second rolls of each simulation. With a joint distributions, the order matters so instead of 11 possible outcomes on the x-axis of our distribution graph (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.
+
+```{r, echo=FALSE}
+
+knitr::include_graphics("05-probability/images/joint.png")
+
 ```
 
-## Tree Diagrams
+## Tree diagrams
 
 ### Independence
 
-So far, you have learned how to calculate P(A), which is the fancy, statistical way of saying the probability of an event. When flipping a coin, the probability of getting heads was 1/2. You have also learned how to compute the P(A or B). This means the probability of either A or B happening. When rolling a dice, P(1 or 2)--the probability of getting a 1 or a 2--was 1/3.
+So far, you have learned how to calculate $p_A$, which is the fancy, statistical way of saying the probability of an event known as A. When flipping a coin, the probability of getting heads was 1/2. You have also learned how to compute the $p_{A or B}$. This means the probability of either A or B happening. When rolling a dice, $p_{1 or 2}$--the probability of getting a 1 or a 2--was 1/3.
 
 What if you flipped 2 coins? You know that the probability of getting heads once is 1/2, but what are the odds of getting heads 2 times in a row? Let's take a look at this tree diagram. We read this diagram from left to right. On the left, the probability of getting heads is 0.5. Now the tree branches out.
 
 * *If* we got heads the first time, then we go up the top branch. The probability of getting heads again is 0.5.
 * *If* we got tails the first time, then we go down the bottom branch. The probability of getting heads is 0.5.
 
-Notice how regardless of what we get the first time we flip the coin, the probability of getting heads is 0.5 throughout. This suggests that the coin flips are **independent**. The result of one coin flip does not impact the likelihood of getting the same result next time. Take a look at the tree diagram. P(H given H) represents the probability of getting heads *given* that we got heads the first time. P(H given T) represents the probability of getting heads *given* that we got tails the first time. P(H given H) = P(H given T).
+Notice how regardless of what we get the first time we flip the coin, the probability of getting heads is 0.5 throughout. This suggests that the coin flips are **independent**. The result of one coin flip does not impact the likelihood of getting the same result next time. Take a look at the tree diagram. $p_{H given H}$ represents the probability of getting heads *given* that we got heads the first time. $p_{H given T}$ represents the probability of getting heads *given* that we got tails the first time. $p_{H given H}$ = $p_{H given T}$.
 
 ```{r, echo=FALSE}
 
@@ -419,13 +462,13 @@ aGivenb <- aANDb / b
 # These are the labels of the nodes on the graph
 # To signify "Not A" - we use A' or A prime 
  
-node1<-"P"
-node2<-"P(H)"
-node3<-"P(T)"
-node4<-"P(H given H)"
-node5<-"P(T given H)"
-node6<-"P(H given T)"
-node7<-"P(T given T)"
+node1<-"p"
+node2<-"p(H)"
+node3<-"p(T)"
+node4<-"p(H given H)"
+node5<-"p(T given H)"
+node6<-"p(H given T)"
+node7<-"p(T given T)"
 nodeNames<-c(node1,node2,node3,node4,node5,node6,node7)
 
 rEG <- new("graphNEL", nodes=nodeNames, edgemode="directed")
@@ -474,7 +517,7 @@ Now the tree branches out.
 
 We decide to go down the top branch *if* our random person has the disease. We go down the bottom branch *if* they do not. This is called **conditional probability**. The probability of testing positive is **dependent** on whether the person has the disease.
 
-How would you express this in statistical notation? p(A|B) is the same thing as the probability of A *given* B. p(A|B) essentially means the probability of A *if* we know for sure that B is true. You should also remember that p(A|B) is not the same thing as p(B|A).
+How would you express this in statistical notation? $p(A|B)$ is the same thing as the probability of A *given* B. $p(A|B)$ essentially means the probability of A *if* we know for sure the value of B. You should also remember that $p(A|B)$ is not the same thing as $p(B|A)$.
 
 ```{marginfigure}
 **Positive:** The test results suggest that the patient has the disease.
@@ -563,23 +606,23 @@ attributes<-list(node=list(label="foo", fillcolor="light blue", fontsize="14"),
 
 plot(rEG, edgeAttrs=eAttrs, attrs=attributes)
 
-text(150,230, "P(Disease)",cex=.5)
+text(150,230, "p(Disease)",cex=.5)
 
-text(150,140, "P(No Disease)",cex=.5)
+text(150,140, "p(No Disease)",cex=.5)
 
-text(340,300,"P(Positive | Disease)",cex=.5)
+text(340,300,"p(Positive | Disease)",cex=.5)
 
-text(340,210,"P(Negative | Disease)",cex=.5)
+text(340,210,"p(Negative | Disease)",cex=.5)
 
-text(340,60,"P(Negative | No Disease)",cex=.5)
+text(340,60,"p(Negative | No Disease)",cex=.5)
 
-text(340,150,"P(Positive | No Disease)",cex=.5)
+text(340,150,"p(Positive | No Disease)",cex=.5)
 
 ```
 
 This concept of conditional probability is relevant in our everyday lives. For example, the probability of Trump's re-election might be different than the probability of Trump's re-election *given* that we are in a recession. The probability of you reading a textbook might vary, *depending* on the likelihood of your instructor cold-calling you in class. Whenever you encounter a question involving conditional probability, drawing a tree diagram is a very useful approach to visualization.
 
-### Two Diagrams for One Set of Coin Flips
+### Two diagrams for one set of coin flips
 
 In our histogram probability distribution, we didn't care what combinations of numbers made each sum. We only cared about the outcome. There are two ways of thinking about a coin toss as well. Your tree diagram should look different depending on whether the order of the results matters.
 
@@ -596,10 +639,10 @@ that you are rolling two coins together, or that you only care about the sum of 
 
 # These are the labels of the nodes on the graph
  
-node1<-"P"
-node2<-"P(0 Heads, 2 Tails)"
-node3<-"P(1 Head, 1 Tail)"
-node4<-"P(2 Heads, 0 Tails)"
+node1<-"p"
+node2<-"p(0 Heads, 2 Tails)"
+node3<-"p(1 Head, 1 Tail)"
+node4<-"p(2 Heads, 0 Tails)"
 nodeNames<-c(node1,node2,node3,node4)
  
 rEG <- new("graphNEL", nodes=nodeNames, edgemode="directed")
@@ -674,13 +717,13 @@ aGivenb <- aANDb / b
 # These are the labels of the nodes on the graph
 # To signify "Not A" - we use A' or A prime 
  
-node1<-"P"
-node2<-"P(H)"
-node3<-"P(T)"
-node4<-"P(H given H)"
-node5<-"P(T given H)"
-node6<-"P(H given T)"
-node7<-"P(T given T)"
+node1<-"p"
+node2<-"p(H)"
+node3<-"p(T)"
+node4<-"p(H given H)"
+node5<-"p(T given H)"
+node6<-"p(H given T)"
+node7<-"p(T given T)"
 nodeNames<-c(node1,node2,node3,node4,node5,node6,node7)
 
 rEG <- new("graphNEL", nodes=nodeNames, edgemode="directed")
@@ -716,156 +759,166 @@ plot(rEG, edgeAttrs=eAttrs, attrs=attributes)
 
 ```
 
-### Joint Probability
-
-Now that we understand both p(A) and p(A|B), let's talk about what it means to calculate p(A, B). With p(A|B), we are considering the probability of A assuming event B has already occurred. p(A, B) is the chance that both events will occur at the same point in time.
-
-Let's say that you are rolling two six-sided die simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both die 1000 times. If we were to visualize this, it would look different because the domain is a plane instead of a line.
-
-```{r, echo=FALSE}
-
-mydata <- tibble(die.1 = sample(1:6, size = 1000, prob =
-                                  c(0.1,0.1,0.1,0.1,0.1,0.5), replace = TRUE),
-                 die.2 = sample(1:6, size = 1000, prob =
-                                  c(0.1,0.1,0.1,0.1,0.5,0.1), replace = TRUE)) %>%
-  group_by(die.1, die.2) %>%
-  summarize(total = n()) %>%
-  ungroup() %>%
-  mutate(probability = total/sum(total))
-
-mydata
-
-```
-
-The fact that we're talking about joint distributions where we roll two die doesn't change the meaning of a probability distribution. As you can see through the tibble, the sum of the probabilities of all the outcomes is 1.
-
-```{r}
-
-sum(mydata$probability)
-
-```
-
 <!-- 2 b) Another coding session, but this time with list-columns and map_functions. These do not have to be long. We just want to re-iterate the points we made in words. Maybe we don't need list-columns. Maybe just show map functions here. Again, the point of this section is ONLY to understand the key probabity concepts: joint, total, conditional and marginal. -->
 
 
-## Two Models
-
-<!-- # Section 3: Two Models, Scatterplots and Bayes Theorem -->
-
-<!-- 3 a) Key point of this section is how we deal with the simplest possible situation. There are only two possibilities. Either you have the disease, or you don't. Walk through this problem with counts first. There are 100,000 people in the country. (Top of tree.) 0.1% have the disease, which is 100 people. 999,900 do not. (These are the two branches from the top.) We give the test to all 100,000 people. And so on. We have the four leaves, and then we just add the two branches which positive test results together, and then divide that into the total with the disease who tested positive. Presto! Your true odds.
-
-See page 330 of the Bayesian Workshop for the use of the frequency format. Don't think in terms of percentages. Think in terms of counts. Would this be useful to show students?
-
-       1000
-      10   990
-     8  2  95 895
-     8/(8 + 95)
-
-Should we start with counts and then go to probabilities, or just start with probabilities? Flip a coin 100 times, and get 53 heads and 47 tails. Or maybe explain with counts each time we learn a new thing, and then do with percentages. Note how all this ties into the below discussion. When we are playing with models, we just "know" what the percentages are. We use this knowledge to determine what a single data point means. But we also do the opposite! (Call this the inverse?) We collect a lot of data (counts?) and then use that data to estimate the probabilities in the tree. Hmmm. 
-
-Then do another example, but point out we don't need the counts. Numbers are abritrary because we divide at the end. Show that.
-
-Now that we understand trees, we can do some Bayes' Theorem examples by hand. We don't even show the formula! Just walk through the four leaves, and how we add two and then divide into one of them. -->
+## Two models
 
 <!-- Then, with those ideas fixed, we make a Bayes Scatterplot with just two rows on the y-axis: have the disease or don't have the disease. (Or maybe we use another exmaple each time.) Since these two models have no fixed numeric meaning, we can just place them at 0 and 1 on the y-axis, which sort of corresponds to FALSE and TRUE. Then, we can x-axis we have the actual data. Which, in this case, is also a TRUE/FAlSE value: Either you tested positive or you tested negative, so also 0 and 1. Then, we can simulate. Put a 100,000 people through, fill out the values. There are only 4 possibilities, so we will need to jittter. (See below for an example of how to do this. And then explore the marginal distributions. Show how this gives you the same answer, roughly, as the math we did before.) -->
 
 <!-- 3 b) Code up a full featured simulation exercise, like the cookie problem but with more complexity. See the old 1005 problem set. Connect this to how 538 does things. 99.99% of real world problems are solved with simulation, not analytically. -->
 
-Imagine you wake up one morning and feel a little bit under the weather. Not sick, just not 100%.
-So, you go to your doctor and your doctor is confused. So, she runs a slew of tests and in a couple of days, one of them comes back positive. You've tested positive for a rare disease, called $X$. Only *.1%* of the population has this disease. And the test correctly identifies you as positive *99%* of the time!
+You are in a city of 100,000 people. We know for a fact that exactly 1% of the population has a disease. Everyone received a test for the disease, which returned accurate results exactly 99% of the time. In terms of a count, that means 1,000 people have this disease of the 100,000 in the population. The correctly identified these individuals 99% of the time, meaning that around 990 correctly tested positive and 10 incorrectly tested negative. This city also has 99,000 people who do not have the disease, 990 of which incorrectly tested positive and 98010 of which correctly tested negative. That means that the number of people who would test positive for the disease is 1980 but *only 990 of them have the disease*. So, in simple terms, the probability of you having the disease given a positive test is $990\div1980$!
 
-So, understandably worried, you ask yourself: what is the probability I have this disease?
+Here is the joint empirical distribution of the test result and disease status. Note that this is an unnormalized distribution because each dot represents a person in this city.
 
-The immediate, but *wrong*, answer would be 99%. Why is this wrong? Isn't 99% the accuracy of the test? To understand, we're going to abandon probability as a *proportion* (ie 99%) and think of it in *counts*. 
+```{r, echo = FALSE}
 
-Imagine you're part of a population of 1000 people. Now, the frequency of the disease is .1%. In terms of a count, that means 1 person has this disease of the 1000 in the population. The test would probably correctly identify this individual. However, a test with an accuracy of 99% would also identify 10 other perfectly healthy people out of 1000 people as sick! That means that the number of people who would test positive for the disease is 11 but *only one of them has the disease*. So, in simple terms, the probability of you having the disease given a positive test is $1\div11$! 
+pop <- tibble(patient_id = 1:100000, positive_test = c(rep(1, 1980),
+                                                       rep(0, 98020)),
+              have_disease = c(rep(1, 990),
+                               rep(0, 99000),
+                               rep(1, 10)))
 
-
-It becomes easier to understand when you increase this population size 10,000 and model this!  
-
-```{r disease, fig.align="center", echo = FALSE}
-
-# Define a population of 10000 where 10 people have the disease but
-# 100 people have tested positive.
-
-pop <- tibble(patient_id = 1:10000, tested_positive = c(rep(1, 110), 
-                                                        rep(0, 9890))) %>%
-  mutate(have_disease = case_when(patient_id == 1:10 ~ 1)) %>%
-  mutate(have_disease = case_when(patient_id == 1:10 ~ 1,
-                                  is.na(have_disease) ~ 0))
-
-# Call a plot. Make the variables factors.
-
-ggplot(pop, aes(x = as.factor(have_disease), y = as.factor(tested_positive))) + 
-  geom_point() + 
+ggplot(pop, aes(x = as.factor(have_disease), y = as.factor(positive_test))) +
+  geom_point() +
   geom_jitter(alpha = .4) +
   theme_classic() +
-  labs(title = "Distribution of Disease Results in a Population of 10000",
-    x = "Did you test positive?",
-    y = "Do you have the disease?"
-  )
+  labs(title = "Joint Unnormalized Empirical Distribution \n of Test Results and Disease Status",
+    x = "Test Result",
+    y = "Disease Status") +
+  scale_x_discrete(breaks = seq(0,1,1), labels = c("Negative", "Positive")) +
+  scale_y_discrete(breaks = seq(0,1,1), labels = c("Negative", "Positive"))
 
 ```
 
-Remember, we're currently conceptualizing probability in counts. Therefore, a .1% chance of having the disease means 10 people have it and a 99% chance of testing correctly (a 1% chance of testing incorrectly) means 100 people were incorrectly identified as positive (in addition to the 10 people who tested positive correctly). So, to recap:
-
-* 10 people have the disease
-
-* They all tested positive
-
-* 9990 people don't have the disease
-
-* 100 of them still tested positive
-
-There's a population of 110 people who tested positive and only 10 of them have the disease. So, if you test positive, your chances of having the disease are $10\div110$, which is equal to 9%!
-
-Now, let's switch back to proportion-based probabilities and think about it. Just because the probability of having the disease is .1% and the test is 99% accurate, it doesn't mean that these are the exact numbers that always work out in the real world. That is, for a *sample* of 10,000, a disease frequency of .1% doesn't necessarily mean that 10 people have the disease. It could be 11. Or 9. Or 20! Given that uncertainty, we do what we did above. We model. We built and understanding of the world and expressed it in counts. We then used that to understand what the implications of an event (testing positive) are on our belief that we have the disease. In the next section, we'll follow the same principle but make this a little more complicated.
-
-
-## Three Models
-
-Now, imagine that your friend gives you a bag with two marbles. There could either be two white marbles, two black marbles, or one of each color. We can formalize this by setting three different values of p, where p represents the proportion of white marbles. The bag could contain 0% white marbles, 50% white marbles, or 100% white marbles. Therefore, p could only be 0, 0.5, or 1. If you take a marble out of the bag, would it be black or white? Let's make what we call a Bayes scatterplot out of this.
-
-<!-- Could we talk about what this scatterplot should look like? -->
+Here is a joint distribution displayed in 3D. Instead of using the "jitter" feature in R to unstack the dots, we are using a 3D plot to visualize the number of dots in each box. The number of people who correctly test negative in this city is 98010, far outweighing any of the other categories. There are 990 false positives, 990 true positives, and only 10 false negatives. This is why we can barely see the 3D bar coming from those sections.
 
 ```{r, echo=FALSE}
 
-all_white <- tibble(results = c(rep(2, 1000)), model = c(rep(1, 1000)))
-
-all_black <- tibble(results = c(rep(0, 1000)), model = c(rep(0, 1000)))
-
-mixed_bw <- tibble(results = sample(0:1, size = 1000, prob = c(0.5, 0.5), 
-                                    replace = TRUE), model = c(rep(0.5, 1000)))
-
-# all_marbles <- merge(all_white, all_black, all.x = TRUE, all.y = TRUE) %>%
-#   merge(mixed_bw, all.x = TRUE, all.y = TRUE)
-# 
-# ggplot(all_marbles, aes(x = results, y = model)) + 
-#   geom_point() +
-#   geom_jitter(alpha = 0.4) +
-#   labs(
-#     title = "Sampling Distributions of Bags of Margles",
-#     subtitle = "Taking a Marble out of the Bag",
-#     x = "Number of White Marbles",
-#     y = "Proportion of White Marbles in the Bag"
-#   )
+knitr::include_graphics("05-probability/images/rayshader_disease.png")
 
 ```
 
+What is the difference between these distributions? How can they be useful in data analysis?
 
-<!-- # Section 4: Three Models (use the the Two Marble Example) and Scatterplots -->
+We want to analyze these plots by looking at different slices. For instance, let's say that you have tested positive for the disease. Since the test is not always accurate, you cannot be 100% certain that you have it. We would isolate the slice where the test result equals 1 (meaning positive). If we zoom in on the plot, 990 people who tested positive have the disease and 990 who tested positive do not have the disease. In this case, we are focusing on one slice of the probability distribution where the test result was positive. There are two disease outcomes: positive or negative. By isolating a section, we are looking at a conditional distribution. Conditional on a positive test, you can visualize the likelihood of actually having the disease versus not.
 
-<!-- 4 a)  Bayes Scatterplots show how both the data and the model can be viewed as probability distributions. If I tell the the model, the you look down one axis to see what the pdf of the data is. If I show you the data, then you look down the other axis to see the posterior pdf of the model. -->
+This is what looks like when we take the slice where the test result is positive and zoom in.
 
-<!-- Having shown an example with two rows above, we now need an example with three. I like the two marble problem. (Cite Rethinking when you use it.) Bag of marbles contains either two white, two black or one of each. This can be formalized with a number p, which is the proportion of white marbles, which can only be 0, 0.5 or 1. Create a Bayes scatterplot for this case. Follow the coding style below. Show the marginal distributions after we observe some data. Big a useful number, like we did with 8 heads out of 20 above.-->
+```{r, echo=FALSE}
 
-<!-- 4 b) Show the code for doing this, both the simulation itself and how to make the graphic. Key is that we do no math anywhere. -->
+knitr::include_graphics("05-probability/images/rayshader_disease_zoom.png")
 
+```
+
+We should rotate this slice and look at it from a 2D perspective. This looks very similar to what we saw at the beginning of the chapter when we flipped coins to create a probability distribution.
+
+```{r, echo=FALSE}
+
+mydata <- tibble(results = c(rep(0, 5),
+                             rep(1, 5)))
+
+ggplot(mydata, aes(x = results)) +
+  geom_histogram(aes(y = ..count../sum(..count..)), 
+                 binwidth = 0.5, color = "white") +
+  labs(title = "Conditional Probability Distribution",
+       subtitle = "Probability of Having the Disease Given a Positive Test Result",
+       x = "Disease Status",
+       y = "Probability") +
+  scale_x_continuous(breaks = seq(0,1,1), labels = c("Positive", "Negative")) +
+  theme_classic()
+
+```
+
+This Stat 110 Animations video does a really good job of explaining a similar concept.
+
+```{r, echo=FALSE}
+knitr::include_app("https://www.youtube.com/embed/by3_weGwnMg")
+```
+
+## Three models
+
+```{marginfigure}
+
+This example is slightly more complex than the previous one with two models; it is the bridge between the two models example and the n models example we are about to explore.
+
+```
+
+Now, imagine that your friend gives you a bag with two marbles. There could either be two white marbles, two black marbles, or one of each color. Thus, the bag could contain 0% white marbles, 50% white marbles, or 100% white marbles. $p$ of white marbles could be 0, 0.5, or 1.
+
+Let's say you take a marble out of the bag, record whether it's black or white, then return it to the bag. You repeat this three times, observing the number of white marbles you see out of three trials. You could get three whites, two whites, one white, or zero whites as a result of this trial. Let's make what we call a Bayes scatterplot out of this. We have three models (three different proportions of white marbles in the bag) and four possible experimental results.
+
+Here is the scatterplot visualization of the scenario:
+
+```{r, echo=FALSE}
+
+x <- tibble(p = rep(seq(0, 1, 0.5), 1000)) %>%
+  mutate(white_marbles = map_int(p, ~ rbinom(n = 1, size = 3, p = .)))
+
+x %>%
+  ggplot(aes(x = white_marbles, y = p)) +
+    geom_jitter(alpha = 0.5) +
+    labs(title = "Number of White Marbles and Probability of White Marbles",
+         x = "Number of White Marbles Out of 3 Samples",
+         y = "Number of White Marbles in the Bag") +
+  theme_classic()
+
+```
+
+Here is the 3D visualization:
+
+```{r, echo=FALSE}
+
+knitr::include_graphics("05-probability/images/three_models.png")
+
+```
+
+```{marginfigure}
+
+The y-axes of both the scatterplot and the 3D visualization are labeled "Number of White Marbles in the Bag." This is a model, a belief about the world you are not sure of. For instance. When the model is 0, we have no white marbles in the bag, meaning that none of the marbles we pull out in the sample will be white.
+
+```
+
+Let's say you got zero white marbles. We would isolate the slice where the result of the simulation involves three black marbles and zero white ones. Here is the unnormalized probability distribution.
+
+```{r, echo=FALSE}
+
+x <- tibble(results = c(rep(0, 1000), rep(0.5, 130), rep(1, 0.1)))
+
+ggplot(x, aes(results)) +
+  geom_histogram(binwidth = 0.25, color = "white") +
+  labs(title = "Conditional Probability Distribution",
+       subtitle = "Number of White Marbles Given a Three White Marbles Selected in the Sample",
+       x = "Number of White Marbles in the Bag",
+       y = "Count") +
+  scale_x_continuous(breaks = seq(0,1,0.5), labels = c("0", "1", "2")) +
+  theme_classic()
+
+```
+
+Next, let's normalize the distribution.
+
+```{r, echo=FALSE}
+
+ggplot(x, aes(results)) +
+  geom_histogram(aes(y = ..count../sum(..count..)), 
+                 binwidth = 0.25, color = "white") +
+  labs(title = "Conditional Probability Distribution",
+       subtitle = "Number of White Marbles Given a Three White Marbles Selected in the Sample",
+       x = "Number of White Marbles in the Bag",
+       y = "Count") +
+  scale_x_continuous(breaks = seq(0,1,0.5), labels = c("0", "1", "2")) +
+  theme_classic()
+
+```
+
+This plot makes sense because when all three marbles you draw out of the bag are NOT white, there is a pretty good chance that there are no white marbles in the bag. There is a smaller chance that the bag contains one black marble and one white marble. However, there is no chance that the bag only contains white marbles.
 
 <!-- # Section 5: 11 and the 1001 models. Same as coin example with unknown p as used in Albert example. First, p is 0, 0.1, 0.2, ... 0.9, 1.0. Make Bayes Scatterplot. Show marginals. Then, extend it so p takes on 1,001 values. This is how we go from discrete to continuous. All the same tricks apply. -->
 
 
-## N Models
+## N models
 
 <!-- 5 a) Now go on to Rethinking approach. I think that chapter 2 is just genius. Bayesian is really just counting. Maybe we do a very similar example to what he does? Maybe different? I am still pondering this myself. I think that there is a deep relationship here. In the simple Bayes rule decision trees, we know all the probabilities. But what if we don't? Instead, we get to observe lots of data (which are counts!) and then, from that data, figure out the probabilities. (Note that Rethinking does not talk like this --- after all, we know all the probabilities since each marble has a 20% chance of being drawn --- but I think it is implicit in his approach.) Key issue: Can we connect this in a sensible way to Bayesian scatterplot. There is always the data and the model and the relationship between the two. (And "the model" means, mainly, the parameter estimates thereof.) Tell me the data, and I will tell you the model. Tell me the model, and I will tell you the model. -->
 
@@ -874,7 +927,9 @@ mixed_bw <- tibble(results = sample(0:1, size = 1000, prob = c(0.5, 0.5),
 <!-- DK: Should we cut out p = 0 and p = 1 as too annoying to deal with? -->
 
 ```{marginfigure}
-Isn't it annoying that we use the same letter, "p", to mean two totally different things? At the start of the chapter, "p" is the symbol used for a probability distribution. Here, we are also using it to mean the probability of a coin coming up heads. Sadly, there are only so many letters we can use, so you need to be mentally flexible enough to keep track of both meanings. When "p" is used for an unknown parameter, it will written in italics as $p$, which is always the case for parameters. The "p" which is the symbol for a probability distribution is in regular text: p. Putting these together, p($p$) is the probability distribution for the probability of a flipped-coin coming up heads.
+
+Is it not annoying that we use the same letter, "p", to mean two totally different things? At the start of the chapter, "p" is the symbol used for a probability distribution. Here, we are also using it to mean the probability of a coin coming up heads. Sadly, there are only so many letters we can use, so you need to be mentally flexible enough to keep track of both meanings. When "p" is used for an unknown parameter, it will written in italics as $p$, which is always the case for parameters. The "p" which is the symbol for a probability distribution is in regular text: p. Putting these together, p($p$) is the probability distribution for the probability of a flipped-coin coming up heads.
+
 ```
 
 Assume that there is a coin with probability $p$ of coming up heads. I guarantee that there are only 11 possible values of $p$: $0, 0.1, 0.2, ..., 0.9, 1$. In other words, there are 11 possible models, 11 things which might be true about the world. This is just like situations we have previously discussed, except that there are more models to consider.
@@ -924,7 +979,7 @@ set.seed(10)
 x <- tibble(p = rep(seq(0, 1, 0.1), 1000)) %>%
   mutate(heads = map_int(p, ~ rbinom(n = 1, size = 20, p = .)))
 
-x %>% 
+x %>%
   ggplot(aes(y = p, x = heads)) +
     geom_jitter(alpha = 0.1) +
     labs(title = "Number of Heads and Probability of Heads",
@@ -932,17 +987,23 @@ x %>%
          y = "Value of *p*")
 ```
 
-<!-- DK: Bunch of things to see in this diagram. -->
+Here is the 3D version of the same plot.
 
-<!-- DK: Then, finally, we do the experiment. We get 8 heads. What does that mean?  -->
+```{r, echo=FALSE}
 
+knitr::include_graphics("05-probability/images/n_models.png")
 
-## Posterior Distribution
+```
 
-
-We don't really care about the p($models$, $data$), the joint distribution of the models-which-might-be-true and the data-which-our-experiment-might-generate. Instead, we want to estimate $p$, the unknown parameter which determines the probability that this coin will come up heads when tossed. The joint distribution alone can't tell us that. We *created* the joint distribution before we had even conducted the experiment. It is our creation, a tool which we use to make infernences. Instead, we want the conditional distribution, p($models$ | $data = 8$). We have the results of the experiment. What do those results tell us about the probability distribution of $p$? 
+In both of these idagrams, we see 11 models and 21 outcomes. We don't really care about the p($models$, $data$), the joint distribution of the models-which-might-be-true and the data-which-our-experiment-might-generate. Instead, we want to estimate $p$, the unknown parameter which determines the probability that this coin will come up heads when tossed. The joint distribution alone can't tell us that. We *created* the joint distribution before we had even conducted the experiment. It is our creation, a tool which we use to make inferences. Instead, we want the conditional distribution, p($models$ | $data = 8$). We have the results of the experiment. What do those results tell us about the probability distribution of $p$? 
 
 To answer this question, we simply take a vertical *slice* from the joint distribution at the point of the x-axis corresponding to the results of the experiment.
+
+```{marginfigure}
+
+This animation shows what we want to do with joint distributions. We take a slice (the red one), isolate it, rotate it to look at the conditional distribution, normalize it (change the values along the current z-axis from counts to probabilities), then observe the resulting posterior.
+
+```
 
 ![](05-probability/animations/color_red_combo.gif)
 
@@ -991,10 +1052,42 @@ The most likely value of $p$ is still 0.4, as before. But, it is much more likel
 Models are useless unless we use them for something. Let's make some predictions. What are the chances that, if we toss this coin 10 times, we will get 7 or more heads? Because our posterior distribution is centered around $p = 0.4$, we don't expect to see 7 heads, but it is certainly not impossible.
   
 
-<!-- DK: Two ways to do this. First (and best?) using x_with_heads_equal_8 and just draw samples from this vector. Second feeding p_posterior directly to rbinom, with one column the p and one column the probs.  -->
+<!-- DK: 
+
+1> First wrong way to do this is with assuming that p is certain, based on seeing 8 heads. Ignore the uncertainty on your estimate of p.
+
+sims <- 100000
+
+tibble(sim_ID = 1:sims) %>%
+  mutate(heads = map_int(sim_ID, ~ rbinom(n = 1, size = 10, p = .4))) %>% 
+  mutate(result = ifelse(heads >= 7, TRUE, FALSE)) %>% 
+  summarize(success = sum(result)/sims)
+  
+About 5%. So, I might offer you 19:1 odds on a bet. But this is wrong!
+
+Second way, it to just sample from the whole distribution posterior distribution vector that you created.
+
+p_draws <- x %>% 
+  filter(heads == 8)
+  
+tibble(p = sample(p_draws$p, size = sims, replace = TRUE)) %>%
+  mutate(heads = map_int(p, ~ rbinom(n = 1, size = 10, p = .))) %>% 
+  mutate(result = ifelse(heads >= 7, TRUE, FALSE)) %>% 
+  summarize(success = sum(result)/sims)
+
+Third way is to sample from the actual distribution, which is a small dataset with just a few rows, but it includes both p and the probability of each p.
+
+tibble(p = sample(p_posterior$p, 
+                  size = sims, prob = p_posterior$probs, replace = TRUE)) %>%
+  mutate(heads = map_int(p, ~ rbinom(n = 1, size = 10, p = .))) %>% 
+  mutate(result = ifelse(heads >= 7, TRUE, FALSE)) %>% 
+  summarize(success = sum(result)/sims)
 
 
-## Testing is Evil
+-->
+
+
+<!-- ## Testing is evil -->
 
 <!-- Introduce concepts like the null model, testing, and p-values. Connect to permutation tests from chapter 3.  Side note quotation: "Amatuers test. Professionals summarize." Maybe we should pick an example in which the number of heads is low enough to provide some reasonable evidence against p = 0.5. -->
 
@@ -1004,55 +1097,17 @@ Models are useless unless we use them for something. Let's make some predictions
 
 <!-- Difference between 0.04 and 0.06 is rarely significant. And is hardly ever a good reason to decide X over Y. -->
 
+The PPBDS contains several important themes that are relevant in all chapters. As you move through the textbook, you will be building on and refining these concepts. In this chapter, you will learn about model structure, predictive uncertainty, parameter uncertainty, unmodeled variation, and unknown unknowns. These are organized according to the four cardinal virtues that reoccur throughout the book: Prudence, Temperance, Fortitude, and Justice.
 
+## Prudence
 
-## Key Themes
-
-The PPBDS contains several important themes that are relevant in all chapters. As you move through the textbook, you will be building on and refining these concepts. In this chapter, you will learn about model structure, predictive uncertainty, parameter uncertainty, unmodeled variation, and unknown unknowns.
-
-```{r, echo=FALSE, fig.margin=TRUE, fig.cap="Probability Themes."}
-
-knitr::include_graphics("05-probability/images/coin_flip.jpg")
-
-```
-
-### Setup
+### Parameter uncertainty
 
 Suppose your friend sets up a pseudo-casino in the playground of the neighborhood school. He's offering everyone the opportunity to play probability games and bet money. The first game is simple: coin tosses. If the coin lands on heads, you get five dollars. If it lands on tails, you pay three dollars.
 
-### Model Structure
-
-Is $P_h$ constant?
-
-### Predictive Uncertainty
-
-```{r, echo=FALSE, fig.margin=TRUE, fig.cap="PROBABILITY DOES NOT EXIST."}
-
-knitr::include_graphics("05-probability/images/probability_dice.jpeg")
-
-```
-
-A wise, Italian statistician named Bruno de Finetti once famously said "PROBABILITY DOES NOT EXIST." Some call him a "radical probabilist" but he was right to point out that probability is something humans constructed to understand the world; it is not possible to forecast the literal future. The two primary sources of predictive uncertainty are parameter uncertainty and unmodeled variation.
-
-<!-- Still conditional on model structure. p(result from experiment to come) -->
-
-### Parameter Uncertainty
-
 You have a sneaking suspicion that the coin isn't fair and you ask your friend to flip it 10 times to test your theory. However, you must not be overconfident. 10 observations might be too few to judge the fairness of the coin. Perhaps your friend secretly switches coins when it comes time for the actual betting and your sample in the initial simulation is not representative. You might be nervous about losing your money and even miscount the number of heads and tails. These are all examples of *parameter uncertainty*. Sometimes, a model has the correct form, but it's not practical to run the simulation millions of times to be certain of the outcome. It's not possible to be absolutely certain that your friend isn't switching coins. A perfect world does not exist, so we must have reservations when drawing likely conclusions.
 
-### Unmodeled Variation
-
-(This may be difficult to talk about since we don't (?) write down formulas with error terms.) But each chapter should discuss the concept of a residual. Even if we have perfect parameter estimates for a model structure which matches the unknown data generating mechanism, we still won't make perfect predictions. Some randomness is intrinsic. Example: prediction for an individual.
-
-result = model + other stuff, where other stuff is variation which is not part of the model, i.e., it is
-
-45 = 40 + 5
-
-unmodeled variation. *residual*; *fitted value* *expected value*
-
-result = fitted (expected) value + residual
-
-### Unknown Unknowns
+### Unknown unknowns
 
 ```{r, echo=FALSE, fig.margin=TRUE, fig.cap="Donald Rumsfeld."}
 
@@ -1072,5 +1127,66 @@ knitr::include_graphics("05-probability/images/Three_Card_Monte.jpg")
 
 What does this mean? Well imagine a crowd playing Three Card Monte in the streets of New York. The guy running the game runs a demo and shows you all the cards to make you confident. They earn money by making you overconfident and persuading you to bet. Your odds may seem good during the demo round, but that doesn't actually say anything about what will likely happen when the real, high stakes game begins. The person running the game does many simulations, making the "victim" forget that they cannot actually make any conclusions about the odds of winning. There are some variables that we simply do not know even if we put a lot of effort into making posterior probability distributions. People can be using slight of hand, for instance.
 
+## Temperance
+
+Models are often not as good as they appear. It's important to be patient and understand the pitfalls of the data you have created.
 
 
+
+## Fortitude
+
+## Justice
+
+
+```{r, echo=FALSE, fig.margin=TRUE, fig.cap="Probability Themes."}
+
+knitr::include_graphics("05-probability/images/coin_flip.jpg")
+
+```
+
+### Model structure
+
+Is $P_h$ constant?
+
+### Predictive uncertainty
+
+```{r, echo=FALSE, fig.margin=TRUE, fig.cap="PROBABILITY DOES NOT EXIST."}
+
+knitr::include_graphics("05-probability/images/probability_dice.jpeg")
+
+```
+
+A wise, Italian statistician named Bruno de Finetti once famously said "PROBABILITY DOES NOT EXIST." Some call him a "radical probabilist" but he was right to point out that probability is something humans constructed to understand the world; it is not possible to forecast the literal future. The two primary sources of predictive uncertainty are parameter uncertainty and unmodeled variation.
+
+<!-- Still conditional on model structure. p(result from experiment to come) -->
+
+### Unmodeled variation
+
+(This may be difficult to talk about since we don't (?) write down formulas with error terms.) But each chapter should discuss the concept of a residual. Even if we have perfect parameter estimates for a model structure which matches the unknown data generating mechanism, we still won't make perfect predictions. Some randomness is intrinsic. Example: prediction for an individual.
+
+result = model + other stuff, where other stuff is variation which is not part of the model, i.e., it is
+
+45 = 40 + 5
+
+unmodeled variation. *residual*; *fitted value* *expected value*
+
+result = fitted (expected) value + residual
+
+
+```{r, echo=FALSE, fig.margin=TRUE, fig.cap="De Finetti."}
+
+knitr::include_graphics("05-probability/images/de_finetti.jpg")
+
+```
+
+```{marginfigure}
+
+Bruno de Finetti was an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.
+
+```
+
+Throughout this chapter, we spent time going through examples of conditional distributions. However, it's worth noting that all probability distributions are conditional on something. Even in the most simple examples, when we were flipping a coin multiple times, we were assuming that the probability of getting heads versus tails did not change between tosses.
+
+We also discussed the difference between empirical, mathematical, and posterior probability distributions. Even though we developed these heuristics to better understand distributions, every time we make a claim about the world, it is based on our beliefs - what we think about the world. We could be wrong. Our beliefs can differ. Two reasonable people can have conflicting beliefs about the fairness of a die.
+
+It is useful to understand the three types of distributions and the concept of conditional distributions, but almost every probability distribution is conditional and posterior. We can leave out both words in future discussions, as we generally will in this book. They are implicit.
