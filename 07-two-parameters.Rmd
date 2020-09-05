@@ -3,34 +3,21 @@ output_yaml:
   - _output.yml
 ---
 
-<!-- TO-DO: Diego!--> 
-
-<!-- 1) Last section is called Virtues. Adding a discussion of the Four Virtues including their pictures. A paragraph or two about each. Only need to do this for the height example, not the pennies -->
-
-<!-- ```{r echo=FALSE, fig.margin=TRUE} -->
-<!-- knitr::include_graphics("other/images/fortitude.jpg") -->
-<!-- ``` -->
-
-<!-- 3) Include the mathematical formula, as a reminder, in the Justice section.  Add the equations. -->
-
-<!-- $$ height_i \sim N(\beta, \sigma^2$$ -->
-<!-- $$ \epsilon_i \sim N(0, \sigma^2)$$ -->
-<!-- Standard deviation of the bootstrap is the same thing as $\sigma$. -->
 
 
-<!-- 2) Read closely chapter 6. Connect your discussion to chapter 6 directly. The 2,400 beads in the Urn is like the 100,000,000 pennies in the US. The sample of 50 beads from the paddle is like the sample of 50 pennies we have. THe big difference is that chapter 6 just wants a proportion (or a count). You want a mean. -->
+<!-- TO-DO: --> 
+
+<!-- Check bootstrap code. Still getting 100% error. A bootstrap confidence interval should include the true mean 95% of the time. Also useful to make a cool plot showing this.  -->
+
+<!-- First draft of this now in Justice section. Revisit it. Read closely chapter 6. Connect your discussion to chapter 6 directly. The 2,400 beads in the Urn is like the 100,000,000 pennies in the US. The sample of 50 beads from the paddle is like the sample of 50 pennies we have. THe big difference is that chapter 6 just wants a proportion (or a count). You want a mean. -->
 
 <!-- Key differences: First,  Mak is dealing with a limited set of specific models: 2401 possible models. The procedure is just what students saw in chapter 5. (Read chapter 5 closely!) You, on the other hand, have a continuous parameter.  (Average year is continuous. Number of beads is discrete.) Second, Mak was only dealing with one parameter: the number of read beads, which we can also define as $p$, which is equal to the number of read beads divided by 2,400.  Her model was binomial, and there is only one unknown parameter p. Your have two unknown parameters: the mean mu of height in the US and the standard deviation sigma, of the normally distributed error term. -->
 
+<!-- Turn Standard error method section of coin bootstrap into a four sentence margin note. Show formula. Note that the 95% confidence interval from the bootstrap will generally be the same thing as +/- two times the standard error. But not always! -->
 
-<!-- 3)  A bootstrap confidence interval should include the true mean 95% of the time. Also useful to make a cool plot showing this. -->
+<!-- Memes and videos! -->
 
-<!-- 4) Turn Standard error method section of coin bootstrap into a four sentence margin note. Show formula. Note that the 95% confidence interval from the bootstrap will generally be the same thing as +/- two times the standard error. But not always! -->
-
-
-<!-- 5) Memes and videos! -->
-
-<!-- 6) Don't worry about predictions. But do discuss the potential difficulties of prediction in the Temperance section. -->
+<!-- Don't worry about predictions. But do discuss the potential difficulties of prediction in the Temperance section. -->
 
 <!-- STOP HERE. -->
 
@@ -101,7 +88,7 @@ In Chapter \@ref(one-parameter), we studied sampling. We started with a "tactile
 
 Remember: There is a *truth* here. There is an urn. It has red and white balls in it. An exact, but unknown, number of the balls are red. An exact, but unknown, number of the balls are white. An exact, but unknown, percentage of the balls are red -- defined as the number red divided by the sum of the number red and the number white. Our goal was to estimate that unknown percentage. We wanted to make statements about the world, even if we can never be certain that those statements are *true*. We will never have the time or inclination to actually count all the balls. We use the term *parameter* for things that exist but which are unknown. We use statistics to estimate the true values of parameters.
 
-We then mimicked this *physical* sampling exercise with an equivalent *virtual* sampling exercise using the computer. In Subsection \@ref(different-shovels), we repeated this sampling procedure 1,000 times, using three different virtual shovels with 25, 50, and 100 slots. We visualized these three sets of 1,000 estimates in Figure \@ref(fig:comparing-sampling-distributions-3) and saw that as the sample size increased, the variation in the estimates decreased.  We then expanded this for all sample sizes from 1 to 100.
+We then mimicked this *physical* sampling exercise with an equivalent *virtual* sampling exercise using the computer. In Subsection \@ref(different-shovels), we repeated this sampling procedure 1,000 times, using three different virtual shovels with 25, 50, and 100 slots. We visualized these three sets of 1,000 estimates in Chapter 6 and saw that as the sample size increased, the variation in the estimates decreased.  We then expanded this for all sample sizes from 1 to 100.
 
 In doing so, we constructed *sampling distributions*. The motivation for taking a 1,000 repeated samples and visualizing the resulting estimates was to study how these estimates varied from one sample to another; in other words, we wanted to study the effect of *sampling variation*. We quantified the variation of these estimates using their standard deviation, which has a special name: the *standard error*. In particular, we saw that as the sample size increased from 1 to 100, the standard error decreased and thus the sampling distributions narrowed. Larger sample sizes led to more *precise* estimates that varied less around the center. 
 
@@ -135,15 +122,14 @@ library(skimr)
 
 ### What is the average year on US pennies in 2019?
 
-Try to imagine all the pennies being used in the United States in 2019. That's a lot of pennies! Now say we're interested in the average year of minting of *all* these pennies. One way to compute this value would be to gather up all pennies being used in the US, record the year, and compute the average. However, this would be near impossible! So instead, let's collect a *sample* of 50 pennies from a local bank in downtown Northampton, Massachusetts, USA as seen in Figure \@ref(fig:resampling-exercise-a).
+Try to imagine all the pennies being used in the United States in 2019. That's a lot of pennies! Now say we're interested in the average year of minting of *all* these pennies. One way to compute this value would be to gather up all pennies being used in the US, record the year, and compute the average. However, this would be near impossible! So instead, let's collect a *sample* of 50 pennies from a local bank in downtown Northampton, Massachusetts, USA as seen in the photo below
 
-<!-- CB: I think it would help  with the Preceptor table concept to ask the question of 'If we are given a random penny in 2019, what would we predict the year to be on that penny?' And that way you can tie in and reinforce the idea of the predictive model which is introduced in my chapter like we talked about. Either introduce here or around line 246? -->
 
 ```{r, echo=FALSE, fig.cap="Collecting a sample of 50 US pennies from a local bank."}
 knitr::include_graphics(c("07-two-parameters/images/bank.jpg", "07-two-parameters/images/roll.jpg"))
 ```
 
-An image of these 50 pennies can be seen in Figure \@ref(fig:resampling-exercise-c). For each of the 50 pennies starting in the top left, progressing row-by-row, and ending in the bottom right, note there is an "ID" identification variable printed in black and the year of minting printed in white.
+An image of these 50 pennies can be seen in below. For each of the 50 pennies starting in the top left, progressing row-by-row, and ending in the bottom right, note there is an "ID" identification variable printed in black and the year of minting printed in white.
 
 ```{r, echo=FALSE, fig.cap="50 US pennies labelled."}
 knitr::include_graphics("07-two-parameters/images/3.jpg")
@@ -166,18 +152,11 @@ pennies_sample
 
 ```
 
-The `pennies_sample` data frame has 50 rows corresponding to each penny with two variables. The first variable `ID` corresponds to the ID labels in Figure \@ref(fig:resampling-exercise-c), whereas the second variable `year` corresponds to the year of minting saved as a numeric variable, also known as a double (`dbl`).
+The `pennies_sample` data frame has 50 rows corresponding to each penny with two variables. The first variable `ID` corresponds to the ID labels in our table above, whereas the second variable `year` corresponds to the year of minting saved as a numeric variable, also known as a double (`dbl`).
+
+Additionally, let's look at what a Preceptor Table would look like in this `pennies_sample example`. Essentially, what we are seeing is that if you are given a random penny in 2019, we are trying to estimate what they year is for that random penny. The last row is your best guess if that random year is given, because given that we are dealing with one parameter we are only dealing with one row. This would be different with two paramters because then we would have two rows. 
 
 ```{r, echo = FALSE}
-# Here is my guess for what a Preceptor table would look like in this
-# pennies_sample example. I haven't been showing the code for the set up so echo
-# = FALSE. Changing the columns to characters for the gt table so that I
-# can add the ... row. If you are given random penny X in 2019, what would you
-# guess the year to be? The last row is your best guess if you are given that
-# random penny. Only have one parameter so only one row to fill in because even
-# if you were given 10 random pennies, your best guess for their year is the
-# same. That would be different in the two parameter chapter because then you
-# could have two rows because you have two parameters.
 
 pennies_sample %>%
   slice(1:7, 50) %>%
@@ -195,7 +174,7 @@ pennies_sample %>%
   cols_align(align = "center", columns = TRUE)
 ```
 
-Based on these 50 sampled pennies, what can we say about *all* US pennies in 2019? Let's study some properties of our sample by performing an exploratory data analysis. Let's first visualize the distribution of the year of these 50 pennies using our data visualization tools from Chapter \@ref(viz). Since `year` is a numerical variable, we use a histogram in Figure \@ref(fig:pennies-sample-histogram) to visualize its distribution.
+Based on these 50 sampled pennies, what can we say about *all* US pennies in 2019? Let's study some properties of our sample by performing an exploratory data analysis. Let's first visualize the distribution of the year of these 50 pennies using our data visualization tools from before. Since `year` is a numerical variable, we use a histogram to visualize its distribution.
 
 ```{r, fig.cap="Distribution of year on 50 US pennies."}
 pennies_sample %>%
@@ -219,11 +198,10 @@ x_bar <- pennies_sample %>%
 
 Thus, if we're willing to assume that `pennies_sample` is a representative sample from *all* US pennies, a "good guess" of the average year of minting of all US pennies would be `r x_bar %>% dplyr::pull(mean_year) %>% round(2)`. In other words, around `r x_bar %>% pull(mean_year) %>% round()`. This should all start sounding similar to what we did previously in Chapter \@ref(one-parameter)!
 
+After calculating our "good guess", we can fill in the question mark for our original Preceptor Table. Essentially, any random penny in 2019, the best guess would be `r x_bar %>% dplyr::pull(mean_year) %>% round(2)`.
+
 ```{r, echo = FALSE}
-# Here I am using the exact same code but adding your good guess value. Any
-# random penny you give me in 2019, my best guess would be to say its from the
-# year 1995. Basically just filling in the question mark from the original
-# Preceptor table.
+
 
 pennies_sample %>%
   slice(1:7, 50) %>%
@@ -245,23 +223,22 @@ In Chapter \@ref(one-parameter), our *study population* was the urn of $N$ = 240
 
 Here our population is $N$ = whatever the number of pennies are being used in the US, a value which we don't know and probably never will. The population parameter of interest is now the *population mean* year of all these pennies, a value denoted mathematically by the Greek letter $\mu$ (pronounced "mu"). In order to estimate $\mu$, we went to the bank and obtained a sample of 50 pennies and computed the relevant point estimate: the *sample mean* year of these 50 pennies, denoted mathematically by $\overline{x}$ (pronounced "x-bar"). An alternative and more intuitive notation for the sample mean is $\hat{\mu}$. However, this is unfortunately not as commonly used, so in this book we'll stick with convention and always denote the sample mean as $\overline{x}$.
 
-We summarize the correspondence between the sampling urn exercise in Chapter \@ref(one-parameter) and our pennies exercise in Table \@ref(tab:table-ch8-b).
-
+We summarize the correspondence between the sampling urn exercise in Chapter \@ref(one-parameter) and our pennies exercise in Table below.
 
 ```{r, echo=FALSE}
 
-absurd_hack <- tibble(Scenario = c("1", "2", "3", "4", "5", "6"), 
-                      Population_parameter = c("Population Proportion", "Population mean", "Difference in population proportions", "Difference in Pupulation means", "Population regression slope", "Population regression coefficient"),
-                      Notation = c("$$p$$", "$$\\mu $$", "$$p_1 - p_2$$", "$$\\mu_1 - \\mu_2$$", "$$\\beta_1$$", "$$\\beta_0$$"), 
-                      Point_Estimate = c("Sample Proportion","Sample mean", "Difference in sample proportions", "Difference in sample means", "Fitted regression slope", "Fitted regression intercept"),
-                      Symbol = c("$$\\hat{p}$$", "$$\\overline{x}$$ or $$\\hat{\\mu}$$", "$$\\hat{p}_1 - \\hat{p}_2$$", "$$\\overline{x}_1 - \\overline{x}_2$$", "$$b_1$$ or $$\\hat{\\beta}_1$$", "\\$$b_0$$ or $$\\hat{\\beta}_0$$")) %>%  gt() %>%  fmt_markdown(columns = TRUE)
+absurd_hack <- tibble(Scenario = c("1", "2", "3", "4"), 
+                      Population_parameter = c("Population Proportion", "Population mean", "Difference in population proportions", "Difference in population means"),
+                      Notation = c("$$p$$", "$$\\mu $$", "$$p_1 - p_2$$", "$$\\mu_1 - \\mu_2$$"), 
+                      Point_Estimate = c("Sample Proportion","Sample mean", "Difference in sample proportions", "Difference in sample means"),
+                      Symbol = c("$$\\hat{p}$$", "$$\\overline{x}$$ or $$\\hat{\\mu}$$", "$$\\hat{p}_1 - \\hat{p}_2$$", "$$\\overline{x}_1 - \\overline{x}_2$$")) %>%  gt() %>%  fmt_markdown(columns = TRUE)
 absurd_hack
 
 ```
 
-Going back to our 50 sampled pennies in Figure \@ref(fig:resampling-exercise-c), the point estimate of interest is the sample mean $\overline{x}$ of `r x_bar %>% pull(mean_year) %>% round(2)`. This quantity is an *estimate* of the population mean year of *all* US pennies $\mu$.
+Going back to our 50 sampled pennies, the point estimate of interest is the sample mean $\overline{x}$ of `r x_bar %>% pull(mean_year) %>% round(2)`. This quantity is an *estimate* of the population mean year of *all* US pennies $\mu$.
 
-Recall that we also saw in Chapter \@ref(one-parameter) that such estimates are prone to *sampling variation*. For example, in this particular sample in Figure \@ref(fig:resampling-exercise-c), we observed three pennies with the year 1999. If we sampled another 50 pennies, would we observe exactly three pennies with the year 1999 again? More than likely not. We might observe none, one, two, or maybe even all 50! The same can be said for the other 26 unique years that are represented in our sample of 50 pennies.
+Recall that we also saw in Chapter \@ref(one-parameter) that such estimates are prone to *sampling variation*. For example, in this particular sample, we observed three pennies with the year 1999. If we sampled another 50 pennies, would we observe exactly three pennies with the year 1999 again? More than likely not. We might observe none, one, two, or maybe even all 50! The same can be said for the other 26 unique years that are represented in our sample of 50 pennies.
 
 So what do we do about this sampling variation? One solution is that we create bootstrap samples! As you already know that resampling is a significant tool in data science, bootstrapping is one such resampling method that many data scientists use today. Bootstrapping essentially repeatedly draws independent samples from our data set with replacement. By sampling with replacement, the same observation can be sampled multiple times and each bootstrap sample will have the same number of observations as the original data set. 
 
@@ -335,7 +312,7 @@ virtual_resamples %>%
 Recall from chapter 5 that posterior distribution is based on beliefs and expectations. In the case of the bootstrap samples we made, the posterior distribution represents our knowledge about the mean year of American Pennies in 2019 after taking into account the the data we gathered from our bootstrap sample means. As demonstrated in the plot above, we can see that the mean year of pennies in 2019 is most likely between 1995 and 1998 from our posterior distribution. 
 
 
-Recall that in the "resampling with replacement" scenario we are illustrating here, this histogram has a special name: the *bootstrap distribution of the sample mean*. Furthermore, recall it is an approximation to the *sampling distribution* of the sample mean, a concept you saw in Chapter \@ref(sampling) on sampling. This distribution allows us to study the effect of sampling variation on our estimates of the true population mean, in this case the true mean year for *all* US pennies. However, unlike in Chapter \@ref(one-parameter) where we took multiple samples (something one would never do in practice), bootstrap distributions are constructed by taking multiple resamples from a *single* sample: in this case, the 50 original pennies from the bank. 
+Recall that in the "resampling with replacement" scenario we are illustrating here, this histogram has a special name: the *bootstrap distribution of the sample mean*. Furthermore, recall it is an approximation to the *sampling distribution* of the sample mean, a concept you saw before. This distribution allows us to study the effect of sampling variation on our estimates of the true population mean, in this case the true mean year for *all* US pennies. However, unlike in Chapter \@ref(one-parameter) where we took multiple samples (something one would never do in practice), bootstrap distributions are constructed by taking multiple resamples from a *single* sample: in this case, the 50 original pennies from the bank. 
 
 Congratulations! You've just constructed your first bootstrap distribution! In the next section, you'll see how to use this bootstrap distribution to construct *confidence intervals*.
 
@@ -346,9 +323,9 @@ Let's start this section with an analogy involving fishing. Say you are trying t
 
 Now think back to our pennies exercise where you are trying to estimate the true population mean year $\mu$ of *all* US pennies. Think of the value of $\mu$ as a fish.
 
-On the one hand, we could use the appropriate *point estimate/sample statistic* to estimate $\mu$, which we saw in Table \@ref(tab:table-ch8-b) is the sample mean $\overline{x}$. Based on our sample of 50 pennies from the bank, the sample mean was `r x_bar %>% pull(mean_year) %>% round(2)`. Think of using this value as "fishing with a spear."
+On the one hand, we could use the appropriate *point estimate/sample statistic* to estimate $\mu$, which we saw in the table in the previous section, is the sample mean $\overline{x}$. Based on our sample of 50 pennies from the bank, the sample mean was `r x_bar %>% pull(mean_year) %>% round(2)`. Think of using this value as "fishing with a spear."
 
-What would "fishing with a net" correspond to? Look at the bootstrap distribution in Figure \@ref(fig:one-thousand-sample-means) once more. Between which two years would you say that "most" sample means lie?  While this question is somewhat subjective, saying that most sample means lie between 1992 and 2000 would not be unreasonable. Think of this interval as the "net."
+What would "fishing with a net" correspond to? Look at the bootstrap distribution we created once more. Between which two years would you say that "most" sample means lie?  While this question is somewhat subjective, saying that most sample means lie between 1992 and 2000 would not be unreasonable. Think of this interval as the "net."
 
 What we've just illustrated is the concept of a *confidence interval*, which we'll abbreviate with "CI" throughout this book. As opposed to a point estimate/sample statistic that estimates the value of an unknown population parameter with a single value, a *confidence interval* \index{confidence interval} gives what can be interpreted as a range of plausible values. Going back to our analogy, point estimates/sample statistics can be thought of as spears, whereas confidence intervals can be thought of as nets.
 
@@ -361,19 +338,17 @@ Our proposed interval of 1992 to 2000 was constructed by eye and was thus somewh
 
 Second, they both require you to specify the *confidence level*. Commonly used confidence levels include 90%, 95%, and 99%.  All other things being equal, higher confidence levels correspond to wider confidence intervals, and lower confidence levels correspond to narrower confidence intervals. In this book, we'll be mostly using 95% and hence constructing "95% confidence intervals for $\mu$" for our pennies activity.
 
+
+Using confidence intervals, we can again look back at our Preceptor Tables. We are not entirely sure that `r x_bar %>% dplyr::pull(mean_year) %>% round(2)` is the perfect guess. However, if we use confidence intervals we can be 95% sure that whatever year we get for a penny in 2019 is the truth. Thus, we will see a confidence interval yet to be created for the "Year" of our random penny from 2019. 
+
 ```{r, echo = FALSE}
-# Maybe another Preceptor table here with the 90% or 95% confidence interval in
-# the last row. Specify that maybe I would answer the question now that if you
-# gave me a random penny in 2019, I would be 95% confident its year is somewhere
-# between x and x. Change the value for year in the second add_row code line to
-# add that confidence interval however you think it best fits in.
 
 pennies_sample %>%
   slice(1:7, 50) %>%
   mutate(ID = as.character(ID),
          year = as.character(year)) %>%
   add_row(ID = "...", year = "...", .after  = 7) %>%
-  add_row(ID = "X", year = "1995") %>%
+  add_row(ID = "X", year = "(?,?)") %>%
   gt() %>%
   cols_label(ID = md("**Penny ID**"),
              year = "Year") %>%
@@ -385,7 +360,6 @@ pennies_sample %>%
 ```
 
 ### Confidence Intervals using lm and quantile
-
 
 
 First, let's type `lm(year ~ 1, data = pennies_sample)` in our code chunk. This alone will get the mean of our dataset for pennies_sample
@@ -598,131 +572,85 @@ Of the `r sims` bootstrap analyses we completed, each starting with a different 
 All our confidence intervals contained true 90th percentile, 184.3 cm! We can conclude from our results that the bootstrap does, in fact, work!
 
 
-## Parameter Uncertainty and Unmodeled Variation
+<!-- DK: Write a few paragraphs of transition. Bayesian models are the bootstrap, except much more easier to use. -->
 
-Although, we have used bootstrap to predict what we think the mean or a parameter like the median will be, it is important to understand what parameter uncertainty is. Parameter uncertainty refers to when exact values of parameters are unknown to experimenters and cannot be controlled for. These values usually cannot be inferred by statistical or computational methods. Let's look at the confidence interval of the mean as an example. Based on our bootstrap method, the 95% CI for the mean income is [128999.8, 155201.6]. However, if we take into consideration parameter uncertainty here, we fall under the trap of overconfidence. This is because we do not know for sure the way our confidence interval is elicited is perfectly accurate. We are thus overconfident here when we use a confidence interval. 
+## Prudence
 
-Furthermore, it is important that we understand what a residual is. The residual in data science is the error that results. In simple terms, it is the observed value minus the predicted value. So, for example, let's say that the actual mean income is 140,000 but the predicted mean income we got was 130,000. That means the residual in our estimation is 10,000. 
+```{r echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/prudence.jpg")
+```
 
-But the reason why residuals are so important is that they help explain why we can't make perfect predictions, especially for an individual. In our experiments, there is a lot of unmodeled variation, or residual variation. Residual variance refers to the variance of residuals, and occurs because randomness in our data is inherently intrinsic. There will be randomness in our data even if we have full knowledge of our data. This thus implies that we cannot really make fully accurate predictions of the future; we can only make probabilistic predictions. It is essentially difficult to control for residual variation: predictions we get from methods like bootstrapping should not be taken as the final consensus. 
+Let's look at how our key theme, Prudence, fits in with two-parameter estimates. Just like in the previous chapter, prudence covers the relevance of the estimands and the map from concept to data. 
 
-I might need to talk more about unmodeled variation here.
-reference chapter 5: even if something is fari, we still cant make accurate predictions, only probabilistic predictions.
+In our NHANES data, we focused on the mean and 90th percentile of male heights. We can easily extract both estimands from our bootstrap samples. However, are these estimands accurately capturing what we care about? Probably, but we are not fully sure. What we want optimally is if we can accurately predict the mean and 90th percentile of male heights in the US. We want a model that should generalize its points of interests and include all predictors. For example, with regard to the outcome variable, a model of heights will not necessarily tell you about patterns of male heights. 
 
+Our problem, estimating both mean and 90th percentile of male heights, is by taking care of our confounding variables.
 
-## Virtues
+First, there are both genders in the data. We had to adjust for that by filtering to only men. Additionally, males have a certain age range, typically above 18 years old. We also had to account for that. By using bootstraps, we were able to use random samples to thus help get more representative samples.
 
+Second, it's important to understand that data is always missing. We could easily calculate our estimands through arithmetic means, but because we don't have perfect data we will have to estimate. In this case, by using bootstrap samples we were able to create confidence intervals to give us some quantitative measure of confidence. 
 
+## Justice
+```{r, echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/justice.jpg")
+```
+Let's try to understand the math behind our height model. For one, height is normally distributed because our data is continuous. Unlike in the previous chapter where data is discrete, we are dealing with continuous data. In addition, we can find the mean height and standard deviation of height, both of which are parameters for the normal distribution. Therefore, we will see the following:
 
+$$ height_i \sim N(\beta, \sigma^2)$$
+But what about the standard error in our data. What does its distribution look like? Well the distribution of our standard error is also normally distributed. This is because the errors from our bootstrap samples are random and continuous, which will also follow a normal distribution.
 
-## Conclusion {#ci-conclusion}
+$$ \epsilon_i \sim N(0, \sigma^2)$$ 
+Standard deviation of the bootstrap is the same thing as $\sigma$.
 
-<!-- DK: This section --- and, indeed, the conclusion to each chapter --- are very important. This is a real chance to hit all the highlights. Everything here should be considered fair game for the exam. Indeed, everything here should be covered in the exam. This one is not bad. But it could be cleaned up a bit, with much nicer plots. Maybe a table which directly compares bootstrap and sampling distributions. Need to remind people about why we bootstrap. (We do it because it proves that the lm() simple approaches make sense. It is the justification for our shortcuts. And, indeed, whenever those shortcuts don't work --- which is often! --- a bootstrap still will work.) -->
+## Fortitude
+```{r echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/fortitude.jpg")
+```
+In data science, we deal with words, math, and code. The most important term is code. We need some sort of framework to detail the structure of our model using all three terms. However, fortitude is needed to implement the coded model. 
 
-### Comparing bootstrap and sampling distributions {#bootstrap-vs-sampling}
+The data we have seen is generated by the complex and confusing world. We have to build a model to create some sort of computational mechanism that creates fake data that is consistent with the real, true data in the world. This is our "Data Generating Mechanism," which provides predictions and uncertainty. 
 
-Let's talk more about the relationship between *sampling distributions* and *bootstrap distributions*.\index{bootstrap!distribution}\index{sampling distributions}
+We need a "machine" that generates our predictions, which is the same thing as a machine which fills in all the question marks in the Actual Preceptor Table and provides confidence intervals, which is the same thing as a machine which produces "fake data" which looks a lot like our actual data.  
 
-Recall back in Subsection \@ref(shovel-1000-times), we took 1,000 virtual samples from the `urn` using a virtual shovel, computed 1,000 values of the sample proportion red $\hat{p}$, then visualized their distribution in a histogram. Recall that this distribution is called the *sampling distribution of* $\hat{p}$. Furthermore, the standard deviation of the sampling distribution has a special name: the *standard error*.
+We are ultimately looking at our code and uncertainty under fortitude. 
 
-We also mentioned that this sampling activity does not reflect how sampling is done in real life. Rather, it was an *idealized version* of sampling so that we could study the effects of sampling variation on estimates, like the proportion of the shovel's balls that are red. In real life, however, one would take a single sample that's as large as possible, much like in the Obama poll we saw in Section \@ref(sampling-case-study). But how can we get a sense of the effect of sampling variation on estimates if we only have one sample and thus only one estimate? Don't we need many samples and hence many estimates?
+## Temperance
 
-<!-- DK: There is nothing wrong with this text, but I don't like it. We need a more coherent story connecting sampling to the bootstrap. Randomization is magic and these are two forms of randomization. Maybe each chapter after this should mention three types of randomization. These two and then assignment to treatment. Indeed, all of statistics is dealing with situations in which we could not use all three randomization techniques, or approximations thereto. -->
+```{r echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/temperance.jpg")
+```
 
-The workaround to having a *single* sample was to perform *bootstrap resampling with replacement* from the single sample. We did this in the resampling activity in Section \@ref(resampling-tactile) where we focused on the mean year of minting of pennies. We used pieces of paper representing the original sample of 50 pennies from the bank and resampled them with replacement from a hat. We had 35 of our friends perform this activity and visualized the resulting 35 sample means $\overline{x}$ in a histogram in Figure \@ref(fig:tactile-resampling-6). 
+Temperance is probably the most important virtue in data science. We won't have the models that look as good as they appear. We are living in a constantly changing and complex world. There will be unknown unknowns, which factors in the representation of our data, realism in our assumptions, and the call for testing. 
 
-This distribution was called the *bootstrap distribution* of $\overline{x}$. We stated at the time that the bootstrap distribution is an *approximation* to the sampling distribution of $\overline{x}$ in the sense that both distributions will have a similar shape and similar spread. \index{bootstrap!distribution!approximation of sampling distribution} Thus the *standard error* of the bootstrap distribution can be used as an approximation to the *standard error* of the sampling distribution. 
-<!-- DK: The below seems useful, but does it belong in a Conclusion? Probably not. Perhaps each chapter ends with some stats nonsense (like CLT in sampling chapter) before we get to the real conclusion. -->
+In data science, we are focused on that missing data, the data from the future. But the world is always changing, and so it's hard to capture that missing data. Our predictions are going to have some sort of uncertainty. 
 
-Let's show you that this is the case by now comparing these two types of distributions. Specifically, we'll compare
+In the case of male heights, what would be the average male height if the data was collected a week later? What if there was a pandemic? What if the world lost a great amount of Vitamin D? As you can see, there are events that are considered unknown unknowns. It's so hard to account for the future, and so our models are likely going to be wrong.
 
-1. the sampling distribution of $\hat{p}$ based on 1,000 virtual samples from the `urn` from Subsection \@ref(shovel-1000-times) to
-1. the bootstrap distribution of $\hat{p}$ based on 1,000 virtual resamples with replacement from Ilyas and Yohan's single sample `urn_sample_1`.
+Another reason why we deal with temperance in data science is that there is realism. Does the structure of our bootstrap match the world? While we hope we won't be wrong, it never matches frankly and we will see that our conclusions are wrong. 
 
+Last but not least, getting the wrong conclusions suck. But at least we are not dealing with null hypotheses. Playing the prediction game could be fun, but if we reject the null hypothesis if p is less than .05, what if we get .06 as our p-value? Will that honestly make a difference? Probably not!
 
 
 
-#### Bootstrap distribution {-}
 
-Here is the code to construct the bootstrap distribution of $\hat{p}$ based on Ilyas and Yohan's original sample of 50 balls saved in `urn_sample_1`. 
 
-<!-- DK: This is still ugly. Might also be nice to show this exercise with sampling of 100, 1000, 10000 and then 100000, in order to show how things smooth out and look more normal as n increases. -->
 
 
+<!-- Follow Gelman. Use some math, from the themes.Rmd file. -->
 
-#### Comparison {-}
 
+```{r}
+# mod.obj <- stan_glm(data = ch7_male, height ~ 1, refresh = 0)
+# 
+# mod.obj
+```
 
+<!-- Explain in detail all aspects of the model. -->
 
 
-1. To the bootstrap distribution on the bottom: a dashed line at the sample proportion $\hat{p}$ = 21/50 = 0.42 = 42\% that Ilyas and Yohan observed.
+```{r}
+# tbl_regression(mod.obj)
+```
 
 
 
-Notice that the bootstrap distribution's standard error is a rather good *approximation* to the sampling distribution's standard error. This leads us to our second lesson about bootstrapping:
-
-> Even if the bootstrap distribution might not have the same center as the sampling distribution, it will likely have very similar shape and spread. In other words, bootstrapping will give you a good estimate of the *standard error*. 
-
-Thus, using the fact that the bootstrap distribution and sampling distributions have similar spreads, we can build confidence intervals using bootstrapping as we've done all throughout this chapter!
-
-
-<!-- ## Rubin Causal Model -->
-
-
-<!-- At least then we could have an average blood pressure for the respondents in our sample, right? -->
-
-<!-- Not so fast! It is probably not reasonable to assume that every blood pressure measurement is perfectly accurate.  Some survey respondents may misremember or round the values, or use measurements from a doctor's visit long ago.  (How many American adults own blood pressure monitors?)  Furthermore, blood pressure monitors aren't 100% accurate. -->
-
-<!-- One's blood pressure reading also isn't a single, constant number, even if it could be perfectly measured: it depends on the time of day, whether one exercised or ate before taking the measurement, and so on. -->
-
-<!-- So what we really should do is think of each measurement as being drawn from a distribution of potential values for each person; we could construct a *confidence interval* around each of the values to try to reflect these sources of error.  Let's say that a fair CI is 15 points in either direction.  (It may actually be higher; this is just for illustration.)  Then our table really looks something like this: -->
-
-<!-- ```{r, echo = FALSE} -->
-<!-- # First, we create a tibble with the values we want for the table -->
-
-<!-- tibble(subject = c("Respondent 1", "Respondent 2", "Respondent 3", "...", "Respondent 1,000"), -->
-<!--        `Blood Pressure` = c("130 (115, 145)", "110 (95, 125)", "115 (100, 130)", "...", "140 (125, 155)")) %>% -->
-
-<!--   # Then, we use the gt function to make it pretty -->
-
-<!--   gt() %>% -->
-<!--   cols_label(subject = md("**Respondent**")) %>% -->
-<!--   tab_style(cell_borders(sides = "right"), -->
-<!--             location = cells_body(columns = vars(subject))) %>% -->
-<!--   tab_style(cell_text(weight = "bold"), -->
-<!--             location = cells_body(columns = vars(subject))) -->
-<!-- ``` -->
-
-
-<!-- 1. **Uncertainty in estimating the ATE**.  Even if treatment is randomly assigned, and thus $\widehat{ATE}$ is an unbiased estimate of the true ATE, we still may not have a very *precise* estimate if our sample is small.  With this miniscule sample (five sujects!), the uncertainty might be gigantic, perhaps someting like ($-25$, $13$), which would lead to a prediction for Joe of ($117, 155$).  As we get a larger sample size, this uncertainty decreases.   -->
-<!-- 1. **Individual variation**.  Even if we have a perfect estimate of the *average* treatment effect, it still may be the case that the effect *for Joe* is higher or lower than average.  We can assume this away if we say that the treatment effect is a constant $\tau$ for everyone, but that is not likely to be true in the real world --- and this source of uncertainty does not go away simply by collecting more observations.  So with a large sample, let's say that we calculated a confidence interval around $\widehat{ATE}$ of ($-6, -5.67$), leading to an interval for Joe's outcome under control of ($135.67, 136$).  The uncertainty due to individual variation may still be a great deal higher---say ($120, 152$).  These numbers are simply illustrative, but they highlight an important point: even if you have a good estimate of the ATE, you should still be much more uncertain about the causal effect for any *particular individual*. -->
-
-<!-- The main takeaway is that we can get rid of #1 by collecting more data, but the only way to get rid of #2 is through making assumptions, potentially very strong ones. -->
-
-<!-- ## Conclusion -->
-
-
-<!--
-Other stuff which might be added
-
-The kind of computer-based statistical inference we've seen so far has a particular name in the field of statistics: *simulation-based inference*. This is because we are performing statistical inference using computer simulations.\index{simulation-based inference} In our opinion, two large benefits of simulation-based methods over theory-based methods are that (1) they are easier for people new to statistical inference to understand and (2) they also work in situations where theory-based methods and mathematical formulas don't exist.
-
-
-#### Confidence intervals based on 100 virtual samples {-}
-
-Let's say, however, we repeated this 100 times, not tactilely, but virtually. Let's do this only 100 times instead of 1000 like we did before so that the results can fit on the screen. Again, the steps for compute a 95% confidence interval for $p$ are:
-
-1. Collect a sample of size $n = 50$ as we did in Chapter \@ref(one-parameter)
-1. Compute $\hat{p}$: the sample proportion red of these $n$ = 50 balls
-1. Compute the standard error $\text{SE} = \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$
-1. Compute the margin of error $\text{MoE} = 1.96 \cdot \text{SE} =  1.96 \cdot \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$
-1. Compute both end points of the confidence interval:
-    + `lower_ci`: $\hat{p} - \text{MoE} = \hat{p} - 1.96 \cdot \text{SE} = \hat{p} - 1.96 \cdot \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$
-    + `upper_ci`: $\hat{p} + \text{MoE} = \hat{p} + 1.96 \cdot \text{SE} = \hat{p} +1.96 \cdot \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$
-
-Run the following three steps, being sure to `View()` the resulting data frame after each step so you can convince yourself of what's going on:
-
-
-
-We see that of our 100 confidence intervals based on samples of size $n$ = 50, `sum(virtual_prop_red[["captured"]])` of them captured the true $p = 900/2400$, whereas `100 - sum(virtual_prop_red[["captured"]])` of them missed. As we create more and more confidence intervals based on more and more samples, about 95% of these intervals will capture. In other words, our procedure is "95% reliable." 
--->
