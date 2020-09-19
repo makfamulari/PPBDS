@@ -41,7 +41,6 @@ output_yaml:
 
 # Visualization
 
-
 This chapter focuses on **ggplot2**, one of the core packages in the **tidyverse**. To access the datasets, help pages, and functions that we will use in this chapter, load the tidyverse by running this code:
 
 ```{r} 
@@ -93,7 +92,7 @@ While it is not required to be a seasoned coder/computer programmer to use R, th
 
 ### Tips
 
-Learning to code/program is quite similar to learning a foreign language. It can be daunting and frustrating at first. Such frustrations are common and it is normal to feel discouraged as you learn. However, just as with learning a foreign language, if you put in the effort and are not afraid to make mistakes, anybody can learn and improve. 
+Learning to code/program is quite similar to learning a foreign language. It can be daunting and frustrating at first. Such frustrations are common and it is normal to feel disCouraged as you learn. However, just as with learning a foreign language, if you put in the effort and are not afraid to make mistakes, anybody can learn and improve. 
 
 Here are a few useful tips to keep in mind as you learn to program:
 
@@ -269,7 +268,7 @@ Each row in this table corresponds to a country in 2007. For each row, we have 5
 Now consider the following scatterplot, which plots this for all `r nrow(gapminder_2007)` of the data's countries.
 
 <!--
-Note that R will deal with large numbers using scientific notation.  So in the legend for "Population", 1.25e+09 is 1.25 $\times$ 10^9^ = 1,250,000,000 = 1.25 billion. 
+Note that R will deal with large numbers using scientific notation.  So in the legend for "Population", 1.25e+09 is 1.25 x 10^9^ = 1,250,000,000 = 1.25 billion. 
 -->
 
 ```{r, echo=FALSE}
@@ -335,7 +334,7 @@ Let's first unpack the graphic. Observe that a *positive relationship* exists be
 
 Let's turn our attention to the warning message. R is alerting us to the fact that five rows were ignored due to them being missing. For these 5 rows, either the value for `dep_delay` or `arr_delay` or both were missing (recorded in R as `NA`), and thus these rows were ignored in our plot.
 
-Before we continue, let's make a few more observations about this code that created the scatterplot. Note that the `+` sign comes at the end of lines, and not at the beginning. You'll get an error in R if you put it at the beginning of a line. When adding layers to a plot, you are encouraged to start a new line after the `+` (by pressing the Return/Enter button on your keyboard) so that the code for each layer is on a new line. As we add more and more layers to plots, you'll see this will greatly improve the legibility of your code.
+Before we continue, let's make a few more observations about this code that created the scatterplot. Note that the `+` sign comes at the end of lines, and not at the beginning. You'll get an error in R if you put it at the beginning of a line. When adding layers to a plot, you are enCouraged to start a new line after the `+` (by pressing the Return/Enter button on your keyboard) so that the code for each layer is on a new line. As we add more and more layers to plots, you'll see this will greatly improve the legibility of your code.
 
 To stress the importance of adding the layer specifying the `geom`etric object, consider this figure where no layers are added. Because the `geom`etric object was not specified, we have a blank plot which is not very useful!
 
@@ -463,7 +462,8 @@ ggplot(data = weather, mapping = aes(x = temp, y = factor("A"))) +
   labs(caption = "Plot of hourly temperature recordings from NYC in 2013.")
 ```
 
-This gives us a general idea of how the values of `temp` distribute: observe that temperatures vary from around `r round(min(weather$temp, na.rm = TRUE), 0)`&deg;F (-11&deg;C) up to `r round(max(weather$temp, na.rm = TRUE), 0)`&deg;F (38&deg;C).  Furthermore, there appear to be more recorded temperatures between 40&deg;F and 60&deg;F than outside this range. However, because of the high degree of overplotting in the points, it's hard to get a sense of exactly how many values are between say 50&deg;F and 55&deg;F.
+This gives us a general idea of how the values of `temp` distribute: observe that temperatures vary from around 
+`r round(min(weather$temp, na.rm = TRUE), 0)`&deg;F (-11&deg;C) up to `r round(max(weather$temp, na.rm = TRUE), 0)`&deg;F (38&deg;C).  Furthermore, there appear to be more recorded temperatures between 40&deg;F and 60&deg;F than outside this range. However, because of the high degree of overplotting in the points, it's hard to get a sense of exactly how many values are between say 50&deg;F and 55&deg;F.
 
 What is commonly produced instead of the horizontal line plot is known as a *histogram*.  A histogram is a plot that visualizes the *distribution* of a numerical value as follows:
 
@@ -607,7 +607,10 @@ boxplot_3 <- base_plot +
 boxplot_1 + boxplot_2 + boxplot_3
 ```
 
-What the boxplot does is visually summarize the `r weather %>% filter(month == 11) %>% nrow()` points by cutting the `r n_nov` temperature recordings into *quartiles* at the dashed lines, where each quartile contains roughly `r n_nov` $\div$ 4 $\approx$ `r round(n_nov / 4)` observations. Thus
+What the boxplot does is visually summarize the 
+`r weather %>% filter(month == 11) %>% nrow()` points by cutting the `r n_nov` temperature recordings into *quartiles* at the dashed lines, where each quartile contains 
+roughly `r n_nov` $\div$ 4 $\approx$ 
+`r round(n_nov / 4)` observations. Thus
   
 1. 25% of points fall below the bottom edge of the box, which is the first quartile of `r quartiles[1] %>% round(3)`&deg;F. In other words, 25% of observations were below `r quartiles[1] %>% round(3)`&deg;F.
 1. 25% of points fall between the bottom edge of the box and the solid middle line, which is the median of `r quartiles[2] %>% round(3)`&deg;F. Thus, 25% of observations were between `r quartiles[1] %>% round(3)`&deg;F and `r quartiles[2] %>% round(3)`&deg;F and 50% of observations were below `r quartiles[2] %>% round(3)`&deg;F.
@@ -641,7 +644,8 @@ The resulting plot shows 12 separate "box and whiskers" plots similar to the rig
 * The "whisker" portions of these plots extend out from the bottoms and tops of the boxes and represent points less than the 25th percentile and greater than the 75th percentiles, respectively. They're set to extend out no more than $1.5 \times IQR$ units away from either end of the boxes. We say "no more than" because the ends of the whiskers have to correspond to observed temperatures.  The length of these whiskers show how the data outside the middle 50% of values vary, with longer whiskers indicating more variability.
 * The dots representing values falling outside the whiskers are called *outliers*. These can be thought of as anomalous ("out-of-the-ordinary") values.
 
-It is important to keep in mind that the definition of an outlier is somewhat arbitrary and not absolute. In this case, they are defined by the length of the whiskers, which are no more than $1.5 \times IQR$ units long for each boxplot. Looking at this side-by-side plot we can see, as expected, that summer months (6 through 8) have higher median temperatures as evidenced by the higher solid lines in the middle of the boxes. We can easily compare temperatures across months by drawing imaginary horizontal lines across the plot. Furthermore, the heights of the 12 boxes as quantified by the interquartile ranges are informative too; they tell us about variability, or spread, of temperatures recorded in a given month. 
+It is important to keep in mind that the definition of an outlier is somewhat arbitrary and not absolute. In this case, they are defined by the length of the whiskers, which are no more 
+than $1.5 \times IQR$ units long for each boxplot. Looking at this side-by-side plot we can see, as expected, that summer months (6 through 8) have higher median temperatures as evidenced by the higher solid lines in the middle of the boxes. We can easily compare temperatures across months by drawing imaginary horizontal lines across the plot. Furthermore, the heights of the 12 boxes as quantified by the interquartile ranges are informative too; they tell us about variability, or spread, of temperatures recorded in a given month. 
 
 ### `geom_violin()`
 
@@ -812,7 +816,9 @@ Compare these barplots. They are identical because they reflect counts of the sa
 
 Let's again look at the `flights` data frame in the `nycflights13` package and visualize the distribution of the categorical variable `carrier`. Alternatively, say you had a data frame where the number of flights for each `carrier` was pre-counted.
 
-```{r include = FALSE}
+<!-- DK: This is very slopy because we have not learne dplyr yet. Use a different data set which does not require cleaning.  -->
+
+```{r}
 flights_counted <- flights %>% 
   group_by(carrier) %>% 
   summarize(number = n())
@@ -982,7 +988,7 @@ ggplot(data = gapminder_07,
   facet_wrap(~ continent)
 ```
 
-This is way better! However, R chooses by default 3 plots per row, so that Europe and Oceania are below the other three continents. We can specify the number of rows and columns in the grid by using the `nrow` and `ncol` arguments inside of `facet_wrap()`. Let's get all continents in a row by setting nrow = 1:
+This is way better! However, R chooses by default 2 plots per row, so that Asia and Europe are below the other two continents. We can specify the number of rows and columns in the grid by using the `nrow` and `ncol` arguments inside of `facet_wrap()`. Let's get all continents in a row by setting nrow = 1:
 
 ```{r}
 ggplot(data = gapminder_07, 
@@ -1006,7 +1012,7 @@ ggplot(data = gapminder_07,
   stat_boxplot()
 ```
 
-Now we not only recognize the differences between the continents, but also within the continents better. However, the interpretation of box plots is not so intuitive, at least at first glance. An easier to understand alternative is a straight line, which we can add with `stat_smooth(formula = y ~ x, method = "lm", se = FALSE)`:
+Now we not only recognize the differences between the continents, but also within the continents better. However, the interpretation of box plots is not so intuitive, at least at first glance. An easier to understand alternative is a line of best fit, which we can add with `stat_smooth(formula = y ~ x, method = "lm", se = FALSE)`:
 
 ```{r}
 ggplot(data = gapminder_07, 
@@ -1015,8 +1021,6 @@ ggplot(data = gapminder_07,
   facet_wrap(~ continent, nrow = 1) +
   stat_smooth(formula = y ~ x, method = "lm", se = FALSE)
 ```
-
-Notice that we used the alpha argument again here. This is optional, but it makes the plot clearer. You can also see that R did not draw a line for Oceania - this is normal and often happens when there is not enough data for an operation.
 
 These were only two stats, but there are many more for different purposes. If you type "stat" in the console, you will get suggestions for the different options that ggplot offers.
 
@@ -1050,7 +1054,7 @@ ggplot(data = gapminder_07,
   stat_smooth(formula = y ~ x, method = "lm", se = FALSE)
 ```
 
-Notice several things about this code. First, positions should be placed in the geom they refer to (in our case `geom_point()`). Second, positions always start with *position =* followed by the position type (in our case `position_jitter()`). The width and height are optional and can be freely defined. You might wonder what the difference between `position_jitter()` and `geom_jitter()` is. The answer is: Nothing. In R there are often several functions which can lead to the same result. However, it is practical to start with `geom_point()` first, because then you still have the choice of changing the position by shaking the dots - with `geom_jitter()` the plot is constructed like this from the beginning.
+Notice several things about this code. First, positions should be placed in the geom they refer to (in our case `geom_point()`). Second, positions always start with `position =` followed by the position type (in our case `position_jitter()`). The width and height are optional and can be freely defined. You might wonder what the difference between `position_jitter()` and `geom_jitter()` is. The answer is: Nothing. In R there are often several functions which can lead to the same result. However, it is practical to start with `geom_point()` first, because then you still have the choice of changing the position by shaking the dots - with `geom_jitter()` the plot is constructed like this from the beginning.
 
 Besides the position we can also manipulate the limits of the axes by using `xlim()` and `ylim()`. For example, assume that we are only interested in countries with a GDP per capita from 0 to 30000. We can tell R as follows that we only want to see this range. Note that, because `data` is the first argument and `mapping` is the second to `ggplot()`, we don't actually have to name the arguments. We can just provide them, as long as they are in the correct order.
 
@@ -1076,7 +1080,8 @@ ggplot(gapminder_07,
   scale_x_log10()
 ```
 
-That looks good! Notice how the scale of GDP per capita has changed. Just like above, we referred to the x-variable again, although gdpPercap is on the y-axis. It should be noted here that this "problem" only occurs with axis limits/scales, and only if we switched axes before (which happens rarely). The point here is just to understand how data mappings work in gglplot.
+Notice how the scale of GDP per capita has changed (for now, don't worry about the overlapping labels).
+
 
 ### Labels and Text
 
@@ -1094,11 +1099,14 @@ ggplot(gapminder_07,
        x = "GDP per Capita, USD",
        y = "Life Expectancy, Years",
        caption = "Source: Gapminder",
-       color = "Continent",
-       alpha = "Transparency") 
+       color = "Continent") 
 ```
 
-It is up to us, which or how many of the arguments in `labs()` we use. While most arguments are probably self-explanatory, it makes sense to have a look at the last two. These determine the title of the legends, and should always be named after the aesthetic to which the legend refers. Since the first legend was created by the *alpha* argument in the density plot, we can refer to it with "alpha =". The same applies to the second legend, which was created by the *color* argument.
+<!-- DK: I never use the color argument in labs(). Worth keeping? -->
+
+If a `title` or other `labs()` argument is too long, you can insert a newline character --- a "\n" --- in the middle, which will cause the `title` to take up two lines rather than one.
+
+It is up to us, which or how many of the arguments in `labs()` we use. While most arguments are probably self-explanatory, it makes sense to have a look at the last one. It determines the title of the legend, and should always be named after the aesthetic to which the legend refers. Since the legend was created by the *color* argument in the density plot, we can refer to it with `color =`.
 
 We can also change labels within the plots. Wouldn't it be great if we knew which country each point refers to? We can do this with the help of `geom_text()`:
 
@@ -1114,8 +1122,7 @@ ggplot(gapminder_07,
        x = "GDP per Capita, USD",
        y = "Life Expectancy, Years",
        caption = "Source: Gapminder",
-       color = "Continent",
-       alpha = "Transparency") +
+       color = "Continent") +
   geom_text(aes(label = country), size = 2, 
             color = "black", check_overlap = TRUE)
 ```
@@ -1139,8 +1146,7 @@ ggplot(gapminder_07,
        x = "GDP per Capita, USD",
        y = "Life Expectancy, Years",
        caption = "Source: Gapminder",
-       color = "Continent",
-       alpha = "Transparency") +
+       color = "Continent") +
   geom_text(aes(label = country), size = 2, 
             color = "black", check_overlap = TRUE) +
   theme_linedraw()
@@ -1162,14 +1168,13 @@ ggplot(gapminder_07,
        x = "GDP per Capita, USD",
        y = "Life Expectancy, Years",
        caption = "Source: Gapminder",
-       color = "Continent",
-       alpha = "Transparency") +
+       color = "Continent") +
   geom_text(aes(label = country), size = 2, 
             color = "black", check_overlap = TRUE) +
   theme_linedraw() +
   theme(legend.position = "none", 
         text = element_text(family = "Palatino"),
-        axis.text.x = element_text(size = 10),
+        axis.text.x = element_text(size = 11),
         axis.text.y = element_text(size = 10))
 ```
 
@@ -1548,11 +1553,21 @@ flights <- flights %>%
 
 #### `ifelse()`
 
-<!-- DK: Something here. Does not need to be long, but shows ifelse() used with mututate. Are there other functions which we should mention here? -->
+<!-- DK: Edit these lines from R4DS. Are there other functions which we should mention here? Do something sensible with group_by. To get `_` to work in caption title. Found at https://github.com/rstudio/bookdown/issues/209  -->
+
+`ifelse()` has three arguments. The first argument `test` should be a logical vector. The result will contain the value of the second argument, `yes`, when test is TRUE, and the value of the third argument, `no`, when it is FALSE. Imagine that we want to create a new variable `E`, which is TRUE when the color of the diamond is "E" and FALSE otherwise. 
 
 
-<!-- To get `_` to work in caption title. Found at https://github.com/rstudio/bookdown/issues/209 -->
-(ref:groupby) Diagram of group_by() and summarize().
+```{r}
+diamonds %>% 
+  select(carat, color, price) %>% 
+  mutate(E = ifelse(color == "E", TRUE, FALSE))
+```
+
+
+Alternatively to `ifelse()`, use `dplyr::case_when()`. `case_when()` is particularly useful inside mutate when you want to create a new variable that relies on a complex combination of existing variables. Note that there is a more robust version of `ifelse()` in **dplyr**: `if_else()`. This works exactly the same as the standard version but is somewhat more robust. 
+
+<!-- DK: Is this useful? -->
 
 ```{r groupsummarize, echo=FALSE, fig.cap="(ref:groupby)", purl=FALSE, fig.height=2.5}
 knitr::include_graphics("01-visualization/images/group_summary.png")
@@ -1766,69 +1781,73 @@ Finally, it should be mentioned that we have only seen a small part of what R of
 ```{r}
 library(gganimate)
 
-gapminder %>% 
-  filter(continent != "Oceania") %>% 
+gapminder %>%
+  filter(continent != "Oceania") %>%
   ggplot(aes(gdpPercap, lifeExp, size = pop, color = continent)) +
     geom_point(show.legend = FALSE, alpha = 0.7) +
-    scale_color_viridis_d() +
+    facet_wrap(~continent, nrow = 1) +
     scale_size(range = c(2, 12)) +
     scale_x_log10() +
-    labs(x = "GDP per capita",
-         y = "Life expectancy") +
-    facet_wrap(~continent, nrow = 1) +
+    labs(subtitle = "Life Expectancy and GDP per Capita (1952-2007)",
+         x = "GDP per Capita, USD",
+         y = "Life Expectancy, Years") +
+    theme_linedraw() +
     transition_time(year) +
     labs(title = "Year: {frame_time}") +
-    shadow_wake(wake_length = 0.1, alpha = FALSE) 
+    shadow_wake(wake_length = 0.1, alpha = FALSE)
 ```
 
-Or the **plotly** package to make it an interactive 3D plot.
+<!-- Or the **plotly** package to make it an interactive 3D plot. -->
+
+<!-- DK: There are two problems with the below code. First, it is absurdly hacky. We need an example to show students which is clean. Second, uncommenting out this mess causes all math formatting to fail. -->
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
-library(plotly)
-
-data <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv")
-
-data_2007 <- data[which(data$year == 2007),]
-data_2007 <- data_2007[order(data_2007$continent, data_2007$country),]
-data_2007$size <- data_2007$pop
-colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951')
-
-fig <- plot_ly(data_2007, x = ~gdpPercap, y = ~lifeExp, z = ~pop, color = ~continent, size = ~size, colors = colors,
-               marker = list(symbol = 'circle', sizemode = 'diameter'), sizes = c(5, 150),
-               text = ~paste('Country:', country, '<br>Life Expectancy:', lifeExp, '<br>GDP:', gdpPercap,
-                             '<br>Pop.:', pop))
-fig <- fig %>% layout(title = 'Life Expectancy v. Per Capita GDP, 2007',
-                      scene = list(xaxis = list(title = 'GDP per capita (2000 dollars)',
-                                                gridcolor = 'rgb(255, 255, 255)',
-                                                range = c(2.003297660701705, 5.191505530708712),
-                                                type = 'log',
-                                                zerolinewidth = 1,
-                                                ticklen = 5,
-                                                gridwidth = 2),
-                                   yaxis = list(title = 'Life Expectancy (years)',
-                                                gridcolor = 'rgb(255, 255, 255)',
-                                                range = c(36.12621671352166, 91.72921793264332),
-                                                zerolinewidth = 1,
-                                                ticklen = 5,
-                                                gridwith = 2),
-                                   zaxis = list(title = 'Population',
-                                                gridcolor = 'rgb(255, 255, 255)',
-                                                type = 'log',
-                                                zerolinewidth = 1,
-                                                ticklen = 5,
-                                                gridwith = 2)),
-                      paper_bgcolor = 'rgb(243, 243, 243)',
-                      plot_bgcolor = 'rgb(243, 243, 243)')
-
-fig
+# library(plotly)
+# 
+# data <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv")
+# 
+# data_2007 <- data[which(data$year == 2007),]
+# data_2007 <- data_2007[order(data_2007$continent, data_2007$country),]
+# data_2007$size <- data_2007$pop
+# colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951')
+# 
+# fig <- plot_ly(data_2007, x = ~gdpPercap, y = ~lifeExp, z = ~pop, color = ~continent, size = ~size, colors = colors,
+#                marker = list(symbol = 'circle', sizemode = 'diameter'), sizes = c(5, 150),
+#                text = ~paste('Country:', country, '<br>Life Expectancy:', lifeExp, '<br>GDP:', gdpPercap,
+#                              '<br>Pop.:', pop))
+# fig <- fig %>% layout(title = 'Life Expectancy v. Per Capita GDP, 2007',
+#                       scene = list(xaxis = list(title = 'GDP per capita (2000 dollars)',
+#                                                 gridcolor = 'rgb(255, 255, 255)',
+#                                                 range = c(2.003297660701705, 5.191505530708712),
+#                                                 type = 'log',
+#                                                 zerolinewidth = 1,
+#                                                 ticklen = 5,
+#                                                 gridwidth = 2),
+#                                    yaxis = list(title = 'Life Expectancy (years)',
+#                                                 gridcolor = 'rgb(255, 255, 255)',
+#                                                 range = c(36.12621671352166, 91.72921793264332),
+#                                                 zerolinewidth = 1,
+#                                                 ticklen = 5,
+#                                                 gridwith = 2),
+#                                    zaxis = list(title = 'Population',
+#                                                 gridcolor = 'rgb(255, 255, 255)',
+#                                                 type = 'log',
+#                                                 zerolinewidth = 1,
+#                                                 ticklen = 5,
+#                                                 gridwith = 2)),
+#                       paper_bgcolor = 'rgb(243, 243, 243)',
+#                       plot_bgcolor = 'rgb(243, 243, 243)')
+# 
+# fig
 ```
 
 Or the **rayshader** package that allows us to create beautiful landscapes and maps.
 
-```{r, echo=FALSE}
-knitr::include_graphics("01-visualization/images/rayshade-plot.png")
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("01-visualization/images/rayshader-plot.png")
 ```
 
-Plotting is cool! At the end of this course, you will know how to create things like this (and much more) on your own.
+Plotting is cool! At the end of this course, you will know how to create things like this (and much more) on your own. 
+
 
 

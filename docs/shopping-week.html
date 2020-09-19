@@ -47,13 +47,6 @@ if(f.classList.contains('fa-plus-square')) {
 </script>
 <script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
-<script src="libs/plotly-binding-4.9.2.1/plotly.js"></script>
-<script src="libs/typedarray-0.1/typedarray.min.js"></script>
-<script src="libs/jquery-1.11.3/jquery.min.js"></script>
-<link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
-<script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
 <link href="libs/str_view-0.1.0/str_view.css" rel="stylesheet" />
 <script src="libs/str_view-binding-1.4.0/str_view.js"></script>
 
@@ -156,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a href="two-parameters.html"><span class="toc-section-number">7</span> Two Parameters</a>
 <a href="three-parameters.html"><span class="toc-section-number">8</span> Three Parameters</a>
 <a href="n-parameters.html"><span class="toc-section-number">9</span> N Parameters</a>
-<a href="pitfalls.html"><span class="toc-section-number">10</span> Pitfalls</a>
+<a href="model-choice.html"><span class="toc-section-number">10</span> Model Choice</a>
 <a href="continuous-response.html"><span class="toc-section-number">11</span> Continuous Response</a>
 <a href="discrete-response.html"><span class="toc-section-number">12</span> Discrete Response</a>
 <a href="appendices.html">Appendices</a>
@@ -177,9 +170,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <html><body><div id="shopping-week" class="section level1 unnumbered">
 <h1>Shopping Week</h1>
 <!-- To-Do -->
+<!-- 0. Add more material about Happy Git with R and how to use it. Add more material from R basics. They need to know how to create and knit an Rmd file. -->
 <!-- 1. Put the Kant quote in a side margin and add a picture. -->
 <!-- 2. Add some sidemargin notes which provide more detail during the Set Up section. Most won't care what those weird R commands are doing but, for those that do, an explanation would be polite. -->
-<!-- 3. How should we end this chapter? Perhaps with some cool example graphics. Take this course to build these things? -->
+<!-- 3. How should we end this chapter? Perhaps with some cool example graphics. Take this course to build these things? Perhaps even a curl() grab of an Rmd which they then knit into something cool. Need to figure out how to get the curly quotes out of the page. -->
 <blockquote>
 <p>The usual touchstone of whether what someone asserts is mere persuasion or at least a subjective conviction, i.e., firm belief, is betting. Often someone pronounces his propositions with such confident and inflexible defiance that he seems to have entirely laid aside all concern for error. A bet disconcerts him. Sometimes he reveals that he is persuaded enough for one ducat but not for ten. For he would happily bet one, but at 10 he suddenly becomes aware of what he had not previously noticed, namely that it is quite possible that he has erred. -— Immanuel Kant, <em>Critique of Pure Reason</em></p>
 </blockquote>
@@ -239,15 +233,14 @@ FIGURE 0.2: Icons of R versus RStudio on your computer.
 <div id="initial-set-up" class="section level3 unnumbered">
 <h3>Initial Set Up</h3>
 <p>Whether you are working on FAS OnDemand or on your own computer, the next step is to copy and paste the following in to the R Console:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="shopping-week.html#cb2-1"></a><span class="kw">options</span>(<span class="dt">pkgType =</span> <span class="st">"binary"</span>)</span>
-<span id="cb2-2"><a href="shopping-week.html#cb2-2"></a><span class="kw">library</span>(rstudioapi)</span>
-<span id="cb2-3"><a href="shopping-week.html#cb2-3"></a>rstudioapi<span class="op">::</span><span class="kw">writeRStudioPreference</span>(<span class="dt">name =</span> <span class="st">"load_workspace"</span>, <span class="dt">value =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb2-4"><a href="shopping-week.html#cb2-4"></a>rstudioapi<span class="op">::</span><span class="kw">writeRStudioPreference</span>(<span class="dt">name =</span> <span class="st">"save_workspace"</span>, <span class="dt">value =</span> <span class="st">"never"</span>)</span></code></pre></div>
-<p>The first causes R to download binary (i.e., pre-built) packages by default. Without this option set to “binary,” you will occasionally be asked by R:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="shopping-week.html#cb2-1"></a><span class="kw">library</span>(rstudioapi)</span>
+<span id="cb2-2"><a href="shopping-week.html#cb2-2"></a>rstudioapi<span class="op">::</span><span class="kw">writeRStudioPreference</span>(<span class="dt">name =</span> <span class="st">"load_workspace"</span>, <span class="dt">value =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb2-3"><a href="shopping-week.html#cb2-3"></a>rstudioapi<span class="op">::</span><span class="kw">writeRStudioPreference</span>(<span class="dt">name =</span> <span class="st">"save_workspace"</span>, <span class="dt">value =</span> <span class="st">"never"</span>)</span></code></pre></div>
+<p>The <code>rstudioapi</code> commands set sensible defaults for working with RStudio. You only have to execute those commands one time.</p>
+<p>Note that R will occasionally ask you if you want to install some packages. Almost all the time you do want to, otherwise R would not be asking you! One tricky aspect of this process is that you will occasionally be asked by R:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="shopping-week.html#cb3-1"></a><span class="ex">Do</span> you want to install from sources the packages which </span>
 <span id="cb3-2"><a href="shopping-week.html#cb3-2"></a><span class="ex">need</span> compilation? (Yes/no/cancel)</span></code></pre></div>
 <p>Unless you have a good reason not to, always answer “no” to this question.</p>
-<p>The <code>rstudioapi</code> commands set sensible defaults for working with RStudio. You only have to execute those commands one time.</p>
 </div>
 <div id="package-installation" class="section level3 unnumbered">
 <h3>Package installation</h3>
@@ -304,8 +297,8 @@ FIGURE 0.4: Installing versus loading an R package
 <p>Now, we will be installing a package which is not available from CRAN: <strong>PPBDS.data</strong>. Copy and paste the following to the R Console:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="shopping-week.html#cb7-1"></a><span class="kw">library</span>(remotes)</span>
 <span id="cb7-2"><a href="shopping-week.html#cb7-2"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"davidkane9/PPBDS.data"</span>)</span></code></pre></div>
-<p>This will result in many new packages being installed. It may take a minute or two. If something gets messed up, it is often useful to <code>remove.packages()</code> the problematic package and then install it again.</p>
-<p>If you are working on FAS OnDemand, none of these steps were necessary. We did everything for you already.</p>
+<p>Depending on your computer/browser/locale, this might fail, especially if the quotation marks you paste over turn curly. In that case, type the commands yourself.</p>
+<p>This will result in many new packages being installed. It may take a few minutes. If something gets messed up, it is often useful to <code>remove.packages()</code> the problematic package and then install it again.</p>
 </div>
 <div id="tutorials" class="section level3 unnumbered">
 <h3>Tutorials</h3>
@@ -340,7 +333,7 @@ FIGURE 0.4: Installing versus loading an R package
 <a href="visualization.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-09-05
+2020-09-18
 </p>
 </div>
 </div>

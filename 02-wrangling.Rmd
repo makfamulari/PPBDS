@@ -86,9 +86,11 @@ library(nycflights13)
 library(fivethirtyeight)
 ```
 
-The **tidyverse** package will be used in every chapter. **PPBDS.data** is the data package created specifically for this course. **lubridate** is a package for working with dates and times. **janitor** offers functions for cleaning up dirty data. **skimr** contains functions that are useful for providing summary statistics. **nycflights** includes data associated with flights out of New York City's three major airports. **gapminder** has data for countries across decades. **fivethirtyeight** cleans up data from the [FiveThirtyEight](https://fivethirtyeight.com/) team.  **PPBDS.data** includes, as you might guess, data organized for use with this textbook.
+The **tidyverse** package will be used in every chapter. **PPBDS.data** is the data package created specifically for this course. **lubridate** is a package for working with dates and times. **janitor** offers functions for cleaning up dirty data. **skimr** contains functions that are useful for providing summary statistics. **nycflights** includes data associated with flights out of New York City's three major airports. **gapminder** has data for countries across decades. **fivethirtyeight** cleans up data from the [FiveThirtyEight](https://fivethirtyeight.com/) team.  
 
 ## Data Gathering
+
+<!-- DK: Not sure I like this example. We should do our own thing. -->
 
 Recall the `read_csv()` function introduced briefly in chapter 1 of this textbook. Let’s import a Comma Separated Values .csv file that exists on the internet. The .csv file dem_score.csv contains ratings of the level of democracy in different countries spanning 1952 to 1992 and is accessible at https://moderndive.com/data/dem_score.csv. Let’s use the read_csv() function from the readr package to read it off the web, import it into R, and save it in a data frame called dem_score. 
 
@@ -497,7 +499,8 @@ knitr::include_graphics("02-wrangling/images/regexp.jpg")
 
 Frequently your string tasks cannot be expressed in terms of a fixed string, but can be described in terms of a pattern. Regular expressions, aka "regexes", are the standard way to specify these patterns. In regexes, specific characters and constructs take on special meaning in order to match multiple strings.
 
-The country names in the `gapminder` dataset are convenient for examples. Load it now and store the `r nlevels(gapminder::gapminder$country)` unique country names in the object `countries`.
+The country names in the `gapminder` dataset are convenient for examples. Load it now and store 
+the `r nlevels(gapminder::gapminder$country)` unique country names in the object `countries`.
 
 ```{r}
 countries <- levels(gapminder$country)
@@ -602,7 +605,8 @@ list(match = intersect(matches, str_subset(fruit, pattern = "le")),
 
 ### Raw strings
 
-You’ve probably caught on by now that there are certain characters with special meaning in regexes, including `$ * + . ? [ ] ^ { } | ( ) \`. This makes things difficult when we want to use these characters within the strings instead of as regexes. Previously, we would have to do a lot of maneuvering to create strings containing special characters, but now we can use `r"()"`. 
+You’ve probably caught on by now that there are certain characters with special meaning in regexes, 
+including `$ * + . ? [ ] ^ { } | ( ) \`. This makes things difficult when we want to use these characters within the strings instead of as regexes. Previously, we would have to do a lot of maneuvering to create strings containing special characters, but now we can use `r"()"`. 
 
 ```{r}
 r"(Do you use "airquotes" much?)"
@@ -764,8 +768,12 @@ ggplot(h_gap, aes(x = year, y = lifeExp,
 Sometimes you just want to hoist one or more levels to the front. Why? Because I said so. This resembles what we do when we move variables to the front with `dplyr::select(special_var, everything())`.
 
 ```{r}
-h_gap$country %>% levels()
-h_gap$country %>% fct_relevel("Romania", "Haiti") %>% levels()
+h_gap$country %>% 
+  levels()
+
+h_gap$country %>% 
+  fct_relevel("Romania", "Haiti") %>% 
+  levels()
 ```
 
 This might be useful if you are preparing a report for, say, the Romanian government. The reason for always putting Romania first has nothing to do with the data, it is important for external reasons and you need a way to express this.
@@ -776,11 +784,16 @@ Sometimes you have better ideas about what certain levels should be. This is cal
 
 ```{r}
 i_gap <- gapminder %>% 
-  filter(country %in% c("United States", "Sweden", "Australia")) %>% 
+  filter(country %in% c("United States", "Sweden", 
+                        "Australia")) %>% 
   droplevels()
-i_gap$country %>% levels()
+
+i_gap$country %>% 
+  levels()
+
 i_gap$country %>%
-  fct_recode("USA" = "United States", "Oz" = "Australia") %>% levels()
+  fct_recode("USA" = "United States", "Oz" = "Australia") %>% 
+  levels()
 ```
 
 ### Grow a factor
