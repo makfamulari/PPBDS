@@ -586,7 +586,7 @@ The mess centers on the transition we are now making between the bootstrap and t
 First, if you understand the concept of a posterior probability distribution as explained in Chapter 5 and, second, if you follow our demonstration that the bootstrap generates posterior distributions, then . . . . hand wave vigorously . . . third, you should be confortable going on to the standard Bayesian modeling approach that we will use for the next few chapters.
 
 
-## `stan_glm()`
+## stan_glm()
 
 Fortunately for us, Bayesian models are not hard to execute in R. Sticking to same the filtered male 2009 data, we can condence all the work we did in the bootstrap method to the `stan_glm()` function which, when fed the right inputs, creates a bayesian generalized linear model to estimate the mean height. This function comes from the **rstanarm** package, which is very useful for bayesian models in general.
 
@@ -612,17 +612,12 @@ mod.obj
 ```
 
 
-```{r}
-mod.obj <- stan_glm(data = ch7_male, height ~ 1, refresh = 0)
-mod.obj
-```
-
-
 Now that have a much cleaner output, we can more easily understand what this model spit out at us. 
 
 The first line is telling us what model we used, in our case a `stan_glm()` model. 
 
-The second line tells us this model is using a gaussian (otherwise known as identity) distribution. A Gaussian, or normal, distribution is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent than data far from it. For that reason, we typically leave it as the default unless we are working with a left hand variable that is not normally distributed. Since we previously saw that height was normally distributed, we are good to go with the Gausian distribution.
+The second line tells us this model is using a Gaussian (otherwise known as identity) distribution. A Gaussian, or normal, distribution is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent than data far from it. For that reason, we typically leave it as the default unless we are working with a left hand variable that is not normally distributed. Since we previously saw that height was normally distributed, we are good to go with the Gaussian distribution.
+
 
 The third line gives us back our input formula for the model. As you may remember, we are creating a model predicting height with a constant - which is in essence the simplest model you can create (don't worry we will get into many more advacned models in the next few chapters)
 
@@ -691,12 +686,15 @@ Before moving on to the next section of this chapter, take a second to make sure
 mod.obj
 ```
 
+<!-- DK: Always MAD_SD -->
+
 Now that we understand MAD SD, we can understand the rest of the output of our mean height model. Since we are trying to find a constant to predict mean height, the intercept of the model can be interpreted as the model's best estimate of the mean height in the dataset. Recall that the `stan_glm()` function took many different resamples and found the mean of each one. The most accurate estimate of what the true mean actually is the Baysesian point estimate, the median of these means which in this case happends to be 167.5. 
 
 In this case, the MAD_SD for the intercept is .4, meaning that the standard deviation of the posterior distribution of mean heights is .4. As a rule of thumb, the smaller the MAD_SD, the less variation there is among mean heights in the samples generated, and thus the more robust our estimate is.
 
 A great way to see this is to visualize the posterior distribution of intercepts that the model spit out. 
 
+<!-- DK: make this plot look exactly like the posterior probability plots ion chapter 5. Same title and look and so on. Remind students that this is why we spent so much time on this for chapter 5. -->
 
 ```{r}
 plot(mod.obj, "hist", pars = "(Intercept)")
