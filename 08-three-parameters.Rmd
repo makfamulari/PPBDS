@@ -183,7 +183,8 @@ Before we write any line of code, the first thing we should do is make it clear 
 First, let's clarify what we want to know. The goal is to find out what age we can expect to find among people of a certain party affiliation. Let's assume we don't want to limit ourselves to people in a certain place, but we are interested in an estimate for the whole USA. As far as party affiliation is concerned, we will probably only want to consider Democrats or Republicans. Returning to the first point, is our data suitable to answer our question? `trains' includes a variable `age' which indicates the age of a person in years, and a variable `party' with values 'Democrat' or 'Republican' which shows their party affiliation. In terms of content this seems to be exactly what we are looking for. Methodologically, however, there could be problems. The data from this study only come from Boston, so the question arises whether we can really draw conclusions for the whole country. In 2018, the median age was 38.8 years in the USA, but 39.4 years in Massachusetts. Although the difference is small, we do not know whether this also applies to Democrats and Republicans separately. Another problem could arise from the fact that Massachusetts (and Boston as an urban area) is very Democratic. As noted earlier, the party affiliates in 'trains' are indeed very unequally distributed:
 
 ```{r}
-table(trains$party)
+trains %>% 
+  count(party)
 ```
 
 With 96 Democrats we could already determine an acceptable estimate of the median age. The sample of 19 Republicans is very small in comparison, and hence more prone to errors. Perhaps Enos happened to catch some Republicans in his study who are significantly younger than the rest? If so, our estimate may not even be representative of Massachusetts. 
@@ -250,17 +251,13 @@ This table is very simple, which is the point. There is no causal effect as we a
 
 #### The mathematical model
 
-$$ y_i = b_1 x_r + b_2 x_d $$
-You couldn't know the true value of our parameters ($b_1$ and $b_2$) unless you surveyed every single commuter in the station. This is why we use models to give us estimates. A hat denotes a number that is constant and no longer variable. Because we have estimates for our parameters, $\hat{b_1}$ and $\hat{b_1}$ are denoted by hats. With these numbers plugged in, you determine a singular y value (age) for each observation, thus the denotation  $\hat{y_i}$. This is called the *fitted value*. 
+$$ y_i = \beta_1 x_r + \beta_2 x_d + \epsilon_i$$
 
-$$ \hat{y_i} = \hat{b_1} x_r + \hat{b_2} x_d  $$
-The equation is not finished yet! 
+where $\epsilon_i \sim N(0, \sigma^2)$.  $\beta_1$ is the average age of Republicans.  $\beta_2$ is the average age of Democrats. 
 
-$$\epsilon_i = y_i - \hat{y_i}$$
-Adding this together gives:
+You couldn't know the true value of our parameters ($\beta_1$, $\beta_2$, and  $\sigma$) unless you surveyed every single commuter in the population. This is why we use models.
 
-$$ y_i = \hat{b_1}x_r + \hat{b_2} x_d + \epsilon_i $$
-
+<!-- DK: Add more words. Explain what x_r et cetera mean, and how the math works with them being zeros or ones. Go through three lines of derivation showing that y_i = B_2 + noise if a new person shows up who is a Democrat. Maybe some discussion about what sigma means. It is the variation around the average age. -->
 
 
 
@@ -275,7 +272,7 @@ knitr::include_graphics("other/images/Courage.jpg")
 #### The fitted model
 
 ```{r}
-obj <- stan_glm(age ~ party, data = trains, refresh = 0)
+obj <- stan_glm(age ~ party - 1, data = trains, refresh = 0)
 
 obj
 ```
@@ -321,31 +318,7 @@ margin_note("Note that this is no longer considered a Preceptor Table by our ter
 
 #### Unmodeled variation
 
-How uncertain are our estimates for age? Again, we use the same tools we have used before:
-
-```{r}
-trains %>% 
-  lm(data = ., age ~ party - 1) %>% 
-  tidy(conf.int = TRUE) %>% 
-  select(term, conf.low, estimate, conf.high)
-```
-
-The confidence intervals that we've generated display the upper and lower bounds of the mean age of Democrat and Republican commuters on this train platform. This touches on the idea of **parameter uncertainty**: even if a model is constructed in a logical way, we are unable to know our parameters exactly, the parameters in this case being the mean ages of the two parties. Confidence intervals are one way to capture this uncertainty, so that we don't over-confidently put forward one value rather than a range. 
-
-```{r}
-trains %>%
-  group_by(party) %>%
-  summarise(n())
-```
-
-You may notice how the range of the confidence interval for Republicans is larger. This may be because far fewer Republicans were surveyed than Democrats -- 19 to 96. Parameter estimates are always exclusively based on the data that the model is fed, so factors like sample size can impact our parameter uncertainty. With more data to work with, we can more accurately capture the true mean age of the Democrat commuters. 
-
-
-
-If a new Democrat entered the train station, how easy would it be to guess their age with our model? Could you confidently say that they would be within the Democrat interval bounds of 40 and 45?
-
-$$ y_i = b_0 + b_1 x_i + \epsilon_i $$
-One shouldn't be too confident in that prediction. As discussed, the new Democrat's age comes in two parts: the beta (determined by their political party) and their residual (how much noise there is in this observation that offsets it from the beta prediction). While the beta values have been determined by our model, the epsilon value represents *unmodeled variation* that could likely put the value outside of these bounds. Our previous example showed us how just a randomly selected handful can have greatly varying residuals due to the real-world variation that is not captured by the model.
+DK: Discuss meaning of sigma here. Show the graphics that are discussed in themes.Rmd. Three histograms. Discuss unmodelled variation. Why are the residuals so big? What would they look like with a better model? 
 
 
 
@@ -360,6 +333,9 @@ knitr::include_graphics("other/images/Temperance.jpg")
 
 #### Making Predictions
 
+A new person shows up.  posterior_predict(), new_data argument. What are the odds that he is older than 50?
+
+What will the age difference be between the oldest Democrat and the youngest Republican if three from each party show up?
 
 
 #### Unknown unknowns
@@ -375,7 +351,7 @@ It is always important to keep the problem of validity in the back of our minds 
 <!-- DK: I went fast above, but that is all the key material. Still need to add a Rubin Table example, highlighting that this is modeling for prediction. There is only one column for Y because it is impossible to change someone's age, whatever manipulations you make to party. -->
 
 
-#### Testing is evil
+<!-- #### Testing is evil -->
 
 
 
