@@ -4,15 +4,18 @@ author: "David Kane"
 output: html_document
 ---
 
+
+Key Question: Do Preceptor Tables belong under Wisdom or Justice?
+
 ## Key Themes
 
 We focus on the four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues).
 
-The four key themes of the book, and of Gov 50, are *Wisdom* (look at the data before we start; try to determine if this data will actually answer our question, validity, ethics), *Justice* (make sure that the *model structure* --- Preceptor Table and mathematics --- matches reality enough), *Courage*  (creating the *data generating mechanism* via code, looking at residuals and fitted values, avoiding overfitting and other mistakes) and *Temperance* (be modest in how we use the model we have created, no sharp null tests).  Almost every chapter should mention at least some of themes. And every chapter after 5 must mention at least one aspect of all four. The more that we discuss these themes, over and over again, the more likely students are to understand them and to remember them. Each time you discuss a theme, place its image on the side margin.
+The four key themes of the book, and of Gov 50, are *Wisdom* (look at the data before we start; try to determine if this data will actually answer our question; validity; estimands; ethics), *Justice* (make sure that the *model structure* --- Preceptor Table and mathematics --- matches reality enough), *Courage*  (creating the *data generating mechanism* via code, looking at residuals and fitted values, avoiding overfitting and other mistakes, interpreting the meaning of posterior estimates of the unknown parameters) and *Temperance* (use the model for some purpose, but be modest in how we use the model we have created, no sharp null tests).  Almost every chapter should mention at least some of themes. And every chapter after 5 must mention at least one aspect of all four. Chapters 7, 8 and 9 are the heart of the book and hammer home these four themes at least 5 times. The more that we discuss these themes, over and over again, the more likely students are to understand them and to remember them. Each time you discuss a theme, place its image on the side margin.
 
 ## Wisdom
 
-Wisdom encompasses two issues: the map from concept to data and the relevance of the estimand. (In the future, we might put ethical issues here, but not this year.)
+Wisdom encompasses three issues: the map from concept to data (validity), the Preceptor Table, and the estimand. Maybe we should also discuss ethics? Not sure.
 
 First, are the variables/numbers we have accurately capturing the concepts we care about? From *Regression and Other Stories*:
 
@@ -24,14 +27,20 @@ First, are the variables/numbers we have accurately capturing the concepts we ca
 
 > A sample that is representative of all mothers and children may not be the most appropriate for making inferences about mothers and children who participate in the Temporary Assistance for Needy Families program. However, a carefully selected subsample may reflect the distribution of this population well. Similarly, results regarding diet and exercise obtained from a study performed on patients at risk for heart disease may not be generally applicable to generally healthy individuals. In this case assumptions would have to be made about how results for the at-risk population might relate to those for the healthy population. Data used in empirical research rarely meet all (if any) of these criteria precisely. However, keeping these goals in mind can help you be precise about the types of questions you can and cannot answer reliably.
 
-Second, *estimands* are the thing we want to know. If we could see all possible numbers, calculating an estimand would be just a matter of arithmetic. But data is always missing, so we need to estimate. Use a Preceptor Table, remind readers what it is, and highlight how we begin by asking what would we know if we could know everything. Then, we show what we do, in fact, know. Inference is the procedure by which we replace the question marks. Perhaps this is not as critical a point as I keep thinking. What are some concrete examples where someone is estimating something easy to estimate, like the mean, when they should really be estimating something else more directly relevant to their actual problem? Perhaps concepts like causal effect on the treated apply here? 
+Second, use a Preceptor Table, remind readers what it is, and highlight how we begin by asking what would we know if we could know everything. Then, we show what we do, in fact, know. Inference is the procedure by which we replace the question marks.
+
+Third, *estimands* are the thing we want to know. If we could see all possible numbers, calculating an estimand would be just a matter of arithmetic. 
+
+
+
+ Perhaps this is not as critical a point as I keep thinking. What are some concrete examples where someone is estimating something easy to estimate, like the mean, when they should really be estimating something else more directly relevant to their actual problem? Perhaps concepts like causal effect on the treated apply here? 
 
 This connects to the idea of the objective function. We have a problem to solve, but our answer will never be certain. Different sorts of errors lead to different costs. If each unit of error costs you a dollar, then the median is a better estimand to use than the mean, for example. If you are only going to act on your outliers, then you don't care much, if at all, about accuracy in the center of the distribution. Example here might be criminal justice sentencing guidelines.
 
 
 ## Justice
 
-There are two key aspects of Justice: predictive/causal and mathematical formula.
+There are three key aspects of Justice: predictive/causal, Preceptor Table and mathematical formula.
 
 ### Predictive versus Causal Models
 
@@ -103,13 +112,19 @@ $$outcome = fitted values + unmodeled variation$$
 
 The three languages of data science are words, math and code, and the most important of these is code. We need to explain the structure of our model using all three languages, but we need *Courage* to implement the model in code.
 
+In the main chapters of the book, the code here is always `stan_glm()`. This is a book on Bayesian Data Science, so all the models we estimate (at least until chapters 11 and 12) are Bayesian. After creating a model, we can look at it in three ways.
+
+First, we can just print it. Chapter 7 walks the reader through all the parts of a stan_glm() model in detail. Later chapters will also show the printed model, but can move more quickly. Second, we create a summary table of the model using **gtsummary**. Note that this is just a different view of the same model. We don't show some things --- like sigma --- that we did show when just printing. We do show other things, like the 95% confidence interval which we did not show before. Neither is better! We use the one which is most helpful to our audience. Third, we use **tidybayes** to show histograms of the posterior distributions. The posterior is the underlying reality, the truth. The printed and table outputs are just summaries of the posterior. We might not show all three things every time, but we certainly always show the posterior. Graphics are pretty!
+
+The key command is `posterior_linpred()`, I think. 
+
 There are few more important concepts in statistics and data science than the "Data Generating Mechanism." Our *data* --- the data that we collect and see --- has been *generated* by the complexity and confusion of the world. God's own *mechanism* has brought His data to us. Our job is to build a model of that process, to create, on the computer, a mechanism which generates fake data consistent with the data which we see. With that DGM, we can answer any question which we might have. In particular, with the DGM, we provide predictions of data we have not seen and estimates of the uncertainty associated with those predictions. There are two parts to the DGM: the fitted model and unmodeled variation.
 
 In simple cases, the DGM is so simple that it barely merits such a fancy name. But, in the professional world, the DGM is often complex. However, the basic ideas are always the same. Recall the key equation:
 
 $$outcome = model + what is not in the model$$
 
-After noting this formula, each chapter should create a plot with three histograms in a row --- left-to-right, the outcome (i.e., a histogram or density of Y), the fitted value (which is sometimes a spike, sometimes two spikes and so on) and, finally, the residuals. This highlights how we have *decomposed* the outcome into two parts: the model and the unmodeled variation.
+After noting this formula, each example should create a plot with three histograms in a row --- left-to-right, the outcome (i.e., a histogram or density of Y), the fitted value (which is sometimes a spike, sometimes two spikes and so on) and, finally, the residuals. This highlights how we have *decomposed* the outcome into two parts: the model and the unmodeled variation. I think this belongs in the Courage chapter because it is a way of understanding the model we have made.
 
 
 If you want to use the model to predict future outcomes, or past outcomes which you have not "seen" yet, then those predictions must account for both the parameter uncertainty embedded in the "model" part of the equation. But there is more uncertainty than just that! There is also the unavoidable noise associated with the "other stuff," all the messy realities of the world which are not included in your model. 
@@ -135,17 +150,25 @@ Even if the model has correct form, we still need to estimate the parameters. We
 
 In many chapters, we just give the `tidy(conf.int = TRUE)` numbers which give the 95% confidence interval. Nothing wrong with that. But, really, the confidence interval only gives us a bit about the shape of the posterior distribution. Some parameters might have the same 95% CI's but still have very different shapes. See the example of the 90th percentile of age given in chapter 8, reviewing the techniques from chapter 7. When we use rstanarm in later chapters, we should provide the whole posterior.
 
-## Unmodeled Variation
+### Unmodeled Variation
 
-(This may be difficult to talk about since we don't (?) write down formulas with error terms.) But each chapter should discuss the concept of a *residual*. But, to define a residual, we need to define the *fitted* value. Again, these concepts apply in every chapter from 7 forward.  Even if we have perfect parameter estimates for a model structure which matches the unknown data generating mechanism, we still won't make perfect predictions. Some randomness is intrinsic. Example: prediction for an individual. Keep in mind the distinction between a fitted value and a prediction. For example, a coin may have p = 0.6 --- meaning it is more likely to come up heads --- because it came up heads in 600 out of 1,000 previous flips. 0.6 is the *fitted value*. But it is not a prediction. A prediction must be made in the form that can actually be observed in the data. In this case, we should predict H.
+Having created a model, we always discuss the  *residual*. But, to define a residual, we need to define the *fitted* value. Again, these concepts apply in every example from 7 forward.  Even if we have perfect parameter estimates for a model structure which matches the unknown data generating mechanism, we still won't make perfect predictions. Some randomness is intrinsic. Example: prediction for an individual. Keep in mind the distinction between a fitted value and a prediction. For example, a coin may have p = 0.6 --- meaning it is more likely to come up heads --- because it came up heads in 600 out of 1,000 previous flips. 0.6 is the *fitted value*. But it is not a prediction. A prediction must be made in the form that can actually be observed in the data. In this case, we should predict H.
 
 It is very useful to plot the distribution of the epsilons. Sometimes it looks normal. But, often, it looks really weird, like for coin flips when it is always either -0.6 or 0.4 (in a case where $p = 0.6$).
 
 
-*Prediction uncertainty* highlights our ability, or lack thereof, to predict the future. This can be conceptualized as either an attempt to forecast the literal future or as an attempt to model data points which have been left out of the original analysis in some way. Prediction uncertainty has two primary sources: *parameter uncertainty* and *unmodeled variation*. 
+
 
 
 ## Temperance
+
+We have a model which we have built and understood. Now we get to use it! This almost always involves `posterior_predict()` and/or `posterior_epred()`. (I am hazy about the differences.)
+
+We need a concrete question. For the `governors` example, it might be
+
+*Prediction uncertainty* highlights our ability, or lack thereof, to predict the future. This can be conceptualized as either an attempt to forecast the literal future or as an attempt to model data points which have been left out of the original analysis in some way. Prediction uncertainty has two primary sources: *parameter uncertainty* and *unmodeled variation*. 
+
+Maybe `posterior_epred()` also?
 
 Temperance is the most important virtue in data science. Your models are never as good as they appear to be. The world is complex and, even worse, always changing. We must be aware of the *unknown unknowns*, concerned about how *representative* our data/model is to our problem, worried about the realism of our assumptions and leery of the siren call of testing.
 
