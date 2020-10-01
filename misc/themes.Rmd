@@ -4,9 +4,6 @@ author: "David Kane"
 output: html_document
 ---
 
-
-Key Question: Do Preceptor Tables belong under Wisdom or Justice?
-
 ## Key Themes
 
 We focus on the four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues).
@@ -15,7 +12,7 @@ The four key themes of the book, and of Gov 50, are *Wisdom* (look at the data b
 
 ## Wisdom
 
-Wisdom encompasses three issues: the map from concept to data (validity), the Preceptor Table, and the estimand. Maybe we should also discuss ethics? Not sure.
+Wisdom encompasses two issues: the map from concept to data (validity) and the estimand. Maybe we should also discuss ethics? Not sure.
 
 First, are the variables/numbers we have accurately capturing the concepts we care about? From *Regression and Other Stories*:
 
@@ -27,15 +24,13 @@ First, are the variables/numbers we have accurately capturing the concepts we ca
 
 > A sample that is representative of all mothers and children may not be the most appropriate for making inferences about mothers and children who participate in the Temporary Assistance for Needy Families program. However, a carefully selected subsample may reflect the distribution of this population well. Similarly, results regarding diet and exercise obtained from a study performed on patients at risk for heart disease may not be generally applicable to generally healthy individuals. In this case assumptions would have to be made about how results for the at-risk population might relate to those for the healthy population. Data used in empirical research rarely meet all (if any) of these criteria precisely. However, keeping these goals in mind can help you be precise about the types of questions you can and cannot answer reliably.
 
-Second, use a Preceptor Table, remind readers what it is, and highlight how we begin by asking what would we know if we could know everything. Then, we show what we do, in fact, know. Inference is the procedure by which we replace the question marks.
+Second, *estimands* are the thing we want to know. If we could see all possible numbers, calculating an estimand would be just a matter of arithmetic. (It is somewhat weird to make that point before providing a Preceptor Table, but perhaps it is OK.)
 
-Third, *estimands* are the thing we want to know. If we could see all possible numbers, calculating an estimand would be just a matter of arithmetic. 
-
-
-
- Perhaps this is not as critical a point as I keep thinking. What are some concrete examples where someone is estimating something easy to estimate, like the mean, when they should really be estimating something else more directly relevant to their actual problem? Perhaps concepts like causal effect on the treated apply here? 
+Perhaps estimands are not critical? What are some concrete examples where someone is estimating something easy to estimate, like the mean, when they should really be estimating something else more directly relevant to their actual problem? Perhaps concepts like causal effect on the treated apply here? 
 
 This connects to the idea of the objective function. We have a problem to solve, but our answer will never be certain. Different sorts of errors lead to different costs. If each unit of error costs you a dollar, then the median is a better estimand to use than the mean, for example. If you are only going to act on your outliers, then you don't care much, if at all, about accuracy in the center of the distribution. Example here might be criminal justice sentencing guidelines.
+
+Apologies for the lack of guidance. Make sure to cover validity and you will be fine.
 
 
 ## Justice
@@ -44,17 +39,17 @@ There are three key aspects of Justice: predictive/causal, Preceptor Table and m
 
 ### Predictive versus Causal Models
 
-First, we need to determine if we are modeling (just) for prediction or are we (also) modeling for causation. (Predictive models care nothing about causation. Causal models are often also concerned with prediction, if only as a means of measuring the quality of the model.)
+First, we need to determine if we are modeling (just) for prediction or are we (also) modeling for causation. Predictive models care nothing about causation. Causal models are often also concerned with prediction, if only as a means of measuring the quality of the model. These points should be made everytime we talk about Justice.
 
 Begin with the Preceptor Table. Each such discussion highlights the distinction between models for prediction and models for causal estimation. (ModernDive has a [useful discussion](https://moderndive.com/5-regression.html): models for prediction versus models for explanation.) We use the same mathematical models in both cases! 
 
 Every model is predictive, in the sense that, if you give me new data --- and it is drawn from a stable distribution --- then I can give you a predictive forecast. But only a subset of those models are causal, meaning that, for a given individual, you can change the value of one input and figure out what the new output would be and then, from that, calculate the causal effect.
 
-With prediction, all we care about is forecasting Y given X on some as-yet-unseen data --- implying that the Preceptor Table has rows in which we know all the X but not the Y. But there is no notion of "manipulation" in such models. We don't pretend that, for Joe, we could turn variable X from a value of 5 to a value of 30 by just turning some knob and, by doing so, cause Joe's value of Y to change from 17 to 23. We can compare two people (or two groups of people), one with X equals 5 and one with X equals 30, and see how they differ in Y. The basic assumption of predictive models is that there is only one Y for Joe. There are not, by assumption, two possible values for Y, one if X equal 5 and another if X equals 30. The Preceptor Table has a single column under Y.
+With prediction, all we care about is forecasting Y given X on some as-yet-unseen data --- implying that the Preceptor Table has rows in which we know all the X but not the Y. But there is no notion of "manipulation" in such models. We don't pretend that, for Joe, we could turn variable X from a value of 5 to a value of 30 by just turning some knob and, by doing so, cause Joe's value of Y to change from 17 to 23. We can compare two people (or two groups of people), one with X equals 5 and one with X equals 30, and see how they differ in Y. The basic assumption of predictive models is that there is only one possible Y for Joe. There are not, by assumption, two possible values for Y, one if X equal 5 and another if X equals 30. The Preceptor Table has a single column under Y.
 
 With causal inference, however, we can consider the case of Joe with X = 5 and Joe with X = 30. Again, the same mathematical model can be used. And both models can be used for prediction, for estimating what the value of Y will be for a yet-unseen observation with values X. But, in this case, instead of only a single column in the Preceptor Table for Y, we have at least two (and possibly many) such columns, one for each of the potential outcomes under consideration.
 
-Tl;dr: *The difference between prediction models and causal models is that the former have one column for Y and the latter have more than one.* 
+Tl;dr: *The difference between prediction models and causal models is that the former have one column for Y and the latter have more than one.* Again, this point should be repeated in each Justice section.
 
 A related issue is the different types of Preceptor Tables. All of these are Preceptor Tables, but it is useful, I think, to have a clear description of the different types. Recall: **A Preceptor Table is a table with rows and columns for all the data that we would (reasonably) like to have.** If we had a Preceptor Table with no questions marks --- which we describe below as the ideal Preceptor Table --- we could calculate the number we want without the need for any inference.
 
@@ -70,39 +65,25 @@ Note that the concept of a Preceptor Table is more subtle than it at first appea
 
 ### Mathematical Model
 
-Second, we need to describe the math of the model, but in the simplest possible way, similar to how [ModernDive](https://davidkane9.github.io/PPBDS/regression.html#model1) does it. Start with the big idea. Every outcome is the sum of two parts: the model and what is not in the model:
+Second, we need to describe the math of the model, but in the simplest possible way, similar to how [ModernDive](https://davidkane9.github.io/PPBDS/regression.html#model1) does it. Here is the approach from the three parameter models in chapter 8. 
+
+$$ y_i = \beta_T x_{i, treated} + \beta_C x_{i, control} + \epsilon_i $$
+
+where $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is immigration attitude of person $i$. $x_{i, treated}$ is a 0/1 variable which is 1 if $i$ was treated and 0 otherwise. $x_{i, control}$ is a 0/1 variable which is 1 if $i$ was untreated and 0 otherwise. 
+
+$\beta_T$ is the average immigration attitude among the treated.  $\beta_C$ is the average immigration attitude among the control. And that is it! We aren't writing pages and pages of proofs and derivations. We write a single model, which clearly specifies the unknown parameters. Notes:
+
+1) This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameters as well. But that is too complex for an intro class, so we wave our hands and point readers to more advanced books. (We may only do this once, in chapter 7.)
+
+2) Defining $\beta_T$ as the "average immigration attitude among the treated" is a bit of a fudge. If you calculate that by hand and then compare it to what stan_glm() produces, they won't be the same. Instead, the stan_glm() value will be closer to zero. Why? $\beta_T$ is really the "average immigration attitude among everyone who might be treated in the entire population you are considering." It is not just the average for the treated. It is also include the controls in the experiment, the values for immigration attitude which they would have had, had they been treated. In fact, it even includes the values for people in the population which you want to make inferences for but which were not in the experiment at all. Should we go into all those messy details? I don't know! Maybe one time? Maybe in the margin?
+
+3) In this simple case, we are fortunate that the parameter $\beta_T$ has such a (mostly!) simple analog to a real world quantity. Much of the time, parameters are not so easy to interpret. What is the meaning of $\sigma$ after all? In a more complex model, especially with one with interaction terms, we will have to rely on the more traditional this is the amount by which a one unit change in X is associated with a change in Y. We save that complexity for chapters 9 and 10.
+
+
+Recall the big idea. Every outcome is the sum of two parts: the model and what is not in the model:
 
 $$outcome = model + what is not in the model$$
 It doesn't matter what the outcome is. It could be the result of a coin flip, the weight of a person, the GDP of a country. Whatever *outcome* you are considering is always made up of two parts. The first is the model you are creating. The second is all the stuff --- all the blooming and buzzing complexity of the real world --- which is not a part of the model.
-
-Instead of using vectors --- which are confusing --- we just give the math for one observation. We always include at least two equations: one with the i's and one with the hats.
-
-With the i's, we have something like:
-
-$$ y_i = b_f x_{female} + b_m x_{male} + \epsilon_i $$
-Or
-
-$$ y_i = b_0 + b_1 x_i + \epsilon_i $$
-
-
-The point of this is to give the math which relates an actual observation for unit i --- the value of Y and the value of the X's --- to each other. The model will also include (unknown and unknowable) parameters, in this case, $b_0$, $b_1$ and $\epsilon_i$. The key distinction is between the data --- the thing which the world shows us and which is in our Preceptor Table, the $y_i$'s and $x_i$'s --- and the parameters, the things which the world hides from us, the things we can never know for sure.
-
-The second equation involves the hats:
-
-$$ \hat{y_i} = \hat{b_0} + \hat{b_1} x_i  $$
-Again, you can never know the true value of a parameter. But, given your assumptions and your data, you can derive an estimate for the parameters. (Keep in mind, in this simple version, we are ignoring the uncertainty associated with our estimation of the parameters.)
-
-The key is that, once you have your estimated betas, you can "stick" the $x_i$ for observation $i$ into the formula and, from those two parts, calculate a $\hat{y_i}$. (Of course, in most textbooks, we do all this in terms of vectors, but I think that keeping everything in terms of a single unit makes things simpler.) Note a key unstated assumption: $\epsilon_i = 0$. That is a big assumption, or, perhaps more accurately, it is a necessary step to get anything accomplished.
-
-Once we have $\hat{y_i}$, we can calculate $\hat{\epsilon_i} = y_i - \hat{y_i}$. This notation makes sense in that, if $\epsilon_i$ is something that we don't know, then we need to estimate it, and anything we estimate should have a "hat." But, for historical reasons, this notation is rarely used. Instead, we write $r_i = y_i - \hat{y_i}$, where $r_i$ is the "residual" for observation $i$.
-
-Last step:
-
-$$ y_i = \hat{b_0} + \hat{b_1} x_i + r_i $$
-
-This mathematics, although simple, allows us to be fairly precise in describing the key concepts discussed below: parameter uncertainty (our uncertainty about the betas), unmodeled variation (how big are the residuals), fitted values (the $\hat{y}$'s) and the data generating mechanism (which is constructed by combining the fitted values and unmodeled variation).
-
-$$outcome = fitted values + unmodeled variation$$
 
 
 
@@ -117,6 +98,14 @@ In the main chapters of the book, the code here is always `stan_glm()`. This is 
 First, we can just print it. Chapter 7 walks the reader through all the parts of a stan_glm() model in detail. Later chapters will also show the printed model, but can move more quickly. Second, we create a summary table of the model using **gtsummary**. Note that this is just a different view of the same model. We don't show some things --- like sigma --- that we did show when just printing. We do show other things, like the 95% confidence interval which we did not show before. Neither is better! We use the one which is most helpful to our audience. Third, we use **tidybayes** to show histograms of the posterior distributions. The posterior is the underlying reality, the truth. The printed and table outputs are just summaries of the posterior. We might not show all three things every time, but we certainly always show the posterior. Graphics are pretty!
 
 The key command is `posterior_linpred()`, I think. 
+
+
+
+$$outcome = fitted values + unmodeled variation$$
+
+
+
+
 
 There are few more important concepts in statistics and data science than the "Data Generating Mechanism." Our *data* --- the data that we collect and see --- has been *generated* by the complexity and confusion of the world. God's own *mechanism* has brought His data to us. Our job is to build a model of that process, to create, on the computer, a mechanism which generates fake data consistent with the data which we see. With that DGM, we can answer any question which we might have. In particular, with the DGM, we provide predictions of data we have not seen and estimates of the uncertainty associated with those predictions. There are two parts to the DGM: the fitted model and unmodeled variation.
 
