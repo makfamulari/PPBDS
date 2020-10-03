@@ -117,11 +117,12 @@ library(PPBDS.data)
 library(rsample)
 library(tidyverse)
 library(skimr)
-library(gtsummary)
 library(rstanarm)
+library(gtsummary)
+library(tidybayes)
 ```
 
-**PPBDS.data** includes the data sets for this book. **rsample** includes functions for bootstrapping.
+**PPBDS.data** includes the data sets for this book. **rsample** includes functions for bootstrapping. **rstanarm**, **gtsummary** and **tidybayes** make it easy to create and display Bayesian models.
 
 ### What was the average year of US pennies in 2019?
 
@@ -357,7 +358,7 @@ Let's restrict our attention to a subset, focusing on gender, height and the yea
 
 ```{r}
 ch7 <- nhanes %>% 
-  select(gender, height, survey)
+  select(age, gender, height, survey)
 ```
 
 Look at a random sample of our data:
@@ -367,7 +368,7 @@ ch7 %>%
   sample_n(5)
 ```
 
-Notice how there is a decimal in the height column of `ch7`. This is because `height` is a `<dbl>` and not an `<int>`.
+Notice how there is a decimal in the `height` column of `ch7`. This is because `height` is a `<dbl>` and not an `<int>`.
 
 Let's also run `glimpse()` on our new data.
 
@@ -385,11 +386,12 @@ ch7 %>%
   skim()
 ```
 
-Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na`. This we will delete the rows in which the value of any variable is missing.
+Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na`. This we will delete the rows in which the value of any variable is missing. For simplicity, let's only consider adults.
 
 ```{r}
 ch7 <- nhanes %>% 
-  select(gender, height, survey) %>%
+  select(age, gender, height, survey) %>%
+  filter(age >= 18) %>% 
   drop_na()
 ```
 
@@ -415,14 +417,14 @@ The plot shows some interesting stuff. Since the distributions of height for bot
 
 ## Bootstrap to estimate average height
 
-We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let's use a similar approach to estimate the value of a different unknown parameter: the average height of an American male in 2009. 
+We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let's use a similar approach to estimate the value of a different unknown parameter: the average height of an adult American male in 2009. 
 
 First, filter the data set:
 
 
 ```{r}
 ch7_male <- nhanes %>%
-  filter(survey == 2009, gender == "Male") %>%
+  filter(survey == 2009, gender == "Male", age >= 18) %>%
   select(height) %>%
   drop_na()
 ```
@@ -448,12 +450,19 @@ virtual_resamples %>%
   ggplot() +
     geom_histogram(aes(x = height_mean, 
                        y = ..count../sum(..count..)), 
-                       binwidth = 0.1) +
+                       binwidth = 0.02) +
     labs(x = "Mean Height", 
          y = "Probability",
          title = "Posterior Distribution for the Mean Height of American Males in 2009") 
 ```
 
+The posterior distribution includes all the information we have about the unknown parameter --- mean height of American males --- which we have used our data to estimate. But we don't always want the entire object. Instead, we might want to know the:
+
+* Mean: `r mean(virtual_resamples$height_mean)`
+
+* Median: `r median(virtual_resamples$height_mean)`
+
+* 95% confidence interval: `r quantile(virtual_resamples$height_mean, probs = c(0.025, 0.975))`
 
 
 
@@ -472,53 +481,118 @@ Did we mention that this book is still a bit of a mess? Well, it is! And, in the
 
 The mess centers on the transition we are now making between the bootstrap and the full scale Bayesian approach. The margin note provides a bit of a justification. For now, that is all we have. So, watch us wave our hands and pretend that we have justified the leap we are about to take. 
 
-First, if you understand the concept of a posterior probability distribution as explained in Chapter 5 and, second, if you follow our demonstration that the bootstrap generates posterior distributions, then . . . . hand wave vigorously . . . third, you should be confortable going on to the standard Bayesian modeling approach that we will use for the next few chapters.
+First, if you understand the concept of a posterior probability distribution as explained in Chapter \@ref(probability) and, second, if you follow our demonstration that the bootstrap generates a posterior distribution, then . . . . hand wave vigorously . . . you should be comfortable going on to the standard Bayesian modeling approach that we will use for the next few chapters.
 
 
-## stan_glm
 
-Fortunately for us, Bayesian models are not hard to execute in R. Sticking to the same filtered male 2009 data, we can reduce all the work we did in the bootstrap method to the `stan_glm()` function which, when fed the right inputs, creates a bayesian generalized linear model to estimate the mean height. This function comes from the **rstanarm** package, which is very useful for Bayesian models in general.
+## Cardinal Virtues
 
-Similarly to the bootstrap method we just went over, this model is taking several resamples of the data when analyzing the distribution of heights in our data to create a posterior distribution. Each resample or simulation is its own model of two parameters (an intercept and sigma). We will get into what these parameters actually mean and how they are represented shortly, but first let's try to run the model
+Data science is ultimately a moral act, so we will use the four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) --- Wisdom, Justice, Courage and Temperance --- to organize our approach. The purpose of this section is two fold. First, we will show you that a more formal Bayesian approach results in, more or less, the same answer as the bootstrap abobve, but with much less code. Second, we will show how the cardinal virtues guide good data science.  
 
-The first argument in the `stan_glm()` function is data, which in our case is the filtered out ch7_male dataset we used in the bootstrap. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we are only trying to find mean heigh and have no predictor variables, our equation will be height ~ 1. What this means is that the mean height will be calculated by finding an intercept (a constant) which best describes it. Let's run this equation and see what it outputs
+### Wisdom
 
-
-```{r}
-stan_glm(data = ch7_male, height ~ 1)
+```{r echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-The model is seen at the end of the output, but before we get to it, lets unpack what all of that weird chain stuff.
+What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numerical value. Given that decision, we should make a model of the world to help us.
 
-As previously said this bayesian generalized linear model is running thousands of simulations in order to give us the most accurate posterior distribution.
+In any textbook, it will be tough to avoid the "toy problem" trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires a great deal of context. We do not have the time to get into that level of detail. So, we simplify. We are just going to estimate the average height of American males in 2009.
+
+But before starting that process, consider why or why not this might be useful knowledge. It is almost certainly not directly useful, except in the context of getting through this chapter. No one cares what the average height of American males was in 2009.
+
+Yet there are *related* things one might plausibly care about. What is the average height of American males today? What is the average height of Boston males today? What do you predict will be the height of the next 5 men you meet? What are the odds of walking past someone this week, assuming you walk past 1,000 men, who is at least 7 feet tall? Again, these are still toy problems, or at least toyish. However, the come a little closer to being useful.
+
+Do we have the data we need to answer those problems, the ones we care about? Maybe. That is where Wisdom comes in. In the social sciences, *there is never a direct relationship between the data you have and the question you are trying to answer.* Data for American males in 2009 is not the same thing as data for American males today, much less data for American males in Boston, much less data for males you are likely to walk by. Yet this data is relevant. Right? it is certainly better than nothing. That is, using not-perfect data is better than using no data at all.
+
+Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Toyko, I doubt that our data is at all relevant for that problem. Wisom is all about realizing that instead of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. Better to just use your common sense and experience.
 
 
-To check the models further, the function runs four randomly initialized Markov chains (each with 2000 simulations). It is then checking to see if all 4 Markov chains converge to the same posterior distribution. If they do, then the model is deemed valid and you can interpret its output. If not, it will warn you that the Markov chains did not converge and you should not analyze results. In general practice, it is really annoying to see the whole chain output when running models, so we add refresh =0 to the end of the function, telling it to only spit out the output of the model and cover up all of the internal processing.
 
-```{r}
-mod.obj <- stan_glm(data = ch7_male, height ~ 1, refresh = 0)
-mod.obj
+### Justice
+
+```{r, echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/Justice.jpg")
 ```
 
+Mathematical knowledge is the least important skill for a data scientist. 
 
-Now that have a much cleaner output, we can more easily understand what this model spit out at us. 
+However, a little mathematical notation will make our modelling assumptions clear, will bring some clarity and precision to our approach. In this case:
+
+$$ y_i =  \beta + \epsilon_i $$
+with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the height of male $i$. $\beta$ is the average height of all males in the population. $\epsilon_i$ is the "error term," the difference between the height of male $i$ and the average height of all males.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
+
+This is almost the simplest model we can construct. Note: 
+
+* The model has two unknown parameters: $\beta$ and $\sigma$. Before we can doing anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create *posterior distributions* for each parameter.
+
+<!-- DK: Box quote. -->
+
+* The model is wrong, as are all models. 
+
+* The parameter we most care about is $\beta$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about is value. Parameters like $\sigma$ in this context are *nuissance* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
+
+Consider this alternative framework:
+
+$$outcome = model + what is not in the model$$
+In this case, the *outcome* is the height of an individual male. This, also called the "response," is what we are trying to understand and/or explain and/or predict. The *model* is our creation, a mixture of data and parameters, an attempt to capture the underlying structure in the world which generates the outcome. 
+
+What is the difference between the *outcome* and the *model*? By definition, it is *what is not in the model*, all the blooming and buzzing complexity of the real world. The model will always be wrong in that it won't capture everything. Whatever the model misses is thrown into the error term. 
+
+
+
+
+
+### Courage
+
+```{r echo=FALSE, fig.margin=TRUE}
+knitr::include_graphics("other/images/Courage.jpg")
+```
+
+In data science, we deal with math, words, and code. The most important of these is code. We need Courage to create the model, the take the leap of faith that we can make our ideas real. 
+
+
+#### stan_glm
+
+Bayesian models are not hard to create in R. Sticking to the same filtered male 2009 data, we can reduce all the work we did for the bootstrap approach to the `stan_glm()` function which, when fed the right inputs, creates a Bayesian generalized linear model to estimate the mean height of all American males in 2009. This function comes from the **rstanarm** package, which is very useful for Bayesian models in general.
+
+
+The first argument in the `stan_glm()` function is data, which in our case is the filtered out `ch7_male` tibble we used in the bootstrap. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we are only trying to find mean height and have no predictor variables, our equation will be `height ~ 1`. Details:
+
+
+```{r, cache = TRUE}
+fit_obj <- stan_glm(data = ch7_male, height ~ 1, refresh = 0)
+```
+
+* This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reasons why Bayesian approaches were --- and to some extent still are --- little used. When creating your own models, you will often want to use the `cache = TRUE` code chunk option. This saves the result of the model in between knittings of your Rmd. 
+
+* If you don't set `refresh = 0`, the model will output many lines of confusing output. You can learn more about that output by reading the help page for `stan_glm()`. The output provides details on the fitting process as it runs and diagnostics about final result. All of those details are beyond the scope of this book.
+
+* You should always assign the result of the call to `stan_glm()` as we do above. By convention, the name of that object will often included the word "fit" to indicate that it is a "fitted" model object.
+
+There are several ways to examine the fitted model. The simplest is to print it:
+
+```{r}
+fit_obj
+```
+
 
 The first line is telling us what model we used, in our case a `stan_glm()` model. 
 
-The second line tells us this model is using a Gaussian (otherwise known as identity) distribution. A Gaussian, or normal, distribution is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent than data far from it. For that reason, we typically leave it as the default unless we are working with a left hand variable that is not normally distributed. Since we previously saw that height was normally distributed, we are good to go with the Gaussian distribution.
+The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section \@ref(normal). The normal is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent than data far from it. For that reason, we typically leave it as the default unless we are working with a left hand variable that is extremely not normal, like something which only takes two values like 0/1 or TRUE/FALSE. Since we previously saw that height was (very roughly) normally distributed, we are good to go with the Gaussian distribution.
 
 
-The third line gives us back our input formula for the model. As you may remember, we are creating a model predicting height with a constant - which is in essence the simplest model you can create (don't worry we will get into many more advacned models in the next few chapters)
+The third line gives us back the formula we provided. We are creating a model predicting height with a constant --- which is the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the "~" symbol), is the "response" or "dependent" variable, the thing which we are trying to explain. Since this is a model about `height`, `height` goes on the lefthand side. Second, we have the "explanatory" or "independent" independent variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant.  (The number `1` indicates that constant. It does not mean that we think that everyone is height `1`.) 
 
-The fourth and fifth lines of the output are very intuitive and are just telling us that our data set that we are feeding to the function has 2370 obeservations and that we only have one predictor (the constant).
+The fourth and fifth lines of the output tell us that we have 1,814 observations and that we only have one predictor (the constant).
 
-The first few lines remind us that we performed a bayesian generalized linear model of 1 predictor, height, with a gaussian distribution on a dataset of 2370 people. It is useful to know that a Gaussian, or normal, distribution is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent than data far from it.
+We knew all this information before we fit the model. R records it in the `fit_obj` because we don't want to forget what we did. The second half of the display gives a summary of the parameter values.
 
 Under that, we see the output for the two parameters of the model: intercept and sigma. A very important thing to remember is that while the function is spitting out two parameters, the actual model we built is a posterior distribution of possible means. The parameters serve as a good way to describe the distribution.
 
 For each parameter, there is a calculated point estimate (medians computed through the simulation) and uncertainty estimates (standard deviations) of these point estimates. This is the case because we cannot be sure what the actual point estimate of the parameter is, but running many simulations through the model can give us an idea of how certain our calculated point estimate is. For a lot of Bayesian inferencing, our uncertainty estimate for each parameter will be calculated using MAD SD, the median absolute deviation.
 
-## Diving into MAD_SD
+#### Diving into MAD_SD
 
 As previously mentioned, MAD SD is a measure of uncertainty, similar to standard error which has been previously mentioned in the book. In fact MAD SD is a more robust measure than standard error becaue standard error is calculated by squaring ditances from data points to the model, which means outliers will more strongly skew data.
 
@@ -551,7 +625,6 @@ The last step in calculating MAD is to take the median of those differenes, whic
 
 ```{r}
 mediandiffx <- median(diffx)
-
 ```
 
 Lastly, because it is very useful in data analysis to be able to compare things to standard deviations, we usually rescale the median absolute deviation by multiplying it by 1.483, which reproduces the standard error if the data is normally distributed and can be calculated with the `mad()` equation
@@ -569,10 +642,10 @@ $$ MADsd = 1.483 * median(|Yi – median(Yi|) $$
 Before moving on to the next section of this chapter, take a second to make sure you understand what MAD SD and how it is calculated - it will play a very big role in demonstrating the uncertainty of most of our future parameters in the book
 
 
-## Unpacking the first parameter: the intercept
+#### Unpacking the first parameter: the intercept
 
 ```{r}
-mod.obj
+fit_obj
 ```
 
 <!-- DK: Always MAD_SD -->
@@ -586,44 +659,41 @@ A great way to see this is to visualize the posterior distribution of intercepts
 <!-- DK: make this plot look exactly like the posterior probability plots ion chapter 5. Same title and look and so on. Remind students that this is why we spent so much time on this for chapter 5. -->
 
 ```{r}
-plot(mod.obj, "hist", pars = "(Intercept)")
+plot(fit_obj, "hist", pars = "(Intercept)")
 ```
 
 Slightly rearranging this function, you can also see You can see how 167.5 is the median of this distribution, and moreover how 68% of heights fall within one MAD_SD from the median (it is a general rule that 68% of the distribution should fall within one MAD_SD of the median, 95% should fall within two, and 99.7% should fall within 3).
 ```{r}
-plot(mod.obj, pars = "(Intercept)", plotfun="areas", prob = .68)
+plot(fit_obj, pars = "(Intercept)", plotfun="areas", prob = .68)
 #abline(v = 167.5)
 
 ```
 
-## Unpacking the second parameter: sigma
+#### Unpacking the second parameter: sigma
 
 The second parameter, sigma, will be outputted for all bayesian models you compute (no matter how many predictors) and shows us the average error of the model. Another way of conceptualizing this parameter is as the deviation between the predicted value and the observed value. Similar to with the intercept, the model ultimately cannot say a definitive answer to what the parameter is, so there is some uncertainty to even the error parameter itself. More specifically, the MAD_SD of the sigma reflects the standard deviation of the sigma value itself (since so many different samples were taken with each its own sigma). In this instance, since the MAD_SD of sigma is .3, we know that 68% of the times the sigma value of the model fell within 21.5 and 22.1, so we can be pretty confident about this parameter.
 
 ```{r}
-plot(mod.obj, "hist", pars = "sigma")
+plot(fit_obj, "hist", pars = "sigma")
 ```
 
 We can also see how the median and MAD_SD values are connected to the sigma posterior distribution with this output. As you can see, the median value falls around 21.8 and 68% of the area od the posterior distrubtion falls within 21.5 and 22.1
 
 ```{r}
-plot(mod.obj, pars = "sigma", plotfun="areas", prob = .68)
+plot(fit_obj, pars = "sigma", plotfun = "areas", prob = .68)
 ```
 
 
-## Comparing lm and stan_glm
+#### Visualizing the results of the linear model
 
 
-Both the `lm()` and `stan_glm()` functions can be used to to create linear models. The reason this textbook is focusing on `stan_glm()` is through running serveral simulations of the model, it can represent uncertainty ina much more accurate way. Additionally, by performing Bayesian inference, this function also leads to more stable estimates and predictions that can be based on priors. A discussion on priors and Bayesian inference in general is beyond the scope of the chapter, but in all essence a prior is some previous information that you bring to the table when creating a sort of model that can influence how you create the model.
-
-
-## Visualizing the results of the linear model
+<!-- as_tibble(fit_obj) -->
 
 
 The results of the bayesian linera model can also be seen with the posterior linpred function, which give a fitted model with a matrix of the estimates probabilites.
 
 ```{r}
-mod.obj_linpred <- posterior_linpred(mod.obj, transform = TRUE)
+mod.obj_linpred <- posterior_linpred(fit_obj, transform = TRUE)
 ```
 
 From this matrix, you can use the ggplot function to create a histogram showing the distribution of mean heights across all of the samples. Looking at the histogram, it seems like the mean point estimate is between 167 and 168, which makes a lot of sense considering our median point estimate is 167.5
@@ -638,73 +708,19 @@ mod.obj_linpred[,3] %>%
 #explain graph
 ```
 
-## Creating a table for the linear model
+<!-- ## Creating a table for the linear model -->
 
-While the output of the `stan_glm()` function is helpful and the histograms we have created do a good job of showin gus the posterior distributions of the model, it is many times helpful to visualize our results with a table. 
-
-
-
-```{r}
-#mod.obj.df <- as.data.frame((mod.obj))
-#tbl_regression(mod.obj.df)
-```
+<!-- While the output of the `stan_glm()` function is helpful and the histograms we have created do a good job of showin gus the posterior distributions of the model, it is many times helpful to visualize our results with a table.  -->
 
 
-##  Predicting 
 
-Now that we understand our model, we can start actually doing stuff with it, including making a lot of predictions. A very useful tool in the rstanarm package to help us with this is posterior predict, which can make predictions on new data using our model.
-
-Let's first try to find
-
-
-```{r}
-mod.obj_predict <- posterior_predict(mod.obj, transform = TRUE)
-mod.obj_predict[,3] %>% 
-  as_tibble() %>% 
-  ggplot(aes(value)) +
-    geom_histogram(binwidth = 0.002)
-```
+<!-- ```{r} -->
+<!-- #mod.obj.df <- as.data.frame((mod.obj)) -->
+<!-- #tbl_regression(mod.obj.df) -->
+<!-- ``` -->
 
 
-## Wisdom
 
-```{r echo=FALSE, fig.margin=TRUE}
-knitr::include_graphics("other/images/Wisdom.jpg")
-```
-
-Let's look at how our key theme, Wisdom, fits in with two-parameter estimates. Just like in the previous chapter, Wisdom covers the relevance of the estimands and the map from concept to data. 
-
-In our NHANES data, we focused on the mean and 90th percentile of male heights. We can easily extract both estimands from our bootstrap samples. However, are these estimands accurately capturing what we care about? Probably, but we are not fully sure. What we want optimally is if we can accurately predict the mean and 90th percentile of male heights in the US. We want a model that should generalize its points of interests and include all predictors. For example, with regard to the outcome variable, a model of heights will not necessarily tell you about patterns of male heights. 
-
-Our problem, estimating both mean and 90th percentile of male heights, is by taking care of our confounding variables.
-
-First, there are both genders in the data. We had to adjust for that by filtering to only men. Additionally, males have a certain age range, typically above 18 years old. We also had to account for that. By using bootstraps, we were able to use random samples to thus help get more representative samples.
-
-Second, it's important to understand that data is always missing. We could easily calculate our estimands through arithmetic means, but because we don't have perfect data we will have to estimate. In this case, by using bootstrap samples we were able to create confidence intervals to give us some quantitative measure of confidence. 
-
-## Justice
-```{r, echo=FALSE, fig.margin=TRUE}
-knitr::include_graphics("other/images/Justice.jpg")
-```
-Let's try to understand the math behind our height model. For one, height is normally distributed because our data is continuous. Unlike in the previous chapter where data is discrete, we are dealing with continuous data. In addition, we can find the mean height and standard deviation of height, both of which are parameters for the normal distribution. Therefore, we will see the following:
-
-$$ height_i \sim N(\beta, \sigma^2)$$
-But what about the standard error in our data. What does its distribution look like? Well the distribution of our standard error is also normally distributed. This is because the errors from our bootstrap samples are random and continuous, which will also follow a normal distribution.
-
-$$ \epsilon_i \sim N(0, \sigma^2)$$ 
-Standard deviation of the bootstrap is the same thing as $\sigma$.
-
-## Courage
-```{r echo=FALSE, fig.margin=TRUE}
-knitr::include_graphics("other/images/Courage.jpg")
-```
-In data science, we deal with words, math, and code. The most important term is code. We need some sort of framework to detail the structure of our model using all three terms. However, Courage is needed to implement the coded model. 
-
-The data we have seen is generated by the complex and confusing world. We have to build a model to create some sort of computational mechanism that creates fake data that is consistent with the real, true data in the world. This is our "Data Generating Mechanism," which provides predictions and uncertainty. 
-
-We need a "machine" that generates our predictions, which is the same thing as a machine which fills in all the question marks in the Actual Preceptor Table and provides confidence intervals, which is the same thing as a machine which produces "fake data" which looks a lot like our actual data.  
-
-We are ultimately looking at our code and uncertainty under Courage. 
 
 ## Temperance
 
@@ -723,6 +739,23 @@ Another reason why we deal with Temperance in data science is that there is real
 Last but not least, getting the wrong conclusions suck. But at least we are not dealing with null hypotheses. Playing the prediction game could be fun, but if we reject the null hypothesis if p is less than .05, what if we get .06 as our p-value? Will that honestly make a difference? Probably not!
 
 
+####  Predicting 
+
+Now that we understand our model, we can start actually doing stuff with it, including making a lot of predictions. A very useful tool in the rstanarm package to help us with this is posterior predict, which can make predictions on new data using our model.
+
+Let's first try to find
+
+
+```{r}
+mod.obj_predict <- posterior_predict(fit_obj, transform = TRUE)
+mod.obj_predict[,3] %>% 
+  as_tibble() %>% 
+  ggplot(aes(value)) +
+    geom_histogram(binwidth = 0.002)
+```
+
+
+## Conclusion
 
 
 
