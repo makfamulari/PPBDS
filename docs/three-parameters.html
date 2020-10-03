@@ -251,12 +251,12 @@ Create some memes. Any way to add Batman to Justice section?
 </h2>
 <!-- DK: Still need to standardize the method we use for providing references. -->
 <p>As always, it makes sense to start with some exploratory data analysis (EDA). To demonstrate modeling with three parameters, we will use the <code>trains</code> data set from the <strong>PPBDS.data</strong> package. Recall the discussion from Chapter <a href="rubin-causal-model.html#rubin-causal-model">3</a>. Enos (2014) randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers – the <code>treatment</code> – influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let’s load the libraries we will need in this chapter, all of which we have used before, and look at the data.</p>
-<div class="sourceCode" id="cb914"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb914-1"><a href="three-parameters.html#cb914-1"></a><span class="kw">library</span>(PPBDS.data)</span>
-<span id="cb914-2"><a href="three-parameters.html#cb914-2"></a><span class="kw">library</span>(rstanarm)</span>
-<span id="cb914-3"><a href="three-parameters.html#cb914-3"></a><span class="kw">library</span>(broom.mixed)</span>
-<span id="cb914-4"><a href="three-parameters.html#cb914-4"></a><span class="kw">library</span>(skimr)</span>
-<span id="cb914-5"><a href="three-parameters.html#cb914-5"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
-<div class="sourceCode" id="cb915"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb915-1"><a href="three-parameters.html#cb915-1"></a><span class="kw">glimpse</span>(trains)</span></code></pre></div>
+<div class="sourceCode" id="cb899"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb899-1"><a href="three-parameters.html#cb899-1"></a><span class="kw">library</span>(PPBDS.data)</span>
+<span id="cb899-2"><a href="three-parameters.html#cb899-2"></a><span class="kw">library</span>(rstanarm)</span>
+<span id="cb899-3"><a href="three-parameters.html#cb899-3"></a><span class="kw">library</span>(broom.mixed)</span>
+<span id="cb899-4"><a href="three-parameters.html#cb899-4"></a><span class="kw">library</span>(skimr)</span>
+<span id="cb899-5"><a href="three-parameters.html#cb899-5"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
+<div class="sourceCode" id="cb900"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb900-1"><a href="three-parameters.html#cb900-1"></a><span class="kw">glimpse</span>(trains)</span></code></pre></div>
 <pre><code>## Rows: 115
 ## Columns: 8
 ## $ gender    &lt;chr&gt; "Female", "Female", "Male", "Male", "Male", "Female", "Fema…
@@ -268,22 +268,22 @@ Create some memes. Any way to add Batman to Justice section?
 ## $ treatment &lt;fct&gt; Treated, Treated, Treated, Treated, Control, Treated, Contr…
 ## $ att_end   &lt;dbl&gt; 11, 10, 5, 11, 5, 13, 13, 11, 12, 10, 9, 9, 13, 7, 8, 13, 8…</code></pre>
 <p>Here, we can see variables that indicate each respondent’s gender, political affiliations, age, and income. Additionally, we have variables that indicate whether a subject was in the control or treatment group, and their attitudes toward immigration both before (<code>att_start</code>) and after (<code>att_end</code>) the experiment. You can type <code>?trains</code> to read the help page for more information about each variable. Let’s restrict attention to a subset of the variables.</p>
-<div class="sourceCode" id="cb917"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb917-1"><a href="three-parameters.html#cb917-1"></a>ch8 &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb917-2"><a href="three-parameters.html#cb917-2"></a><span class="st">  </span><span class="kw">select</span>(age, att_end, party, treatment)</span></code></pre></div>
+<div class="sourceCode" id="cb902"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb902-1"><a href="three-parameters.html#cb902-1"></a>ch8 &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb902-2"><a href="three-parameters.html#cb902-2"></a><span class="st">  </span><span class="kw">select</span>(age, att_end, party, treatment)</span></code></pre></div>
 <p>It is always smart to look at a some random samples of the data:</p>
-<div class="sourceCode" id="cb918"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb918-1"><a href="three-parameters.html#cb918-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb918-2"><a href="three-parameters.html#cb918-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb903"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb903-1"><a href="three-parameters.html#cb903-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb903-2"><a href="three-parameters.html#cb903-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">5</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 4
 ##     age att_end party      treatment
 ##   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;      &lt;fct&gt;    
-## 1    37       7 Republican Control  
-## 2    61       9 Democrat   Control  
-## 3    37       8 Democrat   Treated  
-## 4    67       9 Democrat   Control  
-## 5    55      12 Republican Control</code></pre>
+## 1    30      12 Democrat   Treated  
+## 2    52       7 Democrat   Control  
+## 3    52       7 Democrat   Control  
+## 4    56      11 Democrat   Treated  
+## 5    46       6 Republican Control</code></pre>
 <p><code>att_end</code> is a measure of person’s attitude toward immigration, a higher number means more conservative, i.e., a more exclusionary stance on immigration into the United States. Running <code>glimpse()</code> is another way of exploring a data set.</p>
-<div class="sourceCode" id="cb920"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb920-1"><a href="three-parameters.html#cb920-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb920-2"><a href="three-parameters.html#cb920-2"></a><span class="st">  </span><span class="kw">glimpse</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb905"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb905-1"><a href="three-parameters.html#cb905-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb905-2"><a href="three-parameters.html#cb905-2"></a><span class="st">  </span><span class="kw">glimpse</span>()</span></code></pre></div>
 <pre><code>## Rows: 115
 ## Columns: 4
 ## $ age       &lt;dbl&gt; 31, 34, 63, 45, 55, 37, 53, 36, 54, 42, 33, 50, 24, 40, 53,…
@@ -292,10 +292,10 @@ Create some memes. Any way to add Batman to Justice section?
 ## $ treatment &lt;fct&gt; Treated, Treated, Treated, Treated, Control, Treated, Contr…</code></pre>
 <p>Pay attention to the variable types. Do they make sense? Perhaps. But there are certainly grounds for suspicion. Why are <code>age</code> and <code>att_end</code> doubles rather than integers? All the values in the data appear to be integers, so there is no benefit is having these variables be doubles. Why is <code>party</code> a character variable and <code>treatment</code> a factor variable? It could be that these are intentional choices made by the creator of the tibble, i.e., us. These could be mistakes. Or, most likely, these choices are a mixture of sensible and arbitrary. Regardless, it is your responsibility to notice them. You can’t make a good model without looking closely at the data which you are using.</p>
 <p><code>skim</code> from the <strong>skimr</strong> package is the best way to get an overview of a tibble.</p>
-<div class="sourceCode" id="cb922"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb922-1"><a href="three-parameters.html#cb922-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb922-2"><a href="three-parameters.html#cb922-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb907"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb907-1"><a href="three-parameters.html#cb907-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb907-2"><a href="three-parameters.html#cb907-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-714">TABLE 8.1: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-702">TABLE 8.1: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -426,23 +426,23 @@ Create some memes. Any way to add Batman to Justice section?
 </table>
 <p><code>skim()</code> shows us what the different values of <code>treatment</code> are because it is a factor. Unfortunately, it does not do the same for character variables like <code>party</code>. The ranges for <code>age</code> and <code>att_end</code> seem reasonable. Recall that participants were asked three questions about immigration issues, each of which allowed for an answer indicated strength of agreement on a scale form 1 to 5, with higher values indicating more agreement with conservative viewpoints. <code>att_end</code> is the sum of the responses to the three questions, so the most liberal possible value is 3 and the most conservative is 15.</p>
 <p>Always plot your data.</p>
-<div class="sourceCode" id="cb923"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb923-1"><a href="three-parameters.html#cb923-1"></a>ch8 <span class="op">%&gt;%</span></span>
-<span id="cb923-2"><a href="three-parameters.html#cb923-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> party, <span class="dt">y =</span> age)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb923-3"><a href="three-parameters.html#cb923-3"></a><span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>, <span class="dt">height =</span> <span class="dv">0</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb923-4"><a href="three-parameters.html#cb923-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Age by Party Affiliation in Trains Dataset"</span>,</span>
-<span id="cb923-5"><a href="three-parameters.html#cb923-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Where are the old Republicans?"</span>,</span>
-<span id="cb923-6"><a href="three-parameters.html#cb923-6"></a>       <span class="dt">x =</span> <span class="st">"Party"</span>,</span>
-<span id="cb923-7"><a href="three-parameters.html#cb923-7"></a>       <span class="dt">y =</span> <span class="st">"Age"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-715-1.png" width="672"></p>
+<div class="sourceCode" id="cb908"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb908-1"><a href="three-parameters.html#cb908-1"></a>ch8 <span class="op">%&gt;%</span></span>
+<span id="cb908-2"><a href="three-parameters.html#cb908-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> party, <span class="dt">y =</span> age)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb908-3"><a href="three-parameters.html#cb908-3"></a><span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>, <span class="dt">height =</span> <span class="dv">0</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb908-4"><a href="three-parameters.html#cb908-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Age by Party Affiliation in Trains Dataset"</span>,</span>
+<span id="cb908-5"><a href="three-parameters.html#cb908-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Where are the old Republicans?"</span>,</span>
+<span id="cb908-6"><a href="three-parameters.html#cb908-6"></a>       <span class="dt">x =</span> <span class="st">"Party"</span>,</span>
+<span id="cb908-7"><a href="three-parameters.html#cb908-7"></a>       <span class="dt">y =</span> <span class="st">"Age"</span>)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-703-1.png" width="672"></p>
 <p>From this plot, we can gather that there are many more Democrats in this dataset than Republicans. Democrats also span a wider range of ages than Republicans. The mode age for Democrats appears to be 50.</p>
-<div class="sourceCode" id="cb924"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb924-1"><a href="three-parameters.html#cb924-1"></a>ch8 <span class="op">%&gt;%</span></span>
-<span id="cb924-2"><a href="three-parameters.html#cb924-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> treatment, <span class="dt">y =</span> att_end)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb924-3"><a href="three-parameters.html#cb924-3"></a><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb924-4"><a href="three-parameters.html#cb924-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Attitude End by Treatment in Trains Dataset"</span>,</span>
-<span id="cb924-5"><a href="three-parameters.html#cb924-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Did the treatment make people more conservative?"</span>,</span>
-<span id="cb924-6"><a href="three-parameters.html#cb924-6"></a>       <span class="dt">x =</span> <span class="st">"Treatment"</span>,</span>
-<span id="cb924-7"><a href="three-parameters.html#cb924-7"></a>       <span class="dt">y =</span> <span class="st">"Attitude After Experiment"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-716-1.png" width="672"></p>
+<div class="sourceCode" id="cb909"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb909-1"><a href="three-parameters.html#cb909-1"></a>ch8 <span class="op">%&gt;%</span></span>
+<span id="cb909-2"><a href="three-parameters.html#cb909-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> treatment, <span class="dt">y =</span> att_end)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb909-3"><a href="three-parameters.html#cb909-3"></a><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb909-4"><a href="three-parameters.html#cb909-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Attitude End by Treatment in Trains Dataset"</span>,</span>
+<span id="cb909-5"><a href="three-parameters.html#cb909-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Did the treatment make people more conservative?"</span>,</span>
+<span id="cb909-6"><a href="three-parameters.html#cb909-6"></a>       <span class="dt">x =</span> <span class="st">"Treatment"</span>,</span>
+<span id="cb909-7"><a href="three-parameters.html#cb909-7"></a>       <span class="dt">y =</span> <span class="st">"Attitude After Experiment"</span>)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-704-1.png" width="672"></p>
 <p>On a boxplot, the top and bottom borders of the box denotes the 75th and 25th percentiles, respectively. The line inside the box denotes the mean of the data. Treated individuals have a higher mean <code>att_end</code> than the control group, and a higher distribution in general, with its 25th percentile lining up with the mean of the control group. The control group has one outlier, while the treatment group has none.</p>
 </div>
 <div id="age-as-a-function-of-party" class="section level2">
@@ -456,15 +456,15 @@ Create some memes. Any way to add Batman to Justice section?
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-717"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-705"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 8.1: Wisdom<!--</p>-->
 <!--</div>--></span>
 </p>
 <p>Before we write any line of code, the first thing we should do is make it clear that our approach is correct. As already seen in other chapters, there are two aspects to clarify. First, is the data suitable to answer our question? And second, is our estimand appropriate?</p>
 <p>First, let’s clarify what we want to know. The goal is to find out what age we can expect to find among people of a certain party affiliation. Let’s assume we don’t want to limit ourselves to people in a certain place, but we are interested in an estimate for the whole USA. As far as party affiliation is concerned, we will probably only want to consider Democrats or Republicans. Returning to the first point, is our data suitable to answer our question? <code>trains' includes a variable</code>age’ which indicates the age of a person in years, and a variable `party’ with values ‘Democrat’ or ‘Republican’ which shows their party affiliation. In terms of content this seems to be exactly what we are looking for. Methodologically, however, there could be problems. The data from this study only come from Boston, so the question arises whether we can really draw conclusions for the whole country. In 2018, the median age was 38.8 years in the USA, but 39.4 years in Massachusetts. Although the difference is small, we do not know whether this also applies to Democrats and Republicans separately. Another problem could arise from the fact that Massachusetts (and Boston as an urban area) is very Democratic. As noted earlier, the party affiliates in ‘trains’ are indeed very unequally distributed:</p>
-<div class="sourceCode" id="cb925"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb925-1"><a href="three-parameters.html#cb925-1"></a>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb925-2"><a href="three-parameters.html#cb925-2"></a><span class="st">  </span><span class="kw">count</span>(party)</span></code></pre></div>
+<div class="sourceCode" id="cb910"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb910-1"><a href="three-parameters.html#cb910-1"></a>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb910-2"><a href="three-parameters.html#cb910-2"></a><span class="st">  </span><span class="kw">count</span>(party)</span></code></pre></div>
 <pre><code>## # A tibble: 2 x 2
 ##   party          n
 ##   &lt;chr&gt;      &lt;int&gt;
@@ -487,7 +487,7 @@ The second estimand is therefore not just the median height of the Republicans, 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-719"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-707"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.2: Justice<!--</p>-->
 <!--</div>--></span>
@@ -503,7 +503,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#nyuaifqesm .gt_table {
+#dkmseapqif .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -528,7 +528,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-left-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_heading {
+#dkmseapqif .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -540,7 +540,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_title {
+#dkmseapqif .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -550,7 +550,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-bottom-width: 0;
 }
 
-#nyuaifqesm .gt_subtitle {
+#dkmseapqif .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -560,13 +560,13 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-width: 0;
 }
 
-#nyuaifqesm .gt_bottom_border {
+#dkmseapqif .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_col_headings {
+#dkmseapqif .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -581,7 +581,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_col_heading {
+#dkmseapqif .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -601,7 +601,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   overflow-x: hidden;
 }
 
-#nyuaifqesm .gt_column_spanner_outer {
+#dkmseapqif .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -613,15 +613,15 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 4px;
 }
 
-#nyuaifqesm .gt_column_spanner_outer:first-child {
+#dkmseapqif .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#nyuaifqesm .gt_column_spanner_outer:last-child {
+#dkmseapqif .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#nyuaifqesm .gt_column_spanner {
+#dkmseapqif .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -633,7 +633,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   width: 100%;
 }
 
-#nyuaifqesm .gt_group_heading {
+#dkmseapqif .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -655,7 +655,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   vertical-align: middle;
 }
 
-#nyuaifqesm .gt_empty_group_heading {
+#dkmseapqif .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -670,15 +670,15 @@ The second estimand is therefore not just the median height of the Republicans, 
   vertical-align: middle;
 }
 
-#nyuaifqesm .gt_from_md > :first-child {
+#dkmseapqif .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#nyuaifqesm .gt_from_md > :last-child {
+#dkmseapqif .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#nyuaifqesm .gt_row {
+#dkmseapqif .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -697,7 +697,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   overflow-x: hidden;
 }
 
-#nyuaifqesm .gt_stub {
+#dkmseapqif .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -709,7 +709,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-left: 12px;
 }
 
-#nyuaifqesm .gt_summary_row {
+#dkmseapqif .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -719,7 +719,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 5px;
 }
 
-#nyuaifqesm .gt_first_summary_row {
+#dkmseapqif .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -729,7 +729,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_grand_summary_row {
+#dkmseapqif .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -739,7 +739,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 5px;
 }
 
-#nyuaifqesm .gt_first_grand_summary_row {
+#dkmseapqif .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -749,11 +749,11 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_striped {
+#dkmseapqif .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#nyuaifqesm .gt_table_body {
+#dkmseapqif .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -762,7 +762,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-bottom-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_footnotes {
+#dkmseapqif .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -776,13 +776,13 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_footnote {
+#dkmseapqif .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#nyuaifqesm .gt_sourcenotes {
+#dkmseapqif .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -796,46 +796,46 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#nyuaifqesm .gt_sourcenote {
+#dkmseapqif .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#nyuaifqesm .gt_left {
+#dkmseapqif .gt_left {
   text-align: left;
 }
 
-#nyuaifqesm .gt_center {
+#dkmseapqif .gt_center {
   text-align: center;
 }
 
-#nyuaifqesm .gt_right {
+#dkmseapqif .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#nyuaifqesm .gt_font_normal {
+#dkmseapqif .gt_font_normal {
   font-weight: normal;
 }
 
-#nyuaifqesm .gt_font_bold {
+#dkmseapqif .gt_font_bold {
   font-weight: bold;
 }
 
-#nyuaifqesm .gt_font_italic {
+#dkmseapqif .gt_font_italic {
   font-style: italic;
 }
 
-#nyuaifqesm .gt_super {
+#dkmseapqif .gt_super {
   font-size: 65%;
 }
 
-#nyuaifqesm .gt_footnote_marks {
+#dkmseapqif .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="nyuaifqesm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="dkmseapqif" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of age ~ party</th>
@@ -991,7 +991,7 @@ The second estimand is therefore not just the median height of the Republicans, 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-721"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-709"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 8.3: Courage<!--</p>-->
 <!--</div>--></span>
@@ -999,9 +999,9 @@ The second estimand is therefore not just the median height of the Republicans, 
 <div id="the-fitted-model" class="section level4">
 <h4>
 <span class="header-section-number">8.2.3.1</span> The fitted model</h4>
-<div class="sourceCode" id="cb927"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb927-1"><a href="three-parameters.html#cb927-1"></a>obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(age <span class="op">~</span><span class="st"> </span>party <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> trains, <span class="dt">refresh =</span> <span class="dv">0</span>)</span>
-<span id="cb927-2"><a href="three-parameters.html#cb927-2"></a></span>
-<span id="cb927-3"><a href="three-parameters.html#cb927-3"></a>obj</span></code></pre></div>
+<div class="sourceCode" id="cb912"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb912-1"><a href="three-parameters.html#cb912-1"></a>obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(age <span class="op">~</span><span class="st"> </span>party <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> trains, <span class="dt">refresh =</span> <span class="dv">0</span>)</span>
+<span id="cb912-2"><a href="three-parameters.html#cb912-2"></a></span>
+<span id="cb912-3"><a href="three-parameters.html#cb912-3"></a>obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      age ~ party - 1
@@ -1010,7 +1010,7 @@ The second estimand is therefore not just the median height of the Republicans, 
 ## ------
 ##                 Median MAD_SD
 ## partyDemocrat   42.6    1.3  
-## partyRepublican 41.2    2.8  
+## partyRepublican 41.1    2.8  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
@@ -1025,7 +1025,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#oghgtmtujr .gt_table {
+#xyybckbbny .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1050,7 +1050,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-left-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_heading {
+#xyybckbbny .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1062,7 +1062,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_title {
+#xyybckbbny .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1072,7 +1072,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-bottom-width: 0;
 }
 
-#oghgtmtujr .gt_subtitle {
+#xyybckbbny .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1082,13 +1082,13 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-width: 0;
 }
 
-#oghgtmtujr .gt_bottom_border {
+#xyybckbbny .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_col_headings {
+#xyybckbbny .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1103,7 +1103,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_col_heading {
+#xyybckbbny .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1123,7 +1123,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   overflow-x: hidden;
 }
 
-#oghgtmtujr .gt_column_spanner_outer {
+#xyybckbbny .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1135,15 +1135,15 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 4px;
 }
 
-#oghgtmtujr .gt_column_spanner_outer:first-child {
+#xyybckbbny .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#oghgtmtujr .gt_column_spanner_outer:last-child {
+#xyybckbbny .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#oghgtmtujr .gt_column_spanner {
+#xyybckbbny .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1155,7 +1155,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   width: 100%;
 }
 
-#oghgtmtujr .gt_group_heading {
+#xyybckbbny .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1177,7 +1177,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   vertical-align: middle;
 }
 
-#oghgtmtujr .gt_empty_group_heading {
+#xyybckbbny .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1192,15 +1192,15 @@ The second estimand is therefore not just the median height of the Republicans, 
   vertical-align: middle;
 }
 
-#oghgtmtujr .gt_from_md > :first-child {
+#xyybckbbny .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#oghgtmtujr .gt_from_md > :last-child {
+#xyybckbbny .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#oghgtmtujr .gt_row {
+#xyybckbbny .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1219,7 +1219,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   overflow-x: hidden;
 }
 
-#oghgtmtujr .gt_stub {
+#xyybckbbny .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1231,7 +1231,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-left: 12px;
 }
 
-#oghgtmtujr .gt_summary_row {
+#xyybckbbny .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1241,7 +1241,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 5px;
 }
 
-#oghgtmtujr .gt_first_summary_row {
+#xyybckbbny .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1251,7 +1251,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_grand_summary_row {
+#xyybckbbny .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1261,7 +1261,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 5px;
 }
 
-#oghgtmtujr .gt_first_grand_summary_row {
+#xyybckbbny .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1271,11 +1271,11 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_striped {
+#xyybckbbny .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#oghgtmtujr .gt_table_body {
+#xyybckbbny .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1284,7 +1284,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-bottom-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_footnotes {
+#xyybckbbny .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1298,13 +1298,13 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_footnote {
+#xyybckbbny .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#oghgtmtujr .gt_sourcenotes {
+#xyybckbbny .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1318,46 +1318,46 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#oghgtmtujr .gt_sourcenote {
+#xyybckbbny .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#oghgtmtujr .gt_left {
+#xyybckbbny .gt_left {
   text-align: left;
 }
 
-#oghgtmtujr .gt_center {
+#xyybckbbny .gt_center {
   text-align: center;
 }
 
-#oghgtmtujr .gt_right {
+#xyybckbbny .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#oghgtmtujr .gt_font_normal {
+#xyybckbbny .gt_font_normal {
   font-weight: normal;
 }
 
-#oghgtmtujr .gt_font_bold {
+#xyybckbbny .gt_font_bold {
   font-weight: bold;
 }
 
-#oghgtmtujr .gt_font_italic {
+#xyybckbbny .gt_font_italic {
   font-style: italic;
 }
 
-#oghgtmtujr .gt_super {
+#xyybckbbny .gt_super {
   font-size: 65%;
 }
 
-#oghgtmtujr .gt_footnote_marks {
+#xyybckbbny .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="oghgtmtujr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="xyybckbbny" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="5" class="gt_heading gt_title gt_font_normal" style>8 Observations from Trains Dataset</th>
@@ -1526,7 +1526,7 @@ The second estimand is therefore not just the median height of the Republicans, 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-726"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-714"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.4: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -1559,7 +1559,7 @@ The second estimand is therefore not just the median height of the Republicans, 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-727"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-715"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 8.5: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -1571,7 +1571,7 @@ The second estimand is therefore not just the median height of the Republicans, 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-728"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-716"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.6: Justice<!--</p>-->
 <!--</div>--></span>
@@ -1583,14 +1583,14 @@ The second estimand is therefore not just the median height of the Republicans, 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-729"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-717"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 8.7: Courage<!--</p>-->
 <!--</div>--></span>
 </p>
-<div class="sourceCode" id="cb929"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb929-1"><a href="three-parameters.html#cb929-1"></a>obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> trains, <span class="dt">refresh =</span> <span class="dv">0</span>)</span>
-<span id="cb929-2"><a href="three-parameters.html#cb929-2"></a></span>
-<span id="cb929-3"><a href="three-parameters.html#cb929-3"></a>obj</span></code></pre></div>
+<div class="sourceCode" id="cb914"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb914-1"><a href="three-parameters.html#cb914-1"></a>obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> trains, <span class="dt">refresh =</span> <span class="dv">0</span>)</span>
+<span id="cb914-2"><a href="three-parameters.html#cb914-2"></a></span>
+<span id="cb914-3"><a href="three-parameters.html#cb914-3"></a>obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      att_end ~ treatment - 1
@@ -1599,7 +1599,7 @@ The second estimand is therefore not just the median height of the Republicans, 
 ## ------
 ##                  Median MAD_SD
 ## treatmentTreated 10.0    0.4  
-## treatmentControl  8.4    0.4  
+## treatmentControl  8.5    0.4  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
@@ -1616,7 +1616,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ribdpqgvqf .gt_table {
+#xpfvhxbucx .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1641,7 +1641,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-left-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_heading {
+#xpfvhxbucx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1653,7 +1653,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_title {
+#xpfvhxbucx .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1663,7 +1663,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-bottom-width: 0;
 }
 
-#ribdpqgvqf .gt_subtitle {
+#xpfvhxbucx .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1673,13 +1673,13 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-width: 0;
 }
 
-#ribdpqgvqf .gt_bottom_border {
+#xpfvhxbucx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_col_headings {
+#xpfvhxbucx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1694,7 +1694,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_col_heading {
+#xpfvhxbucx .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1714,7 +1714,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   overflow-x: hidden;
 }
 
-#ribdpqgvqf .gt_column_spanner_outer {
+#xpfvhxbucx .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1726,15 +1726,15 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 4px;
 }
 
-#ribdpqgvqf .gt_column_spanner_outer:first-child {
+#xpfvhxbucx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ribdpqgvqf .gt_column_spanner_outer:last-child {
+#xpfvhxbucx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ribdpqgvqf .gt_column_spanner {
+#xpfvhxbucx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1746,7 +1746,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   width: 100%;
 }
 
-#ribdpqgvqf .gt_group_heading {
+#xpfvhxbucx .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1768,7 +1768,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   vertical-align: middle;
 }
 
-#ribdpqgvqf .gt_empty_group_heading {
+#xpfvhxbucx .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1783,15 +1783,15 @@ The second estimand is therefore not just the median height of the Republicans, 
   vertical-align: middle;
 }
 
-#ribdpqgvqf .gt_from_md > :first-child {
+#xpfvhxbucx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ribdpqgvqf .gt_from_md > :last-child {
+#xpfvhxbucx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ribdpqgvqf .gt_row {
+#xpfvhxbucx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1810,7 +1810,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   overflow-x: hidden;
 }
 
-#ribdpqgvqf .gt_stub {
+#xpfvhxbucx .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1822,7 +1822,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-left: 12px;
 }
 
-#ribdpqgvqf .gt_summary_row {
+#xpfvhxbucx .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1832,7 +1832,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 5px;
 }
 
-#ribdpqgvqf .gt_first_summary_row {
+#xpfvhxbucx .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1842,7 +1842,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_grand_summary_row {
+#xpfvhxbucx .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1852,7 +1852,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 5px;
 }
 
-#ribdpqgvqf .gt_first_grand_summary_row {
+#xpfvhxbucx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1862,11 +1862,11 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_striped {
+#xpfvhxbucx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ribdpqgvqf .gt_table_body {
+#xpfvhxbucx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1875,7 +1875,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-bottom-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_footnotes {
+#xpfvhxbucx .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1889,13 +1889,13 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_footnote {
+#xpfvhxbucx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ribdpqgvqf .gt_sourcenotes {
+#xpfvhxbucx .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1909,46 +1909,46 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#ribdpqgvqf .gt_sourcenote {
+#xpfvhxbucx .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ribdpqgvqf .gt_left {
+#xpfvhxbucx .gt_left {
   text-align: left;
 }
 
-#ribdpqgvqf .gt_center {
+#xpfvhxbucx .gt_center {
   text-align: center;
 }
 
-#ribdpqgvqf .gt_right {
+#xpfvhxbucx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ribdpqgvqf .gt_font_normal {
+#xpfvhxbucx .gt_font_normal {
   font-weight: normal;
 }
 
-#ribdpqgvqf .gt_font_bold {
+#xpfvhxbucx .gt_font_bold {
   font-weight: bold;
 }
 
-#ribdpqgvqf .gt_font_italic {
+#xpfvhxbucx .gt_font_italic {
   font-style: italic;
 }
 
-#ribdpqgvqf .gt_super {
+#xpfvhxbucx .gt_super {
   font-size: 65%;
 }
 
-#ribdpqgvqf .gt_footnote_marks {
+#xpfvhxbucx .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ribdpqgvqf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="xpfvhxbucx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -2007,7 +2007,7 @@ The second estimand is therefore not just the median height of the Republicans, 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-732"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-720"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.8: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -2026,16 +2026,16 @@ The second estimand is therefore not just the median height of the Republicans, 
 <span class="header-section-number">8.3.5</span> Model Structure</h3>
 <p>Our predictive model helped us make guesses as to what an individual’s age is. However, that’s just about all we can do with this relationship. Recall that the trains dataset was originally introduced in the context of the Rubin Causal Model back in Chapter <a href="rubin-causal-model.html#rubin-causal-model">3</a>. That model cannot be applied to the relationship between party and income because these values were independently decided outside the experiment — although we were able to identify correlations between those two variables, the combinations of party and income were predetermined and not randomly assigned in a way that allows us to establish a causal relationship. If an individual suddenly decided to change party affiliations, we wouldn’t suddenly expect his or her income to spike or plummet.</p>
 <p>In conclusion, while we can explore correlations or trends between party and income, we cannot label these correlations or trends as causal. However, <code>treatment</code> was a variable that was randomly assigned to subjects, and we have a variable that was measured after this random assignment, <code>att_end</code>. With this setup, we can calculate the Average Treatment Effect, or the average difference in <code>att_end</code> for treated subjects and control subjects.</p>
-<div class="sourceCode" id="cb931"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb931-1"><a href="three-parameters.html#cb931-1"></a>mean_ends &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb931-2"><a href="three-parameters.html#cb931-2"></a><span class="st">  </span><span class="kw">group_by</span>(treatment) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb931-3"><a href="three-parameters.html#cb931-3"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_att_end =</span> <span class="kw">mean</span>(att_end))</span></code></pre></div>
-<div class="sourceCode" id="cb932"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb932-1"><a href="three-parameters.html#cb932-1"></a>ATE &lt;-<span class="st"> </span>mean_ends<span class="op">$</span>mean_att_end[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>mean_ends<span class="op">$</span>mean_att_end[<span class="dv">1</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb916"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb916-1"><a href="three-parameters.html#cb916-1"></a>mean_ends &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb916-2"><a href="three-parameters.html#cb916-2"></a><span class="st">  </span><span class="kw">group_by</span>(treatment) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb916-3"><a href="three-parameters.html#cb916-3"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_att_end =</span> <span class="kw">mean</span>(att_end))</span></code></pre></div>
+<div class="sourceCode" id="cb917"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb917-1"><a href="three-parameters.html#cb917-1"></a>ATE &lt;-<span class="st"> </span>mean_ends<span class="op">$</span>mean_att_end[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>mean_ends<span class="op">$</span>mean_att_end[<span class="dv">1</span>]</span></code></pre></div>
 <p>Now, let’s make a Preceptor Table for this data:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ugymdvlphj .gt_table {
+#ktblylrynz .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2060,7 +2060,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-left-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_heading {
+#ktblylrynz .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2072,7 +2072,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_title {
+#ktblylrynz .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2082,7 +2082,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-bottom-width: 0;
 }
 
-#ugymdvlphj .gt_subtitle {
+#ktblylrynz .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2092,13 +2092,13 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-width: 0;
 }
 
-#ugymdvlphj .gt_bottom_border {
+#ktblylrynz .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_col_headings {
+#ktblylrynz .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2113,7 +2113,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_col_heading {
+#ktblylrynz .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2133,7 +2133,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   overflow-x: hidden;
 }
 
-#ugymdvlphj .gt_column_spanner_outer {
+#ktblylrynz .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2145,15 +2145,15 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 4px;
 }
 
-#ugymdvlphj .gt_column_spanner_outer:first-child {
+#ktblylrynz .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ugymdvlphj .gt_column_spanner_outer:last-child {
+#ktblylrynz .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ugymdvlphj .gt_column_spanner {
+#ktblylrynz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2165,7 +2165,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   width: 100%;
 }
 
-#ugymdvlphj .gt_group_heading {
+#ktblylrynz .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2187,7 +2187,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   vertical-align: middle;
 }
 
-#ugymdvlphj .gt_empty_group_heading {
+#ktblylrynz .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2202,15 +2202,15 @@ The second estimand is therefore not just the median height of the Republicans, 
   vertical-align: middle;
 }
 
-#ugymdvlphj .gt_from_md > :first-child {
+#ktblylrynz .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ugymdvlphj .gt_from_md > :last-child {
+#ktblylrynz .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ugymdvlphj .gt_row {
+#ktblylrynz .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2229,7 +2229,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   overflow-x: hidden;
 }
 
-#ugymdvlphj .gt_stub {
+#ktblylrynz .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2241,7 +2241,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-left: 12px;
 }
 
-#ugymdvlphj .gt_summary_row {
+#ktblylrynz .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2251,7 +2251,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 5px;
 }
 
-#ugymdvlphj .gt_first_summary_row {
+#ktblylrynz .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2261,7 +2261,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_grand_summary_row {
+#ktblylrynz .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2271,7 +2271,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   padding-right: 5px;
 }
 
-#ugymdvlphj .gt_first_grand_summary_row {
+#ktblylrynz .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2281,11 +2281,11 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-top-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_striped {
+#ktblylrynz .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ugymdvlphj .gt_table_body {
+#ktblylrynz .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2294,7 +2294,7 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-bottom-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_footnotes {
+#ktblylrynz .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2308,13 +2308,13 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_footnote {
+#ktblylrynz .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ugymdvlphj .gt_sourcenotes {
+#ktblylrynz .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2328,46 +2328,46 @@ The second estimand is therefore not just the median height of the Republicans, 
   border-right-color: #D3D3D3;
 }
 
-#ugymdvlphj .gt_sourcenote {
+#ktblylrynz .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ugymdvlphj .gt_left {
+#ktblylrynz .gt_left {
   text-align: left;
 }
 
-#ugymdvlphj .gt_center {
+#ktblylrynz .gt_center {
   text-align: center;
 }
 
-#ugymdvlphj .gt_right {
+#ktblylrynz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ugymdvlphj .gt_font_normal {
+#ktblylrynz .gt_font_normal {
   font-weight: normal;
 }
 
-#ugymdvlphj .gt_font_bold {
+#ktblylrynz .gt_font_bold {
   font-weight: bold;
 }
 
-#ugymdvlphj .gt_font_italic {
+#ktblylrynz .gt_font_italic {
   font-style: italic;
 }
 
-#ugymdvlphj .gt_super {
+#ktblylrynz .gt_super {
   font-size: 65%;
 }
 
-#ugymdvlphj .gt_footnote_marks {
+#ktblylrynz .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ugymdvlphj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="ktblylrynz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of att_end ~ treatment</th>
@@ -2518,33 +2518,33 @@ When the individual is treated (<span class="math inline">\(x_t\)</span>=1 and <
 <span class="math display">\[ y_i = \hat{b_1}x_r + \hat{b_2} x_d + \epsilon_i \]</span>
 Note that the math for both the predictive model we worked on earlier and this model is <em>identical</em>. It is not the calculations for the residual, fitted value, or parameter estimates that differ between these two model types; rather, it is how one uses and interprets these numbers. While predictive models are simply used for predicting another variable’s value (in the previous case, age), we can use these numbers to calculate the effect of one variable (treatment) on another (att_end) for each individual observation.</p>
 <p>Now, we’ll create a Rubin Causal Model table of possible outcomes, as we did back in ch3. We’ll do this using 7 random observations from the trains dataset.</p>
-<div class="sourceCode" id="cb933"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb933-1"><a href="three-parameters.html#cb933-1"></a><span class="co">#Adding question marks where necessary</span></span>
-<span id="cb933-2"><a href="three-parameters.html#cb933-2"></a></span>
-<span id="cb933-3"><a href="three-parameters.html#cb933-3"></a>trains_RCM &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb933-4"><a href="three-parameters.html#cb933-4"></a><span class="st">  </span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> treatment, <span class="dt">values_from =</span> att_end) <span class="op">%&gt;%</span></span>
-<span id="cb933-5"><a href="three-parameters.html#cb933-5"></a><span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) <span class="op">%&gt;%</span></span>
-<span id="cb933-6"><a href="three-parameters.html#cb933-6"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">subject =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) <span class="op">%&gt;%</span></span>
-<span id="cb933-7"><a href="three-parameters.html#cb933-7"></a><span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">Treated =</span> <span class="st">"?"</span>, <span class="dt">Control =</span> <span class="st">"?"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb933-8"><a href="three-parameters.html#cb933-8"></a><span class="st">  </span><span class="kw">select</span>(subject, Control, Treated)</span>
-<span id="cb933-9"><a href="three-parameters.html#cb933-9"></a></span>
-<span id="cb933-10"><a href="three-parameters.html#cb933-10"></a>trains_RCM<span class="op">$</span>subject &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"7"</span>, <span class="st">"6,041"</span>, <span class="st">"67"</span>, <span class="st">"40,080"</span>, <span class="st">"758"</span>, <span class="st">"32"</span>, <span class="st">"8,809"</span>)</span>
-<span id="cb933-11"><a href="three-parameters.html#cb933-11"></a></span>
-<span id="cb933-12"><a href="three-parameters.html#cb933-12"></a><span class="co">#Mathematical notation</span></span>
-<span id="cb933-13"><a href="three-parameters.html#cb933-13"></a></span>
-<span id="cb933-14"><a href="three-parameters.html#cb933-14"></a>trains_RCM <span class="op">%&gt;%</span></span>
-<span id="cb933-15"><a href="three-parameters.html#cb933-15"></a><span class="st">  </span><span class="kw">gt</span>() <span class="op">%&gt;%</span></span>
-<span id="cb933-16"><a href="three-parameters.html#cb933-16"></a><span class="st">  </span><span class="kw">cols_label</span>(<span class="dt">subject =</span> <span class="kw">md</span>(<span class="st">"**Subject**"</span>),</span>
-<span id="cb933-17"><a href="three-parameters.html#cb933-17"></a>                <span class="dt">Control =</span> <span class="kw">md</span>(<span class="st">"**$$Y_c(u)$$**"</span>),</span>
-<span id="cb933-18"><a href="three-parameters.html#cb933-18"></a>                <span class="dt">Treated =</span> <span class="kw">md</span>(<span class="st">"**$$Y_t(u)$$**"</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb933-19"><a href="three-parameters.html#cb933-19"></a><span class="st">  </span><span class="kw">tab_style</span>(<span class="kw">cell_borders</span>(<span class="dt">sides =</span> <span class="st">"right"</span>),</span>
-<span id="cb933-20"><a href="three-parameters.html#cb933-20"></a>            <span class="dt">location =</span> <span class="kw">cells_body</span>(<span class="dt">columns =</span> <span class="kw">vars</span>(subject))) <span class="op">%&gt;%</span></span>
-<span id="cb933-21"><a href="three-parameters.html#cb933-21"></a><span class="st">  </span><span class="kw">cols_align</span>(<span class="dt">align =</span> <span class="st">"center"</span>, <span class="dt">columns =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></span>
-<span id="cb933-22"><a href="three-parameters.html#cb933-22"></a><span class="st">  </span><span class="kw">tab_header</span>(<span class="dt">title =</span> <span class="st">"Ending Attitudes on Immigration of 7 Random Respondents"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb918"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb918-1"><a href="three-parameters.html#cb918-1"></a><span class="co">#Adding question marks where necessary</span></span>
+<span id="cb918-2"><a href="three-parameters.html#cb918-2"></a></span>
+<span id="cb918-3"><a href="three-parameters.html#cb918-3"></a>trains_RCM &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb918-4"><a href="three-parameters.html#cb918-4"></a><span class="st">  </span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> treatment, <span class="dt">values_from =</span> att_end) <span class="op">%&gt;%</span></span>
+<span id="cb918-5"><a href="three-parameters.html#cb918-5"></a><span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) <span class="op">%&gt;%</span></span>
+<span id="cb918-6"><a href="three-parameters.html#cb918-6"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">subject =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) <span class="op">%&gt;%</span></span>
+<span id="cb918-7"><a href="three-parameters.html#cb918-7"></a><span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">Treated =</span> <span class="st">"?"</span>, <span class="dt">Control =</span> <span class="st">"?"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb918-8"><a href="three-parameters.html#cb918-8"></a><span class="st">  </span><span class="kw">select</span>(subject, Control, Treated)</span>
+<span id="cb918-9"><a href="three-parameters.html#cb918-9"></a></span>
+<span id="cb918-10"><a href="three-parameters.html#cb918-10"></a>trains_RCM<span class="op">$</span>subject &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"7"</span>, <span class="st">"6,041"</span>, <span class="st">"67"</span>, <span class="st">"40,080"</span>, <span class="st">"758"</span>, <span class="st">"32"</span>, <span class="st">"8,809"</span>)</span>
+<span id="cb918-11"><a href="three-parameters.html#cb918-11"></a></span>
+<span id="cb918-12"><a href="three-parameters.html#cb918-12"></a><span class="co">#Mathematical notation</span></span>
+<span id="cb918-13"><a href="three-parameters.html#cb918-13"></a></span>
+<span id="cb918-14"><a href="three-parameters.html#cb918-14"></a>trains_RCM <span class="op">%&gt;%</span></span>
+<span id="cb918-15"><a href="three-parameters.html#cb918-15"></a><span class="st">  </span><span class="kw">gt</span>() <span class="op">%&gt;%</span></span>
+<span id="cb918-16"><a href="three-parameters.html#cb918-16"></a><span class="st">  </span><span class="kw">cols_label</span>(<span class="dt">subject =</span> <span class="kw">md</span>(<span class="st">"**Subject**"</span>),</span>
+<span id="cb918-17"><a href="three-parameters.html#cb918-17"></a>                <span class="dt">Control =</span> <span class="kw">md</span>(<span class="st">"**$$Y_c(u)$$**"</span>),</span>
+<span id="cb918-18"><a href="three-parameters.html#cb918-18"></a>                <span class="dt">Treated =</span> <span class="kw">md</span>(<span class="st">"**$$Y_t(u)$$**"</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb918-19"><a href="three-parameters.html#cb918-19"></a><span class="st">  </span><span class="kw">tab_style</span>(<span class="kw">cell_borders</span>(<span class="dt">sides =</span> <span class="st">"right"</span>),</span>
+<span id="cb918-20"><a href="three-parameters.html#cb918-20"></a>            <span class="dt">location =</span> <span class="kw">cells_body</span>(<span class="dt">columns =</span> <span class="kw">vars</span>(subject))) <span class="op">%&gt;%</span></span>
+<span id="cb918-21"><a href="three-parameters.html#cb918-21"></a><span class="st">  </span><span class="kw">cols_align</span>(<span class="dt">align =</span> <span class="st">"center"</span>, <span class="dt">columns =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></span>
+<span id="cb918-22"><a href="three-parameters.html#cb918-22"></a><span class="st">  </span><span class="kw">tab_header</span>(<span class="dt">title =</span> <span class="st">"Ending Attitudes on Immigration of 7 Random Respondents"</span>)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#biibzyajhm .gt_table {
+#xjlkczdsyp .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2569,7 +2569,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_heading {
+#xjlkczdsyp .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2581,7 +2581,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_title {
+#xjlkczdsyp .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2591,7 +2591,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#biibzyajhm .gt_subtitle {
+#xjlkczdsyp .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2601,13 +2601,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#biibzyajhm .gt_bottom_border {
+#xjlkczdsyp .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_col_headings {
+#xjlkczdsyp .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2622,7 +2622,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_col_heading {
+#xjlkczdsyp .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2642,7 +2642,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#biibzyajhm .gt_column_spanner_outer {
+#xjlkczdsyp .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2654,15 +2654,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#biibzyajhm .gt_column_spanner_outer:first-child {
+#xjlkczdsyp .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#biibzyajhm .gt_column_spanner_outer:last-child {
+#xjlkczdsyp .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#biibzyajhm .gt_column_spanner {
+#xjlkczdsyp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2674,7 +2674,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#biibzyajhm .gt_group_heading {
+#xjlkczdsyp .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2696,7 +2696,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#biibzyajhm .gt_empty_group_heading {
+#xjlkczdsyp .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2711,15 +2711,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#biibzyajhm .gt_from_md > :first-child {
+#xjlkczdsyp .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#biibzyajhm .gt_from_md > :last-child {
+#xjlkczdsyp .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#biibzyajhm .gt_row {
+#xjlkczdsyp .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2738,7 +2738,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#biibzyajhm .gt_stub {
+#xjlkczdsyp .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2750,7 +2750,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#biibzyajhm .gt_summary_row {
+#xjlkczdsyp .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2760,7 +2760,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#biibzyajhm .gt_first_summary_row {
+#xjlkczdsyp .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2770,7 +2770,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_grand_summary_row {
+#xjlkczdsyp .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2780,7 +2780,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#biibzyajhm .gt_first_grand_summary_row {
+#xjlkczdsyp .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2790,11 +2790,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_striped {
+#xjlkczdsyp .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#biibzyajhm .gt_table_body {
+#xjlkczdsyp .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2803,7 +2803,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_footnotes {
+#xjlkczdsyp .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2817,13 +2817,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_footnote {
+#xjlkczdsyp .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#biibzyajhm .gt_sourcenotes {
+#xjlkczdsyp .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2837,46 +2837,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#biibzyajhm .gt_sourcenote {
+#xjlkczdsyp .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#biibzyajhm .gt_left {
+#xjlkczdsyp .gt_left {
   text-align: left;
 }
 
-#biibzyajhm .gt_center {
+#xjlkczdsyp .gt_center {
   text-align: center;
 }
 
-#biibzyajhm .gt_right {
+#xjlkczdsyp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#biibzyajhm .gt_font_normal {
+#xjlkczdsyp .gt_font_normal {
   font-weight: normal;
 }
 
-#biibzyajhm .gt_font_bold {
+#xjlkczdsyp .gt_font_bold {
   font-weight: bold;
 }
 
-#biibzyajhm .gt_font_italic {
+#xjlkczdsyp .gt_font_italic {
   font-style: italic;
 }
 
-#biibzyajhm .gt_super {
+#xjlkczdsyp .gt_super {
   font-size: 65%;
 }
 
-#biibzyajhm .gt_footnote_marks {
+#xjlkczdsyp .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="biibzyajhm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="xjlkczdsyp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -2933,7 +2933,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#lmlrhqdtvr .gt_table {
+#kyuwriplet .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2958,7 +2958,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_heading {
+#kyuwriplet .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2970,7 +2970,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_title {
+#kyuwriplet .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2980,7 +2980,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#lmlrhqdtvr .gt_subtitle {
+#kyuwriplet .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2990,13 +2990,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#lmlrhqdtvr .gt_bottom_border {
+#kyuwriplet .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_col_headings {
+#kyuwriplet .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3011,7 +3011,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_col_heading {
+#kyuwriplet .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3031,7 +3031,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#lmlrhqdtvr .gt_column_spanner_outer {
+#kyuwriplet .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3043,15 +3043,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#lmlrhqdtvr .gt_column_spanner_outer:first-child {
+#kyuwriplet .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lmlrhqdtvr .gt_column_spanner_outer:last-child {
+#kyuwriplet .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lmlrhqdtvr .gt_column_spanner {
+#kyuwriplet .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3063,7 +3063,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#lmlrhqdtvr .gt_group_heading {
+#kyuwriplet .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3085,7 +3085,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#lmlrhqdtvr .gt_empty_group_heading {
+#kyuwriplet .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3100,15 +3100,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#lmlrhqdtvr .gt_from_md > :first-child {
+#kyuwriplet .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lmlrhqdtvr .gt_from_md > :last-child {
+#kyuwriplet .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lmlrhqdtvr .gt_row {
+#kyuwriplet .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3127,7 +3127,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#lmlrhqdtvr .gt_stub {
+#kyuwriplet .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3139,7 +3139,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#lmlrhqdtvr .gt_summary_row {
+#kyuwriplet .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3149,7 +3149,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#lmlrhqdtvr .gt_first_summary_row {
+#kyuwriplet .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3159,7 +3159,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_grand_summary_row {
+#kyuwriplet .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3169,7 +3169,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#lmlrhqdtvr .gt_first_grand_summary_row {
+#kyuwriplet .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3179,11 +3179,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_striped {
+#kyuwriplet .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#lmlrhqdtvr .gt_table_body {
+#kyuwriplet .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3192,7 +3192,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_footnotes {
+#kyuwriplet .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3206,13 +3206,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_footnote {
+#kyuwriplet .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#lmlrhqdtvr .gt_sourcenotes {
+#kyuwriplet .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3226,46 +3226,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#lmlrhqdtvr .gt_sourcenote {
+#kyuwriplet .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#lmlrhqdtvr .gt_left {
+#kyuwriplet .gt_left {
   text-align: left;
 }
 
-#lmlrhqdtvr .gt_center {
+#kyuwriplet .gt_center {
   text-align: center;
 }
 
-#lmlrhqdtvr .gt_right {
+#kyuwriplet .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lmlrhqdtvr .gt_font_normal {
+#kyuwriplet .gt_font_normal {
   font-weight: normal;
 }
 
-#lmlrhqdtvr .gt_font_bold {
+#kyuwriplet .gt_font_bold {
   font-weight: bold;
 }
 
-#lmlrhqdtvr .gt_font_italic {
+#kyuwriplet .gt_font_italic {
   font-style: italic;
 }
 
-#lmlrhqdtvr .gt_super {
+#kyuwriplet .gt_super {
   font-size: 65%;
 }
 
-#lmlrhqdtvr .gt_footnote_marks {
+#kyuwriplet .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="lmlrhqdtvr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="kyuwriplet" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -3329,7 +3329,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#cehveqvftm .gt_table {
+#edpynrdllt .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3354,7 +3354,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_heading {
+#edpynrdllt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3366,7 +3366,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_title {
+#edpynrdllt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3376,7 +3376,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#cehveqvftm .gt_subtitle {
+#edpynrdllt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3386,13 +3386,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#cehveqvftm .gt_bottom_border {
+#edpynrdllt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_col_headings {
+#edpynrdllt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3407,7 +3407,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_col_heading {
+#edpynrdllt .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3427,7 +3427,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#cehveqvftm .gt_column_spanner_outer {
+#edpynrdllt .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3439,15 +3439,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#cehveqvftm .gt_column_spanner_outer:first-child {
+#edpynrdllt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#cehveqvftm .gt_column_spanner_outer:last-child {
+#edpynrdllt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#cehveqvftm .gt_column_spanner {
+#edpynrdllt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3459,7 +3459,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#cehveqvftm .gt_group_heading {
+#edpynrdllt .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3481,7 +3481,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#cehveqvftm .gt_empty_group_heading {
+#edpynrdllt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3496,15 +3496,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#cehveqvftm .gt_from_md > :first-child {
+#edpynrdllt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#cehveqvftm .gt_from_md > :last-child {
+#edpynrdllt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#cehveqvftm .gt_row {
+#edpynrdllt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3523,7 +3523,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#cehveqvftm .gt_stub {
+#edpynrdllt .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3535,7 +3535,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#cehveqvftm .gt_summary_row {
+#edpynrdllt .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3545,7 +3545,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#cehveqvftm .gt_first_summary_row {
+#edpynrdllt .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3555,7 +3555,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_grand_summary_row {
+#edpynrdllt .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3565,7 +3565,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#cehveqvftm .gt_first_grand_summary_row {
+#edpynrdllt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3575,11 +3575,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_striped {
+#edpynrdllt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#cehveqvftm .gt_table_body {
+#edpynrdllt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3588,7 +3588,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_footnotes {
+#edpynrdllt .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3602,13 +3602,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_footnote {
+#edpynrdllt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#cehveqvftm .gt_sourcenotes {
+#edpynrdllt .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3622,46 +3622,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#cehveqvftm .gt_sourcenote {
+#edpynrdllt .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#cehveqvftm .gt_left {
+#edpynrdllt .gt_left {
   text-align: left;
 }
 
-#cehveqvftm .gt_center {
+#edpynrdllt .gt_center {
   text-align: center;
 }
 
-#cehveqvftm .gt_right {
+#edpynrdllt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#cehveqvftm .gt_font_normal {
+#edpynrdllt .gt_font_normal {
   font-weight: normal;
 }
 
-#cehveqvftm .gt_font_bold {
+#edpynrdllt .gt_font_bold {
   font-weight: bold;
 }
 
-#cehveqvftm .gt_font_italic {
+#edpynrdllt .gt_font_italic {
   font-style: italic;
 }
 
-#cehveqvftm .gt_super {
+#edpynrdllt .gt_super {
   font-size: 65%;
 }
 
-#cehveqvftm .gt_footnote_marks {
+#edpynrdllt .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="cehveqvftm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="edpynrdllt" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -3719,19 +3719,19 @@ Note that the math for both the predictive model we worked on earlier and this m
 <h3>
 <span class="header-section-number">8.3.6</span> Parameter Uncertainty</h3>
 <p>Here, we see that the average treatment effect is -1.55; this is the average change in att_end caused by treatment (if this statistic looks unfamiliar, refer back to chapter 3 for a refresher on ATE). But how confident are we in this ATE? We can use <code>lm()</code> again to generate confidence intervals for our parameters and for this value:</p>
-<div class="sourceCode" id="cb935"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb935-1"><a href="three-parameters.html#cb935-1"></a><span class="co">#This is necessary so we can see the offset as caused by treatmentTreated, not treatmentControl.</span></span>
-<span id="cb935-2"><a href="three-parameters.html#cb935-2"></a></span>
-<span id="cb935-3"><a href="three-parameters.html#cb935-3"></a>trains<span class="op">$</span>treatment &lt;-<span class="kw">fct_relevel</span>(trains<span class="op">$</span>treatment, <span class="st">"Control"</span>, <span class="st">"Treated"</span>)</span>
-<span id="cb935-4"><a href="three-parameters.html#cb935-4"></a></span>
-<span id="cb935-5"><a href="three-parameters.html#cb935-5"></a><span class="kw">lm</span>(<span class="dt">data =</span> trains, att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb935-6"><a href="three-parameters.html#cb935-6"></a><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">conf.int =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></span>
-<span id="cb935-7"><a href="three-parameters.html#cb935-7"></a><span class="st">  </span><span class="kw">select</span>(term, estimate, conf.low, conf.high)</span></code></pre></div>
+<div class="sourceCode" id="cb920"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb920-1"><a href="three-parameters.html#cb920-1"></a><span class="co">#This is necessary so we can see the offset as caused by treatmentTreated, not treatmentControl.</span></span>
+<span id="cb920-2"><a href="three-parameters.html#cb920-2"></a></span>
+<span id="cb920-3"><a href="three-parameters.html#cb920-3"></a>trains<span class="op">$</span>treatment &lt;-<span class="kw">fct_relevel</span>(trains<span class="op">$</span>treatment, <span class="st">"Control"</span>, <span class="st">"Treated"</span>)</span>
+<span id="cb920-4"><a href="three-parameters.html#cb920-4"></a></span>
+<span id="cb920-5"><a href="three-parameters.html#cb920-5"></a><span class="kw">lm</span>(<span class="dt">data =</span> trains, att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb920-6"><a href="three-parameters.html#cb920-6"></a><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">conf.int =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></span>
+<span id="cb920-7"><a href="three-parameters.html#cb920-7"></a><span class="st">  </span><span class="kw">select</span>(term, estimate, conf.low, conf.high)</span></code></pre></div>
 <pre><code>## # A tibble: 2 x 4
 ##   term             estimate conf.low conf.high
 ##   &lt;chr&gt;               &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
 ## 1 treatmentControl     8.45     7.77      9.14
 ## 2 treatmentTreated    10.       9.23     10.8</code></pre>
-<div class="sourceCode" id="cb937"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb937-1"><a href="three-parameters.html#cb937-1"></a><span class="kw">summary</span>(<span class="kw">lm</span>(<span class="dt">data =</span> trains, att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb922"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb922-1"><a href="three-parameters.html#cb922-1"></a><span class="kw">summary</span>(<span class="kw">lm</span>(<span class="dt">data =</span> trains, att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = att_end ~ treatment - 1, data = trains)
@@ -3766,7 +3766,7 @@ Note that the math for both the predictive model we worked on earlier and this m
 <a href="n-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-01
+2020-10-02
 </p>
 </div>
 </div>
