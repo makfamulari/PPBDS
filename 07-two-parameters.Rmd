@@ -7,19 +7,16 @@ output_yaml:
 
 <!-- TO-DO: --> 
 
-<!-- Check bootstrap code. Still getting 100% error. A bootstrap confidence interval should include the true mean 95% of the time. Also useful to make a cool plot showing this.  -->
+<!-- Use \mu everywhere. -->
 
-<!-- First draft of this now in Justice section. Revisit it. Read closely chapter 6. Connect your discussion to chapter 6 directly. The 2,400 beads in the Urn is like the 100,000,000 pennies in the US. The sample of 50 beads from the paddle is like the sample of 50 pennies we have. THe big difference is that chapter 6 just wants a proportion (or a count). You want a mean. -->
+<!-- We should reframe the chapter. Start with the big picture involving the connection between this chapter and the other chapters. Then, invoke the bootstrap as being the equivalent of all the sampling tricks we did in previous chapters. Then, make some graphics which look a lot like the graphics from chapter 6. (Make one graphic for a fixed value of sigma and then, I hope, make a 3-D graphic which shows what we do with two unknowns.) Then, explain that this is a total pain in the butt. Then introduce stan_glm() as the solution. Then show that stan_glm() "works" by doing the repeated sampling exercise which we had previously suggested for bootstrapping.  -->
 
-<!-- Key differences: First,  Mak is dealing with a limited set of specific models: 2401 possible models. The procedure is just what students saw in chapter 5. (Read chapter 5 closely!) You, on the other hand, have a continuous parameter.  (Average year is continuous. Number of beads is discrete.) Second, Mak was only dealing with one parameter: the number of read beads, which we can also define as $p$, which is equal to the number of read beads divided by 2,400.  Her model was binomial, and there is only one unknown parameter p. Your have two unknown parameters: the mean mu of height in the US and the standard deviation sigma, of the normally distributed error term. -->
+<!-- We should end the bootstrap section with a simple proof that the bootstrap works, that 95% of the time the 95% confidence intervals cover the true value. -->
 
-<!-- Turn Standard error method section of coin bootstrap into a four sentence margin note. Show formula. Note that the 95% confidence interval from the bootstrap will generally be the same thing as +/- two times the standard error. But not always! -->
+<!-- Connect the discussion to chapter 6 directly. The 2,400 beads in the Urn is like the 100,000,000 pennies in the US. The sample of 50 beads from the paddle is like the sample of 50 pennies we have. THe big difference is that chapter 6 just wants a proportion (or a count). We want a mean. -->
 
-<!-- Memes and videos! -->
+<!-- Key differences: First, chapter 6 deals with a limited set of specific models: 2401 possible models. The procedure is just what we saw in chapter 5.  We, on the other hand, have a continuous parameter.  (Average year is continuous. Number of beads is discrete.) Second, chapter 5 dealt with one parameter: the number of read beads, which we can also define as $p$, defined as the number of read beads divided by 2,400.  The  model in chapter 6 was binomial, and there is only one unknown parameter p. We have two unknown parameters: the mean mu of height in the US and the standard deviation sigma, of the normally distributed error term. -->
 
-<!-- Don't worry about predictions. But do discuss the potential difficulties of prediction in the Temperance section. -->
-
-<!-- STOP HERE. -->
 
 <!-- Remaining Outline of the Chapter -->
 
@@ -30,14 +27,6 @@ Plan: create function called create_ci(), which takes a tibble with a single var
 
 Then, create a tibble, first column is ID. Second column is height_sample, which is created by running sample(ch7$height, size = 40, replace = FALSE). Third column is ci, which is result mutate(ci = map(height_sample, ~ create_ci(.)). Fourth column is within_ci, which is TRUE if ci includes the TRUE value and FALSE otherwise. (If you want to have two columns, one for each limit, that is fine.)
 -->
-
-
-<!-- 5. height in the US, using all 2,475 men for 2009. Let's skip the bootstrap here. (We have seen it twice already.) Instead, we just go straight to lm(), tidy() to calculate the mean and its confidence interval. Note that, unlike with 2, we can never know the truth. Then, use this as an example to discuss parameter uncertainty. Incorporate discussion of all four virtues throughout.  -->
-
-<!-- 6. Prediction. What can we use this model for? We think we know p(mean height for 2009), call it p(height). So what? What can we do with this and what do we need to be careful about? This is where we can discuss all our other topics from themes.Rmd. Build a data generating mechanism. With it, we can answer any question we like!  -->
-
-
-
 
 
 
@@ -158,7 +147,7 @@ pennies_sample
 
 The `pennies_sample` data frame has 50 rows corresponding to each penny with two variables. The first variable `ID` corresponds to the ID labels in our table above, whereas the second variable `year` corresponds to the year of minting saved as a numeric variable, also known as a double (`dbl`).
 
-<!-- DK: Shouldn't the year be an int? -->
+<!-- DK: Shouldn't the year be an int? Should it be ID or id? -->
 
 <!-- Additionally, let's look at what a Preceptor Table would look like in this `pennies_sample` example. Essentially, what we are seeing is that if you are given a random penny in 2019, we are trying to estimate what they year is for that random penny. The last row is your best guess if that random year is given, because given that we are dealing with one parameter we are only dealing with one row. This would be different with two paramters because then we would have two rows.  -->
 
@@ -207,7 +196,7 @@ Thus, if we're willing to assume that `pennies_sample` is a representative sampl
 
 In Chapter \@ref(one-parameter), our *study population* was the urn of $N$ = 2400 balls. Our *population parameter* was the *population proportion* of these balls that were red, denoted by $p$. In order to estimate $p$, we extracted a sample of 50 balls using the shovel. We then computed the relevant *point estimate*: the *sample proportion* of these 50 balls that were red, denoted mathematically by $\hat{p}$.
 
-Here our population is $N$ = whatever the number of pennies are being used in the US, a value which we don't know and probably never will. The population parameter of interest is now the *population mean* year of all these pennies, a value denoted mathematically by the Greek letter $\mu$ (pronounced "mu"). In order to estimate $\mu$, we went to the bank and obtained a sample of 50 pennies and computed the relevant point estimate: the *sample mean* year of these 50 pennies, denoted mathematically by $\overline{x}$ (pronounced "x-bar"). An alternative and more intuitive notation for the sample mean is $\hat{\mu}$. However, this is unfortunately not as commonly used.
+Here our population is $N$ = whatever the number of pennies are being used in the US, a value which we don't know and probably never will. The population parameter of interest is now the *population mean* year of all these pennies, a value denoted mathematically by the Greek letter $\mu$ (pronounced "mu"). In order to estimate $\mu$, we went to the bank and obtained a sample of 50 pennies and computed the relevant point estimate: the *sample mean* year of these 50 pennies, denoted mathematically by $\overline{x}$ (pronounced "x-bar"). 
 
 We summarize the correspondence between the sampling urn exercise in Chapter \@ref(one-parameter) and our pennies exercise in Table below.
 
@@ -228,12 +217,12 @@ Recall that we also saw in Chapter \@ref(one-parameter) that such estimates are 
 
 So what do we do about this sampling variation? One solution is that we create bootstrap samples! Bootstrapping repeatedly draws independent samples from our data set with replacement. By sampling with replacement, the same observation can be sampled multiple times and each bootstrap sample will have the same number of observations as the original data set. 
 
-`r margin_note("To conduct bootstraps, make sure you install both rsample and tidyverse libraries")`
+`r margin_note("To conduct bootstraps, make sure you install both the rsample and tidyverse libraries")`
 
 
 The intuition with bootstrapping is that we can model an inference about the population from resampling our sample data and then performing an inference about a sample from each resample. It will look something like this: resampled → sample → population. 
 
-The first thing we want to do when bootstrapping is to create our bootstrap samples. Since we are concerned with the `year` of pennies in 2019, let's select `year` in our data set before we create our bootstraps. Let's now perform the virtual analog for 1000 resamples. Using these results, we'll be able to study the variability in the sample means from 1000 resamples of size 50. Let's first add a `times = 1000` argument to `bootstraps()` \index{rsample!bootstraps()} to indicate we would like 1000 replicates. Remember that we must use the `rsample` library to use bootstraps. 
+The first thing we want to do when bootstrapping is to create our bootstrap samples. Since we are concerned with the `year` of pennies in 2019, let's select `year` in our data set before we create our bootstraps. Let's now perform the virtual analog for 1,000 resamples. Using these results, we'll be able to study the variability in the sample means from 1,000 resamples of size 50. Let's first add a `times = 1000` argument to `bootstraps()` to indicate we would like 1,000 replicates. Remember that we must use the `rsample` library to use bootstraps. 
 
 ```{r}
 set.seed(9)
@@ -245,7 +234,9 @@ virtual_resamples
 
 Our bootstrap samples are stored in a tibble-like object, with each bootstrap sample nested in the `splits` column. Each row is a different bootstrap sample and the `id` column is used to identify each bootstrap sample. 
 
-`r margin_note("Check out ?analysis in the Console to get an even more comprehensive review of what analysis() does")`
+<!-- DK: Can we use `id` with the backticks in a margin note? -->
+
+`r margin_note("It is annoying that bootstraps() requires the use of an id column even though we have used ID in the past to identify specific observations. Here, instead, it is used to mean a specific bootstrapped tibble.")`
 
 Tto view a specific bootstrap sample, use the `analysis()` function from the `rsample` package, which basically allows you to view a specific bootstrap sample as a data frame. To do so, type `analysis(virtual_resamples$splits[[n]]) %>% as_tibble()` with `n` as the nth row bootstrap sample. Consider the first bootstrap sample: 
 
@@ -283,7 +274,7 @@ virtual_resamples
 
 Voila! We were able to create a thousand bootstrap samples and calculate the mean year for each resample. Let's now create a plot to visualizes the posterior distribution for the mean year of American pennies in 2019.
 
-
+<!-- DK: Need to explain the .. syntax or replace it with the new stat_density trick. -->
 
 ```{r}
 virtual_resamples %>% 
@@ -296,7 +287,7 @@ virtual_resamples %>%
          title = "Posterior Distribution for the Mean Year of American Pennies in 2019") 
 ```
 
-How did we sneak in the word "posterior" into this discussion. Recall in Chapter \@ref(probability) that we defined a posterior distribution as our beliefs about an unknown value or parameter.  In the case of the bootstrap samples we made, the posterior distribution represents our knowledge about the mean year of American pennies in 2019 after taking into account the the data we gathered from our bootstrap sample means. As demonstrated in the plot above, we can see that the mean year of pennies in 2019 is most likely between 1992 and 1998. 
+How did we sneak in the word "posterior" into this discussion. Recall in Chapter \@ref(probability) that we defined a posterior distribution as our beliefs about an unknown number: either a number which we don't know now but which we will know, like Biden's electoral vote total or parameter.  In the case of the bootstrap samples we made, the posterior distribution represents our beliefs about $\mu$, the mean year of American pennies in 2019 after taking into account the information from our bootstrap sample means. As demonstrated in the plot above, we can see that $\mu$ --- an unknown parameter, the true value of which we will never know --- is most likely between 1992 and 1998. 
 
 Have we proved how the bootstrap, almost magically, can create a reasonable posterior? Not at all! The mathematics of that proof are beyond the scope of this book.
 
@@ -417,7 +408,7 @@ The plot shows some interesting stuff. Since the distributions of height for bot
 
 ## Bootstrap to estimate average height
 
-We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let's use a similar approach to estimate the value of a different unknown parameter: the average height of an adult American male in 2009. 
+We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let's use a similar approach to estimate the value of a different unknown parameter: the average height of an adult American male in 2009. Let's also name this parameter $\mu$. Is it confusing that we are using the same parameter? Yes! But, sadly, there are only so many Greek letters. We have no choice but to reuse them. By convention, $\mu$ is often used as the parameter name for an unknown mean. But we could have used a different letter, Greek or otherwise. And, symbols besides $\mu$ are often used for unknown means. It is up to you, in general, but following the conventions in your field is wise. 
 
 First, filter the data set:
 
@@ -466,16 +457,16 @@ The posterior distribution includes all the information we have about the unknow
 
 
 
-### Watch me wave my hands
+## Probability to bootstrap to Bayesian models
 
-`r margin_note(" In this sense, the bootstrap distribution represents an (approximate)
-nonparametric, noninformative posterior distribution for our parameter.
-But this bootstrap distribution is obtained painlessly --- without having to
-formally specify a prior and without having to sample from the posterior
-distribution. Hence we might think of the bootstrap distribution as a “poor
-man’s” Bayes posterior. By perturbing the data, the bootstrap approximates
-the Bayesian effect of perturbing the parameters, and is typically
-much simpler to carry out. --- Elements of Statistical Learning, 2nd edition, by Hastie et al, page 271.")`
+`r margin_note(" In this sense, the bootstrap distribution represents an (approximate) nonparametric, noninformative posterior distribution for our parameter. But this bootstrap distribution is obtained painlessly --- without having to formally specify a prior and without having to sample from the posterior distribution. Hence we might think of the bootstrap distribution as a “poor man’s” Bayes posterior. By perturbing the data, the bootstrap approximates the Bayesian effect of perturbing the parameters, and is typically much simpler to carry out. --- Elements of Statistical Learning, 2nd edition, by Hastie et al, page 271.")`
+
+Most textbooks would, at this stage, provide a more mathematical explanation of the transition we are making from Chapter \@ref(probability) to this chapter. In both Chapters \@ref(probability) and \@ref(one-parameter) we dealt with a discrete set of possible models. We began with examples in which there were only two or three possible "true" states of the world. You were either infected or not infected. There were either zero, one or two white marbles in the bag. These examples grew more and more complex, both by increasing the number of models under consideration and by increasing the number of possible outcomes of the experiment. In the case of the urn, there were 2,401 possible models: either zero or one or two or . . . 2,400 red beans in the urn. 
+
+The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values. Yet, almost miraculously, the same intuition applies. 
+
+Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which  $\mu$ might take. We restricted 
+
 
 Did we mention that this book is still a bit of a mess? Well, it is! And, in the entire book, this section is the messiest mess of them all. Forgive us.
 
