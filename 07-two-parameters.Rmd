@@ -107,11 +107,12 @@ library(rsample)
 library(tidyverse)
 library(skimr)
 library(rstanarm)
+library(broom.mixed)
 library(gtsummary)
 library(tidybayes)
 ```
 
-**PPBDS.data** includes the data sets for this book. **rsample** includes functions for bootstrapping. **rstanarm**, **gtsummary** and **tidybayes** make it easy to create and display Bayesian models.
+**PPBDS.data** includes the data sets for this book. **rsample** includes functions for bootstrapping. **rstanarm**, **broom.mixed**, **gtsummary** and **tidybayes** make it easy to create and display Bayesian models.
 
 ### What was the average year of US pennies in 2019?
 
@@ -547,11 +548,14 @@ The first argument in the `stan_glm()` function is `data`, which in our case is 
 fit_obj <- stan_glm(data = ch7_male, height ~ 1, refresh = 0)
 ```
 
-* This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were --- and, to some extent, still are --- little used. When creating your own models, you will often want to use the `cache = TRUE` code chunk option. This saves the result of the model in between knittings of your Rmd. 
+* This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were --- and, to some extent, still are --- little used. When creating your own models, you will often want to use the `cache = TRUE` code chunk option. This saves the result of the model so that you don't recalculate it every time you knit.
 
-* If you don't set `refresh = 0`, the model will output many lines of confusing output. You can learn more about that output by reading the help page for `stan_glm()`. The output provides details on the fitting process as it runs and diagnostics about the final result. All of those details are beyond the scope of this book.
+* If you don't set `refresh = 0`, the model will output many lines of confusing output. You can learn more about that output by reading the help page for `stan_glm()`. The output provides details on the fitting process as it runs as well as diagnostics about the final result. All of those details are beyond the scope of this book.
 
-* You should always assign the result of the call to `stan_glm()` to an object, as we do above. By convention, the name of that object will often included the word "fit" to indicate that it is a "fitted" model object.
+* You should always assign the result of the call of `stan_glm()` to an object, as we do above. By convention, the name of that object will often included the word "fit" to indicate that it is a *fitted* model object.
+
+
+##### Printed model
 
 There are several ways to examine the fitted model. The simplest is to print it:
 
@@ -560,23 +564,23 @@ fit_obj
 ```
 
 
-The first line is telling us what model we used, in our case a `stan_glm()` model. 
+The first line is telling us what model we used, in our case a `stan_glm()`. 
 
 The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section \@ref(normal). The normal is a probability distribution that is symmetric about the mean and unimodal. For that reason, we typically leave it as the default unless we are working with a lefthand variable that is extremely non-normal, e.g., something which only takes two values like 0/1 or TRUE/FALSE. Since we previously saw that height was (very roughly) normally distributed, the Gaussian distribution is a good choice.
 
 
-The third line gives us back the formula we provided. We are creating a model predicting height with a constant --- which is the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the "~" symbol), is the "response" or "dependent" variable, the thing which we are trying to explain. Since this is a model about `height`, `height` goes on the lefthand side. Second, we have the "explanatory" or "independent"  variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant.  (The number `1` indicates that constant. It does not mean that we think that everyone is height `1`.) 
+The third line gives us back the formula we provided. We are creating a model predicting height with a constant --- which is just about the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the "~" symbol), is the "response" or "dependent" variable, the thing which we are trying to explain. Since this is a model about `height`, `height` goes on the lefthand side. Second, we have the "explanatory" or "independent"  variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant.  (The number `1` indicates that constant. It does not mean that we think that everyone is height `1`.) 
 
 
-The fourth and fifth lines of the output tell us that we have 1,814 observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that $\mu$ is "constant?" It means that, although $\mu$'s value is unknown, it is *fixed*. It does not change from person to person. The `1` in the formula corresponds to the parameter $\mu$ in our mathematical definition of the model. 
+The fourth and fifth lines of the output tell us that we have `r nobs(fit_obj)`  observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that $\mu$ is "constant?" It means that, although $\mu$'s value is unknown, it is *fixed*. It does not change from person to person. The `1` in the formula corresponds to the parameter $\mu$ in our mathematical definition of the model. 
 
 We knew all this information before we fit the model. R records it in the `fit_obj` because we don't want to forget what we did. The second half of the display gives a summary of the parameter values.
 
-We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is $\mu$, the average height. If we had the ideal Preceptor Table --- with a row for every adult American male in 2009 and no missing data --- $\mu$ would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter $\mu$. All that R sees is the `1` in the formula. In most fields of statistics, this constant term is called the "intercept." So, now we have three things --- $\mu$, `1` and "intercept" --- all of which refer to the exact same concept. This will not the last time that terminology will be confusing.
+We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is $\mu$, the average height. If we had the ideal Preceptor Table --- with a row for every adult American male in 2009 and no missing data --- $\mu$ would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter $\mu$. All that R sees is the `1` in the formula. In most fields of statistics, this constant term is called the "intercept." So, now we have three things --- $\mu$, `1` and "intercept" --- all of which refer to the exact same concept. This will not be the last time that terminology will be confusing.
 
 At this point, `stan_glm()` --- or rather the `print()` method for rstan objects --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show you the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the median of the posterior and the "MAD_SD." 
 
-* Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its *location*. Where is the data? The two most common choices for this measure are the mean and median. We use median here because posterior distributions can often be quite skewed, making the mean a less stable measure.
+* Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its *location*. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less stable measure.
 
 * The second most important number for summarizing a distribution concerns its *spread*. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.
 
@@ -589,13 +593,13 @@ fit_obj
 
 <!-- DK: Are we sure that coef() and sigma() give us the median values? -->
 
-Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The Median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2009. The Median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the remaining variability in the data, once we account for our estimate of $\mu$.
+Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2009. The median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of American men in 2009, once we account for our estimate of $\mu$.
 
-The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within plus/minus 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between 175.6 and 176.4. 
+The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between 175.6 and 176.4. 
 
-#### Plotting the posterior distributions
+##### Plotting the posterior distributions
 
-Instead of doing this math in our heads, we should display both posterior distributions. Pictures speak where math mumbles. Fortunately, getting values for those posteriors is easy:
+Instead of doing this math in our heads, we can display both posterior distributions. *Pictures speak where math mumbles.* Fortunately, getting values for those posteriors is easy:
 
 ```{r}
 fit_obj %>% 
@@ -619,6 +623,7 @@ fit_obj %>%
     theme_classic()
 ```
 
+Although it is possible to have variables names like (Intercept), it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Better, rename them, as we do above.
 
 ```{r}
 fit_obj %>% 
@@ -633,26 +638,48 @@ fit_obj %>%
     theme_classic()
 ```
 
+Again, $\sigma$ is usually a nuisance parameter. We don't really care what its value us, so we rarely plot it.
+
+<!-- DK: Discuss the meaning? -->
 
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
 
-<!-- DK: Explain what these things are. Maybe also show tbl_regression. -->
+<!-- ##### Model in a table -->
+
+<!-- DK: Could not get this to work. It seems like these gt objects are already text, so there is no easy way to, for example, change the formatting but adding decimals.  -->
+
+<!-- A third way to display the model is to use `tbl_regresssion()` from the **gtsummary** package. (Note that this will often require the **broom.mixed** package as well.) -->
+
+<!-- ```{r, eval=FALSE} -->
+<!-- library(broom.mixed) -->
+<!-- library(gtsummary) -->
+<!-- ``` -->
+
+<!-- Example: -->
+
+<!-- ```{r} -->
+<!-- tbl_regression(fit_obj,  -->
+<!--                intercept = TRUE, -->
+<!--                estimate_fun = ~(decimals = 4)) %>% -->
+<!--   as_gt() -->
 
 
-
-<!-- #### Visualizing the results of the linear model -->
-
-
-<!-- as_tibble(fit_obj) -->
+<!--   tab_header("Average Height of American Men in 2009")  -->
 
 
-<!-- The results of the bayesian linera model can also be seen with the posterior linpred function, which give a fitted model with a matrix of the estimates probabilites. -->
+<!-- ``` -->
+
+<!-- See [here](https://cran.r-project.org/web/packages/gtsummary/vignettes/tbl_regression.html) for more details on `tbl_regression()`. -->
+
+<!-- DK: Maybe I don't need to show posterior_linpred at all? One less thing to worry about. -->
+
+
 
 <!-- ```{r} -->
 <!-- mod.obj_linpred <- posterior_linpred(fit_obj, transform = TRUE) -->
 <!-- ``` -->
 
-<!-- From this matrix, you can use the ggplot function to create a histogram showing the distribution of mean heights across all of the samples. Looking at the histogram, it seems like the mean point estimate is between 167 and 168, which makes a lot of sense considering our median point estimate is 167.5 -->
+
 
 <!-- ```{r} -->
 <!-- mod.obj_linpred[,3] %>%  -->
