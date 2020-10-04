@@ -581,75 +581,88 @@ At this point, `stan_glm()` --- or rather the `print()` method for rstan objects
 * The second most important number for summarizing a distribution concerns its *spread*. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.
 
 
-<!-- DK: I think the next two sections are awkward. Let's rewrite them. -->
-
-
-
-#### Unpacking the first parameter: the intercept
+Recall the fitted object:
 
 ```{r}
 fit_obj
 ```
 
-<!-- DK: Always MAD_SD -->
+<!-- DK: Are we sure that coef() and sigma() give us the median values? -->
 
-Now that we understand MAD SD, we can understand the rest of the output of our mean height model. Since we are trying to find a constant to predict mean height, the intercept of the model can be interpreted as the model's best estimate of the mean height in the dataset. Recall that the `stan_glm()` function took many different resamples and found the mean of each one. The most accurate estimate of what the true mean actually is the Baysesian point estimate, the median of these means which in this case happends to be 167.5. 
+Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The Median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2009. The Median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the remaining variability in the data, once we account for our estimate of $\mu$.
 
-In this case, the MAD_SD for the intercept is .4, meaning that the standard deviation of the posterior distribution of mean heights is .4. As a rule of thumb, the smaller the MAD_SD, the less variation there is among mean heights in the samples generated, and thus the more robust our estimate is.
+The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within plus/minus 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between 175.6 and 176.4. 
 
-A great way to see this is to visualize the posterior distribution of intercepts that the model spit out. 
+#### Plotting the posterior distributions
 
-<!-- DK: make this plot look exactly like the posterior probability plots ion chapter 5. Same title and look and so on. Remind students that this is why we spent so much time on this for chapter 5. -->
+Instead of doing this math in our heads, we should display both posterior distributions. Pictures speak where math mumbles. Fortunately, getting values for those posteriors is easy:
 
 ```{r}
-plot(fit_obj, "hist", pars = "(Intercept)")
+fit_obj %>% 
+  as_tibble()
 ```
 
-Slightly rearranging this function, you can also see You can see how 167.5 is the median of this distribution, and moreover how 68% of heights fall within one MAD_SD from the median (it is a general rule that 68% of the distribution should fall within one MAD_SD of the median, 95% should fall within two, and 99.7% should fall within 3).
-```{r}
-plot(fit_obj, pars = "(Intercept)", plotfun="areas", prob = .68)
-#abline(v = 167.5)
+These 4,000 rows are "draws" from the estimated posteriors, each in its own column. These are like the vectors which result from calling functions like `rnorm()` or `rbinom()`. We can create the plot in a similar way:
 
-```
-
-#### Unpacking the second parameter: sigma
-
-The second parameter, sigma, will be outputted for all bayesian models you compute (no matter how many predictors) and shows us the average error of the model. Another way of conceptualizing this parameter is as the deviation between the predicted value and the observed value. Similar to with the intercept, the model ultimately cannot say a definitive answer to what the parameter is, so there is some uncertainty to even the error parameter itself. More specifically, the MAD_SD of the sigma reflects the standard deviation of the sigma value itself (since so many different samples were taken with each its own sigma). In this instance, since the MAD_SD of sigma is .3, we know that 68% of the times the sigma value of the model fell within 21.5 and 22.1, so we can be pretty confident about this parameter.
 
 ```{r}
-plot(fit_obj, "hist", pars = "sigma")
-```
-
-We can also see how the median and MAD_SD values are connected to the sigma posterior distribution with this output. As you can see, the median value falls around 21.8 and 68% of the area od the posterior distrubtion falls within 21.5 and 22.1
-
-```{r}
-plot(fit_obj, pars = "sigma", plotfun = "areas", prob = .68)
+fit_obj %>% 
+  as_tibble() %>% 
+  rename(mu = `(Intercept)`) %>% 
+  ggplot(aes(x = mu)) +
+    geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 0.01, 
+                   color = "white") +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Average height among American adult men in 2009",
+         x = "Height in Centimeters",
+         y = "Probability") +
+    theme_classic()
 ```
 
 
-#### Visualizing the results of the linear model
+```{r}
+fit_obj %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = sigma)) +
+    geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 0.01, 
+                   color = "white") +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Height standard deviation among American adult men in 2009",
+         x = "Sigma in Centimeters",
+         y = "Probability") +
+    theme_classic()
+```
+
+
+<!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
+
+<!-- DK: Explain what these things are. Maybe also show tbl_regression. -->
+
+
+
+<!-- #### Visualizing the results of the linear model -->
 
 
 <!-- as_tibble(fit_obj) -->
 
 
-The results of the bayesian linera model can also be seen with the posterior linpred function, which give a fitted model with a matrix of the estimates probabilites.
+<!-- The results of the bayesian linera model can also be seen with the posterior linpred function, which give a fitted model with a matrix of the estimates probabilites. -->
 
-```{r}
-mod.obj_linpred <- posterior_linpred(fit_obj, transform = TRUE)
-```
+<!-- ```{r} -->
+<!-- mod.obj_linpred <- posterior_linpred(fit_obj, transform = TRUE) -->
+<!-- ``` -->
 
-From this matrix, you can use the ggplot function to create a histogram showing the distribution of mean heights across all of the samples. Looking at the histogram, it seems like the mean point estimate is between 167 and 168, which makes a lot of sense considering our median point estimate is 167.5
+<!-- From this matrix, you can use the ggplot function to create a histogram showing the distribution of mean heights across all of the samples. Looking at the histogram, it seems like the mean point estimate is between 167 and 168, which makes a lot of sense considering our median point estimate is 167.5 -->
 
-```{r}
-mod.obj_linpred[,3] %>% 
-  as_tibble() %>% 
-  ggplot(aes(value)) +
-    geom_histogram(binwidth = 0.002, color = "blue")
+<!-- ```{r} -->
+<!-- mod.obj_linpred[,3] %>%  -->
+<!--   as_tibble() %>%  -->
+<!--   ggplot(aes(value)) + -->
+<!--     geom_histogram(binwidth = 0.002, color = "blue") -->
 
-## add median of model, try to add mad_sd to show the 68& and 95% rules
-#explain graph
-```
+<!-- ## add median of model, try to add mad_sd to show the 68& and 95% rules -->
+<!-- #explain graph -->
+<!-- ``` -->
 
 <!-- ## Creating a table for the linear model -->
 
@@ -665,37 +678,16 @@ mod.obj_linpred[,3] %>%
 
 
 
-## Temperance
+### Temperance
 
 ```{r echo=FALSE, fig.margin=TRUE}
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
-Temperance is probably the most important virtue in data science. We won't have the models that look as good as they appear. We are living in a constantly changing and complex world. There will be unknown unknowns, which factors in the representation of our data, realism in our assumptions, and the call for testing. 
-
-In data science, we are focused on that missing data, the data from the future. But the world is always changing, and so it's hard to capture that missing data. Our predictions are going to have some sort of uncertainty. 
-
-In the case of male heights, what would be the average male height if the data was collected a week later? What if there was a pandemic? What if the world lost a great amount of Vitamin D? As you can see, there are events that are considered unknown unknowns. It's so hard to account for the future, and so our models are likely going to be wrong.
-
-Another reason why we deal with Temperance in data science is that there is realism. Does the structure of our bootstrap match the world? While we hope we won't be wrong, it never matches frankly and we will see that our conclusions are wrong. 
-
-Last but not least, getting the wrong conclusions suck. But at least we are not dealing with null hypotheses. Playing the prediction game could be fun, but if we reject the null hypothesis if p is less than .05, what if we get .06 as our p-value? Will that honestly make a difference? Probably not!
 
 
-####  Predicting 
+####  Predictions 
 
-Now that we understand our model, we can start actually doing stuff with it, including making a lot of predictions. A very useful tool in the rstanarm package to help us with this is posterior predict, which can make predictions on new data using our model.
-
-Let's first try to find
-
-
-```{r}
-mod.obj_predict <- posterior_predict(fit_obj, transform = TRUE)
-mod.obj_predict[,3] %>% 
-  as_tibble() %>% 
-  ggplot(aes(value)) +
-    geom_histogram(binwidth = 0.002)
-```
 
 
 ## Conclusion
