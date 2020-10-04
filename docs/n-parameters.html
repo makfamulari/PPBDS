@@ -200,17 +200,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">9.1</span> EDA of <code>governors</code>
 </h2>
 <p>Begin by loading the packages which we need.</p>
-<div class="sourceCode" id="cb924"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb924-1"><a href="n-parameters.html#cb924-1"></a><span class="kw">library</span>(PPBDS.data)</span>
-<span id="cb924-2"><a href="n-parameters.html#cb924-2"></a><span class="kw">library</span>(skimr)</span>
-<span id="cb924-3"><a href="n-parameters.html#cb924-3"></a><span class="kw">library</span>(broom.mixed)</span>
-<span id="cb924-4"><a href="n-parameters.html#cb924-4"></a><span class="kw">library</span>(rstanarm)</span>
-<span id="cb924-5"><a href="n-parameters.html#cb924-5"></a><span class="kw">library</span>(gtsummary)</span>
-<span id="cb924-6"><a href="n-parameters.html#cb924-6"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
+<div class="sourceCode" id="cb907"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb907-1"><a href="n-parameters.html#cb907-1"></a><span class="kw">library</span>(PPBDS.data)</span>
+<span id="cb907-2"><a href="n-parameters.html#cb907-2"></a><span class="kw">library</span>(skimr)</span>
+<span id="cb907-3"><a href="n-parameters.html#cb907-3"></a><span class="kw">library</span>(broom.mixed)</span>
+<span id="cb907-4"><a href="n-parameters.html#cb907-4"></a><span class="kw">library</span>(rstanarm)</span>
+<span id="cb907-5"><a href="n-parameters.html#cb907-5"></a><span class="kw">library</span>(gtsummary)</span>
+<span id="cb907-6"><a href="n-parameters.html#cb907-6"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
 <!-- Talk about the data, as we usual do. Lots of interesting things. Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Make sure to mention all the variables we end up keeping below. Finish with some graphics which show how various things are related to our lefthand side variable: alive_post. -->
 <!-- HV: Should I move my EDA introduction from the shaming EDA to here since this is now first? Same with the general descriptions of functions such as skim, glimpse, etc. -->
 <p>We will start off by using a subset of the <code>governors</code> data set from the <code>PPBDS.data</code> package. This data set looks at the lifespans of U.S. politicians from 1945 to 2012. It corresponds to the paper “Longevity Returns to Political Office” by Barfort, Klemmensen &amp; Larsen (2019), and aims to find out whether winning an election influences the lifespan of politicians.</p>
 <p>Let’s explore the variables and observations contained within this data set by performing an Exploratory Data Analysis (EDA). EDAs help us summarize the data, identify patterns, spot outliers or anomalies, and more. We can start by running some summarizing commands such as <code>glimpse()</code>, <code>sample_n()</code>, and <code>skim()</code>.</p>
-<div class="sourceCode" id="cb925"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb925-1"><a href="n-parameters.html#cb925-1"></a><span class="kw">glimpse</span>(governors)</span></code></pre></div>
+<div class="sourceCode" id="cb908"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb908-1"><a href="n-parameters.html#cb908-1"></a><span class="kw">glimpse</span>(governors)</span></code></pre></div>
 <pre><code>## Rows: 1,092
 ## Columns: 11
 ## $ state      &lt;chr&gt; "Alabama", "Alabama", "Alabama", "Alabama", "Alabama", "Al…
@@ -225,32 +225,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## $ alive_post &lt;int&gt; 14991, 773, 5319, 4871, 12069, 19924, 13096, 18622, 549, 1…
 ## $ alive_pre  &lt;int&gt; 13906, 28690, 17805, 17001, 16828, 12152, 15778, 17597, 14…</code></pre>
 <p>As we can see, there are 11 variables and 1,092 observations. In this chapter, we will only be looking at the variables <code>state</code>, <code>year</code>, <code>last_name</code>, <code>sex</code>, <code>status</code>, <code>alive_post</code>, and <code>alive_pre</code>. We will also create a new variable called <code>won</code> that is <code>TRUE</code> when the win margin is greater than 0, and <code>FALSE</code> if not.</p>
-<div class="sourceCode" id="cb927"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb927-1"><a href="n-parameters.html#cb927-1"></a>ch9_gov &lt;-<span class="st"> </span>governors <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb927-2"><a href="n-parameters.html#cb927-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">won =</span> <span class="kw">ifelse</span>(win_margin <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb927-3"><a href="n-parameters.html#cb927-3"></a><span class="st">  </span><span class="kw">select</span>(last_name, year, state, sex, status, won, alive_post, alive_pre)</span></code></pre></div>
+<div class="sourceCode" id="cb910"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb910-1"><a href="n-parameters.html#cb910-1"></a>ch9_gov &lt;-<span class="st"> </span>governors <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb910-2"><a href="n-parameters.html#cb910-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">won =</span> <span class="kw">ifelse</span>(win_margin <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb910-3"><a href="n-parameters.html#cb910-3"></a><span class="st">  </span><span class="kw">select</span>(last_name, year, state, sex, status, won, alive_post, alive_pre)</span></code></pre></div>
 <p>There are a few things to note when looking at this data. First, the data set includes the variables <code>alive_pre</code> and <code>alive_post</code>, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election took place, respectively. Therefore, only politicians who are already deceased are included in this data set. Furthermore, candidates with unknown dates of death were not included in the dataset.</p>
 <p>Another caveat is that for a given election, only the top two candidates are included in the data set. If a politician did not receive the highest or second-highest number of votes, they are excluded.</p>
 <p>Finally, it is noted that for some observations, only the birth or death year of a candidate could be determined, in which case the date was taken as July 1st of that year.</p>
 <p>Now, let’s continue with the EDA by running <code>sample_n()</code> on the data. This will give us a random sample of observations to look at and may help us notice trends in the data, especially if we run it multiple times.</p>
-<div class="sourceCode" id="cb928"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb928-1"><a href="n-parameters.html#cb928-1"></a><span class="kw">sample_n</span>(ch9_gov, <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb911"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb911-1"><a href="n-parameters.html#cb911-1"></a><span class="kw">sample_n</span>(ch9_gov, <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 8
-##    last_name  year state         sex   status     won   alive_post alive_pre
-##    &lt;chr&gt;     &lt;int&gt; &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;      &lt;lgl&gt;      &lt;int&gt;     &lt;int&gt;
-##  1 Janklow    1998 South Dakota  Male  Incumbent  TRUE        4816     21603
-##  2 Warren     1950 California    Male  Incumbent  TRUE        8647     21780
-##  3 Stanley    1953 Virginia      Male  Challenger TRUE        6091     23122
-##  4 Snelling   1966 Vermont       Male  Challenger FALSE       9047     14505
-##  5 Payne      1948 Maine         Male  Challenger TRUE       10814     16175
-##  6 Whelan     1978 Nebraska      Male  Challenger FALSE       5172     19533
-##  7 Agnew      1966 Maryland      Male  Challenger TRUE       10909     17528
-##  8 Skeen      1974 New Mexico    Male  Challenger FALSE      10624     17295
-##  9 Lucey      1966 Wisconsin     Male  Challenger FALSE      17353     17761
-## 10 Holt       1952 West Virginia Male  Challenger FALSE        825     17306</code></pre>
+##    last_name   year state         sex   status     won   alive_post alive_pre
+##    &lt;chr&gt;      &lt;int&gt; &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;      &lt;lgl&gt;      &lt;int&gt;     &lt;int&gt;
+##  1 Ellington   1966 Tennessee     Male  Challenger TRUE        1976     21681
+##  2 Fitzgerald  1978 Michigan      Male  Challenger FALSE      10682     13295
+##  3 Howell      1973 Virginia      Male  Challenger FALSE       8645     19419
+##  4 Anderson    1968 Montana       Male  Challenger TRUE        7562     20368
+##  5 Williams    1948 Michigan      Male  Challenger TRUE       14333     13770
+##  6 Hatch       1978 Massachusetts Male  Challenger FALSE      11477     19541
+##  7 Carmichael  1975 Mississippi   Male  Challenger FALSE      14697     17663
+##  8 Bramlett    1983 Mississippi   Male  Challenger FALSE      11671     21964
+##  9 Abernethy   1954 Alabama       Male  Challenger FALSE       4871     17001
+## 10 Carnahan    1996 Missouri      Male  Incumbent  TRUE        1441     22913</code></pre>
 <p>From this sample, we can see some trends start to appear. For example, we see that <code>sex</code> is most often “Male”, and status is most often “Challenger” rather than “Incumbent”.</p>
 <p>Another useful command in summarizing data sets during and EDA is <code>skim()</code>.</p>
-<div class="sourceCode" id="cb930"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb930-1"><a href="n-parameters.html#cb930-1"></a><span class="kw">skim</span>(ch9_gov)</span></code></pre></div>
+<div class="sourceCode" id="cb913"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb913-1"><a href="n-parameters.html#cb913-1"></a><span class="kw">skim</span>(ch9_gov)</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-735">TABLE 9.1: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-726">TABLE 9.1: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -424,16 +424,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <p>This output groups the variables together by type (character, logical, numeric, etc.). From this, we can see things like the number of unique last names, how many of the observations in our subset won versus how many lost their elections, and the mean number of days before and after a gubernatorial election that a candidate lived. We are also given histograms of the numerical data. In looking at the histogram for <code>year</code>, we see that it is skewed right, with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.</p>
 <p>In using this data set, our left-side variable will be <code>alive_post</code>. We want to know how the election affected the lifespan of these gubernatorial candidates. Let’s look at some graphs and plots showing the relationships between <code>alive_post</code> and some of the other variables in our subset.</p>
-<div class="sourceCode" id="cb931"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb931-1"><a href="n-parameters.html#cb931-1"></a>ch9_gov <span class="op">%&gt;%</span></span>
-<span id="cb931-2"><a href="n-parameters.html#cb931-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year, <span class="dt">y =</span> alive_post)) <span class="op">+</span></span>
-<span id="cb931-3"><a href="n-parameters.html#cb931-3"></a><span class="st">  </span><span class="kw">geom_point</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-736-1.png" width="672">
+<div class="sourceCode" id="cb914"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb914-1"><a href="n-parameters.html#cb914-1"></a>ch9_gov <span class="op">%&gt;%</span></span>
+<span id="cb914-2"><a href="n-parameters.html#cb914-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year, <span class="dt">y =</span> alive_post)) <span class="op">+</span></span>
+<span id="cb914-3"><a href="n-parameters.html#cb914-3"></a><span class="st">  </span><span class="kw">geom_point</span>()</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-727-1.png" width="672">
 Starting with the relationship between <code>alive_post</code> and <code>year</code>, we can see that the data is skewed right and that there is a defined line that data points do not exist above. There are no data points in the top right portion of the graph because it is not possible to have run in 2011, lived 20,000 days after the election took place, and still have died before the data set was created. This line represents the most a candidate could have possibly lived - and still have died - to be included the data set. The reason this line is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a longer time after the election and still have died prior to the data set creation, giving them higher <code>alive_post</code> values than those who ran for office in later years.</p>
 <p>Another note to make about this graph is that there are fewer observations in later years because less have died. Many governors who ran for office in the 21st century are still alive today and therefore excluded from this data set.</p>
-<div class="sourceCode" id="cb932"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb932-1"><a href="n-parameters.html#cb932-1"></a>ch9_gov <span class="op">%&gt;%</span></span>
-<span id="cb932-2"><a href="n-parameters.html#cb932-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> won, <span class="dt">y =</span> alive_post)) <span class="op">+</span></span>
-<span id="cb932-3"><a href="n-parameters.html#cb932-3"></a><span class="st">  </span><span class="kw">geom_boxplot</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-737-1.png" width="672">
+<div class="sourceCode" id="cb915"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb915-1"><a href="n-parameters.html#cb915-1"></a>ch9_gov <span class="op">%&gt;%</span></span>
+<span id="cb915-2"><a href="n-parameters.html#cb915-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> won, <span class="dt">y =</span> alive_post)) <span class="op">+</span></span>
+<span id="cb915-3"><a href="n-parameters.html#cb915-3"></a><span class="st">  </span><span class="kw">geom_boxplot</span>()</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-728-1.png" width="672">
 This box plot is interesting in that it takes a direct look at the relationship we are trying to learn more about: whether winning an election influences the lifespan of politicians. In looking at these box plots, we can see that there are minor differences in the width of the boxes and length of the lines. Of the candidates who won, the 25% who lived the longest after the election lived longer than the top 25% of candidates who lost the election.</p>
 <!-- Clean up and add more discussion here -->
 <!-- HV: What specific types of plots/graphs do you suggest adding? -->
@@ -444,7 +444,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-738"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-729"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 9.1: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -456,7 +456,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-739"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-730"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.2: Justice<!--</p>-->
 <!--</div>--></span>
@@ -468,7 +468,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-740"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-731"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 9.3: Courage<!--</p>-->
 <!--</div>--></span>
@@ -476,17 +476,17 @@ This box plot is interesting in that it takes a direct look at the relationship 
 <!-- DK: Maybe instead of tables, we should just be showing graphics, using ggdist/tidybayes. -->
 <p>Let’s explore descriptive, not causal, models of covariates associated with how long candidates for governor live after elections.</p>
 <p>To begin, let’s run a Bayesian regression of gubernatorial candidate lifespan prior to the election on candidate lifespan after the election. That is, we will regress <code>alive_pre</code> on <code>alive_post</code> using <code>stan_glm()</code>.</p>
-<div class="sourceCode" id="cb933"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb933-1"><a href="n-parameters.html#cb933-1"></a>obj.gov<span class="fl">.1</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
-<span id="cb933-2"><a href="n-parameters.html#cb933-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>alive_pre,</span>
-<span id="cb933-3"><a href="n-parameters.html#cb933-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
-<span id="cb933-4"><a href="n-parameters.html#cb933-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb916"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb916-1"><a href="n-parameters.html#cb916-1"></a>obj.gov<span class="fl">.1</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
+<span id="cb916-2"><a href="n-parameters.html#cb916-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>alive_pre,</span>
+<span id="cb916-3"><a href="n-parameters.html#cb916-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
+<span id="cb916-4"><a href="n-parameters.html#cb916-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <!-- This is a simple example. Only three parameters are estimated: intercept, beta and sigma. But step through them all slowly, discussing what they mean. Not sure on the best way to display this. Maybe we just ignore sigma? -->
-<div class="sourceCode" id="cb934"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb934-1"><a href="n-parameters.html#cb934-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.1</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb917"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb917-1"><a href="n-parameters.html#cb917-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.1</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#msldlgnyqq .gt_table {
+#psqeyrcwyy .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -511,7 +511,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-left-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_heading {
+#psqeyrcwyy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -523,7 +523,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_title {
+#psqeyrcwyy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -533,7 +533,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-bottom-width: 0;
 }
 
-#msldlgnyqq .gt_subtitle {
+#psqeyrcwyy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -543,13 +543,13 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-width: 0;
 }
 
-#msldlgnyqq .gt_bottom_border {
+#psqeyrcwyy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_col_headings {
+#psqeyrcwyy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -564,7 +564,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_col_heading {
+#psqeyrcwyy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -584,7 +584,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   overflow-x: hidden;
 }
 
-#msldlgnyqq .gt_column_spanner_outer {
+#psqeyrcwyy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -596,15 +596,15 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 4px;
 }
 
-#msldlgnyqq .gt_column_spanner_outer:first-child {
+#psqeyrcwyy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#msldlgnyqq .gt_column_spanner_outer:last-child {
+#psqeyrcwyy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#msldlgnyqq .gt_column_spanner {
+#psqeyrcwyy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -616,7 +616,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   width: 100%;
 }
 
-#msldlgnyqq .gt_group_heading {
+#psqeyrcwyy .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -638,7 +638,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   vertical-align: middle;
 }
 
-#msldlgnyqq .gt_empty_group_heading {
+#psqeyrcwyy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -653,15 +653,15 @@ This box plot is interesting in that it takes a direct look at the relationship 
   vertical-align: middle;
 }
 
-#msldlgnyqq .gt_from_md > :first-child {
+#psqeyrcwyy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#msldlgnyqq .gt_from_md > :last-child {
+#psqeyrcwyy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#msldlgnyqq .gt_row {
+#psqeyrcwyy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -680,7 +680,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   overflow-x: hidden;
 }
 
-#msldlgnyqq .gt_stub {
+#psqeyrcwyy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -692,7 +692,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-left: 12px;
 }
 
-#msldlgnyqq .gt_summary_row {
+#psqeyrcwyy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -702,7 +702,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 5px;
 }
 
-#msldlgnyqq .gt_first_summary_row {
+#psqeyrcwyy .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -712,7 +712,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_grand_summary_row {
+#psqeyrcwyy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -722,7 +722,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 5px;
 }
 
-#msldlgnyqq .gt_first_grand_summary_row {
+#psqeyrcwyy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -732,11 +732,11 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_striped {
+#psqeyrcwyy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#msldlgnyqq .gt_table_body {
+#psqeyrcwyy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -745,7 +745,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-bottom-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_footnotes {
+#psqeyrcwyy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -759,13 +759,13 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_footnote {
+#psqeyrcwyy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#msldlgnyqq .gt_sourcenotes {
+#psqeyrcwyy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -779,46 +779,46 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#msldlgnyqq .gt_sourcenote {
+#psqeyrcwyy .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#msldlgnyqq .gt_left {
+#psqeyrcwyy .gt_left {
   text-align: left;
 }
 
-#msldlgnyqq .gt_center {
+#psqeyrcwyy .gt_center {
   text-align: center;
 }
 
-#msldlgnyqq .gt_right {
+#psqeyrcwyy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#msldlgnyqq .gt_font_normal {
+#psqeyrcwyy .gt_font_normal {
   font-weight: normal;
 }
 
-#msldlgnyqq .gt_font_bold {
+#psqeyrcwyy .gt_font_bold {
   font-weight: bold;
 }
 
-#msldlgnyqq .gt_font_italic {
+#psqeyrcwyy .gt_font_italic {
   font-style: italic;
 }
 
-#msldlgnyqq .gt_super {
+#psqeyrcwyy .gt_super {
   font-size: 65%;
 }
 
-#msldlgnyqq .gt_footnote_marks {
+#psqeyrcwyy .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="msldlgnyqq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="psqeyrcwyy" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -829,8 +829,8 @@ This box plot is interesting in that it takes a direct look at the relationship 
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">26507</td>
-      <td class="gt_row gt_center">24998, 28020</td>
+      <td class="gt_row gt_center">26536</td>
+      <td class="gt_row gt_center">25079, 28021</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">alive_pre</td>
@@ -854,18 +854,18 @@ This box plot is interesting in that it takes a direct look at the relationship 
 <p>Let’s continue by discussing Beta for <code>alive_pre</code>. This value, -0.86, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this beta value. Putting this slope definition in terms of our model, this means that for every additional day a candidate is alive before an election, their lifespan after the election will decrease by 0.86 days on average. If we are given the number of days a candidate lived before the election and want to estimate how long they will live for after, we will multiply the days they were alive prior by this beta of -0.86, then subtract that from the intercept. Our 95% confidence interval here tells us that we are 95% confident that the true mean slope of this regression is contained between -0.93 and -0.78.</p>
 <p>And now, back to centering. Centering is a tool that is used when the model’s intercept does not make logical sense to interpret. To center a model, we pick a constant value, usually the mean of the independent variable, and subtract that constant from every value of the independent variable. This changes the zero point for the variable and shifts the model over.</p>
 <p>In this example, we want to center the value for <code>alive_pre</code>, the predictor. First, we must pick the value that we will center by. Here, we will use the mean of <code>alive_pre</code>. Once we find this value, we will subtract it to every <code>alive_pre</code> value, creating a new variable called <code>alive_pre_centered</code>. We then regress this <code>alive_pre_centered</code> variable on <code>alive_post</code>.</p>
-<div class="sourceCode" id="cb935"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb935-1"><a href="n-parameters.html#cb935-1"></a>center &lt;-<span class="st"> </span><span class="kw">mean</span>(ch9_gov<span class="op">$</span>alive_pre)</span>
-<span id="cb935-2"><a href="n-parameters.html#cb935-2"></a>ch9_gov<span class="op">$</span>alive_pre_centered &lt;-<span class="st"> </span>ch9_gov<span class="op">$</span>alive_pre <span class="op">-</span><span class="st"> </span>center</span></code></pre></div>
-<div class="sourceCode" id="cb936"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb936-1"><a href="n-parameters.html#cb936-1"></a>obj.gov.<span class="fl">1.</span>centered &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
-<span id="cb936-2"><a href="n-parameters.html#cb936-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>alive_pre_centered,</span>
-<span id="cb936-3"><a href="n-parameters.html#cb936-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
-<span id="cb936-4"><a href="n-parameters.html#cb936-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb937"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb937-1"><a href="n-parameters.html#cb937-1"></a><span class="kw">tbl_regression</span>(obj.gov.<span class="fl">1.</span>centered, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb918"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb918-1"><a href="n-parameters.html#cb918-1"></a>center &lt;-<span class="st"> </span><span class="kw">mean</span>(ch9_gov<span class="op">$</span>alive_pre)</span>
+<span id="cb918-2"><a href="n-parameters.html#cb918-2"></a>ch9_gov<span class="op">$</span>alive_pre_centered &lt;-<span class="st"> </span>ch9_gov<span class="op">$</span>alive_pre <span class="op">-</span><span class="st"> </span>center</span></code></pre></div>
+<div class="sourceCode" id="cb919"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb919-1"><a href="n-parameters.html#cb919-1"></a>obj.gov.<span class="fl">1.</span>centered &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
+<span id="cb919-2"><a href="n-parameters.html#cb919-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>alive_pre_centered,</span>
+<span id="cb919-3"><a href="n-parameters.html#cb919-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
+<span id="cb919-4"><a href="n-parameters.html#cb919-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb920"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb920-1"><a href="n-parameters.html#cb920-1"></a><span class="kw">tbl_regression</span>(obj.gov.<span class="fl">1.</span>centered, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#gtzmymcimg .gt_table {
+#kterpcnmct .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -890,7 +890,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-left-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_heading {
+#kterpcnmct .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -902,7 +902,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_title {
+#kterpcnmct .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -912,7 +912,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-bottom-width: 0;
 }
 
-#gtzmymcimg .gt_subtitle {
+#kterpcnmct .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -922,13 +922,13 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-width: 0;
 }
 
-#gtzmymcimg .gt_bottom_border {
+#kterpcnmct .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_col_headings {
+#kterpcnmct .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -943,7 +943,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_col_heading {
+#kterpcnmct .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -963,7 +963,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   overflow-x: hidden;
 }
 
-#gtzmymcimg .gt_column_spanner_outer {
+#kterpcnmct .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -975,15 +975,15 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 4px;
 }
 
-#gtzmymcimg .gt_column_spanner_outer:first-child {
+#kterpcnmct .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#gtzmymcimg .gt_column_spanner_outer:last-child {
+#kterpcnmct .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#gtzmymcimg .gt_column_spanner {
+#kterpcnmct .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -995,7 +995,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   width: 100%;
 }
 
-#gtzmymcimg .gt_group_heading {
+#kterpcnmct .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1017,7 +1017,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   vertical-align: middle;
 }
 
-#gtzmymcimg .gt_empty_group_heading {
+#kterpcnmct .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1032,15 +1032,15 @@ This box plot is interesting in that it takes a direct look at the relationship 
   vertical-align: middle;
 }
 
-#gtzmymcimg .gt_from_md > :first-child {
+#kterpcnmct .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#gtzmymcimg .gt_from_md > :last-child {
+#kterpcnmct .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#gtzmymcimg .gt_row {
+#kterpcnmct .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1059,7 +1059,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   overflow-x: hidden;
 }
 
-#gtzmymcimg .gt_stub {
+#kterpcnmct .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1071,7 +1071,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-left: 12px;
 }
 
-#gtzmymcimg .gt_summary_row {
+#kterpcnmct .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1081,7 +1081,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 5px;
 }
 
-#gtzmymcimg .gt_first_summary_row {
+#kterpcnmct .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1091,7 +1091,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_grand_summary_row {
+#kterpcnmct .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1101,7 +1101,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 5px;
 }
 
-#gtzmymcimg .gt_first_grand_summary_row {
+#kterpcnmct .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1111,11 +1111,11 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_striped {
+#kterpcnmct .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#gtzmymcimg .gt_table_body {
+#kterpcnmct .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1124,7 +1124,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-bottom-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_footnotes {
+#kterpcnmct .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1138,13 +1138,13 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_footnote {
+#kterpcnmct .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#gtzmymcimg .gt_sourcenotes {
+#kterpcnmct .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1158,46 +1158,46 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#gtzmymcimg .gt_sourcenote {
+#kterpcnmct .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#gtzmymcimg .gt_left {
+#kterpcnmct .gt_left {
   text-align: left;
 }
 
-#gtzmymcimg .gt_center {
+#kterpcnmct .gt_center {
   text-align: center;
 }
 
-#gtzmymcimg .gt_right {
+#kterpcnmct .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#gtzmymcimg .gt_font_normal {
+#kterpcnmct .gt_font_normal {
   font-weight: normal;
 }
 
-#gtzmymcimg .gt_font_bold {
+#kterpcnmct .gt_font_bold {
   font-weight: bold;
 }
 
-#gtzmymcimg .gt_font_italic {
+#kterpcnmct .gt_font_italic {
   font-style: italic;
 }
 
-#gtzmymcimg .gt_super {
+#kterpcnmct .gt_super {
   font-size: 65%;
 }
 
-#gtzmymcimg .gt_footnote_marks {
+#kterpcnmct .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="gtzmymcimg" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="kterpcnmct" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -1208,13 +1208,13 @@ This box plot is interesting in that it takes a direct look at the relationship 
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">10313</td>
-      <td class="gt_row gt_center">10070, 10558</td>
+      <td class="gt_row gt_center">10309</td>
+      <td class="gt_row gt_center">10070, 10545</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">alive_pre_centered</td>
       <td class="gt_row gt_center">-0.86</td>
-      <td class="gt_row gt_center">-0.93, -0.79</td>
+      <td class="gt_row gt_center">-0.93, -0.78</td>
     </tr>
 </tbody>
 <tfoot><tr class="gt_footnotes">
@@ -1232,18 +1232,18 @@ This box plot is interesting in that it takes a direct look at the relationship 
 <p>Since all values of the predictor variable decreased by the same amount, the model shifted over but the slope of the linear model did not change. For this reason, the slope stays the same.</p>
 <!-- HV: I am not sure if I explained centering in the clearest/correct way. -->
 <p>Let’s now regress <code>sex</code> on <code>alive_post</code> to see how sex affects candidates’ post-election lifespans.</p>
-<div class="sourceCode" id="cb938"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb938-1"><a href="n-parameters.html#cb938-1"></a>obj.gov<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
-<span id="cb938-2"><a href="n-parameters.html#cb938-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>sex <span class="op">-</span><span class="st"> </span><span class="dv">1</span>,</span>
-<span id="cb938-3"><a href="n-parameters.html#cb938-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
-<span id="cb938-4"><a href="n-parameters.html#cb938-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb921"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb921-1"><a href="n-parameters.html#cb921-1"></a>obj.gov<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
+<span id="cb921-2"><a href="n-parameters.html#cb921-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>sex <span class="op">-</span><span class="st"> </span><span class="dv">1</span>,</span>
+<span id="cb921-3"><a href="n-parameters.html#cb921-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
+<span id="cb921-4"><a href="n-parameters.html#cb921-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <!-- Make these two the first models. Just like how we ended chapter 8. But you need to do more. Follow Modern Dive section: https://moderndive.com/5-regression.html#model2. In particular, explain fitted value, residual. Show the math.  Justice. The math plus the fact that the Preceptor is descriptive, meaning only one column for Y. Read the themes document.  -->
 <!-- Do this in your preferred order. -->
-<div class="sourceCode" id="cb939"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb939-1"><a href="n-parameters.html#cb939-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.2</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb922"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb922-1"><a href="n-parameters.html#cb922-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.2</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <p><style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#mnyriptxoh .gt_table {
+#ljeeznscgi .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1268,7 +1268,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-left-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_heading {
+#ljeeznscgi .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1280,7 +1280,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_title {
+#ljeeznscgi .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1290,7 +1290,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-bottom-width: 0;
 }
 
-#mnyriptxoh .gt_subtitle {
+#ljeeznscgi .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1300,13 +1300,13 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-width: 0;
 }
 
-#mnyriptxoh .gt_bottom_border {
+#ljeeznscgi .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_col_headings {
+#ljeeznscgi .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1321,7 +1321,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_col_heading {
+#ljeeznscgi .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1341,7 +1341,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   overflow-x: hidden;
 }
 
-#mnyriptxoh .gt_column_spanner_outer {
+#ljeeznscgi .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1353,15 +1353,15 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 4px;
 }
 
-#mnyriptxoh .gt_column_spanner_outer:first-child {
+#ljeeznscgi .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#mnyriptxoh .gt_column_spanner_outer:last-child {
+#ljeeznscgi .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#mnyriptxoh .gt_column_spanner {
+#ljeeznscgi .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1373,7 +1373,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   width: 100%;
 }
 
-#mnyriptxoh .gt_group_heading {
+#ljeeznscgi .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1395,7 +1395,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   vertical-align: middle;
 }
 
-#mnyriptxoh .gt_empty_group_heading {
+#ljeeznscgi .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1410,15 +1410,15 @@ This box plot is interesting in that it takes a direct look at the relationship 
   vertical-align: middle;
 }
 
-#mnyriptxoh .gt_from_md > :first-child {
+#ljeeznscgi .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#mnyriptxoh .gt_from_md > :last-child {
+#ljeeznscgi .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#mnyriptxoh .gt_row {
+#ljeeznscgi .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1437,7 +1437,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   overflow-x: hidden;
 }
 
-#mnyriptxoh .gt_stub {
+#ljeeznscgi .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1449,7 +1449,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-left: 12px;
 }
 
-#mnyriptxoh .gt_summary_row {
+#ljeeznscgi .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1459,7 +1459,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 5px;
 }
 
-#mnyriptxoh .gt_first_summary_row {
+#ljeeznscgi .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1469,7 +1469,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_grand_summary_row {
+#ljeeznscgi .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1479,7 +1479,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   padding-right: 5px;
 }
 
-#mnyriptxoh .gt_first_grand_summary_row {
+#ljeeznscgi .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1489,11 +1489,11 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-top-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_striped {
+#ljeeznscgi .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#mnyriptxoh .gt_table_body {
+#ljeeznscgi .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1502,7 +1502,7 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-bottom-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_footnotes {
+#ljeeznscgi .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1516,13 +1516,13 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_footnote {
+#ljeeznscgi .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#mnyriptxoh .gt_sourcenotes {
+#ljeeznscgi .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1536,46 +1536,46 @@ This box plot is interesting in that it takes a direct look at the relationship 
   border-right-color: #D3D3D3;
 }
 
-#mnyriptxoh .gt_sourcenote {
+#ljeeznscgi .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#mnyriptxoh .gt_left {
+#ljeeznscgi .gt_left {
   text-align: left;
 }
 
-#mnyriptxoh .gt_center {
+#ljeeznscgi .gt_center {
   text-align: center;
 }
 
-#mnyriptxoh .gt_right {
+#ljeeznscgi .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mnyriptxoh .gt_font_normal {
+#ljeeznscgi .gt_font_normal {
   font-weight: normal;
 }
 
-#mnyriptxoh .gt_font_bold {
+#ljeeznscgi .gt_font_bold {
   font-weight: bold;
 }
 
-#mnyriptxoh .gt_font_italic {
+#ljeeznscgi .gt_font_italic {
   font-style: italic;
 }
 
-#mnyriptxoh .gt_super {
+#ljeeznscgi .gt_super {
   font-size: 65%;
 }
 
-#mnyriptxoh .gt_footnote_marks {
+#ljeeznscgi .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style></p>
-<div id="mnyriptxoh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="ljeeznscgi" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -1591,13 +1591,13 @@ This box plot is interesting in that it takes a direct look at the relationship 
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Female</td>
-      <td class="gt_row gt_center">5858</td>
-      <td class="gt_row gt_center">3758, 7936</td>
+      <td class="gt_row gt_center">5851</td>
+      <td class="gt_row gt_center">3821, 7953</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">10395</td>
-      <td class="gt_row gt_center">10119, 10682</td>
+      <td class="gt_row gt_center">10399</td>
+      <td class="gt_row gt_center">10107, 10684</td>
     </tr>
 </tbody>
 <tfoot><tr class="gt_footnotes">
@@ -1622,16 +1622,16 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case. -->
 <!-- Perhaps of next is to understand what the intercept is. That is, this model is identical to the previous. -->
 <p>Now that we have interpreted the model using a -1 in the formula to get both a <span class="math display">\[ {b_m} \]</span> value and a <span class="math display">\[ {b_f} \]</span> value, let’s take away the -1 and regress <code>sex</code> on <code>alive_post</code> to see how our equation changes.</p>
-<div class="sourceCode" id="cb940"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb940-1"><a href="n-parameters.html#cb940-1"></a>obj.gov<span class="fl">.2</span>a &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
-<span id="cb940-2"><a href="n-parameters.html#cb940-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>sex,</span>
-<span id="cb940-3"><a href="n-parameters.html#cb940-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
-<span id="cb940-4"><a href="n-parameters.html#cb940-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb941"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb941-1"><a href="n-parameters.html#cb941-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.2</span>a, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb923"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb923-1"><a href="n-parameters.html#cb923-1"></a>obj.gov<span class="fl">.2</span>a &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
+<span id="cb923-2"><a href="n-parameters.html#cb923-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>sex,</span>
+<span id="cb923-3"><a href="n-parameters.html#cb923-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
+<span id="cb923-4"><a href="n-parameters.html#cb923-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb924"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb924-1"><a href="n-parameters.html#cb924-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.2</span>a, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zerobnkcnh .gt_table {
+#ukygqebddf .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1656,7 +1656,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-left-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_heading {
+#ukygqebddf .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1668,7 +1668,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_title {
+#ukygqebddf .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1678,7 +1678,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-bottom-width: 0;
 }
 
-#zerobnkcnh .gt_subtitle {
+#ukygqebddf .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1688,13 +1688,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-width: 0;
 }
 
-#zerobnkcnh .gt_bottom_border {
+#ukygqebddf .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_col_headings {
+#ukygqebddf .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1709,7 +1709,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_col_heading {
+#ukygqebddf .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1729,7 +1729,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   overflow-x: hidden;
 }
 
-#zerobnkcnh .gt_column_spanner_outer {
+#ukygqebddf .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1741,15 +1741,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 4px;
 }
 
-#zerobnkcnh .gt_column_spanner_outer:first-child {
+#ukygqebddf .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zerobnkcnh .gt_column_spanner_outer:last-child {
+#ukygqebddf .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zerobnkcnh .gt_column_spanner {
+#ukygqebddf .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1761,7 +1761,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   width: 100%;
 }
 
-#zerobnkcnh .gt_group_heading {
+#ukygqebddf .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1783,7 +1783,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   vertical-align: middle;
 }
 
-#zerobnkcnh .gt_empty_group_heading {
+#ukygqebddf .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1798,15 +1798,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
   vertical-align: middle;
 }
 
-#zerobnkcnh .gt_from_md > :first-child {
+#ukygqebddf .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zerobnkcnh .gt_from_md > :last-child {
+#ukygqebddf .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zerobnkcnh .gt_row {
+#ukygqebddf .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1825,7 +1825,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   overflow-x: hidden;
 }
 
-#zerobnkcnh .gt_stub {
+#ukygqebddf .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1837,7 +1837,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-left: 12px;
 }
 
-#zerobnkcnh .gt_summary_row {
+#ukygqebddf .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1847,7 +1847,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 5px;
 }
 
-#zerobnkcnh .gt_first_summary_row {
+#ukygqebddf .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1857,7 +1857,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_grand_summary_row {
+#ukygqebddf .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1867,7 +1867,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 5px;
 }
 
-#zerobnkcnh .gt_first_grand_summary_row {
+#ukygqebddf .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1877,11 +1877,11 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_striped {
+#ukygqebddf .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zerobnkcnh .gt_table_body {
+#ukygqebddf .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1890,7 +1890,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-bottom-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_footnotes {
+#ukygqebddf .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1904,13 +1904,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_footnote {
+#ukygqebddf .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#zerobnkcnh .gt_sourcenotes {
+#ukygqebddf .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1924,46 +1924,46 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#zerobnkcnh .gt_sourcenote {
+#ukygqebddf .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#zerobnkcnh .gt_left {
+#ukygqebddf .gt_left {
   text-align: left;
 }
 
-#zerobnkcnh .gt_center {
+#ukygqebddf .gt_center {
   text-align: center;
 }
 
-#zerobnkcnh .gt_right {
+#ukygqebddf .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zerobnkcnh .gt_font_normal {
+#ukygqebddf .gt_font_normal {
   font-weight: normal;
 }
 
-#zerobnkcnh .gt_font_bold {
+#ukygqebddf .gt_font_bold {
   font-weight: bold;
 }
 
-#zerobnkcnh .gt_font_italic {
+#ukygqebddf .gt_font_italic {
   font-style: italic;
 }
 
-#zerobnkcnh .gt_super {
+#ukygqebddf .gt_super {
   font-size: 65%;
 }
 
-#zerobnkcnh .gt_footnote_marks {
+#ukygqebddf .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="zerobnkcnh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="ukygqebddf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -1974,8 +1974,8 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">5846</td>
-      <td class="gt_row gt_center">3789, 7999</td>
+      <td class="gt_row gt_center">5876</td>
+      <td class="gt_row gt_center">3743, 7935</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex</td>
@@ -1989,8 +1989,8 @@ In this regression, we use the -1 in the formula to make the output more straigh
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">4564</td>
-      <td class="gt_row gt_center">2416, 6640</td>
+      <td class="gt_row gt_center">4522</td>
+      <td class="gt_row gt_center">2412, 6673</td>
     </tr>
 </tbody>
 <tfoot><tr class="gt_footnotes">
@@ -2007,28 +2007,28 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <p>From this result, we can see that we no longer have a value for female, however we do have an intercept. In this regression our mathematical regression formula is <span class="math display">\[ \hat{alivepost} = {b_0} + {b_m}* male  \]</span>. <span class="math display">\[ {b_0} \]</span> is our intercept value which here would be 5875. You may notice that this is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or <span class="math display">\[ {b_m} \]</span> value is for when the candidate is male. Therefore, we can infer that the intercept value represents those who are not male: females.</p>
 <p>When the candidate is a male, we add the beta for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding <span class="math display">\[{b_m}\]</span> and <span class="math display">\[{b_0}\]</span>, this value is the same as what we got for males in the previous model.</p>
 <!-- HV: Shouldn't the intercept be the same as the female value from the previous regression? Is the difference here due to running stan_glm? Kind of confused by this result. -->
-<div class="sourceCode" id="cb942"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb942-1"><a href="n-parameters.html#cb942-1"></a>sex_means &lt;-<span class="st"> </span></span>
-<span id="cb942-2"><a href="n-parameters.html#cb942-2"></a><span class="st">  </span>governors <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb942-3"><a href="n-parameters.html#cb942-3"></a><span class="st">  </span><span class="kw">group_by</span>(sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb942-4"><a href="n-parameters.html#cb942-4"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">avg =</span> <span class="kw">mean</span>(alive_post), <span class="dt">.groups =</span> <span class="st">"drop"</span>)</span>
-<span id="cb942-5"><a href="n-parameters.html#cb942-5"></a></span>
-<span id="cb942-6"><a href="n-parameters.html#cb942-6"></a>governors <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb942-7"><a href="n-parameters.html#cb942-7"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(sex, alive_post)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb942-8"><a href="n-parameters.html#cb942-8"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb942-9"><a href="n-parameters.html#cb942-9"></a><span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">data =</span> sex_means, <span class="kw">aes</span>(<span class="dt">y =</span> avg), <span class="dt">color =</span> <span class="st">"red"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-750-1.png" width="672"></p>
+<div class="sourceCode" id="cb925"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb925-1"><a href="n-parameters.html#cb925-1"></a>sex_means &lt;-<span class="st"> </span></span>
+<span id="cb925-2"><a href="n-parameters.html#cb925-2"></a><span class="st">  </span>governors <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb925-3"><a href="n-parameters.html#cb925-3"></a><span class="st">  </span><span class="kw">group_by</span>(sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb925-4"><a href="n-parameters.html#cb925-4"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">avg =</span> <span class="kw">mean</span>(alive_post), <span class="dt">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb925-5"><a href="n-parameters.html#cb925-5"></a></span>
+<span id="cb925-6"><a href="n-parameters.html#cb925-6"></a>governors <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb925-7"><a href="n-parameters.html#cb925-7"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(sex, alive_post)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb925-8"><a href="n-parameters.html#cb925-8"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb925-9"><a href="n-parameters.html#cb925-9"></a><span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">data =</span> sex_means, <span class="kw">aes</span>(<span class="dt">y =</span> avg), <span class="dt">color =</span> <span class="st">"red"</span>)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-741-1.png" width="672"></p>
 <!-- use posterior lin pred instead of sex_means to get fitted values -->
 <!-- DK: All the above happens before this -->
-<div class="sourceCode" id="cb943"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb943-1"><a href="n-parameters.html#cb943-1"></a>obj.gov<span class="fl">.3</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
-<span id="cb943-2"><a href="n-parameters.html#cb943-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>alive_pre,</span>
-<span id="cb943-3"><a href="n-parameters.html#cb943-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
-<span id="cb943-4"><a href="n-parameters.html#cb943-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb944"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb944-1"><a href="n-parameters.html#cb944-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.3</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb926"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb926-1"><a href="n-parameters.html#cb926-1"></a>obj.gov<span class="fl">.3</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
+<span id="cb926-2"><a href="n-parameters.html#cb926-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>alive_pre,</span>
+<span id="cb926-3"><a href="n-parameters.html#cb926-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
+<span id="cb926-4"><a href="n-parameters.html#cb926-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb927"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb927-1"><a href="n-parameters.html#cb927-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.3</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#edzlxsrrsw .gt_table {
+#gkvbtyusjd .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2053,7 +2053,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-left-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_heading {
+#gkvbtyusjd .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2065,7 +2065,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_title {
+#gkvbtyusjd .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2075,7 +2075,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-bottom-width: 0;
 }
 
-#edzlxsrrsw .gt_subtitle {
+#gkvbtyusjd .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2085,13 +2085,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-width: 0;
 }
 
-#edzlxsrrsw .gt_bottom_border {
+#gkvbtyusjd .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_col_headings {
+#gkvbtyusjd .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2106,7 +2106,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_col_heading {
+#gkvbtyusjd .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2126,7 +2126,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   overflow-x: hidden;
 }
 
-#edzlxsrrsw .gt_column_spanner_outer {
+#gkvbtyusjd .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2138,15 +2138,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 4px;
 }
 
-#edzlxsrrsw .gt_column_spanner_outer:first-child {
+#gkvbtyusjd .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#edzlxsrrsw .gt_column_spanner_outer:last-child {
+#gkvbtyusjd .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#edzlxsrrsw .gt_column_spanner {
+#gkvbtyusjd .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2158,7 +2158,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   width: 100%;
 }
 
-#edzlxsrrsw .gt_group_heading {
+#gkvbtyusjd .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2180,7 +2180,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   vertical-align: middle;
 }
 
-#edzlxsrrsw .gt_empty_group_heading {
+#gkvbtyusjd .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2195,15 +2195,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
   vertical-align: middle;
 }
 
-#edzlxsrrsw .gt_from_md > :first-child {
+#gkvbtyusjd .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#edzlxsrrsw .gt_from_md > :last-child {
+#gkvbtyusjd .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#edzlxsrrsw .gt_row {
+#gkvbtyusjd .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2222,7 +2222,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   overflow-x: hidden;
 }
 
-#edzlxsrrsw .gt_stub {
+#gkvbtyusjd .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2234,7 +2234,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-left: 12px;
 }
 
-#edzlxsrrsw .gt_summary_row {
+#gkvbtyusjd .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2244,7 +2244,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 5px;
 }
 
-#edzlxsrrsw .gt_first_summary_row {
+#gkvbtyusjd .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2254,7 +2254,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_grand_summary_row {
+#gkvbtyusjd .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2264,7 +2264,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 5px;
 }
 
-#edzlxsrrsw .gt_first_grand_summary_row {
+#gkvbtyusjd .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2274,11 +2274,11 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_striped {
+#gkvbtyusjd .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#edzlxsrrsw .gt_table_body {
+#gkvbtyusjd .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2287,7 +2287,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-bottom-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_footnotes {
+#gkvbtyusjd .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2301,13 +2301,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_footnote {
+#gkvbtyusjd .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#edzlxsrrsw .gt_sourcenotes {
+#gkvbtyusjd .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2321,46 +2321,46 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#edzlxsrrsw .gt_sourcenote {
+#gkvbtyusjd .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#edzlxsrrsw .gt_left {
+#gkvbtyusjd .gt_left {
   text-align: left;
 }
 
-#edzlxsrrsw .gt_center {
+#gkvbtyusjd .gt_center {
   text-align: center;
 }
 
-#edzlxsrrsw .gt_right {
+#gkvbtyusjd .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#edzlxsrrsw .gt_font_normal {
+#gkvbtyusjd .gt_font_normal {
   font-weight: normal;
 }
 
-#edzlxsrrsw .gt_font_bold {
+#gkvbtyusjd .gt_font_bold {
   font-weight: bold;
 }
 
-#edzlxsrrsw .gt_font_italic {
+#gkvbtyusjd .gt_font_italic {
   font-style: italic;
 }
 
-#edzlxsrrsw .gt_super {
+#gkvbtyusjd .gt_super {
   font-size: 65%;
 }
 
-#edzlxsrrsw .gt_footnote_marks {
+#gkvbtyusjd .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="edzlxsrrsw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="gkvbtyusjd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -2371,8 +2371,8 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">24058</td>
-      <td class="gt_row gt_center">21664, 26386</td>
+      <td class="gt_row gt_center">24086</td>
+      <td class="gt_row gt_center">21698, 26486</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex</td>
@@ -2386,8 +2386,8 @@ In this regression, we use the -1 in the formula to make the output more straigh
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">2286</td>
-      <td class="gt_row gt_center">568, 4054</td>
+      <td class="gt_row gt_center">2271</td>
+      <td class="gt_row gt_center">517, 4046</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">alive_pre</td>
@@ -2411,16 +2411,16 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <!-- Side note: I would have thought that overlapping CIs for male/female would equate to insignificance of sex dummy when the regression includes a intercept. But that does not seem to be the case. Am I missing something? -->
 <!-- Make the graphic which shows two parallel lines, by calling two layers of geom_smooth().  -->
 <!-- With this as warm-up, we are now in a position to explore interactions. -->
-<div class="sourceCode" id="cb945"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb945-1"><a href="n-parameters.html#cb945-1"></a>obj.gov<span class="fl">.4</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
-<span id="cb945-2"><a href="n-parameters.html#cb945-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>sex<span class="op">*</span>alive_pre,</span>
-<span id="cb945-3"><a href="n-parameters.html#cb945-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
-<span id="cb945-4"><a href="n-parameters.html#cb945-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb946"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb946-1"><a href="n-parameters.html#cb946-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.4</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb928"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb928-1"><a href="n-parameters.html#cb928-1"></a>obj.gov<span class="fl">.4</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
+<span id="cb928-2"><a href="n-parameters.html#cb928-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>sex<span class="op">*</span>alive_pre,</span>
+<span id="cb928-3"><a href="n-parameters.html#cb928-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
+<span id="cb928-4"><a href="n-parameters.html#cb928-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb929"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb929-1"><a href="n-parameters.html#cb929-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.4</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#tljlfnumgd .gt_table {
+#pjlcnocfxh .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2445,7 +2445,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-left-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_heading {
+#pjlcnocfxh .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2457,7 +2457,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_title {
+#pjlcnocfxh .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2467,7 +2467,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-bottom-width: 0;
 }
 
-#tljlfnumgd .gt_subtitle {
+#pjlcnocfxh .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2477,13 +2477,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-width: 0;
 }
 
-#tljlfnumgd .gt_bottom_border {
+#pjlcnocfxh .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_col_headings {
+#pjlcnocfxh .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2498,7 +2498,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_col_heading {
+#pjlcnocfxh .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2518,7 +2518,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   overflow-x: hidden;
 }
 
-#tljlfnumgd .gt_column_spanner_outer {
+#pjlcnocfxh .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2530,15 +2530,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 4px;
 }
 
-#tljlfnumgd .gt_column_spanner_outer:first-child {
+#pjlcnocfxh .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tljlfnumgd .gt_column_spanner_outer:last-child {
+#pjlcnocfxh .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tljlfnumgd .gt_column_spanner {
+#pjlcnocfxh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2550,7 +2550,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   width: 100%;
 }
 
-#tljlfnumgd .gt_group_heading {
+#pjlcnocfxh .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2572,7 +2572,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   vertical-align: middle;
 }
 
-#tljlfnumgd .gt_empty_group_heading {
+#pjlcnocfxh .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2587,15 +2587,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
   vertical-align: middle;
 }
 
-#tljlfnumgd .gt_from_md > :first-child {
+#pjlcnocfxh .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tljlfnumgd .gt_from_md > :last-child {
+#pjlcnocfxh .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tljlfnumgd .gt_row {
+#pjlcnocfxh .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2614,7 +2614,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   overflow-x: hidden;
 }
 
-#tljlfnumgd .gt_stub {
+#pjlcnocfxh .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2626,7 +2626,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-left: 12px;
 }
 
-#tljlfnumgd .gt_summary_row {
+#pjlcnocfxh .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2636,7 +2636,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 5px;
 }
 
-#tljlfnumgd .gt_first_summary_row {
+#pjlcnocfxh .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2646,7 +2646,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_grand_summary_row {
+#pjlcnocfxh .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2656,7 +2656,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 5px;
 }
 
-#tljlfnumgd .gt_first_grand_summary_row {
+#pjlcnocfxh .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2666,11 +2666,11 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_striped {
+#pjlcnocfxh .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#tljlfnumgd .gt_table_body {
+#pjlcnocfxh .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2679,7 +2679,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-bottom-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_footnotes {
+#pjlcnocfxh .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2693,13 +2693,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_footnote {
+#pjlcnocfxh .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#tljlfnumgd .gt_sourcenotes {
+#pjlcnocfxh .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2713,46 +2713,46 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#tljlfnumgd .gt_sourcenote {
+#pjlcnocfxh .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#tljlfnumgd .gt_left {
+#pjlcnocfxh .gt_left {
   text-align: left;
 }
 
-#tljlfnumgd .gt_center {
+#pjlcnocfxh .gt_center {
   text-align: center;
 }
 
-#tljlfnumgd .gt_right {
+#pjlcnocfxh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tljlfnumgd .gt_font_normal {
+#pjlcnocfxh .gt_font_normal {
   font-weight: normal;
 }
 
-#tljlfnumgd .gt_font_bold {
+#pjlcnocfxh .gt_font_bold {
   font-weight: bold;
 }
 
-#tljlfnumgd .gt_font_italic {
+#pjlcnocfxh .gt_font_italic {
   font-style: italic;
 }
 
-#tljlfnumgd .gt_super {
+#pjlcnocfxh .gt_super {
   font-size: 65%;
 }
 
-#tljlfnumgd .gt_footnote_marks {
+#pjlcnocfxh .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="tljlfnumgd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="pjlcnocfxh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -2763,8 +2763,8 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">7605</td>
-      <td class="gt_row gt_center">-8143, 23224</td>
+      <td class="gt_row gt_center">7715</td>
+      <td class="gt_row gt_center">-7866, 23850</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex</td>
@@ -2778,13 +2778,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">18919</td>
-      <td class="gt_row gt_center">3112, 34779</td>
+      <td class="gt_row gt_center">18768</td>
+      <td class="gt_row gt_center">2496, 34658</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">alive_pre</td>
-      <td class="gt_row gt_center">-0.08</td>
-      <td class="gt_row gt_center">-0.80, 0.64</td>
+      <td class="gt_row gt_center">-0.09</td>
+      <td class="gt_row gt_center">-0.82, 0.63</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex * alive_pre</td>
@@ -2793,8 +2793,8 @@ In this regression, we use the -1 in the formula to make the output more straigh
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male * alive_pre</td>
-      <td class="gt_row gt_center">-0.78</td>
-      <td class="gt_row gt_center">-1.5, -0.04</td>
+      <td class="gt_row gt_center">-0.76</td>
+      <td class="gt_row gt_center">-1.5, -0.02</td>
     </tr>
 </tbody>
 <tfoot><tr class="gt_footnotes">
@@ -2809,17 +2809,17 @@ In this regression, we use the -1 in the formula to make the output more straigh
     </tr></tfoot>
 </table></div>
 <!-- DK: Take your time explaining what this means! It is not trivial. Note that this is a non-parallel slopes model. -->
-<div class="sourceCode" id="cb947"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb947-1"><a href="n-parameters.html#cb947-1"></a>obj.gov<span class="fl">.5</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
-<span id="cb947-2"><a href="n-parameters.html#cb947-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>state <span class="op">+</span><span class="st"> </span>sex<span class="op">*</span>alive_pre,</span>
-<span id="cb947-3"><a href="n-parameters.html#cb947-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
-<span id="cb947-4"><a href="n-parameters.html#cb947-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>,</span>
-<span id="cb947-5"><a href="n-parameters.html#cb947-5"></a>                      <span class="dt">iter =</span> <span class="dv">10000</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb948"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb948-1"><a href="n-parameters.html#cb948-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.5</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb930"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb930-1"><a href="n-parameters.html#cb930-1"></a>obj.gov<span class="fl">.5</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
+<span id="cb930-2"><a href="n-parameters.html#cb930-2"></a>                      <span class="dt">formula =</span> alive_post <span class="op">~</span><span class="st"> </span>state <span class="op">+</span><span class="st"> </span>sex<span class="op">*</span>alive_pre,</span>
+<span id="cb930-3"><a href="n-parameters.html#cb930-3"></a>                      <span class="dt">family =</span> <span class="kw">gaussian</span>(),</span>
+<span id="cb930-4"><a href="n-parameters.html#cb930-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>,</span>
+<span id="cb930-5"><a href="n-parameters.html#cb930-5"></a>                      <span class="dt">iter =</span> <span class="dv">10000</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb931"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb931-1"><a href="n-parameters.html#cb931-1"></a><span class="kw">tbl_regression</span>(obj.gov<span class="fl">.5</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#qjdvygnjmq .gt_table {
+#vihefnbstu .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2844,7 +2844,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-left-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_heading {
+#vihefnbstu .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2856,7 +2856,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_title {
+#vihefnbstu .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2866,7 +2866,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-bottom-width: 0;
 }
 
-#qjdvygnjmq .gt_subtitle {
+#vihefnbstu .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2876,13 +2876,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-width: 0;
 }
 
-#qjdvygnjmq .gt_bottom_border {
+#vihefnbstu .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_col_headings {
+#vihefnbstu .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2897,7 +2897,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_col_heading {
+#vihefnbstu .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2917,7 +2917,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   overflow-x: hidden;
 }
 
-#qjdvygnjmq .gt_column_spanner_outer {
+#vihefnbstu .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2929,15 +2929,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 4px;
 }
 
-#qjdvygnjmq .gt_column_spanner_outer:first-child {
+#vihefnbstu .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qjdvygnjmq .gt_column_spanner_outer:last-child {
+#vihefnbstu .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qjdvygnjmq .gt_column_spanner {
+#vihefnbstu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2949,7 +2949,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   width: 100%;
 }
 
-#qjdvygnjmq .gt_group_heading {
+#vihefnbstu .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2971,7 +2971,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   vertical-align: middle;
 }
 
-#qjdvygnjmq .gt_empty_group_heading {
+#vihefnbstu .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2986,15 +2986,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
   vertical-align: middle;
 }
 
-#qjdvygnjmq .gt_from_md > :first-child {
+#vihefnbstu .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qjdvygnjmq .gt_from_md > :last-child {
+#vihefnbstu .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qjdvygnjmq .gt_row {
+#vihefnbstu .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3013,7 +3013,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   overflow-x: hidden;
 }
 
-#qjdvygnjmq .gt_stub {
+#vihefnbstu .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3025,7 +3025,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-left: 12px;
 }
 
-#qjdvygnjmq .gt_summary_row {
+#vihefnbstu .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3035,7 +3035,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 5px;
 }
 
-#qjdvygnjmq .gt_first_summary_row {
+#vihefnbstu .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3045,7 +3045,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_grand_summary_row {
+#vihefnbstu .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3055,7 +3055,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   padding-right: 5px;
 }
 
-#qjdvygnjmq .gt_first_grand_summary_row {
+#vihefnbstu .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3065,11 +3065,11 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-top-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_striped {
+#vihefnbstu .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qjdvygnjmq .gt_table_body {
+#vihefnbstu .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3078,7 +3078,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-bottom-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_footnotes {
+#vihefnbstu .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3092,13 +3092,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_footnote {
+#vihefnbstu .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#qjdvygnjmq .gt_sourcenotes {
+#vihefnbstu .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3112,46 +3112,46 @@ In this regression, we use the -1 in the formula to make the output more straigh
   border-right-color: #D3D3D3;
 }
 
-#qjdvygnjmq .gt_sourcenote {
+#vihefnbstu .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#qjdvygnjmq .gt_left {
+#vihefnbstu .gt_left {
   text-align: left;
 }
 
-#qjdvygnjmq .gt_center {
+#vihefnbstu .gt_center {
   text-align: center;
 }
 
-#qjdvygnjmq .gt_right {
+#vihefnbstu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qjdvygnjmq .gt_font_normal {
+#vihefnbstu .gt_font_normal {
   font-weight: normal;
 }
 
-#qjdvygnjmq .gt_font_bold {
+#vihefnbstu .gt_font_bold {
   font-weight: bold;
 }
 
-#qjdvygnjmq .gt_font_italic {
+#vihefnbstu .gt_font_italic {
   font-style: italic;
 }
 
-#qjdvygnjmq .gt_super {
+#vihefnbstu .gt_super {
   font-size: 65%;
 }
 
-#qjdvygnjmq .gt_footnote_marks {
+#vihefnbstu .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="qjdvygnjmq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="vihefnbstu" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -3162,8 +3162,8 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">6053</td>
-      <td class="gt_row gt_center">-9264, 21704</td>
+      <td class="gt_row gt_center">6165</td>
+      <td class="gt_row gt_center">-9437, 21574</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">state</td>
@@ -3177,248 +3177,248 @@ In this regression, we use the -1 in the formula to make the output more straigh
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Alaska</td>
-      <td class="gt_row gt_center">1184</td>
-      <td class="gt_row gt_center">-1674, 4016</td>
+      <td class="gt_row gt_center">1163</td>
+      <td class="gt_row gt_center">-1594, 3908</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Arizona</td>
-      <td class="gt_row gt_center">3014</td>
-      <td class="gt_row gt_center">741, 5242</td>
+      <td class="gt_row gt_center">2981</td>
+      <td class="gt_row gt_center">740, 5182</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Arkansas</td>
-      <td class="gt_row gt_center">616</td>
-      <td class="gt_row gt_center">-1732, 2868</td>
+      <td class="gt_row gt_center">585</td>
+      <td class="gt_row gt_center">-1687, 2792</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">California</td>
-      <td class="gt_row gt_center">2080</td>
-      <td class="gt_row gt_center">-395, 4531</td>
+      <td class="gt_row gt_center">2061</td>
+      <td class="gt_row gt_center">-376, 4459</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Colorado</td>
-      <td class="gt_row gt_center">1572</td>
-      <td class="gt_row gt_center">-879, 3939</td>
+      <td class="gt_row gt_center">1546</td>
+      <td class="gt_row gt_center">-810, 3883</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Connecticut</td>
-      <td class="gt_row gt_center">1114</td>
-      <td class="gt_row gt_center">-1363, 3524</td>
+      <td class="gt_row gt_center">1092</td>
+      <td class="gt_row gt_center">-1335, 3454</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Delaware</td>
-      <td class="gt_row gt_center">3215</td>
-      <td class="gt_row gt_center">688, 5710</td>
+      <td class="gt_row gt_center">3172</td>
+      <td class="gt_row gt_center">693, 5622</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Florida</td>
-      <td class="gt_row gt_center">-1471</td>
-      <td class="gt_row gt_center">-4148, 1197</td>
+      <td class="gt_row gt_center">-1488</td>
+      <td class="gt_row gt_center">-4073, 1054</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Georgia</td>
       <td class="gt_row gt_center">1860</td>
-      <td class="gt_row gt_center">-928, 4654</td>
+      <td class="gt_row gt_center">-945, 4591</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Hawaii</td>
-      <td class="gt_row gt_center">1672</td>
-      <td class="gt_row gt_center">-1381, 4730</td>
+      <td class="gt_row gt_center">1633</td>
+      <td class="gt_row gt_center">-1358, 4616</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Idaho</td>
-      <td class="gt_row gt_center">1807</td>
-      <td class="gt_row gt_center">-720, 4235</td>
+      <td class="gt_row gt_center">1776</td>
+      <td class="gt_row gt_center">-671, 4138</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Illinois</td>
-      <td class="gt_row gt_center">-80</td>
-      <td class="gt_row gt_center">-2696, 2535</td>
+      <td class="gt_row gt_center">-109</td>
+      <td class="gt_row gt_center">-2659, 2432</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Indiana</td>
-      <td class="gt_row gt_center">1318</td>
-      <td class="gt_row gt_center">-1210, 3835</td>
+      <td class="gt_row gt_center">1308</td>
+      <td class="gt_row gt_center">-1144, 3705</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Iowa</td>
-      <td class="gt_row gt_center">1031</td>
-      <td class="gt_row gt_center">-1304, 3313</td>
+      <td class="gt_row gt_center">1011</td>
+      <td class="gt_row gt_center">-1275, 3226</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Kansas</td>
-      <td class="gt_row gt_center">-64</td>
-      <td class="gt_row gt_center">-2402, 2235</td>
+      <td class="gt_row gt_center">-89</td>
+      <td class="gt_row gt_center">-2357, 2161</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Kentucky</td>
-      <td class="gt_row gt_center">1569</td>
-      <td class="gt_row gt_center">-981, 4117</td>
+      <td class="gt_row gt_center">1547</td>
+      <td class="gt_row gt_center">-936, 3987</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Louisiana</td>
-      <td class="gt_row gt_center">1516</td>
-      <td class="gt_row gt_center">-1360, 4360</td>
+      <td class="gt_row gt_center">1473</td>
+      <td class="gt_row gt_center">-1361, 4307</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Maine</td>
-      <td class="gt_row gt_center">2211</td>
-      <td class="gt_row gt_center">-404, 4789</td>
+      <td class="gt_row gt_center">2168</td>
+      <td class="gt_row gt_center">-390, 4740</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Maryland</td>
-      <td class="gt_row gt_center">1757</td>
-      <td class="gt_row gt_center">-748, 4264</td>
+      <td class="gt_row gt_center">1727</td>
+      <td class="gt_row gt_center">-660, 4146</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Massachusetts</td>
-      <td class="gt_row gt_center">183</td>
-      <td class="gt_row gt_center">-2136, 2508</td>
+      <td class="gt_row gt_center">160</td>
+      <td class="gt_row gt_center">-2056, 2356</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Michigan</td>
-      <td class="gt_row gt_center">-1074</td>
-      <td class="gt_row gt_center">-3482, 1241</td>
+      <td class="gt_row gt_center">-1121</td>
+      <td class="gt_row gt_center">-3455, 1176</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Minnesota</td>
-      <td class="gt_row gt_center">1730</td>
-      <td class="gt_row gt_center">-604, 4000</td>
+      <td class="gt_row gt_center">1682</td>
+      <td class="gt_row gt_center">-537, 3935</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Mississippi</td>
-      <td class="gt_row gt_center">841</td>
-      <td class="gt_row gt_center">-1787, 3414</td>
+      <td class="gt_row gt_center">820</td>
+      <td class="gt_row gt_center">-1702, 3367</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Missouri</td>
-      <td class="gt_row gt_center">565</td>
-      <td class="gt_row gt_center">-2100, 3125</td>
+      <td class="gt_row gt_center">534</td>
+      <td class="gt_row gt_center">-2030, 3073</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Montana</td>
-      <td class="gt_row gt_center">933</td>
-      <td class="gt_row gt_center">-1564, 3403</td>
+      <td class="gt_row gt_center">902</td>
+      <td class="gt_row gt_center">-1499, 3300</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Nebraska</td>
-      <td class="gt_row gt_center">873</td>
-      <td class="gt_row gt_center">-1508, 3196</td>
+      <td class="gt_row gt_center">849</td>
+      <td class="gt_row gt_center">-1426, 3117</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Nevada</td>
-      <td class="gt_row gt_center">1594</td>
-      <td class="gt_row gt_center">-1109, 4249</td>
+      <td class="gt_row gt_center">1564</td>
+      <td class="gt_row gt_center">-1017, 4132</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">New Hampshire</td>
-      <td class="gt_row gt_center">1392</td>
-      <td class="gt_row gt_center">-940, 3661</td>
+      <td class="gt_row gt_center">1365</td>
+      <td class="gt_row gt_center">-874, 3620</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">New Jersey</td>
-      <td class="gt_row gt_center">442</td>
-      <td class="gt_row gt_center">-2115, 3014</td>
+      <td class="gt_row gt_center">430</td>
+      <td class="gt_row gt_center">-2105, 2909</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">New Mexico</td>
-      <td class="gt_row gt_center">1106</td>
-      <td class="gt_row gt_center">-1196, 3298</td>
+      <td class="gt_row gt_center">1066</td>
+      <td class="gt_row gt_center">-1089, 3219</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">New York</td>
-      <td class="gt_row gt_center">973</td>
-      <td class="gt_row gt_center">-1444, 3375</td>
+      <td class="gt_row gt_center">937</td>
+      <td class="gt_row gt_center">-1412, 3264</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">North Carolina</td>
-      <td class="gt_row gt_center">-1350</td>
-      <td class="gt_row gt_center">-4147, 1438</td>
+      <td class="gt_row gt_center">-1397</td>
+      <td class="gt_row gt_center">-4171, 1418</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">North Dakota</td>
-      <td class="gt_row gt_center">2237</td>
-      <td class="gt_row gt_center">-209, 4605</td>
+      <td class="gt_row gt_center">2215</td>
+      <td class="gt_row gt_center">-163, 4545</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Ohio</td>
-      <td class="gt_row gt_center">2270</td>
-      <td class="gt_row gt_center">-106, 4606</td>
+      <td class="gt_row gt_center">2237</td>
+      <td class="gt_row gt_center">-68, 4559</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Oklahoma</td>
-      <td class="gt_row gt_center">-503</td>
-      <td class="gt_row gt_center">-3168, 2139</td>
+      <td class="gt_row gt_center">-507</td>
+      <td class="gt_row gt_center">-3122, 2030</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Oregon</td>
-      <td class="gt_row gt_center">315</td>
-      <td class="gt_row gt_center">-2187, 2795</td>
+      <td class="gt_row gt_center">270</td>
+      <td class="gt_row gt_center">-2179, 2683</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Pennsylvania</td>
-      <td class="gt_row gt_center">1365</td>
-      <td class="gt_row gt_center">-1189, 3807</td>
+      <td class="gt_row gt_center">1315</td>
+      <td class="gt_row gt_center">-1126, 3774</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Rhode Island</td>
-      <td class="gt_row gt_center">2031</td>
-      <td class="gt_row gt_center">-205, 4151</td>
+      <td class="gt_row gt_center">2002</td>
+      <td class="gt_row gt_center">-141, 4103</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">South Carolina</td>
-      <td class="gt_row gt_center">2546</td>
-      <td class="gt_row gt_center">-171, 5182</td>
+      <td class="gt_row gt_center">2509</td>
+      <td class="gt_row gt_center">-141, 5142</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">South Dakota</td>
-      <td class="gt_row gt_center">-1761</td>
-      <td class="gt_row gt_center">-4056, 471</td>
+      <td class="gt_row gt_center">-1790</td>
+      <td class="gt_row gt_center">-4046, 409</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Tennessee</td>
-      <td class="gt_row gt_center">-375</td>
-      <td class="gt_row gt_center">-2946, 2149</td>
+      <td class="gt_row gt_center">-401</td>
+      <td class="gt_row gt_center">-2867, 2093</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Texas</td>
-      <td class="gt_row gt_center">1272</td>
-      <td class="gt_row gt_center">-1040, 3541</td>
+      <td class="gt_row gt_center">1238</td>
+      <td class="gt_row gt_center">-995, 3466</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Utah</td>
-      <td class="gt_row gt_center">1273</td>
-      <td class="gt_row gt_center">-1194, 3775</td>
+      <td class="gt_row gt_center">1247</td>
+      <td class="gt_row gt_center">-1180, 3657</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Vermont</td>
-      <td class="gt_row gt_center">639</td>
-      <td class="gt_row gt_center">-1679, 2908</td>
+      <td class="gt_row gt_center">610</td>
+      <td class="gt_row gt_center">-1640, 2856</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Virginia</td>
-      <td class="gt_row gt_center">2637</td>
-      <td class="gt_row gt_center">-160, 5406</td>
+      <td class="gt_row gt_center">2590</td>
+      <td class="gt_row gt_center">-186, 5357</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Washington</td>
-      <td class="gt_row gt_center">2844</td>
-      <td class="gt_row gt_center">317, 5350</td>
+      <td class="gt_row gt_center">2818</td>
+      <td class="gt_row gt_center">316, 5239</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">West Virginia</td>
-      <td class="gt_row gt_center">2488</td>
-      <td class="gt_row gt_center">-61, 4980</td>
+      <td class="gt_row gt_center">2459</td>
+      <td class="gt_row gt_center">-23, 4961</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Wisconsin</td>
-      <td class="gt_row gt_center">2543</td>
-      <td class="gt_row gt_center">247, 4795</td>
+      <td class="gt_row gt_center">2505</td>
+      <td class="gt_row gt_center">274, 4720</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Wyoming</td>
-      <td class="gt_row gt_center">-431</td>
-      <td class="gt_row gt_center">-2960, 2034</td>
+      <td class="gt_row gt_center">-472</td>
+      <td class="gt_row gt_center">-2927, 1970</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex</td>
@@ -3432,13 +3432,13 @@ In this regression, we use the -1 in the formula to make the output more straigh
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">19884</td>
-      <td class="gt_row gt_center">4134, 35284</td>
+      <td class="gt_row gt_center">19798</td>
+      <td class="gt_row gt_center">4370, 35550</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">alive_pre</td>
-      <td class="gt_row gt_center">-0.06</td>
-      <td class="gt_row gt_center">-0.79, 0.65</td>
+      <td class="gt_row gt_center">-0.07</td>
+      <td class="gt_row gt_center">-0.78, 0.65</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex * alive_pre</td>
@@ -3448,7 +3448,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male * alive_pre</td>
       <td class="gt_row gt_center">-0.82</td>
-      <td class="gt_row gt_center">-1.5, -0.09</td>
+      <td class="gt_row gt_center">-1.5, -0.10</td>
     </tr>
 </tbody>
 <tfoot><tr class="gt_footnotes">
@@ -3470,7 +3470,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-757"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-748"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.4: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -3484,7 +3484,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
 </h2>
 <p>Consider a new data set, <code>shaming</code>, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled “Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment”. This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout.</p>
 <p>Let’s now do another EDA, starting off by running <code>glimpse()</code>.</p>
-<div class="sourceCode" id="cb949"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb949-1"><a href="n-parameters.html#cb949-1"></a><span class="kw">glimpse</span>(shaming)</span></code></pre></div>
+<div class="sourceCode" id="cb932"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb932-1"><a href="n-parameters.html#cb932-1"></a><span class="kw">glimpse</span>(shaming)</span></code></pre></div>
 <pre><code>## Rows: 344,084
 ## Columns: 10
 ## $ sex         &lt;chr&gt; "Male", "Female", "Male", "Female", "Female", "Male", "Fe…
@@ -3507,8 +3507,8 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <!-- HV: should I explain why we are not using any of these variables? why they are not of great use to us? --></p>
 <p>By narrowing down the set of variables we are looking at and investigating, we will find more meaningful relationships among them. However, we have not yet discussed the most important variable of them all: <code>treatment</code>. The <code>treatment</code> variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let’s start off by taking a broad look at the different treatments.
 <!-- HV: Is it okay to say the first sentence of this paragraph? --></p>
-<div class="sourceCode" id="cb951"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb951-1"><a href="n-parameters.html#cb951-1"></a>shaming <span class="op">%&gt;%</span></span>
-<span id="cb951-2"><a href="n-parameters.html#cb951-2"></a><span class="st">  </span><span class="kw">count</span>(treatment)</span></code></pre></div>
+<div class="sourceCode" id="cb934"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb934-1"><a href="n-parameters.html#cb934-1"></a>shaming <span class="op">%&gt;%</span></span>
+<span id="cb934-2"><a href="n-parameters.html#cb934-2"></a><span class="st">  </span><span class="kw">count</span>(treatment)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 2
 ##   treatment       n
 ##   &lt;fct&gt;       &lt;int&gt;
@@ -3523,15 +3523,15 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <p>In the third treatment, Self, the mailing includes the recent voting record of each member of the household, placing the word “Voted” next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. In this mailing, the households were also told, “we intend to mail an updated chart” with the voting record of the household members after the 2006 primary. By emphasizing the public nature of voting records, this type of mailing exerts more social pressure on voting than the Hawthorne treatment.</p>
 <p>The fourth treatment, Neighbors, provides the household members’ voting records, as well as the voting records of those who live nearby. This mailing also told recipients, “we intend to mail an updated chart” of who voted in the 2006 election.</p>
 <p>For now, let’s focus on a subset of the data.</p>
-<div class="sourceCode" id="cb953"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb953-1"><a href="n-parameters.html#cb953-1"></a>ch9 &lt;-<span class="st"> </span>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb953-2"><a href="n-parameters.html#cb953-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">solo =</span> <span class="kw">ifelse</span>(hh_size <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb953-3"><a href="n-parameters.html#cb953-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="dv">2006</span> <span class="op">-</span><span class="st"> </span>birth_year) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb953-4"><a href="n-parameters.html#cb953-4"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, solo, sex, age)</span></code></pre></div>
+<div class="sourceCode" id="cb936"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb936-1"><a href="n-parameters.html#cb936-1"></a>ch9 &lt;-<span class="st"> </span>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb936-2"><a href="n-parameters.html#cb936-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">solo =</span> <span class="kw">ifelse</span>(hh_size <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb936-3"><a href="n-parameters.html#cb936-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="dv">2006</span> <span class="op">-</span><span class="st"> </span>birth_year) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb936-4"><a href="n-parameters.html#cb936-4"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, solo, sex, age)</span></code></pre></div>
 <p>We create the variable <code>solo</code>, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not.</p>
-<div class="sourceCode" id="cb954"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb954-1"><a href="n-parameters.html#cb954-1"></a>ch9 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb954-2"><a href="n-parameters.html#cb954-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb937"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb937-1"><a href="n-parameters.html#cb937-1"></a>ch9 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb937-2"><a href="n-parameters.html#cb937-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-761">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-752">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -3683,29 +3683,29 @@ In this regression, we use the -1 in the formula to make the output more straigh
 </table>
 <!-- DK: Add discussion of what you see here. No need to drop missing values since there aren't any. I think this next discussion can be dropped. --><p>While some summarizing commands such as <code>glimpse()</code> gives us a good look at the possible values for the variables, it is difficult to read it in terms of individual observations. Recall that the <em>observational unit</em> is what is being measured. With the <code>shaming</code> data set, the observational unit would be the voter respondent. To get a better sense of some respondents’ information, let’s use <code>sample_n()</code> to gather a random sample of <em>n</em> observations from the data set.
 <!-- HV: Does this belong here? --></p>
-<div class="sourceCode" id="cb955"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb955-1"><a href="n-parameters.html#cb955-1"></a>ch9 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb955-2"><a href="n-parameters.html#cb955-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb938"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb938-1"><a href="n-parameters.html#cb938-1"></a>ch9 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb938-2"><a href="n-parameters.html#cb938-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 5
 ##    primary_06 treatment  solo  sex      age
 ##         &lt;int&gt; &lt;fct&gt;      &lt;lgl&gt; &lt;chr&gt;  &lt;dbl&gt;
-##  1          0 Control    FALSE Male      57
-##  2          0 Civic Duty TRUE  Male      59
-##  3          0 Civic Duty FALSE Female    46
-##  4          0 Civic Duty FALSE Female    24
-##  5          1 Control    FALSE Female    53
-##  6          0 Hawthorne  FALSE Female    40
-##  7          1 Civic Duty FALSE Female    29
-##  8          0 Hawthorne  FALSE Male      51
-##  9          0 Control    FALSE Male      52
-## 10          1 Control    FALSE Female    49</code></pre>
+##  1          0 Control    FALSE Female    72
+##  2          1 Civic Duty FALSE Female    39
+##  3          0 Control    TRUE  Female    51
+##  4          0 Control    FALSE Male      56
+##  5          0 Control    TRUE  Female    45
+##  6          0 Civic Duty FALSE Male      79
+##  7          0 Control    TRUE  Female    38
+##  8          0 Control    FALSE Female    37
+##  9          0 Control    FALSE Female    44
+## 10          1 Control    FALSE Male      55</code></pre>
 <p>Now we have a table with 5 random observations and the respondents’ information in a regular table output. By taking a few random samples, we may start to see some patterns within the data.</p>
 <p>Now we have a table with 5 random observations and the respondents’ information in a regular table output. By taking a few random samples, we may start to see some patterns within the data. Do you notice anything in particular about the variable <code>treatment</code>?</p>
 <p>One other helpful summarizing technique we can use is <code>skim()</code>. To make the information it contains simpler, we will only be looking at three variables: <code>primary_06</code>, <code>treatment</code>, and <code>sex</code>.</p>
-<div class="sourceCode" id="cb957"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb957-1"><a href="n-parameters.html#cb957-1"></a>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb957-2"><a href="n-parameters.html#cb957-2"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb957-3"><a href="n-parameters.html#cb957-3"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb940"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb940-1"><a href="n-parameters.html#cb940-1"></a>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb940-2"><a href="n-parameters.html#cb940-2"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb940-3"><a href="n-parameters.html#cb940-3"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-763">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-754">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -3833,7 +3833,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-764"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-755"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 9.5: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -3845,7 +3845,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-765"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-756"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.6: Justice<!--</p>-->
 <!--</div>--></span>
@@ -3857,7 +3857,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-766"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-757"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 9.7: Courage<!--</p>-->
 <!--</div>--></span>
@@ -3869,7 +3869,7 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-767"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-758"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.8: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -3881,17 +3881,17 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <span class="header-section-number">9.3</span> Causal Effects of <code>treament</code>
 </h2>
 <p>We will now be looking into the causal effect of the treatment variable on the 2006 primary election. To start, let’s build a model using <code>stan_glm()</code> followed by a regression table.</p>
-<div class="sourceCode" id="cb958"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb958-1"><a href="n-parameters.html#cb958-1"></a><span class="co"># obj.1 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb958-2"><a href="n-parameters.html#cb958-2"></a><span class="co">#                 formula = primary_06 ~ treatment - 1, </span></span>
-<span id="cb958-3"><a href="n-parameters.html#cb958-3"></a><span class="co">#                 family = gaussian(), </span></span>
-<span id="cb958-4"><a href="n-parameters.html#cb958-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb941"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb941-1"><a href="n-parameters.html#cb941-1"></a><span class="co"># obj.1 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb941-2"><a href="n-parameters.html#cb941-2"></a><span class="co">#                 formula = primary_06 ~ treatment - 1, </span></span>
+<span id="cb941-3"><a href="n-parameters.html#cb941-3"></a><span class="co">#                 family = gaussian(), </span></span>
+<span id="cb941-4"><a href="n-parameters.html#cb941-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
 <p>This table shows us each of the five treatments and their beta coefficients, along with a 95% Confidence Interval for these coefficients. The Control provides us with a baseline.</p>
 <!-- HV: Not exactly sure how to interpret this using causal effect... Should I be making preceptor tables here? -->
 <!-- Talk about what these results mean.  Then, create the same model but with a different structure. -->
-<div class="sourceCode" id="cb959"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb959-1"><a href="n-parameters.html#cb959-1"></a><span class="co"># obj.2 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb959-2"><a href="n-parameters.html#cb959-2"></a><span class="co">#                 formula = primary_06 ~ treatment, </span></span>
-<span id="cb959-3"><a href="n-parameters.html#cb959-3"></a><span class="co">#                 family = gaussian(), </span></span>
-<span id="cb959-4"><a href="n-parameters.html#cb959-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb942"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb942-1"><a href="n-parameters.html#cb942-1"></a><span class="co"># obj.2 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb942-2"><a href="n-parameters.html#cb942-2"></a><span class="co">#                 formula = primary_06 ~ treatment, </span></span>
+<span id="cb942-3"><a href="n-parameters.html#cb942-3"></a><span class="co">#                 family = gaussian(), </span></span>
+<span id="cb942-4"><a href="n-parameters.html#cb942-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
 <!-- Explain how these two models are the same, except in how they define the parameters. Show us the math like Gelman does. Write down the math. For simple. -->
 <!-- Once we talk about these things --- and, again, this is exactly what we have talked about in chapter 8 --- we can do a bit more. Like discuss how we are using 99%, because there is nothing magical aboyt 95%, other than convention. I also think it would be fun to show a nice graphic of this, highlighting how the estimates for Civic and Hawthorne overlap.  -->
 <div id="interactions" class="section level3">
@@ -3899,10 +3899,10 @@ In this regression, we use the -1 in the formula to make the output more straigh
 <span class="header-section-number">9.3.1</span> Interactions</h3>
 <!-- This is new. With only two parameters, we can't really look at interaction effects. Need to discuss interaction effects in general. Also, note that heterogenous treatment effects are the same thing as interaction effects that involve a treatment effect as one of the variables.  -->
 <!-- Feel free to build up this code, and other examples, more slowly than I am doing it here. -->
-<div class="sourceCode" id="cb960"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb960-1"><a href="n-parameters.html#cb960-1"></a><span class="co"># obj.3 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb960-2"><a href="n-parameters.html#cb960-2"></a><span class="co">#                 formula = primary_06 ~ sex + treatment + sex:treatment, </span></span>
-<span id="cb960-3"><a href="n-parameters.html#cb960-3"></a><span class="co">#                 family = gaussian(), </span></span>
-<span id="cb960-4"><a href="n-parameters.html#cb960-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb943"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb943-1"><a href="n-parameters.html#cb943-1"></a><span class="co"># obj.3 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb943-2"><a href="n-parameters.html#cb943-2"></a><span class="co">#                 formula = primary_06 ~ sex + treatment + sex:treatment, </span></span>
+<span id="cb943-3"><a href="n-parameters.html#cb943-3"></a><span class="co">#                 family = gaussian(), </span></span>
+<span id="cb943-4"><a href="n-parameters.html#cb943-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
 <!-- Takes a while to explain what all this means. -->
 <!-- Two key issues: 1) Interpreting lots of parameters in a model. interactions, heterogenous treatment effects. shaming using lm().  -->
 <!-- Treatment effect is not the same thing as a coefficient. -->
@@ -3977,7 +3977,7 @@ Perhaps all this is enough to both fill this chapter and set the stage for 11 an
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-02
+2020-10-03
 </p>
 </div>
 </div>

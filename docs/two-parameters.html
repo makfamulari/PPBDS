@@ -148,8 +148,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="toc"><a href="#resampling-tactile"> Pennies example</a></li>
 <li class="toc"><a href="#eda-for-nhanes"> EDA for <code>nhanes</code></a></li>
 <li class="toc"><a href="#bootstrap-to-estimate-average-height"> Bootstrap to estimate average height</a></li>
+<li class="toc"><a href="#probability-to-bootstrap-to-bayesian-models"> Probability to bootstrap to Bayesian models</a></li>
 <li class="toc"><a href="#cardinal-virtues"> Cardinal Virtues</a></li>
-<li class="toc"><a href="#temperance"> Temperance</a></li>
 <li class="toc"><a href="#conclusion"> Conclusion</a></li>
 </ul>
 <a href="three-parameters.html"><span class="toc-section-number">8</span> Three Parameters</a>
@@ -254,7 +254,7 @@ FIGURE 7.3: 50 US pennies labelled.
 ## 10    10  2000
 ## # … with 40 more rows</code></pre>
 <p>The <code>pennies_sample</code> data frame has 50 rows corresponding to each penny with two variables. The first variable <code>ID</code> corresponds to the ID labels in our table above, whereas the second variable <code>year</code> corresponds to the year of minting saved as a numeric variable, also known as a double (<code>dbl</code>).</p>
-<!-- DK: Shouldn't the year be an int? -->
+<!-- DK: Shouldn't the year be an int? Should it be ID or id? -->
 <!-- Additionally, let's look at what a Preceptor Table would look like in this `pennies_sample` example. Essentially, what we are seeing is that if you are given a random penny in 2019, we are trying to estimate what they year is for that random penny. The last row is your best guess if that random year is given, because given that we are dealing with one parameter we are only dealing with one row. This would be different with two paramters because then we would have two rows.  -->
 <!-- ```{r, echo = FALSE} -->
 <!-- pennies_sample %>% -->
@@ -292,7 +292,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## 1     1995.</code></pre>
 <p>Thus, if we’re willing to assume that <code>pennies_sample</code> is a representative sample from <em>all</em> US pennies, a “good guess” of the average year of minting of all US pennies would be 1995.44. In other words, around 1995. This should all start sounding similar to what we did previously in Chapter <a href="one-parameter.html#one-parameter">6</a>!</p>
 <p>In Chapter <a href="one-parameter.html#one-parameter">6</a>, our <em>study population</em> was the urn of <span class="math inline">\(N\)</span> = 2400 balls. Our <em>population parameter</em> was the <em>population proportion</em> of these balls that were red, denoted by <span class="math inline">\(p\)</span>. In order to estimate <span class="math inline">\(p\)</span>, we extracted a sample of 50 balls using the shovel. We then computed the relevant <em>point estimate</em>: the <em>sample proportion</em> of these 50 balls that were red, denoted mathematically by <span class="math inline">\(\hat{p}\)</span>.</p>
-<p>Here our population is <span class="math inline">\(N\)</span> = whatever the number of pennies are being used in the US, a value which we don’t know and probably never will. The population parameter of interest is now the <em>population mean</em> year of all these pennies, a value denoted mathematically by the Greek letter <span class="math inline">\(\mu\)</span> (pronounced “mu”). In order to estimate <span class="math inline">\(\mu\)</span>, we went to the bank and obtained a sample of 50 pennies and computed the relevant point estimate: the <em>sample mean</em> year of these 50 pennies, denoted mathematically by <span class="math inline">\(\overline{x}\)</span> (pronounced “x-bar”). An alternative and more intuitive notation for the sample mean is <span class="math inline">\(\hat{\mu}\)</span>. However, this is unfortunately not as commonly used.</p>
+<p>Here our population is <span class="math inline">\(N\)</span> = whatever the number of pennies are being used in the US, a value which we don’t know and probably never will. The population parameter of interest is now the <em>population mean</em> year of all these pennies, a value denoted mathematically by the Greek letter <span class="math inline">\(\mu\)</span> (pronounced “mu”). In order to estimate <span class="math inline">\(\mu\)</span>, we went to the bank and obtained a sample of 50 pennies and computed the relevant point estimate: the <em>sample mean</em> year of these 50 pennies, denoted mathematically by <span class="math inline">\(\overline{x}\)</span> (pronounced “x-bar”).</p>
 <p>We summarize the correspondence between the sampling urn exercise in Chapter <a href="one-parameter.html#one-parameter">6</a> and our pennies exercise in Table below.</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -712,9 +712,9 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <p>Going back to our 50 sampled pennies, the point estimate of interest is the sample mean <span class="math inline">\(\overline{x}\)</span> of 1995.44. This quantity is an <em>estimate</em> of the population mean year of <em>all</em> US pennies <span class="math inline">\(\mu\)</span>.</p>
 <p>Recall that we also saw in Chapter <a href="one-parameter.html#one-parameter">6</a> that such estimates are prone to <em>sampling variation</em>. For example, in this particular sample, we observed three pennies with the year 1999. If we sampled another 50 pennies, would we observe exactly three pennies with the year 1999 again? More than likely not. We might observe none, one, two, or maybe even all 50! The same can be said for the other 26 unique years that are represented in our sample of 50 pennies.</p>
 <p>So what do we do about this sampling variation? One solution is that we create bootstrap samples! Bootstrapping repeatedly draws independent samples from our data set with replacement. By sampling with replacement, the same observation can be sampled multiple times and each bootstrap sample will have the same number of observations as the original data set.</p>
-<p><label for="tufte-mn-79" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-79" class="margin-toggle"><span class="marginnote">To conduct bootstraps, make sure you install both rsample and tidyverse libraries</span></p>
+<p><label for="tufte-mn-79" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-79" class="margin-toggle"><span class="marginnote">To conduct bootstraps, make sure you install both the rsample and tidyverse libraries</span></p>
 <p>The intuition with bootstrapping is that we can model an inference about the population from resampling our sample data and then performing an inference about a sample from each resample. It will look something like this: resampled → sample → population.</p>
-<p>The first thing we want to do when bootstrapping is to create our bootstrap samples. Since we are concerned with the <code>year</code> of pennies in 2019, let’s select <code>year</code> in our data set before we create our bootstraps. Let’s now perform the virtual analog for 1000 resamples. Using these results, we’ll be able to study the variability in the sample means from 1000 resamples of size 50. Let’s first add a <code>times = 1000</code> argument to <code>bootstraps()</code>  to indicate we would like 1000 replicates. Remember that we must use the <code>rsample</code> library to use bootstraps.</p>
+<p>The first thing we want to do when bootstrapping is to create our bootstrap samples. Since we are concerned with the <code>year</code> of pennies in 2019, let’s select <code>year</code> in our data set before we create our bootstraps. Let’s now perform the virtual analog for 1,000 resamples. Using these results, we’ll be able to study the variability in the sample means from 1,000 resamples of size 50. Let’s first add a <code>times = 1000</code> argument to <code>bootstraps()</code> to indicate we would like 1,000 replicates. Remember that we must use the <code>rsample</code> library to use bootstraps.</p>
 <div class="sourceCode" id="cb849"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb849-1"><a href="two-parameters.html#cb849-1"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
 <span id="cb849-2"><a href="two-parameters.html#cb849-2"></a>virtual_resamples &lt;-<span class="st"> </span>pennies_sample <span class="op">%&gt;%</span></span>
 <span id="cb849-3"><a href="two-parameters.html#cb849-3"></a><span class="st">  </span><span class="kw">select</span>(year) <span class="op">%&gt;%</span></span>
@@ -736,7 +736,8 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## 10 &lt;split [50/20]&gt; Bootstrap0010
 ## # … with 990 more rows</code></pre>
 <p>Our bootstrap samples are stored in a tibble-like object, with each bootstrap sample nested in the <code>splits</code> column. Each row is a different bootstrap sample and the <code>id</code> column is used to identify each bootstrap sample.</p>
-<p><label for="tufte-mn-80" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-80" class="margin-toggle"><span class="marginnote">Check out ?analysis in the Console to get an even more comprehensive review of what analysis() does</span></p>
+<!-- DK: Can we use `id` with the backticks in a margin note? -->
+<p><label for="tufte-mn-80" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-80" class="margin-toggle"><span class="marginnote">It is annoying that bootstraps() requires the use of an id column even though we have used ID in the past to identify specific observations. Here, instead, it is used to mean a specific bootstrapped tibble.</span></p>
 <p>Tto view a specific bootstrap sample, use the <code>analysis()</code> function from the <code>rsample</code> package, which basically allows you to view a specific bootstrap sample as a data frame. To do so, type <code>analysis(virtual_resamples$splits[[n]]) %&gt;% as_tibble()</code> with <code>n</code> as the nth row bootstrap sample. Consider the first bootstrap sample:</p>
 <div class="sourceCode" id="cb851"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb851-1"><a href="two-parameters.html#cb851-1"></a><span class="kw">analysis</span>(virtual_resamples<span class="op">$</span>splits[[<span class="dv">1</span>]]) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb851-2"><a href="two-parameters.html#cb851-2"></a><span class="st">  </span><span class="kw">as_tibble</span>()</span></code></pre></div>
@@ -802,6 +803,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## 10 &lt;split [50/20]&gt; Bootstrap0010 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     2000.
 ## # … with 990 more rows</code></pre>
 <p>Voila! We were able to create a thousand bootstrap samples and calculate the mean year for each resample. Let’s now create a plot to visualizes the posterior distribution for the mean year of American pennies in 2019.</p>
+<!-- DK: Need to explain the .. syntax or replace it with the new stat_density trick. -->
 <div class="sourceCode" id="cb857"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb857-1"><a href="two-parameters.html#cb857-1"></a>virtual_resamples <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb857-2"><a href="two-parameters.html#cb857-2"></a><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></span>
 <span id="cb857-3"><a href="two-parameters.html#cb857-3"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year_mean, </span>
@@ -811,7 +813,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <span id="cb857-7"><a href="two-parameters.html#cb857-7"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
 <span id="cb857-8"><a href="two-parameters.html#cb857-8"></a>         <span class="dt">title =</span> <span class="st">"Posterior Distribution for the Mean Year of American Pennies in 2019"</span>) </span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-664-1.png" width="672"></p>
-<p>How did we sneak in the word “posterior” into this discussion. Recall in Chapter <a href="probability.html#probability">5</a> that we defined a posterior distribution as our beliefs about an unknown value or parameter. In the case of the bootstrap samples we made, the posterior distribution represents our knowledge about the mean year of American pennies in 2019 after taking into account the the data we gathered from our bootstrap sample means. As demonstrated in the plot above, we can see that the mean year of pennies in 2019 is most likely between 1992 and 1998.</p>
+<p>How did we sneak in the word “posterior” into this discussion. Recall in Chapter <a href="probability.html#probability">5</a> that we defined a posterior distribution as our beliefs about an unknown number: either a number which we don’t know now but which we will know, like Biden’s electoral vote total or parameter. In the case of the bootstrap samples we made, the posterior distribution represents our beliefs about <span class="math inline">\(\mu\)</span>, the mean year of American pennies in 2019 after taking into account the information from our bootstrap sample means. As demonstrated in the plot above, we can see that <span class="math inline">\(\mu\)</span> — an unknown parameter, the true value of which we will never know — is most likely between 1992 and 1998.</p>
 <p>Have we proved how the bootstrap, almost magically, can create a reasonable posterior? Not at all! The mathematics of that proof are beyond the scope of this book.</p>
 <!-- In the "resampling with replacement" scenario we are illustrating here, this histogram has a special name: the *bootstrap distribution of the sample mean*. Furthermore, recall it is an approximation to the *sampling distribution* of the sample mean, a concept you saw before. This distribution allows us to study the effect of sampling variation on our estimates of the true population mean, in this case the true mean year for *all* US pennies. However, unlike in Chapter \@ref(one-parameter) where we took multiple samples (something one would never do in practice), bootstrap distributions are constructed by taking multiple resamples from a *single* sample: in this case, the 50 original pennies from the bank.  -->
 <!-- Congratulations! You've just constructed your first bootstrap distribution!  -->
@@ -1029,7 +1031,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <div id="bootstrap-to-estimate-average-height" class="section level2">
 <h2>
 <span class="header-section-number">7.3</span> Bootstrap to estimate average height</h2>
-<p>We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let’s use a similar approach to estimate the value of a different unknown parameter: the average height of an adult American male in 2009.</p>
+<p>We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let’s use a similar approach to estimate the value of a different unknown parameter: the average height of an adult American male in 2009. Let’s also name this parameter <span class="math inline">\(\mu\)</span>. Is it confusing that we are using the same parameter? Yes! But, sadly, there are only so many Greek letters. We have no choice but to reuse them. By convention, <span class="math inline">\(\mu\)</span> is often used as the parameter name for an unknown mean. But we could have used a different letter, Greek or otherwise. And, symbols besides <span class="math inline">\(\mu\)</span> are often used for unknown means. It is up to you, in general, but following the conventions in your field is wise.</p>
 <p>First, filter the data set:</p>
 <div class="sourceCode" id="cb869"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb869-1"><a href="two-parameters.html#cb869-1"></a>ch7_male &lt;-<span class="st"> </span>nhanes <span class="op">%&gt;%</span></span>
 <span id="cb869-2"><a href="two-parameters.html#cb869-2"></a><span class="st">  </span><span class="kw">filter</span>(survey <span class="op">==</span><span class="st"> </span><span class="dv">2009</span>, gender <span class="op">==</span><span class="st"> "Male"</span>, age <span class="op">&gt;=</span><span class="st"> </span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
@@ -1060,6 +1062,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## 10 &lt;split [1.8K/657]&gt; Bootstrap0010 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
 ## # … with 990 more rows</code></pre>
 <p>Plot the results:</p>
+<!-- DK: Either explain ..count.. or use stat_density trick. -->
 <div class="sourceCode" id="cb872"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb872-1"><a href="two-parameters.html#cb872-1"></a>virtual_resamples <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb872-2"><a href="two-parameters.html#cb872-2"></a><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></span>
 <span id="cb872-3"><a href="two-parameters.html#cb872-3"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> height_mean, </span>
@@ -1075,29 +1078,23 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <li><p>Median: 175.97</p></li>
 <li><p>95% confidence interval: 175.66, 176.28</p></li>
 </ul>
-<div id="watch-me-wave-my-hands" class="section level3">
-<h3>
-<span class="header-section-number">7.3.1</span> Watch me wave my hands</h3>
-<p><label for="tufte-mn-83" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-83" class="margin-toggle"><span class="marginnote"> In this sense, the bootstrap distribution represents an (approximate)
-nonparametric, noninformative posterior distribution for our parameter.
-But this bootstrap distribution is obtained painlessly — without having to
-formally specify a prior and without having to sample from the posterior
-distribution. Hence we might think of the bootstrap distribution as a “poor
-man’s” Bayes posterior. By perturbing the data, the bootstrap approximates
-the Bayesian effect of perturbing the parameters, and is typically
-much simpler to carry out. — Elements of Statistical Learning, 2nd edition, by Hastie et al, page 271.</span></p>
-<p>Did we mention that this book is still a bit of a mess? Well, it is! And, in the entire book, this section is the messiest mess of them all. Forgive us.</p>
-<p>The mess centers on the transition we are now making between the bootstrap and the full scale Bayesian approach. The margin note provides a bit of a justification. For now, that is all we have. So, watch us wave our hands and pretend that we have justified the leap we are about to take.</p>
-<p>First, if you understand the concept of a posterior probability distribution as explained in Chapter <a href="probability.html#probability">5</a> and, second, if you follow our demonstration that the bootstrap generates a posterior distribution, then . . . . hand wave vigorously . . . you should be comfortable going on to the standard Bayesian modeling approach that we will use for the next few chapters.</p>
 </div>
+<div id="probability-to-bootstrap-to-bayesian-models" class="section level2">
+<h2>
+<span class="header-section-number">7.4</span> Probability to bootstrap to Bayesian models</h2>
+<p><label for="tufte-mn-83" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-83" class="margin-toggle"><span class="marginnote"> In this sense, the bootstrap distribution represents an (approximate) nonparametric, noninformative posterior distribution for our parameter. But this bootstrap distribution is obtained painlessly — without having to formally specify a prior and without having to sample from the posterior distribution. Hence we might think of the bootstrap distribution as a “poor man’s” Bayes posterior. By perturbing the data, the bootstrap approximates the Bayesian effect of perturbing the parameters, and is typically much simpler to carry out. — Elements of Statistical Learning, 2nd edition, by Hastie et al, page 271.</span></p>
+<p>Most textbooks would, at this stage, provide a more mathematical explanation of the transition we are making from Chapter <a href="probability.html#probability">5</a> to this chapter. In both Chapters <a href="probability.html#probability">5</a> and <a href="one-parameter.html#one-parameter">6</a> we dealt with a discrete set of possible models. We began with examples in which there were only two or three possible “true” states of the world. You were either infected or not infected. There were either zero, one or two white marbles in the bag. These examples grew more and more complex, both by increasing the number of models under consideration and by increasing the number of possible outcomes of the experiment. In the case of the urn, there were 2,401 possible models: either zero or one or two or . . . 2,400 red beans in the urn.</p>
+<p>The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values. Yet, almost miraculously, the same intuition applies.</p>
+<p>Let’s use <span class="math inline">\(\mu\)</span> as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter <span class="math inline">\(p\)</span> from Chapter <a href="one-parameter.html#one-parameter">6</a>, the proportion of red beans in the urn. The only difference is that there are an infinite number of values which <span class="math inline">\(\mu\)</span> might take. We restricted <span class="math inline">\(p\)</span> to only 2,401 possible values.</p>
+<p>Although a bootstrap can create a posterior distribution, as above, there are much simpler ways to do so. The most common involves the function <code>stan_glm()</code> from the <strong>rstanarm</strong> library. Halfway through the book, we are now ready for our first full scale data science project. Let us be guided by the cardinal virtues.</p>
 </div>
 <div id="cardinal-virtues" class="section level2">
 <h2>
-<span class="header-section-number">7.4</span> Cardinal Virtues</h2>
-<p>Data science is ultimately a moral act, so we will use the four <a href="https://en.wikipedia.org/wiki/Cardinal_virtues">Cardinal Virtues</a> — Wisdom, Justice, Courage and Temperance — to organize our approach. The purpose of this section is two fold. First, we will show you that a more formal Bayesian approach results in, more or less, the same answer as the bootstrap abobve, but with much less code. Second, we will show how the cardinal virtues guide good data science.</p>
+<span class="header-section-number">7.5</span> Cardinal Virtues</h2>
+<p>Data science is ultimately a moral act, so we will use the four <a href="https://en.wikipedia.org/wiki/Cardinal_virtues">Cardinal Virtues</a> — Wisdom, Justice, Courage and Temperance — to organize our approach. The purpose of this section is two-fold. First, we will show you that a more formal Bayesian approach results in, more or less, the same answer as the bootstrap above, but with much less code. Second, we will show how the cardinal virtues guide good data science.</p>
 <div id="wisdom" class="section level3">
 <h3>
-<span class="header-section-number">7.4.1</span> Wisdom</h3>
+<span class="header-section-number">7.5.1</span> Wisdom</h3>
 <p>
 <span class="marginnote shownote">
 <!--
@@ -1114,7 +1111,7 @@ much simpler to carry out. — Elements of Statistical Learning, 2nd edition, by
 </div>
 <div id="justice" class="section level3">
 <h3>
-<span class="header-section-number">7.4.2</span> Justice</h3>
+<span class="header-section-number">7.5.2</span> Justice</h3>
 <p>
 <span class="marginnote shownote">
 <!--
@@ -1124,15 +1121,15 @@ much simpler to carry out. — Elements of Statistical Learning, 2nd edition, by
 </p>
 <p>Mathematical knowledge is the least important skill for a data scientist.</p>
 <p>However, a little mathematical notation will make our modelling assumptions clear, will bring some clarity and precision to our approach. In this case:</p>
-<p><span class="math display">\[ y_i =  \beta + \epsilon_i \]</span>
-with <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span>. <span class="math inline">\(y_i\)</span> is the height of male <span class="math inline">\(i\)</span>. <span class="math inline">\(\beta\)</span> is the average height of all males in the population. <span class="math inline">\(\epsilon_i\)</span> is the “error term,” the difference between the height of male <span class="math inline">\(i\)</span> and the average height of all males. <span class="math inline">\(\epsilon_i\)</span> is normally distributed with a mean of 0 and a standard deviation of <span class="math inline">\(\sigma\)</span>.</p>
+<p><span class="math display">\[ y_i =  \mu + \epsilon_i \]</span>
+with <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span>. <span class="math inline">\(y_i\)</span> is the height of male <span class="math inline">\(i\)</span>. <span class="math inline">\(\mu\)</span> is the average height of all males in the population. <span class="math inline">\(\epsilon_i\)</span> is the “error term,” the difference between the height of male <span class="math inline">\(i\)</span> and the average height of all males. <span class="math inline">\(\epsilon_i\)</span> is normally distributed with a mean of 0 and a standard deviation of <span class="math inline">\(\sigma\)</span>.</p>
 <p>This is almost the simplest model we can construct. Note:</p>
 <ul>
-<li>The model has two unknown parameters: <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma\)</span>. Before we can doing anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God’s own R code. But, using a Bayesian approach similar to what we used in Chapters <a href="probability.html#probability">5</a> and <a href="one-parameter.html#one-parameter">6</a>, we will be able to create <em>posterior distributions</em> for each parameter.</li>
+<li>The model has two unknown parameters: <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God’s own R code. But, using a Bayesian approach similar to what we used in Chapters <a href="probability.html#probability">5</a> and <a href="one-parameter.html#one-parameter">6</a>, we will be able to create <em>posterior distributions</em> for each parameter.</li>
 </ul>
 <!-- DK: Box quote. --><ul>
 <li><p>The model is wrong, as are all models.</p></li>
-<li><p>The parameter we most care about is <span class="math inline">\(\beta\)</span>. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of <span class="math inline">\(\sigma\)</span> difficult to describe, we also don’t particular care about is value. Parameters like <span class="math inline">\(\sigma\)</span> in this context are <em>nuissance</em> parameters. We still have to estimate their posterior distributions, but we don’t really care what those posteriors look like.</p></li>
+<li><p>The parameter we most care about is <span class="math inline">\(\mu\)</span>. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of <span class="math inline">\(\sigma\)</span> difficult to describe, we also don’t particular care about its value. Parameters like <span class="math inline">\(\sigma\)</span> in this context are <em>nuisance</em> parameters. We still have to estimate their posterior distributions, but we don’t really care what those posteriors look like.</p></li>
 </ul>
 <p>Consider this alternative framework:</p>
 <p><span class="math display">\[outcome = model + what is not in the model\]</span>
@@ -1141,7 +1138,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 </div>
 <div id="courage" class="section level3">
 <h3>
-<span class="header-section-number">7.4.3</span> Courage</h3>
+<span class="header-section-number">7.5.3</span> Courage</h3>
 <p>
 <span class="marginnote shownote">
 <!--
@@ -1149,17 +1146,17 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <img src="other/images/Courage.jpg" alt=" " width="1024"><!--
 <p class="caption marginnote">--><!--</p>--><!--</div>--></span>
 </p>
-<p>In data science, we deal with math, words, and code. The most important of these is code. We need Courage to create the model, the take the leap of faith that we can make our ideas real.</p>
+<p>In data science, we deal with math, words, and code, but the most important of these is code. We need Courage to create the model, to take the leap of faith that we can make our ideas real.</p>
 <div id="stan_glm" class="section level4">
 <h4>
-<span class="header-section-number">7.4.3.1</span> stan_glm</h4>
-<p>Bayesian models are not hard to create in R. Sticking to the same filtered male 2009 data, we can reduce all the work we did for the bootstrap approach to the <code>stan_glm()</code> function which, when fed the right inputs, creates a Bayesian generalized linear model to estimate the mean height of all American males in 2009. This function comes from the <strong>rstanarm</strong> package, which is very useful for Bayesian models in general.</p>
-<p>The first argument in the <code>stan_glm()</code> function is data, which in our case is the filtered out <code>ch7_male</code> tibble we used in the bootstrap. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we are only trying to find mean height and have no predictor variables, our equation will be <code>height ~ 1</code>. Details:</p>
+<span class="header-section-number">7.5.3.1</span> stan_glm</h4>
+<p>Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the <code>stan_glm()</code> function which, when fed the correct inputs, creates a Bayesian generalized linear model to estimate the mean height of all American males in 2009. This function comes from the <strong>rstanarm</strong> package, which is very useful for Bayesian models in general.</p>
+<p>The first argument in the <code>stan_glm()</code> function is <code>data</code>, which in our case is the filtered <code>ch7_male</code> tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we are only trying to find mean height and have no predictor variables, our equation will be <code>height ~ 1</code>. Details:</p>
 <div class="sourceCode" id="cb873"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb873-1"><a href="two-parameters.html#cb873-1"></a>fit_obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch7_male, height <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <ul>
-<li><p>This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reasons why Bayesian approaches were — and to some extent still are — little used. When creating your own models, you will often want to use the <code>cache = TRUE</code> code chunk option. This saves the result of the model in between knittings of your Rmd.</p></li>
-<li><p>If you don’t set <code>refresh = 0</code>, the model will output many lines of confusing output. You can learn more about that output by reading the help page for <code>stan_glm()</code>. The output provides details on the fitting process as it runs and diagnostics about final result. All of those details are beyond the scope of this book.</p></li>
-<li><p>You should always assign the result of the call to <code>stan_glm()</code> as we do above. By convention, the name of that object will often included the word “fit” to indicate that it is a “fitted” model object.</p></li>
+<li><p>This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were — and, to some extent, still are — little used. When creating your own models, you will often want to use the <code>cache = TRUE</code> code chunk option. This saves the result of the model in between knittings of your Rmd.</p></li>
+<li><p>If you don’t set <code>refresh = 0</code>, the model will output many lines of confusing output. You can learn more about that output by reading the help page for <code>stan_glm()</code>. The output provides details on the fitting process as it runs and diagnostics about the final result. All of those details are beyond the scope of this book.</p></li>
+<li><p>You should always assign the result of the call to <code>stan_glm()</code> to an object, as we do above. By convention, the name of that object will often included the word “fit” to indicate that it is a “fitted” model object.</p></li>
 </ul>
 <p>There are several ways to examine the fitted model. The simplest is to print it:</p>
 <div class="sourceCode" id="cb874"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb874-1"><a href="two-parameters.html#cb874-1"></a>fit_obj</span></code></pre></div>
@@ -1180,43 +1177,18 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>The first line is telling us what model we used, in our case a <code>stan_glm()</code> model.</p>
-<p>The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section <a href="wrangling.html#normal">2.9.3</a>. The normal is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent than data far from it. For that reason, we typically leave it as the default unless we are working with a left hand variable that is extremely not normal, like something which only takes two values like 0/1 or TRUE/FALSE. Since we previously saw that height was (very roughly) normally distributed, we are good to go with the Gaussian distribution.</p>
-<p>The third line gives us back the formula we provided. We are creating a model predicting height with a constant — which is the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the “~” symbol), is the “response” or “dependent” variable, the thing which we are trying to explain. Since this is a model about <code>height</code>, <code>height</code> goes on the lefthand side. Second, we have the “explanatory” or “independent” independent variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant. (The number <code>1</code> indicates that constant. It does not mean that we think that everyone is height <code>1</code>.)</p>
-<p>The fourth and fifth lines of the output tell us that we have 1,814 observations and that we only have one predictor (the constant).</p>
+<p>The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section <a href="wrangling.html#normal">2.9.3</a>. The normal is a probability distribution that is symmetric about the mean and unimodal. For that reason, we typically leave it as the default unless we are working with a lefthand variable that is extremely non-normal, e.g., something which only takes two values like 0/1 or TRUE/FALSE. Since we previously saw that height was (very roughly) normally distributed, the Gaussian distribution is a good choice.</p>
+<p>The third line gives us back the formula we provided. We are creating a model predicting height with a constant — which is the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the “~” symbol), is the “response” or “dependent” variable, the thing which we are trying to explain. Since this is a model about <code>height</code>, <code>height</code> goes on the lefthand side. Second, we have the “explanatory” or “independent” variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant. (The number <code>1</code> indicates that constant. It does not mean that we think that everyone is height <code>1</code>.)</p>
+<p>The fourth and fifth lines of the output tell us that we have 1,814 observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that <span class="math inline">\(\mu\)</span> is “constant?” It means that, although <span class="math inline">\(\mu\)</span>’s value is unknown, it is <em>fixed</em>. It does not change from person to person. The <code>1</code> in the formula corresponds to the parameter <span class="math inline">\(\mu\)</span> in our mathematical definition of the model.</p>
 <p>We knew all this information before we fit the model. R records it in the <code>fit_obj</code> because we don’t want to forget what we did. The second half of the display gives a summary of the parameter values.</p>
-<p>Under that, we see the output for the two parameters of the model: intercept and sigma. A very important thing to remember is that while the function is spitting out two parameters, the actual model we built is a posterior distribution of possible means. The parameters serve as a good way to describe the distribution.</p>
-<p>For each parameter, there is a calculated point estimate (medians computed through the simulation) and uncertainty estimates (standard deviations) of these point estimates. This is the case because we cannot be sure what the actual point estimate of the parameter is, but running many simulations through the model can give us an idea of how certain our calculated point estimate is. For a lot of Bayesian inferencing, our uncertainty estimate for each parameter will be calculated using MAD SD, the median absolute deviation.</p>
-</div>
-<div id="diving-into-mad_sd" class="section level4">
-<h4>
-<span class="header-section-number">7.4.3.2</span> Diving into MAD_SD</h4>
-<p>As previously mentioned, MAD SD is a measure of uncertainty, similar to standard error which has been previously mentioned in the book. In fact MAD SD is a more robust measure than standard error becaue standard error is calculated by squaring ditances from data points to the model, which means outliers will more strongly skew data.</p>
-<p>MAD SD is computed by scaling the median absolute deviation from the posterior medians, but what does this even mean? Let’s dive deeper with an example</p>
-<p>Here below, we have a vector of 9 numbers, which could represent anything, like the ages of children at a park.</p>
-<div class="sourceCode" id="cb876"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb876-1"><a href="two-parameters.html#cb876-1"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">8</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">2</span>, <span class="dv">1</span>,<span class="dv">5</span>)</span></code></pre></div>
-<p>The first step of calculating MAD SD is to calculate MAD, which can be seen with this equation.</p>
-<p><span class="math display">\[ MAD = median(|Yi – median(Yi|) \]</span></p>
-<p>The first step to doing this is first finding the median of the vector (which in this case is 3) and subtracting it from each value. This gives you a vector where each number is the distance from the original the the median of all the differences. Importantly, all of these distances should be the same sign, since we care about distance more than direction, thus we take the absolute value of them.</p>
-<div class="sourceCode" id="cb877"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb877-1"><a href="two-parameters.html#cb877-1"></a>medianx &lt;-<span class="st"> </span><span class="kw">median</span>(x)</span>
-<span id="cb877-2"><a href="two-parameters.html#cb877-2"></a>diffx &lt;-<span class="st"> </span><span class="kw">abs</span>(x <span class="op">-</span><span class="st"> </span>medianx)</span></code></pre></div>
-<p>At this point, we have a list of numbers which represent that difference between the original numbers and the median</p>
-<div class="sourceCode" id="cb878"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb878-1"><a href="two-parameters.html#cb878-1"></a>diffx</span></code></pre></div>
-<pre><code>## [1] 0 1 2 5 1 2 1 2 2</code></pre>
-<p>The last step in calculating MAD is to take the median of those differenes, which in this case gives us 2</p>
-<div class="sourceCode" id="cb880"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb880-1"><a href="two-parameters.html#cb880-1"></a>mediandiffx &lt;-<span class="st"> </span><span class="kw">median</span>(diffx)</span></code></pre></div>
-<p>Lastly, because it is very useful in data analysis to be able to compare things to standard deviations, we usually rescale the median absolute deviation by multiplying it by 1.483, which reproduces the standard error if the data is normally distributed and can be calculated with the <code>mad()</code> equation</p>
-<div class="sourceCode" id="cb881"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb881-1"><a href="two-parameters.html#cb881-1"></a>mediandiffx <span class="op">*</span><span class="st"> </span><span class="fl">1.483</span></span></code></pre></div>
-<pre><code>## [1] 3</code></pre>
-<div class="sourceCode" id="cb883"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb883-1"><a href="two-parameters.html#cb883-1"></a><span class="kw">mad</span>(x) </span></code></pre></div>
-<pre><code>## [1] 3</code></pre>
-<p>Thus, the full equation of MAD SD is</p>
-<p><span class="math display">\[ MADsd = 1.483 * median(|Yi – median(Yi|) \]</span></p>
-<p>Before moving on to the next section of this chapter, take a second to make sure you understand what MAD SD and how it is calculated - it will play a very big role in demonstrating the uncertainty of most of our future parameters in the book</p>
-</div>
-<div id="unpacking-the-first-parameter-the-intercept" class="section level4">
-<h4>
-<span class="header-section-number">7.4.3.3</span> Unpacking the first parameter: the intercept</h4>
-<div class="sourceCode" id="cb885"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb885-1"><a href="two-parameters.html#cb885-1"></a>fit_obj</span></code></pre></div>
+<p>We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is <span class="math inline">\(\mu\)</span>, the average height. If we had the ideal Preceptor Table — with a row for every adult American male in 2009 and no missing data — <span class="math inline">\(\mu\)</span> would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter <span class="math inline">\(\mu\)</span>. All that R sees is the <code>1</code> in the formula. In most fields of statistics, this constant term is called the “intercept.” So, now we have three things — <span class="math inline">\(\mu\)</span>, <code>1</code> and “intercept” — all of which refer to the exact same concept. This will not the last time that terminology will be confusing.</p>
+<p>At this point, <code>stan_glm()</code> — or rather the <code>print()</code> method for rstan objects — has a problem. We have full posteriors for both <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>. But this is a simple printed summary. We can’t show you the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the median of the posterior and the “MAD_SD.”</p>
+<ul>
+<li><p>Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its <em>location</em>. Where is the data? The two most common choices for this measure are the mean and median. We use median here because posterior distributions can often be quite skewed, making the mean a less stable measure.</p></li>
+<li><p>The second most important number for summarizing a distribution concerns its <em>spread</em>. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.</p></li>
+</ul>
+<p>Recall the fitted object:</p>
+<div class="sourceCode" id="cb876"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb876-1"><a href="two-parameters.html#cb876-1"></a>fit_obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      height ~ 1
@@ -1233,45 +1205,71 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
-<!-- DK: Always MAD_SD -->
-<p>Now that we understand MAD SD, we can understand the rest of the output of our mean height model. Since we are trying to find a constant to predict mean height, the intercept of the model can be interpreted as the model’s best estimate of the mean height in the dataset. Recall that the <code>stan_glm()</code> function took many different resamples and found the mean of each one. The most accurate estimate of what the true mean actually is the Baysesian point estimate, the median of these means which in this case happends to be 167.5.</p>
-<p>In this case, the MAD_SD for the intercept is .4, meaning that the standard deviation of the posterior distribution of mean heights is .4. As a rule of thumb, the smaller the MAD_SD, the less variation there is among mean heights in the samples generated, and thus the more robust our estimate is.</p>
-<p>A great way to see this is to visualize the posterior distribution of intercepts that the model spit out.</p>
-<!-- DK: make this plot look exactly like the posterior probability plots ion chapter 5. Same title and look and so on. Remind students that this is why we spent so much time on this for chapter 5. -->
-<div class="sourceCode" id="cb887"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb887-1"><a href="two-parameters.html#cb887-1"></a><span class="kw">plot</span>(fit_obj, <span class="st">"hist"</span>, <span class="dt">pars =</span> <span class="st">"(Intercept)"</span>)</span></code></pre></div>
-<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-687-1.png" width="672"></p>
-<p>Slightly rearranging this function, you can also see You can see how 167.5 is the median of this distribution, and moreover how 68% of heights fall within one MAD_SD from the median (it is a general rule that 68% of the distribution should fall within one MAD_SD of the median, 95% should fall within two, and 99.7% should fall within 3).</p>
-<div class="sourceCode" id="cb889"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb889-1"><a href="two-parameters.html#cb889-1"></a><span class="kw">plot</span>(fit_obj, <span class="dt">pars =</span> <span class="st">"(Intercept)"</span>, <span class="dt">plotfun=</span><span class="st">"areas"</span>, <span class="dt">prob =</span> <span class="fl">.68</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-688-1.png" width="672"></p>
-<div class="sourceCode" id="cb890"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb890-1"><a href="two-parameters.html#cb890-1"></a><span class="co">#abline(v = 167.5)</span></span></code></pre></div>
+<!-- DK: Are we sure that coef() and sigma() give us the median values? -->
+<p>Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The Median of the intercept, 175.98, is the median of our posterior distribution for <span class="math inline">\(\mu\)</span>, the average height of all American men in 2009. The Median of sigma, 7.29, is the median of our posterior distribution for the true <span class="math inline">\(\sigma\)</span>, which can be roughly understood as the remaining variability in the data, once we account for our estimate of <span class="math inline">\(\mu\)</span>.</p>
+<p>The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within plus/minus 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of <span class="math inline">\(\mu\)</span> is somewhere between 175.6 and 176.4.</p>
 </div>
-<div id="unpacking-the-second-parameter-sigma" class="section level4">
+<div id="plotting-the-posterior-distributions" class="section level4">
 <h4>
-<span class="header-section-number">7.4.3.4</span> Unpacking the second parameter: sigma</h4>
-<p>The second parameter, sigma, will be outputted for all bayesian models you compute (no matter how many predictors) and shows us the average error of the model. Another way of conceptualizing this parameter is as the deviation between the predicted value and the observed value. Similar to with the intercept, the model ultimately cannot say a definitive answer to what the parameter is, so there is some uncertainty to even the error parameter itself. More specifically, the MAD_SD of the sigma reflects the standard deviation of the sigma value itself (since so many different samples were taken with each its own sigma). In this instance, since the MAD_SD of sigma is .3, we know that 68% of the times the sigma value of the model fell within 21.5 and 22.1, so we can be pretty confident about this parameter.</p>
-<div class="sourceCode" id="cb891"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb891-1"><a href="two-parameters.html#cb891-1"></a><span class="kw">plot</span>(fit_obj, <span class="st">"hist"</span>, <span class="dt">pars =</span> <span class="st">"sigma"</span>)</span></code></pre></div>
-<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-689-1.png" width="672"></p>
-<p>We can also see how the median and MAD_SD values are connected to the sigma posterior distribution with this output. As you can see, the median value falls around 21.8 and 68% of the area od the posterior distrubtion falls within 21.5 and 22.1</p>
-<div class="sourceCode" id="cb893"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb893-1"><a href="two-parameters.html#cb893-1"></a><span class="kw">plot</span>(fit_obj, <span class="dt">pars =</span> <span class="st">"sigma"</span>, <span class="dt">plotfun =</span> <span class="st">"areas"</span>, <span class="dt">prob =</span> <span class="fl">.68</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-690-1.png" width="672"></p>
-</div>
-<div id="visualizing-the-results-of-the-linear-model" class="section level4">
-<h4>
-<span class="header-section-number">7.4.3.5</span> Visualizing the results of the linear model</h4>
+<span class="header-section-number">7.5.3.2</span> Plotting the posterior distributions</h4>
+<p>Instead of doing this math in our heads, we should display both posterior distributions. Pictures speak where math mumbles. Fortunately, getting values for those posteriors is easy:</p>
+<div class="sourceCode" id="cb878"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb878-1"><a href="two-parameters.html#cb878-1"></a>fit_obj <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb878-2"><a href="two-parameters.html#cb878-2"></a><span class="st">  </span><span class="kw">as_tibble</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 4,000 x 2
+##    `(Intercept)` sigma
+##            &lt;dbl&gt; &lt;dbl&gt;
+##  1          176.  7.46
+##  2          176.  7.15
+##  3          176.  7.44
+##  4          176.  7.53
+##  5          176.  7.50
+##  6          176.  7.08
+##  7          176.  7.14
+##  8          176.  7.22
+##  9          176.  7.30
+## 10          176.  7.34
+## # … with 3,990 more rows</code></pre>
+<p>These 4,000 rows are “draws” from the estimated posteriors, each in its own column. These are like the vectors which result from calling functions like <code>rnorm()</code> or <code>rbinom()</code>. We can create the plot in a similar way:</p>
+<div class="sourceCode" id="cb880"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb880-1"><a href="two-parameters.html#cb880-1"></a>fit_obj <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb880-2"><a href="two-parameters.html#cb880-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb880-3"><a href="two-parameters.html#cb880-3"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">mu =</span> <span class="st">`</span><span class="dt">(Intercept)</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb880-4"><a href="two-parameters.html#cb880-4"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> mu)) <span class="op">+</span></span>
+<span id="cb880-5"><a href="two-parameters.html#cb880-5"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> ..count..<span class="op">/</span><span class="kw">sum</span>(..count..)), <span class="dt">binwidth =</span> <span class="fl">0.01</span>, </span>
+<span id="cb880-6"><a href="two-parameters.html#cb880-6"></a>                   <span class="dt">color =</span> <span class="st">"white"</span>) <span class="op">+</span></span>
+<span id="cb880-7"><a href="two-parameters.html#cb880-7"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>,</span>
+<span id="cb880-8"><a href="two-parameters.html#cb880-8"></a>         <span class="dt">subtitle =</span> <span class="st">"Average height among American adult men in 2009"</span>,</span>
+<span id="cb880-9"><a href="two-parameters.html#cb880-9"></a>         <span class="dt">x =</span> <span class="st">"Height in Centimeters"</span>,</span>
+<span id="cb880-10"><a href="two-parameters.html#cb880-10"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
+<span id="cb880-11"><a href="two-parameters.html#cb880-11"></a><span class="st">    </span><span class="kw">theme_classic</span>()</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-683-1.png" width="672"></p>
+<div class="sourceCode" id="cb881"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb881-1"><a href="two-parameters.html#cb881-1"></a>fit_obj <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb881-2"><a href="two-parameters.html#cb881-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb881-3"><a href="two-parameters.html#cb881-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> sigma)) <span class="op">+</span></span>
+<span id="cb881-4"><a href="two-parameters.html#cb881-4"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> ..count..<span class="op">/</span><span class="kw">sum</span>(..count..)), <span class="dt">binwidth =</span> <span class="fl">0.01</span>, </span>
+<span id="cb881-5"><a href="two-parameters.html#cb881-5"></a>                   <span class="dt">color =</span> <span class="st">"white"</span>) <span class="op">+</span></span>
+<span id="cb881-6"><a href="two-parameters.html#cb881-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>,</span>
+<span id="cb881-7"><a href="two-parameters.html#cb881-7"></a>         <span class="dt">subtitle =</span> <span class="st">"Height standard deviation among American adult men in 2009"</span>,</span>
+<span id="cb881-8"><a href="two-parameters.html#cb881-8"></a>         <span class="dt">x =</span> <span class="st">"Sigma in Centimeters"</span>,</span>
+<span id="cb881-9"><a href="two-parameters.html#cb881-9"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
+<span id="cb881-10"><a href="two-parameters.html#cb881-10"></a><span class="st">    </span><span class="kw">theme_classic</span>()</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-684-1.png" width="672"></p>
+<!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
+<!-- DK: Explain what these things are. Maybe also show tbl_regression. -->
+<!-- #### Visualizing the results of the linear model -->
 <!-- as_tibble(fit_obj) -->
-<p>The results of the bayesian linera model can also be seen with the posterior linpred function, which give a fitted model with a matrix of the estimates probabilites.</p>
-<div class="sourceCode" id="cb894"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb894-1"><a href="two-parameters.html#cb894-1"></a>mod.obj_linpred &lt;-<span class="st"> </span><span class="kw">posterior_linpred</span>(fit_obj, <span class="dt">transform =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
-<pre><code>## Instead of posterior_linpred(..., transform=TRUE) please call posterior_epred(), which provides equivalent functionality.</code></pre>
-<p>From this matrix, you can use the ggplot function to create a histogram showing the distribution of mean heights across all of the samples. Looking at the histogram, it seems like the mean point estimate is between 167 and 168, which makes a lot of sense considering our median point estimate is 167.5</p>
-<div class="sourceCode" id="cb896"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb896-1"><a href="two-parameters.html#cb896-1"></a>mod.obj_linpred[,<span class="dv">3</span>] <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb896-2"><a href="two-parameters.html#cb896-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb896-3"><a href="two-parameters.html#cb896-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(value)) <span class="op">+</span></span>
-<span id="cb896-4"><a href="two-parameters.html#cb896-4"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> <span class="fl">0.002</span>, <span class="dt">color =</span> <span class="st">"blue"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-692-1.png" width="672"></p>
-<div class="sourceCode" id="cb897"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb897-1"><a href="two-parameters.html#cb897-1"></a><span class="co">## add median of model, try to add mad_sd to show the 68&amp; and 95% rules</span></span>
-<span id="cb897-2"><a href="two-parameters.html#cb897-2"></a><span class="co">#explain graph</span></span></code></pre></div>
+<!-- The results of the bayesian linera model can also be seen with the posterior linpred function, which give a fitted model with a matrix of the estimates probabilites. -->
+<!-- ```{r} -->
+<!-- mod.obj_linpred <- posterior_linpred(fit_obj, transform = TRUE) -->
+<!-- ``` -->
+<!-- From this matrix, you can use the ggplot function to create a histogram showing the distribution of mean heights across all of the samples. Looking at the histogram, it seems like the mean point estimate is between 167 and 168, which makes a lot of sense considering our median point estimate is 167.5 -->
+<!-- ```{r} -->
+<!-- mod.obj_linpred[,3] %>%  -->
+<!--   as_tibble() %>%  -->
+<!--   ggplot(aes(value)) + -->
+<!--     geom_histogram(binwidth = 0.002, color = "blue") -->
+<!-- ## add median of model, try to add mad_sd to show the 68& and 95% rules -->
+<!-- #explain graph -->
+<!-- ``` -->
 <!-- ## Creating a table for the linear model -->
 <!-- While the output of the `stan_glm()` function is helpful and the histograms we have created do a good job of showin gus the posterior distributions of the model, it is many times helpful to visualize our results with a table.  -->
 <!-- ```{r} -->
@@ -1280,10 +1278,9 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <!-- ``` -->
 </div>
 </div>
-</div>
-<div id="temperance" class="section level2">
-<h2>
-<span class="header-section-number">7.5</span> Temperance</h2>
+<div id="temperance" class="section level3">
+<h3>
+<span class="header-section-number">7.5.4</span> Temperance</h3>
 <p>
 <span class="marginnote shownote">
 <!--
@@ -1291,22 +1288,10 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <img src="other/images/Temperance.jpg" alt=" " width="960"><!--
 <p class="caption marginnote">--><!--</p>--><!--</div>--></span>
 </p>
-<p>Temperance is probably the most important virtue in data science. We won’t have the models that look as good as they appear. We are living in a constantly changing and complex world. There will be unknown unknowns, which factors in the representation of our data, realism in our assumptions, and the call for testing.</p>
-<p>In data science, we are focused on that missing data, the data from the future. But the world is always changing, and so it’s hard to capture that missing data. Our predictions are going to have some sort of uncertainty.</p>
-<p>In the case of male heights, what would be the average male height if the data was collected a week later? What if there was a pandemic? What if the world lost a great amount of Vitamin D? As you can see, there are events that are considered unknown unknowns. It’s so hard to account for the future, and so our models are likely going to be wrong.</p>
-<p>Another reason why we deal with Temperance in data science is that there is realism. Does the structure of our bootstrap match the world? While we hope we won’t be wrong, it never matches frankly and we will see that our conclusions are wrong.</p>
-<p>Last but not least, getting the wrong conclusions suck. But at least we are not dealing with null hypotheses. Playing the prediction game could be fun, but if we reject the null hypothesis if p is less than .05, what if we get .06 as our p-value? Will that honestly make a difference? Probably not!</p>
-<div id="predicting" class="section level4">
+<div id="predictions" class="section level4">
 <h4>
-<span class="header-section-number">7.5.0.1</span> Predicting</h4>
-<p>Now that we understand our model, we can start actually doing stuff with it, including making a lot of predictions. A very useful tool in the rstanarm package to help us with this is posterior predict, which can make predictions on new data using our model.</p>
-<p>Let’s first try to find</p>
-<div class="sourceCode" id="cb898"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb898-1"><a href="two-parameters.html#cb898-1"></a>mod.obj_predict &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">transform =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb898-2"><a href="two-parameters.html#cb898-2"></a>mod.obj_predict[,<span class="dv">3</span>] <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb898-3"><a href="two-parameters.html#cb898-3"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb898-4"><a href="two-parameters.html#cb898-4"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(value)) <span class="op">+</span></span>
-<span id="cb898-5"><a href="two-parameters.html#cb898-5"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> <span class="fl">0.002</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-694-1.png" width="672"></p>
+<span class="header-section-number">7.5.4.1</span> Predictions</h4>
+</div>
 </div>
 </div>
 <div id="conclusion" class="section level2">
@@ -1321,7 +1306,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <a href="three-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-02
+2020-10-03
 </p>
 </div>
 </div>
