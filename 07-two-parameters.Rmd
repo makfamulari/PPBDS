@@ -436,6 +436,8 @@ virtual_resamples
 
 Plot the results:
 
+<!-- DK: Either explain ..count.. or use stat_density trick. -->
+
 ```{r}
 virtual_resamples %>% 
   ggplot() +
@@ -465,20 +467,14 @@ Most textbooks would, at this stage, provide a more mathematical explanation of 
 
 The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values. Yet, almost miraculously, the same intuition applies. 
 
-Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which  $\mu$ might take. We restricted 
+Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which $\mu$ might take. We restricted $p$ to only 2,401 possible values.
 
-
-Did we mention that this book is still a bit of a mess? Well, it is! And, in the entire book, this section is the messiest mess of them all. Forgive us.
-
-The mess centers on the transition we are now making between the bootstrap and the full scale Bayesian approach. The margin note provides a bit of a justification. For now, that is all we have. So, watch us wave our hands and pretend that we have justified the leap we are about to take. 
-
-First, if you understand the concept of a posterior probability distribution as explained in Chapter \@ref(probability) and, second, if you follow our demonstration that the bootstrap generates a posterior distribution, then . . . . hand wave vigorously . . . you should be comfortable going on to the standard Bayesian modeling approach that we will use for the next few chapters.
-
+Although a bootstrap can create a posterior distribution, as above, there are much simpler ways to do so. The most common involves the function `stan_glm()` from the **rstanarm** library. Halfway through the book, we are now ready for our first full scale data science project. Let us be guided by the cardinal virtues.
 
 
 ## Cardinal Virtues
 
-Data science is ultimately a moral act, so we will use the four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) --- Wisdom, Justice, Courage and Temperance --- to organize our approach. The purpose of this section is two fold. First, we will show you that a more formal Bayesian approach results in, more or less, the same answer as the bootstrap abobve, but with much less code. Second, we will show how the cardinal virtues guide good data science.  
+Data science is ultimately a moral act, so we will use the four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) --- Wisdom, Justice, Courage and Temperance --- to organize our approach. The purpose of this section is two-fold. First, we will show you that a more formal Bayesian approach results in, more or less, the same answer as the bootstrap above, but with much less code. Second, we will show how the cardinal virtues guide good data science.  
 
 ### Wisdom
 
@@ -510,18 +506,18 @@ Mathematical knowledge is the least important skill for a data scientist.
 
 However, a little mathematical notation will make our modelling assumptions clear, will bring some clarity and precision to our approach. In this case:
 
-$$ y_i =  \beta + \epsilon_i $$
-with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the height of male $i$. $\beta$ is the average height of all males in the population. $\epsilon_i$ is the "error term," the difference between the height of male $i$ and the average height of all males.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
+$$ y_i =  \mu + \epsilon_i $$
+with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the height of male $i$. $\mu$ is the average height of all males in the population. $\epsilon_i$ is the "error term," the difference between the height of male $i$ and the average height of all males.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
 
 This is almost the simplest model we can construct. Note: 
 
-* The model has two unknown parameters: $\beta$ and $\sigma$. Before we can doing anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create *posterior distributions* for each parameter.
+* The model has two unknown parameters: $\mu$ and $\sigma$. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create *posterior distributions* for each parameter.
 
 <!-- DK: Box quote. -->
 
 * The model is wrong, as are all models. 
 
-* The parameter we most care about is $\beta$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about is value. Parameters like $\sigma$ in this context are *nuissance* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
+* The parameter we most care about is $\mu$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about its value. Parameters like $\sigma$ in this context are *nuisance* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
 
 Consider this alternative framework:
 
@@ -531,35 +527,31 @@ In this case, the *outcome* is the height of an individual male. This, also call
 What is the difference between the *outcome* and the *model*? By definition, it is *what is not in the model*, all the blooming and buzzing complexity of the real world. The model will always be wrong in that it won't capture everything. Whatever the model misses is thrown into the error term. 
 
 
-
-
-
 ### Courage
 
 ```{r echo=FALSE, fig.margin=TRUE}
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
-In data science, we deal with math, words, and code. The most important of these is code. We need Courage to create the model, the take the leap of faith that we can make our ideas real. 
-
+In data science, we deal with math, words, and code, but the most important of these is code. We need Courage to create the model, to take the leap of faith that we can make our ideas real. 
 
 #### stan_glm
 
-Bayesian models are not hard to create in R. Sticking to the same filtered male 2009 data, we can reduce all the work we did for the bootstrap approach to the `stan_glm()` function which, when fed the right inputs, creates a Bayesian generalized linear model to estimate the mean height of all American males in 2009. This function comes from the **rstanarm** package, which is very useful for Bayesian models in general.
+Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the `stan_glm()` function which, when fed the correct inputs, creates a Bayesian generalized linear model to estimate the mean height of all American males in 2009. This function comes from the **rstanarm** package, which is very useful for Bayesian models in general.
 
 
-The first argument in the `stan_glm()` function is data, which in our case is the filtered out `ch7_male` tibble we used in the bootstrap. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we are only trying to find mean height and have no predictor variables, our equation will be `height ~ 1`. Details:
+The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7_male` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we are only trying to find mean height and have no predictor variables, our equation will be `height ~ 1`. Details:
 
 
 ```{r, cache = TRUE}
 fit_obj <- stan_glm(data = ch7_male, height ~ 1, refresh = 0)
 ```
 
-* This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reasons why Bayesian approaches were --- and to some extent still are --- little used. When creating your own models, you will often want to use the `cache = TRUE` code chunk option. This saves the result of the model in between knittings of your Rmd. 
+* This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were --- and, to some extent, still are --- little used. When creating your own models, you will often want to use the `cache = TRUE` code chunk option. This saves the result of the model in between knittings of your Rmd. 
 
-* If you don't set `refresh = 0`, the model will output many lines of confusing output. You can learn more about that output by reading the help page for `stan_glm()`. The output provides details on the fitting process as it runs and diagnostics about final result. All of those details are beyond the scope of this book.
+* If you don't set `refresh = 0`, the model will output many lines of confusing output. You can learn more about that output by reading the help page for `stan_glm()`. The output provides details on the fitting process as it runs and diagnostics about the final result. All of those details are beyond the scope of this book.
 
-* You should always assign the result of the call to `stan_glm()` as we do above. By convention, the name of that object will often included the word "fit" to indicate that it is a "fitted" model object.
+* You should always assign the result of the call to `stan_glm()` to an object, as we do above. By convention, the name of that object will often included the word "fit" to indicate that it is a "fitted" model object.
 
 There are several ways to examine the fitted model. The simplest is to print it:
 
@@ -570,67 +562,27 @@ fit_obj
 
 The first line is telling us what model we used, in our case a `stan_glm()` model. 
 
-The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section \@ref(normal). The normal is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent than data far from it. For that reason, we typically leave it as the default unless we are working with a left hand variable that is extremely not normal, like something which only takes two values like 0/1 or TRUE/FALSE. Since we previously saw that height was (very roughly) normally distributed, we are good to go with the Gaussian distribution.
+The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section \@ref(normal). The normal is a probability distribution that is symmetric about the mean and unimodal. For that reason, we typically leave it as the default unless we are working with a lefthand variable that is extremely non-normal, e.g., something which only takes two values like 0/1 or TRUE/FALSE. Since we previously saw that height was (very roughly) normally distributed, the Gaussian distribution is a good choice.
 
 
-The third line gives us back the formula we provided. We are creating a model predicting height with a constant --- which is the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the "~" symbol), is the "response" or "dependent" variable, the thing which we are trying to explain. Since this is a model about `height`, `height` goes on the lefthand side. Second, we have the "explanatory" or "independent" independent variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant.  (The number `1` indicates that constant. It does not mean that we think that everyone is height `1`.) 
+The third line gives us back the formula we provided. We are creating a model predicting height with a constant --- which is the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the "~" symbol), is the "response" or "dependent" variable, the thing which we are trying to explain. Since this is a model about `height`, `height` goes on the lefthand side. Second, we have the "explanatory" or "independent"  variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant.  (The number `1` indicates that constant. It does not mean that we think that everyone is height `1`.) 
 
-The fourth and fifth lines of the output tell us that we have 1,814 observations and that we only have one predictor (the constant).
+
+The fourth and fifth lines of the output tell us that we have 1,814 observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that $\mu$ is "constant?" It means that, although $\mu$'s value is unknown, it is *fixed*. It does not change from person to person. The `1` in the formula corresponds to the parameter $\mu$ in our mathematical definition of the model. 
 
 We knew all this information before we fit the model. R records it in the `fit_obj` because we don't want to forget what we did. The second half of the display gives a summary of the parameter values.
 
-Under that, we see the output for the two parameters of the model: intercept and sigma. A very important thing to remember is that while the function is spitting out two parameters, the actual model we built is a posterior distribution of possible means. The parameters serve as a good way to describe the distribution.
+We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is $\mu$, the average height. If we had the ideal Preceptor Table --- with a row for every adult American male in 2009 and no missing data --- $\mu$ would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter $\mu$. All that R sees is the `1` in the formula. In most fields of statistics, this constant term is called the "intercept." So, now we have three things --- $\mu$, `1` and "intercept" --- all of which refer to the exact same concept. This will not the last time that terminology will be confusing.
 
-For each parameter, there is a calculated point estimate (medians computed through the simulation) and uncertainty estimates (standard deviations) of these point estimates. This is the case because we cannot be sure what the actual point estimate of the parameter is, but running many simulations through the model can give us an idea of how certain our calculated point estimate is. For a lot of Bayesian inferencing, our uncertainty estimate for each parameter will be calculated using MAD SD, the median absolute deviation.
+At this point, `stan_glm()` --- or rather the `print()` method for rstan objects --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show you the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the median of the posterior and the "MAD_SD." 
 
-#### Diving into MAD_SD
+* Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its *location*. Where is the data? The two most common choices for this measure are the mean and median. We use median here because posterior distributions can often be quite skewed, making the mean a less stable measure.
 
-As previously mentioned, MAD SD is a measure of uncertainty, similar to standard error which has been previously mentioned in the book. In fact MAD SD is a more robust measure than standard error becaue standard error is calculated by squaring ditances from data points to the model, which means outliers will more strongly skew data.
+* The second most important number for summarizing a distribution concerns its *spread*. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.
 
-MAD SD is computed by scaling the median absolute deviation from the posterior medians, but what does this even mean? Let's dive deeper with an example
 
-Here below, we have a vector of 9 numbers, which could represent anything, like the ages of children at a park.
+<!-- DK: I think the next two sections are awkward. Let's rewrite them. -->
 
-```{r}
-x <- c(3, 4, 1, 8, 2, 5, 2, 1,5)
-```
-
-The first step of calculating MAD SD is to calculate MAD, which can be seen with this equation.
-
-$$ MAD = median(|Yi – median(Yi|) $$
-
-The first step to doing this is first finding the median of the vector (which in this case is 3) and subtracting it from each value. This gives you a vector where each number is the distance from the original the the median of all the differences. Importantly, all of these distances should be the same sign, since we care about distance more than direction, thus we take the absolute value of them.
-
-```{r}
-medianx <- median(x)
-diffx <- abs(x - medianx)
-```
-
-At this point, we have a list of numbers which represent that difference between the original numbers and the median
-
-```{r}
-diffx
-```
-
-The last step in calculating MAD is to take the median of those differenes, which in this case gives us 2
-
-```{r}
-mediandiffx <- median(diffx)
-```
-
-Lastly, because it is very useful in data analysis to be able to compare things to standard deviations, we usually rescale the median absolute deviation by multiplying it by 1.483, which reproduces the standard error if the data is normally distributed and can be calculated with the `mad()` equation
-
-```{r}
-mediandiffx * 1.483
-mad(x) 
-
-```
-
-Thus, the full equation of MAD SD is
-
-$$ MADsd = 1.483 * median(|Yi – median(Yi|) $$
-
-Before moving on to the next section of this chapter, take a second to make sure you understand what MAD SD and how it is calculated - it will play a very big role in demonstrating the uncertainty of most of our future parameters in the book
 
 
 #### Unpacking the first parameter: the intercept
