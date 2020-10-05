@@ -281,7 +281,7 @@ Voila! We were able to create a thousand bootstrap samples and calculate the mea
 virtual_resamples %>% 
   ggplot() +
     geom_histogram(aes(x = year_mean, 
-                       y = ..count../sum(..count..)), 
+                       y = after_stat(count/sum(count))), 
                        binwidth = .5) +
     labs(x = "Mean Year", 
          y = "Probability",
@@ -437,13 +437,12 @@ virtual_resamples
 
 Plot the results:
 
-<!-- DK: Either explain ..count.. or use stat_density trick. -->
 
 ```{r}
 virtual_resamples %>% 
   ggplot() +
     geom_histogram(aes(x = height_mean, 
-                       y = ..count../sum(..count..)), 
+                       y = after_stat(count/sum(count))), 
                        binwidth = 0.02) +
     labs(x = "Mean Height", 
          y = "Probability",
@@ -621,7 +620,7 @@ fit_obj %>%
   as_tibble() %>% 
   rename(mu = `(Intercept)`) %>% 
   ggplot(aes(x = mu)) +
-    geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 0.01, 
+    geom_histogram(aes(y = after_stat(count/sum(count))), binwidth = 0.01, 
                    color = "white") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Average height among American adult men in 2009",
@@ -636,7 +635,7 @@ Although it is possible to have variables names like (Intercept), it is not reco
 fit_obj %>% 
   as_tibble() %>% 
   ggplot(aes(x = sigma)) +
-    geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 0.01, 
+    geom_histogram(aes(y = after_stat(count/sum(count))), binwidth = 0.01, 
                    color = "white") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Height standard deviation among American adult men in 2009",
