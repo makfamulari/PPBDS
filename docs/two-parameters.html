@@ -49,6 +49,8 @@ if(f.classList.contains('fa-plus-square')) {
 <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
 <link href="libs/str_view-0.1.0/str_view.css" rel="stylesheet" />
 <script src="libs/str_view-binding-1.4.0/str_view.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -198,9 +200,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb843-3"><a href="two-parameters.html#cb843-3"></a><span class="kw">library</span>(tidyverse)</span>
 <span id="cb843-4"><a href="two-parameters.html#cb843-4"></a><span class="kw">library</span>(skimr)</span>
 <span id="cb843-5"><a href="two-parameters.html#cb843-5"></a><span class="kw">library</span>(rstanarm)</span>
-<span id="cb843-6"><a href="two-parameters.html#cb843-6"></a><span class="kw">library</span>(gtsummary)</span>
-<span id="cb843-7"><a href="two-parameters.html#cb843-7"></a><span class="kw">library</span>(tidybayes)</span></code></pre></div>
-<p><strong>PPBDS.data</strong> includes the data sets for this book. <strong>rsample</strong> includes functions for bootstrapping. <strong>rstanarm</strong>, <strong>gtsummary</strong> and <strong>tidybayes</strong> make it easy to create and display Bayesian models.</p>
+<span id="cb843-6"><a href="two-parameters.html#cb843-6"></a><span class="kw">library</span>(broom.mixed)</span>
+<span id="cb843-7"><a href="two-parameters.html#cb843-7"></a><span class="kw">library</span>(modelsummary)</span>
+<span id="cb843-8"><a href="two-parameters.html#cb843-8"></a><span class="kw">library</span>(tidybayes)</span></code></pre></div>
+<p><strong>PPBDS.data</strong> includes the data sets for this book. <strong>rsample</strong> includes functions for bootstrapping. <strong>rstanarm</strong>, <strong>broom.mixed</strong>, <strong>modelsummary</strong> and <strong>tidybayes</strong> make it easy to create and display Bayesian models.</p>
 </div>
 <div id="what-was-the-average-year-of-us-pennies-in-2019" class="section level3">
 <h3>
@@ -1154,10 +1157,13 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <p>The first argument in the <code>stan_glm()</code> function is <code>data</code>, which in our case is the filtered <code>ch7_male</code> tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we are only trying to find mean height and have no predictor variables, our equation will be <code>height ~ 1</code>. Details:</p>
 <div class="sourceCode" id="cb873"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb873-1"><a href="two-parameters.html#cb873-1"></a>fit_obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch7_male, height <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <ul>
-<li><p>This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were — and, to some extent, still are — little used. When creating your own models, you will often want to use the <code>cache = TRUE</code> code chunk option. This saves the result of the model in between knittings of your Rmd.</p></li>
-<li><p>If you don’t set <code>refresh = 0</code>, the model will output many lines of confusing output. You can learn more about that output by reading the help page for <code>stan_glm()</code>. The output provides details on the fitting process as it runs and diagnostics about the final result. All of those details are beyond the scope of this book.</p></li>
-<li><p>You should always assign the result of the call to <code>stan_glm()</code> to an object, as we do above. By convention, the name of that object will often included the word “fit” to indicate that it is a “fitted” model object.</p></li>
+<li><p>This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were — and, to some extent, still are — little used. When creating your own models, you will often want to use the <code>cache = TRUE</code> code chunk option. This saves the result of the model so that you don’t recalculate it every time you knit.</p></li>
+<li><p>If you don’t set <code>refresh = 0</code>, the model will output many lines of confusing output. You can learn more about that output by reading the help page for <code>stan_glm()</code>. The output provides details on the fitting process as it runs as well as diagnostics about the final result. All of those details are beyond the scope of this book.</p></li>
+<li><p>You should always assign the result of the call of <code>stan_glm()</code> to an object, as we do above. By convention, the name of that object will often included the word “fit” to indicate that it is a <em>fitted</em> model object.</p></li>
 </ul>
+<div id="printed-model" class="section level5">
+<h5>
+<span class="header-section-number">7.5.3.1.1</span> Printed model</h5>
 <p>There are several ways to examine the fitted model. The simplest is to print it:</p>
 <div class="sourceCode" id="cb874"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb874-1"><a href="two-parameters.html#cb874-1"></a>fit_obj</span></code></pre></div>
 <pre><code>## stan_glm
@@ -1176,15 +1182,15 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
-<p>The first line is telling us what model we used, in our case a <code>stan_glm()</code> model.</p>
+<p>The first line is telling us what model we used, in our case a <code>stan_glm()</code>.</p>
 <p>The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section <a href="wrangling.html#normal">2.9.3</a>. The normal is a probability distribution that is symmetric about the mean and unimodal. For that reason, we typically leave it as the default unless we are working with a lefthand variable that is extremely non-normal, e.g., something which only takes two values like 0/1 or TRUE/FALSE. Since we previously saw that height was (very roughly) normally distributed, the Gaussian distribution is a good choice.</p>
-<p>The third line gives us back the formula we provided. We are creating a model predicting height with a constant — which is the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the “~” symbol), is the “response” or “dependent” variable, the thing which we are trying to explain. Since this is a model about <code>height</code>, <code>height</code> goes on the lefthand side. Second, we have the “explanatory” or “independent” variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant. (The number <code>1</code> indicates that constant. It does not mean that we think that everyone is height <code>1</code>.)</p>
-<p>The fourth and fifth lines of the output tell us that we have 1,814 observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that <span class="math inline">\(\mu\)</span> is “constant?” It means that, although <span class="math inline">\(\mu\)</span>’s value is unknown, it is <em>fixed</em>. It does not change from person to person. The <code>1</code> in the formula corresponds to the parameter <span class="math inline">\(\mu\)</span> in our mathematical definition of the model.</p>
+<p>The third line gives us back the formula we provided. We are creating a model predicting height with a constant — which is just about the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the “~” symbol), is the “response” or “dependent” variable, the thing which we are trying to explain. Since this is a model about <code>height</code>, <code>height</code> goes on the lefthand side. Second, we have the “explanatory” or “independent” variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant. (The number <code>1</code> indicates that constant. It does not mean that we think that everyone is height <code>1</code>.)</p>
+<p>The fourth and fifth lines of the output tell us that we have 1814 observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that <span class="math inline">\(\mu\)</span> is “constant?” It means that, although <span class="math inline">\(\mu\)</span>’s value is unknown, it is <em>fixed</em>. It does not change from person to person. The <code>1</code> in the formula corresponds to the parameter <span class="math inline">\(\mu\)</span> in our mathematical definition of the model.</p>
 <p>We knew all this information before we fit the model. R records it in the <code>fit_obj</code> because we don’t want to forget what we did. The second half of the display gives a summary of the parameter values.</p>
-<p>We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is <span class="math inline">\(\mu\)</span>, the average height. If we had the ideal Preceptor Table — with a row for every adult American male in 2009 and no missing data — <span class="math inline">\(\mu\)</span> would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter <span class="math inline">\(\mu\)</span>. All that R sees is the <code>1</code> in the formula. In most fields of statistics, this constant term is called the “intercept.” So, now we have three things — <span class="math inline">\(\mu\)</span>, <code>1</code> and “intercept” — all of which refer to the exact same concept. This will not the last time that terminology will be confusing.</p>
+<p>We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is <span class="math inline">\(\mu\)</span>, the average height. If we had the ideal Preceptor Table — with a row for every adult American male in 2009 and no missing data — <span class="math inline">\(\mu\)</span> would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter <span class="math inline">\(\mu\)</span>. All that R sees is the <code>1</code> in the formula. In most fields of statistics, this constant term is called the “intercept.” So, now we have three things — <span class="math inline">\(\mu\)</span>, <code>1</code> and “intercept” — all of which refer to the exact same concept. This will not be the last time that terminology will be confusing.</p>
 <p>At this point, <code>stan_glm()</code> — or rather the <code>print()</code> method for rstan objects — has a problem. We have full posteriors for both <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>. But this is a simple printed summary. We can’t show you the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the median of the posterior and the “MAD_SD.”</p>
 <ul>
-<li><p>Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its <em>location</em>. Where is the data? The two most common choices for this measure are the mean and median. We use median here because posterior distributions can often be quite skewed, making the mean a less stable measure.</p></li>
+<li><p>Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its <em>location</em>. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less stable measure.</p></li>
 <li><p>The second most important number for summarizing a distribution concerns its <em>spread</em>. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.</p></li>
 </ul>
 <p>Recall the fitted object:</p>
@@ -1206,13 +1212,13 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <!-- DK: Are we sure that coef() and sigma() give us the median values? -->
-<p>Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The Median of the intercept, 175.98, is the median of our posterior distribution for <span class="math inline">\(\mu\)</span>, the average height of all American men in 2009. The Median of sigma, 7.29, is the median of our posterior distribution for the true <span class="math inline">\(\sigma\)</span>, which can be roughly understood as the remaining variability in the data, once we account for our estimate of <span class="math inline">\(\mu\)</span>.</p>
-<p>The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within plus/minus 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of <span class="math inline">\(\mu\)</span> is somewhere between 175.6 and 176.4.</p>
+<p>Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, 175.98, is the median of our posterior distribution for <span class="math inline">\(\mu\)</span>, the average height of all American men in 2009. The median of sigma, 7.29, is the median of our posterior distribution for the true <span class="math inline">\(\sigma\)</span>, which can be roughly understood as the variability in the height of American men in 2009, once we account for our estimate of <span class="math inline">\(\mu\)</span>.</p>
+<p>The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of <span class="math inline">\(\mu\)</span> is somewhere between 175.6 and 176.4.</p>
 </div>
-<div id="plotting-the-posterior-distributions" class="section level4">
-<h4>
-<span class="header-section-number">7.5.3.2</span> Plotting the posterior distributions</h4>
-<p>Instead of doing this math in our heads, we should display both posterior distributions. Pictures speak where math mumbles. Fortunately, getting values for those posteriors is easy:</p>
+<div id="plotting-the-posterior-distributions" class="section level5">
+<h5>
+<span class="header-section-number">7.5.3.1.2</span> Plotting the posterior distributions</h5>
+<p>Instead of doing this math in our heads, we can display both posterior distributions. <em>Pictures speak where math mumbles.</em> Fortunately, getting values for those posteriors is easy:</p>
 <div class="sourceCode" id="cb878"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb878-1"><a href="two-parameters.html#cb878-1"></a>fit_obj <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb878-2"><a href="two-parameters.html#cb878-2"></a><span class="st">  </span><span class="kw">as_tibble</span>()</span></code></pre></div>
 <pre><code>## # A tibble: 4,000 x 2
@@ -1242,6 +1248,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <span id="cb880-10"><a href="two-parameters.html#cb880-10"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
 <span id="cb880-11"><a href="two-parameters.html#cb880-11"></a><span class="st">    </span><span class="kw">theme_classic</span>()</span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-683-1.png" width="672"></p>
+<p>Although it is possible to have variables names like (Intercept), it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Better, rename them, as we do above.</p>
 <div class="sourceCode" id="cb881"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb881-1"><a href="two-parameters.html#cb881-1"></a>fit_obj <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb881-2"><a href="two-parameters.html#cb881-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb881-3"><a href="two-parameters.html#cb881-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> sigma)) <span class="op">+</span></span>
@@ -1253,29 +1260,71 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <span id="cb881-9"><a href="two-parameters.html#cb881-9"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
 <span id="cb881-10"><a href="two-parameters.html#cb881-10"></a><span class="st">    </span><span class="kw">theme_classic</span>()</span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-684-1.png" width="672"></p>
+<p>Again, <span class="math inline">\(\sigma\)</span> is usually a nuisance parameter. We don’t really care what its value us, so we rarely plot it.</p>
+<!-- DK: Discuss the meaning in more detail. -->
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
-<!-- DK: Explain what these things are. Maybe also show tbl_regression. -->
-<!-- #### Visualizing the results of the linear model -->
-<!-- as_tibble(fit_obj) -->
-<!-- The results of the bayesian linera model can also be seen with the posterior linpred function, which give a fitted model with a matrix of the estimates probabilites. -->
-<!-- ```{r} -->
-<!-- mod.obj_linpred <- posterior_linpred(fit_obj, transform = TRUE) -->
-<!-- ``` -->
-<!-- From this matrix, you can use the ggplot function to create a histogram showing the distribution of mean heights across all of the samples. Looking at the histogram, it seems like the mean point estimate is between 167 and 168, which makes a lot of sense considering our median point estimate is 167.5 -->
-<!-- ```{r} -->
-<!-- mod.obj_linpred[,3] %>%  -->
-<!--   as_tibble() %>%  -->
-<!--   ggplot(aes(value)) + -->
-<!--     geom_histogram(binwidth = 0.002, color = "blue") -->
-<!-- ## add median of model, try to add mad_sd to show the 68& and 95% rules -->
-<!-- #explain graph -->
-<!-- ``` -->
-<!-- ## Creating a table for the linear model -->
-<!-- While the output of the `stan_glm()` function is helpful and the histograms we have created do a good job of showin gus the posterior distributions of the model, it is many times helpful to visualize our results with a table.  -->
-<!-- ```{r} -->
-<!-- #mod.obj.df <- as.data.frame((mod.obj)) -->
-<!-- #tbl_regression(mod.obj.df) -->
-<!-- ``` -->
+</div>
+<div id="model-in-a-table" class="section level5">
+<h5>
+<span class="header-section-number">7.5.3.1.3</span> Model in a table</h5>
+<!-- DK: Could not get this to work. It seems like these gt objects are already text, so there is no easy way to, for example, change the formatting but adding decimals.  Maybe we should use model_summary, which seems to work nicely. -->
+<!-- DK: Maybe I don't need to show posterior_linpred at all? One less thing to worry about. -->
+<p>A third way to display the model is to use <code>modelsummary()</code> from the <strong>modelsummary</strong> package. (Note that this will often require the <strong>broom.mixed</strong> package as well.)</p>
+<div class="sourceCode" id="cb882"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb882-1"><a href="two-parameters.html#cb882-1"></a><span class="kw">library</span>(broom.mixed)</span>
+<span id="cb882-2"><a href="two-parameters.html#cb882-2"></a><span class="kw">library</span>(modelsummary)</span></code></pre></div>
+<div class="sourceCode" id="cb883"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb883-1"><a href="two-parameters.html#cb883-1"></a><span class="kw">library</span>(modelsummary)</span>
+<span id="cb883-2"><a href="two-parameters.html#cb883-2"></a><span class="kw">modelsummary</span>(fit_obj, </span>
+<span id="cb883-3"><a href="two-parameters.html#cb883-3"></a>             <span class="dt">statistic =</span> <span class="st">'conf.int'</span>, </span>
+<span id="cb883-4"><a href="two-parameters.html#cb883-4"></a>             <span class="dt">statistic_vertical =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb883-5"><a href="two-parameters.html#cb883-5"></a>             <span class="dt">title =</span> <span class="st">"Average Height of American Men in 2009"</span>)</span></code></pre></div>
+<p><!--
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-686">TABLE 7.2: </span>Average Height of American Men in 2009</span><!--</caption>--></p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Model 1
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:left;">
+175.976 [175.637, 176.310]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Num.Obs.
+</td>
+<td style="text-align:left;">
+1814
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+algorithm
+</td>
+<td style="text-align:left;">
+sampling
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pss
+</td>
+<td style="text-align:left;">
+4000.000
+</td>
+</tr>
+</tbody>
+</table>
+<p>Keep in mind, again, that we are just looking at the same model in a different way. The <code>fit_obj</code> has not changed. Instead, we are just exploring a third way to consider it. Much of this information is the same that we have seen before. At the same time, other information is omitted. For example, and by default, <code>modelsummary()</code> does not even bother to show any numbers associated with <span class="math inline">\(\sigma\)</span>. It doubts that you, or your readers, will care.</p>
+<!-- DK: More details. And don't forget to compare this confidence interval to the bootstrapped one. -->
+</div>
 </div>
 </div>
 <div id="temperance" class="section level3">
@@ -1288,15 +1337,78 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <img src="other/images/Temperance.jpg" alt=" " width="960"><!--
 <p class="caption marginnote">--><!--</p>--><!--</div>--></span>
 </p>
-<div id="predictions" class="section level4">
-<h4>
-<span class="header-section-number">7.5.4.1</span> Predictions</h4>
-</div>
+<!-- DK: Should introduce matrices in chapter 2. -->
+<p>Recall that a “matrix” in R is a rectangular array of data, shaped like a data frame or tibble, but containing only one type of data, i.e., numeric. Large matrices also print out ugly. (There are other differences, none of which we care about here.) Example:</p>
+<div class="sourceCode" id="cb884"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb884-1"><a href="two-parameters.html#cb884-1"></a>m &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">12</span>, <span class="dv">13</span>), <span class="dt">ncol =</span> <span class="dv">2</span>)</span>
+<span id="cb884-2"><a href="two-parameters.html#cb884-2"></a>m</span></code></pre></div>
+<pre><code>##      [,1] [,2]
+## [1,]    3    9
+## [2,]    4   12
+## [3,]    8   13</code></pre>
+<p>The easiest way to pull information from a matrix is to use <code>[]</code>, the subset operator. Here is how we grab the second column of <code>m</code>:</p>
+<div class="sourceCode" id="cb886"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb886-1"><a href="two-parameters.html#cb886-1"></a>m[, <span class="dv">2</span>]</span></code></pre></div>
+<pre><code>## [1]  9 12 13</code></pre>
+<p>Note how matrices with just one dimension “collapse” into single vectors. Tibbles, on the other hand, always maintain their rectangular shapes, even with only one column or row. Matrices are important because <code>posterior_predict()</code> and other functions from <strong>rstanarm</strong> return matrices.</p>
+<p>We have a model. What can we do with it? Let’s start off with a simple problem. <em>What are the chances that the next man we meet is taller than 180 centimeters.</em> We have a model of American male height from 2009, <code>fit_obj</code>, which we can use for this purpose.</p>
+<div class="sourceCode" id="cb888"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb888-1"><a href="two-parameters.html#cb888-1"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj)</span></code></pre></div>
+<p>That is a simple enough command, but the resulting object <code>pp</code>, a matrix, is not easy to work with. Note how big it is!</p>
+<div class="sourceCode" id="cb889"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb889-1"><a href="two-parameters.html#cb889-1"></a><span class="kw">dim</span>(pp)</span></code></pre></div>
+<pre><code>## [1] 4000 1814</code></pre>
+<p>There are 4000 rows because, by default, <code>stan_glm()</code> gives us 4000 draws from the posterior distributions, both the distribution of the parameters (which we looked at above under Courage) and of the predicted values. There
+are 1814 because the matrix provides a (potentially) different posterior prediction for each of the input data rows. (In this case, they are all the same because the model does not use any covariates. In more complex models, the columns in the <code>pp</code> matrix will be very different.) Consider:</p>
+<div class="sourceCode" id="cb891"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb891-1"><a href="two-parameters.html#cb891-1"></a><span class="kw">tibble</span>(<span class="dt">pred =</span> pp[, <span class="dv">1</span>]) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb891-2"><a href="two-parameters.html#cb891-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gt_180 =</span> <span class="kw">ifelse</span>(pred <span class="op">&gt;</span><span class="st"> </span><span class="dv">180</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 4,000 x 2
+##     pred gt_180
+##    &lt;dbl&gt; &lt;lgl&gt; 
+##  1  170. FALSE 
+##  2  186. TRUE  
+##  3  172. FALSE 
+##  4  173. FALSE 
+##  5  173. FALSE 
+##  6  190. TRUE  
+##  7  183. TRUE  
+##  8  174. FALSE 
+##  9  173. FALSE 
+## 10  170. FALSE 
+## # … with 3,990 more rows</code></pre>
+<p>We don’t have to put the posterior predictions in a tibble, but doing so makes everything easier. What are the odds that the next adult male will be taller than 180 centimeters?</p>
+<div class="sourceCode" id="cb893"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb893-1"><a href="two-parameters.html#cb893-1"></a><span class="kw">tibble</span>(<span class="dt">pred =</span> pp[, <span class="dv">1</span>]) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb893-2"><a href="two-parameters.html#cb893-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gt_180 =</span> <span class="kw">ifelse</span>(pred <span class="op">&gt;</span><span class="st"> </span><span class="dv">180</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb893-3"><a href="two-parameters.html#cb893-3"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">answer =</span> <span class="kw">sum</span>(gt_<span class="dv">180</span>) <span class="op">/</span><span class="st"> </span><span class="kw">n</span>())</span></code></pre></div>
+<pre><code>## # A tibble: 1 x 1
+##   answer
+##    &lt;dbl&gt;
+## 1  0.282</code></pre>
+<p>Somewhere around 28% to 30% or so.</p>
+<p>Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. Consider something more complex: What are the chances that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest? With simulation, we just need to answer this step by step.</p>
+<div class="sourceCode" id="cb895"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb895-1"><a href="two-parameters.html#cb895-1"></a><span class="kw">tibble</span>(<span class="dt">pred_1 =</span> pp[, <span class="dv">1</span>],</span>
+<span id="cb895-2"><a href="two-parameters.html#cb895-2"></a>       <span class="dt">pred_2 =</span> pp[, <span class="dv">2</span>],</span>
+<span id="cb895-3"><a href="two-parameters.html#cb895-3"></a>       <span class="dt">pred_3 =</span> pp[, <span class="dv">3</span>],</span>
+<span id="cb895-4"><a href="two-parameters.html#cb895-4"></a>       <span class="dt">pred_4 =</span> pp[, <span class="dv">4</span>]) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb895-5"><a href="two-parameters.html#cb895-5"></a><span class="st">  </span><span class="kw">rowwise</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb895-6"><a href="two-parameters.html#cb895-6"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">tallest =</span> <span class="kw">max</span>(<span class="kw">c_across</span>(pred_<span class="dv">1</span><span class="op">:</span>pred_<span class="dv">4</span>))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb895-7"><a href="two-parameters.html#cb895-7"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">shortest =</span> <span class="kw">min</span>(<span class="kw">c_across</span>(pred_<span class="dv">1</span><span class="op">:</span>pred_<span class="dv">4</span>))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb895-8"><a href="two-parameters.html#cb895-8"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">diff =</span> tallest <span class="op">-</span><span class="st"> </span>shortest) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb895-9"><a href="two-parameters.html#cb895-9"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gt_10 =</span> <span class="kw">ifelse</span>(diff <span class="op">&gt;=</span><span class="st"> </span><span class="dv">10</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb895-10"><a href="two-parameters.html#cb895-10"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb895-11"><a href="two-parameters.html#cb895-11"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">answer =</span> <span class="kw">sum</span>(gt_<span class="dv">10</span>) <span class="op">/</span><span class="st"> </span><span class="kw">n</span>())</span></code></pre></div>
+<pre><code>## # A tibble: 1 x 1
+##   answer
+##    &lt;dbl&gt;
+## 1  0.766</code></pre>
+<p>There is about a 75% chance that, when meeting 4 random men, the tallest with be at least 10 cm taller than the shortest.</p>
+<!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
 </div>
 </div>
 <div id="conclusion" class="section level2">
 <h2>
 <span class="header-section-number">7.6</span> Conclusion</h2>
+<p>The next five chapters will follow the same process we have just completed here. We start with a decision we have to make. With luck, we will have some data to guide us. (Without data, even the best data scientist will struggle to make progress.) Wisdom asks us: “Is the data we have close enough to the decision we face to make using that data likely to be helpful?” Often times, the answer is “No.” Even if we do have data, and the ability to make a model, Wisdom will tap us on the shoulder and say, “Even if you can make a model, don’t forget to ask yourself if you should.” Ethics matter.</p>
+<p>Once we start to build the model, Justice will guide us. Is the model descriptive or causal? What is the mathematical relationship between the dependent variable we are trying to explain and the independent variables we can use to explain it? What assumptions are we making about distributions, especially with regard to the error term?</p>
+<p>Having set up the model framework, we need Courage to implement the model in code. Without code, all the math in the world is useless. Once we have created the model, we need to understand it. What are the posterior distributions of the unknown parameters? Do they seem sensible? How should we interpret them?</p>
+<p>Temperance guides the final step. With a model, we can finally get back to the decision which motivated the exercise in the first place. We can use the model to make statements about the world, both to confirm that the model is consistent with the world and to use the model to make predictions about numbers which we do not know.</p>
+<p>Let’s practice this process another dozen or so times.</p>
 
 </div>
 </div></body></html>
@@ -1306,7 +1418,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <a href="three-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-03
+2020-10-04
 </p>
 </div>
 </div>
