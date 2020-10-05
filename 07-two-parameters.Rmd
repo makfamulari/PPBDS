@@ -108,11 +108,11 @@ library(tidyverse)
 library(skimr)
 library(rstanarm)
 library(broom.mixed)
-library(gtsummary)
+library(modelsummary)
 library(tidybayes)
 ```
 
-**PPBDS.data** includes the data sets for this book. **rsample** includes functions for bootstrapping. **rstanarm**, **broom.mixed**, **gtsummary** and **tidybayes** make it easy to create and display Bayesian models.
+**PPBDS.data** includes the data sets for this book. **rsample** includes functions for bootstrapping. **rstanarm**, **broom.mixed**, **modelsummary** and **tidybayes** make it easy to create and display Bayesian models.
 
 ### What was the average year of US pennies in 2019?
 
@@ -640,68 +640,36 @@ fit_obj %>%
 
 Again, $\sigma$ is usually a nuisance parameter. We don't really care what its value us, so we rarely plot it.
 
-<!-- DK: Discuss the meaning? -->
+<!-- DK: Discuss the meaning in more detail. -->
 
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
 
-<!-- ##### Model in a table -->
+##### Model in a table
 
-<!-- DK: Could not get this to work. It seems like these gt objects are already text, so there is no easy way to, for example, change the formatting but adding decimals.  -->
-
-<!-- A third way to display the model is to use `tbl_regresssion()` from the **gtsummary** package. (Note that this will often require the **broom.mixed** package as well.) -->
-
-<!-- ```{r, eval=FALSE} -->
-<!-- library(broom.mixed) -->
-<!-- library(gtsummary) -->
-<!-- ``` -->
-
-<!-- Example: -->
-
-<!-- ```{r} -->
-<!-- tbl_regression(fit_obj,  -->
-<!--                intercept = TRUE, -->
-<!--                estimate_fun = ~(decimals = 4)) %>% -->
-<!--   as_gt() -->
-
-
-<!--   tab_header("Average Height of American Men in 2009")  -->
-
-
-<!-- ``` -->
-
-<!-- See [here](https://cran.r-project.org/web/packages/gtsummary/vignettes/tbl_regression.html) for more details on `tbl_regression()`. -->
+<!-- DK: Could not get this to work. It seems like these gt objects are already text, so there is no easy way to, for example, change the formatting but adding decimals.  Maybe we should use model_summary, which seems to work nicely. -->
 
 <!-- DK: Maybe I don't need to show posterior_linpred at all? One less thing to worry about. -->
 
+A third way to display the model is to use `modelsummary()` from the **modelsummary** package. (Note that this will often require the **broom.mixed** package as well.)
+
+```{r, eval=FALSE}
+library(broom.mixed)
+library(modelsummary)
+```
+
+```{r}
+library(modelsummary)
+modelsummary(fit_obj, 
+             statistic = 'conf.int', 
+             statistic_vertical = FALSE,
+             title = "Average Height of American Men in 2009")
+```
 
 
-<!-- ```{r} -->
-<!-- mod.obj_linpred <- posterior_linpred(fit_obj, transform = TRUE) -->
-<!-- ``` -->
+Keep in mind, again, that we are just looking at the same model in a different way. The `fit_obj` has not changed. Instead, we are just exploring a third way to consider it. Much of this information is the same that we have seen before. At the same time, other information is omitted. For example, and by default, `modelsummary()` does not even bother to show any numbers associated with $\sigma$. It doubts that you, or your readers, will care.
 
 
-
-<!-- ```{r} -->
-<!-- mod.obj_linpred[,3] %>%  -->
-<!--   as_tibble() %>%  -->
-<!--   ggplot(aes(value)) + -->
-<!--     geom_histogram(binwidth = 0.002, color = "blue") -->
-
-<!-- ## add median of model, try to add mad_sd to show the 68& and 95% rules -->
-<!-- #explain graph -->
-<!-- ``` -->
-
-<!-- ## Creating a table for the linear model -->
-
-<!-- While the output of the `stan_glm()` function is helpful and the histograms we have created do a good job of showin gus the posterior distributions of the model, it is many times helpful to visualize our results with a table.  -->
-
-
-
-<!-- ```{r} -->
-<!-- #mod.obj.df <- as.data.frame((mod.obj)) -->
-<!-- #tbl_regression(mod.obj.df) -->
-<!-- ``` -->
-
+<!-- DK: More details. And don't forget to compare this confidence interval to the bootstrapped one. -->
 
 
 
@@ -711,14 +679,84 @@ Again, $\sigma$ is usually a nuisance parameter. We don't really care what its v
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
+<!-- DK: Should introduce matrices in chapter 2. -->
+
+Recall that a "matrix" in R is a rectangular array of data, shaped like a data frame or tibble, but containing only one type of data, i.e., numeric. Large matrices also print out ugly. (There are other differences, none of which we care about here.) Example:
+
+```{r}
+m <- matrix(c(3, 4, 8, 9, 12, 13), ncol = 2)
+m
+```
+
+The easiest way to pull information from a matrix is to use `[]`, the subset operator. Here is how we grab the second column of `m`:
+
+```{r}
+m[, 2]
+```
+
+Note how matrices with just one dimension "collapse" into single vectors. Tibbles, on the other hand, always maintain their rectangular shapes, even with only one column or row. Matrices are important because `posterior_predict()` and other functions from **rstanarm** return matrices.
+
+We have a model. What can we do with it? Let's start off with a simple problem. *What are the chances that the next man we meet is taller than 180 centimeters.* We have a model of American male height from 2009, `fit_obj`, which we can use for this purpose.
 
 
-####  Predictions 
+```{r}
+pp <- posterior_predict(fit_obj)
+```
 
+That is a simple enough command, but the resulting object `pp`, a matrix, is not easy to work with. Note how big it is!
 
+```{r}
+dim(pp)
+```
+
+There are `r nrow(pp)` rows because, by default, `stan_glm()` gives us `r nrow(pp)` draws from the posterior distributions, both the distribution of the parameters (which we looked at above under Courage) and of the predicted values. There 
+are `r ncol(pp)` because the matrix provides a (potentially) different posterior prediction for each of the input data rows. (In this case, they are all the same because the model does not use any covariates. In more complex models, the columns in the `pp` matrix will be very different.) Consider:
+
+```{r}
+tibble(pred = pp[, 1]) %>% 
+  mutate(gt_180 = ifelse(pred > 180, TRUE, FALSE))
+```
+
+We don't have to put the posterior predictions in a tibble, but doing so makes everything easier. What are the odds that the next adult male will be taller than 180 centimeters?
+
+```{r}
+tibble(pred = pp[, 1]) %>% 
+  mutate(gt_180 = ifelse(pred > 180, TRUE, FALSE)) %>% 
+  summarize(answer = sum(gt_180) / n())
+```
+
+Somewhere around 28% to 30% or so. 
+
+Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. Consider something more complex: What are the chances that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest? With simulation, we just need to answer this step by step.
+
+```{r}
+tibble(pred_1 = pp[, 1],
+       pred_2 = pp[, 2],
+       pred_3 = pp[, 3],
+       pred_4 = pp[, 4]) %>% 
+  rowwise() %>% 
+  mutate(tallest = max(c_across(pred_1:pred_4))) %>% 
+  mutate(shortest = min(c_across(pred_1:pred_4))) %>% 
+  mutate(diff = tallest - shortest) %>% 
+  mutate(gt_10 = ifelse(diff >= 10, TRUE, FALSE)) %>% 
+  ungroup() %>% 
+  summarize(answer = sum(gt_10) / n())
+```
+
+There is about a 75% chance that, when meeting 4 random men, the tallest with be at least 10 cm taller than the shortest.
+
+<!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
 
 ## Conclusion
 
+The next five chapters will follow the same process we have just completed here. We start with a decision we have to make. With luck, we will have some data to guide us. (Without data, even the best data scientist will struggle to make progress.) Wisdom asks us: "Is the data we have close enough to the decision we face to make using that data likely to be helpful?" Often times, the answer is "No." Even if we do have data, and the ability to make a model, Wisdom will tap us on the shoulder and say, "Even if you can make a model, don't forget to ask yourself if you should." Ethics matter.
 
+Once we start to build the model, Justice will guide us. Is the model descriptive or causal? What is the mathematical relationship between the dependent variable we are trying to explain and the independent variables we can use to explain it? What assumptions are we making about distributions, especially with regard to the error term?
+
+Having set up the model framework, we need Courage to implement the model in code. Without code, all the math in the world is useless. Once we have created the model, we need to understand it. What are the posterior distributions of the unknown parameters? Do they seem sensible? How should we interpret them?
+
+Temperance guides the final step. With a model, we can finally get back to the decision which motivated the exercise in the first place. We can use the model to make statements about the world, both to confirm that the model is consistent with the world and to use the model to make predictions about numbers which we do not know. 
+
+Let's practice this process another dozen or so times.
 
 
