@@ -810,7 +810,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <div class="sourceCode" id="cb857"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb857-1"><a href="two-parameters.html#cb857-1"></a>virtual_resamples <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb857-2"><a href="two-parameters.html#cb857-2"></a><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></span>
 <span id="cb857-3"><a href="two-parameters.html#cb857-3"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year_mean, </span>
-<span id="cb857-4"><a href="two-parameters.html#cb857-4"></a>                       <span class="dt">y =</span> ..count..<span class="op">/</span><span class="kw">sum</span>(..count..)), </span>
+<span id="cb857-4"><a href="two-parameters.html#cb857-4"></a>                       <span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))), </span>
 <span id="cb857-5"><a href="two-parameters.html#cb857-5"></a>                       <span class="dt">binwidth =</span> <span class="fl">.5</span>) <span class="op">+</span></span>
 <span id="cb857-6"><a href="two-parameters.html#cb857-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Mean Year"</span>, </span>
 <span id="cb857-7"><a href="two-parameters.html#cb857-7"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
@@ -1065,11 +1065,10 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## 10 &lt;split [1.8K/657]&gt; Bootstrap0010 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
 ## # … with 990 more rows</code></pre>
 <p>Plot the results:</p>
-<!-- DK: Either explain ..count.. or use stat_density trick. -->
 <div class="sourceCode" id="cb872"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb872-1"><a href="two-parameters.html#cb872-1"></a>virtual_resamples <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb872-2"><a href="two-parameters.html#cb872-2"></a><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></span>
 <span id="cb872-3"><a href="two-parameters.html#cb872-3"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> height_mean, </span>
-<span id="cb872-4"><a href="two-parameters.html#cb872-4"></a>                       <span class="dt">y =</span> ..count..<span class="op">/</span><span class="kw">sum</span>(..count..)), </span>
+<span id="cb872-4"><a href="two-parameters.html#cb872-4"></a>                       <span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))), </span>
 <span id="cb872-5"><a href="two-parameters.html#cb872-5"></a>                       <span class="dt">binwidth =</span> <span class="fl">0.02</span>) <span class="op">+</span></span>
 <span id="cb872-6"><a href="two-parameters.html#cb872-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Mean Height"</span>, </span>
 <span id="cb872-7"><a href="two-parameters.html#cb872-7"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
@@ -1106,11 +1105,17 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <p class="caption marginnote">--><!--</p>--><!--</div>--></span>
 </p>
 <p>What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numerical value. Given that decision, we should make a model of the world to help us.</p>
-<p>In any textbook, it will be tough to avoid the “toy problem” trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires a great deal of context. We do not have the time to get into that level of detail. So, we simplify. We are just going to estimate the average height of American males in 2009.</p>
-<p>But before starting that process, consider why or why not this might be useful knowledge. It is almost certainly not directly useful, except in the context of getting through this chapter. No one cares what the average height of American males was in 2009.</p>
-<p>Yet there are <em>related</em> things one might plausibly care about. What is the average height of American males today? What is the average height of Boston males today? What do you predict will be the height of the next 5 men you meet? What are the odds of walking past someone this week, assuming you walk past 1,000 men, who is at least 7 feet tall? Again, these are still toy problems, or at least toyish. However, the come a little closer to being useful.</p>
-<p>Do we have the data we need to answer those problems, the ones we care about? Maybe. That is where Wisdom comes in. In the social sciences, <em>there is never a direct relationship between the data you have and the question you are trying to answer.</em> Data for American males in 2009 is not the same thing as data for American males today, much less data for American males in Boston, much less data for males you are likely to walk by. Yet this data is relevant. Right? it is certainly better than nothing. That is, using not-perfect data is better than using no data at all.</p>
-<p>Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Toyko, I doubt that our data is at all relevant for that problem. Wisom is all about realizing that instead of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. Better to just use your common sense and experience.</p>
+<p>In any textbook, it will be tough to avoid the “toy problem” trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires a great deal of context. We do not have the time to get into that level of detail. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer three questions:</p>
+<ul>
+<li><p>What is the probability that the next adult male we meet will be taller than 180 centimeters?</p></li>
+<li><p>What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?</p></li>
+<li><p>What is our posterior probability of the height of the 3rd tallest man out of the next 100 we meet?</p></li>
+</ul>
+<p>But before starting that process, we need to check that the data we have — which is only for a sample adult American men in 2009 — will allow us to answer these questions, however roughly.</p>
+<p>That is where Wisdom comes in. In the social sciences, <em>there is never a direct relationship between the data you have and the question you are trying to answer.</em> Data for American males in 2009 is not the same thing as data for American males today. Nor is it the same as the data for men in France or Mexico. Moreover, the problem hasn’t specified where on Earth we are, nor who we are near. Walking near a basketball tournament will generate difference answers than walking around Times Square would.</p>
+<p>Yet this data is relevant. Right? It is certainly better than nothing. That is, using not-perfect data is better than using no data at all.</p>
+<p>Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Toyko, I doubt that our data is at all relevant for that problem. Wisdom is all about realizing that instead of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. Better to just use your common sense and experience.</p>
+<p>The other aspect of Wisdom is ethics. Just because we <em>can</em> make a model does not mean we <em>should</em> make that model. Models can be used for evil and, if at all possible, you should do no evil. Fortunately, it is hard to generate much ethical worries about height models. If, instead, we were modeling criminality, the ethics become much more complex . . .</p>
 </div>
 <div id="justice" class="section level3">
 <h3>
@@ -1123,7 +1128,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <p class="caption marginnote">--><!--</p>--><!--</div>--></span>
 </p>
 <p>Mathematical knowledge is the least important skill for a data scientist.</p>
-<p>However, a little mathematical notation will make our modelling assumptions clear, will bring some clarity and precision to our approach. In this case:</p>
+<p>However, a little mathematical notation will make our modeling assumptions clear, will bring some clarity and precision to our approach. In this case:</p>
 <p><span class="math display">\[ y_i =  \mu + \epsilon_i \]</span>
 with <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span>. <span class="math inline">\(y_i\)</span> is the height of male <span class="math inline">\(i\)</span>. <span class="math inline">\(\mu\)</span> is the average height of all males in the population. <span class="math inline">\(\epsilon_i\)</span> is the “error term,” the difference between the height of male <span class="math inline">\(i\)</span> and the average height of all males. <span class="math inline">\(\epsilon_i\)</span> is normally distributed with a mean of 0 and a standard deviation of <span class="math inline">\(\sigma\)</span>.</p>
 <p>This is almost the simplest model we can construct. Note:</p>
@@ -1134,7 +1139,7 @@ with <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span>. <span 
 <li><p>The model is wrong, as are all models.</p></li>
 <li><p>The parameter we most care about is <span class="math inline">\(\mu\)</span>. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of <span class="math inline">\(\sigma\)</span> difficult to describe, we also don’t particular care about its value. Parameters like <span class="math inline">\(\sigma\)</span> in this context are <em>nuisance</em> parameters. We still have to estimate their posterior distributions, but we don’t really care what those posteriors look like.</p></li>
 </ul>
-<p>Consider this alternative framework:</p>
+<p>Consider this framework:</p>
 <p><span class="math display">\[outcome = model + what is not in the model\]</span>
 In this case, the <em>outcome</em> is the height of an individual male. This, also called the “response,” is what we are trying to understand and/or explain and/or predict. The <em>model</em> is our creation, a mixture of data and parameters, an attempt to capture the underlying structure in the world which generates the outcome.</p>
 <p>What is the difference between the <em>outcome</em> and the <em>model</em>? By definition, it is <em>what is not in the model</em>, all the blooming and buzzing complexity of the real world. The model will always be wrong in that it won’t capture everything. Whatever the model misses is thrown into the error term.</p>
@@ -1153,12 +1158,12 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <div id="stan_glm" class="section level4">
 <h4>
 <span class="header-section-number">7.5.3.1</span> stan_glm</h4>
-<p>Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the <code>stan_glm()</code> function which, when fed the correct inputs, creates a Bayesian generalized linear model to estimate the mean height of all American males in 2009. This function comes from the <strong>rstanarm</strong> package, which is very useful for Bayesian models in general.</p>
-<p>The first argument in the <code>stan_glm()</code> function is <code>data</code>, which in our case is the filtered <code>ch7_male</code> tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we are only trying to find mean height and have no predictor variables, our equation will be <code>height ~ 1</code>. Details:</p>
+<p>Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the <code>stan_glm()</code> function which, when fed the correct inputs, creates a Bayesian generalized linear model of height. This function comes from the <strong>rstanarm</strong> package, which is very useful for Bayesian models in general.</p>
+<p>The first argument in the <code>stan_glm()</code> function is <code>data</code>, which in our case is the filtered <code>ch7_male</code> tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we have no predictor variables, our equation will be <code>height ~ 1</code>. Details:</p>
 <div class="sourceCode" id="cb873"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb873-1"><a href="two-parameters.html#cb873-1"></a>fit_obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch7_male, height <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <ul>
 <li><p>This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were — and, to some extent, still are — little used. When creating your own models, you will often want to use the <code>cache = TRUE</code> code chunk option. This saves the result of the model so that you don’t recalculate it every time you knit.</p></li>
-<li><p>If you don’t set <code>refresh = 0</code>, the model will output many lines of confusing output. You can learn more about that output by reading the help page for <code>stan_glm()</code>. The output provides details on the fitting process as it runs as well as diagnostics about the final result. All of those details are beyond the scope of this book.</p></li>
+<li><p>If you don’t set <code>refresh = 0</code>, the model will puke out many lines of confusing output. You can learn more about that output by reading the help page for <code>stan_glm()</code>. The output provides details on the fitting process as it runs as well as diagnostics about the final result. All of those details are beyond the scope of this book.</p></li>
 <li><p>You should always assign the result of the call of <code>stan_glm()</code> to an object, as we do above. By convention, the name of that object will often included the word “fit” to indicate that it is a <em>fitted</em> model object.</p></li>
 </ul>
 <div id="printed-model" class="section level5">
@@ -1193,24 +1198,14 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <li><p>Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its <em>location</em>. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less stable measure.</p></li>
 <li><p>The second most important number for summarizing a distribution concerns its <em>spread</em>. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.</p></li>
 </ul>
-<p>Recall the fitted object:</p>
-<div class="sourceCode" id="cb876"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb876-1"><a href="two-parameters.html#cb876-1"></a>fit_obj</span></code></pre></div>
-<pre><code>## stan_glm
-##  family:       gaussian [identity]
-##  formula:      height ~ 1
-##  observations: 1814
-##  predictors:   1
-## ------
-##             Median MAD_SD
+<p>Instead of printing the whole model, we can just print out the parameters.</p>
+<div class="sourceCode" id="cb876"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb876-1"><a href="two-parameters.html#cb876-1"></a><span class="kw">print</span>(fit_obj, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<pre><code>##             Median MAD_SD
 ## (Intercept) 176.0    0.2 
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 7.3    0.1   
-## 
-## ------
-## * For help interpreting the printed output see ?print.stanreg
-## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+## sigma 7.3    0.1</code></pre>
 <!-- DK: Are we sure that coef() and sigma() give us the median values? -->
 <p>Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, 175.98, is the median of our posterior distribution for <span class="math inline">\(\mu\)</span>, the average height of all American men in 2009. The median of sigma, 7.29, is the median of our posterior distribution for the true <span class="math inline">\(\sigma\)</span>, which can be roughly understood as the variability in the height of American men in 2009, once we account for our estimate of <span class="math inline">\(\mu\)</span>.</p>
 <p>The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of <span class="math inline">\(\mu\)</span> is somewhere between 175.6 and 176.4.</p>
@@ -1240,7 +1235,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <span id="cb880-2"><a href="two-parameters.html#cb880-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb880-3"><a href="two-parameters.html#cb880-3"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">mu =</span> <span class="st">`</span><span class="dt">(Intercept)</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb880-4"><a href="two-parameters.html#cb880-4"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> mu)) <span class="op">+</span></span>
-<span id="cb880-5"><a href="two-parameters.html#cb880-5"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> ..count..<span class="op">/</span><span class="kw">sum</span>(..count..)), <span class="dt">binwidth =</span> <span class="fl">0.01</span>, </span>
+<span id="cb880-5"><a href="two-parameters.html#cb880-5"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))), <span class="dt">binwidth =</span> <span class="fl">0.01</span>, </span>
 <span id="cb880-6"><a href="two-parameters.html#cb880-6"></a>                   <span class="dt">color =</span> <span class="st">"white"</span>) <span class="op">+</span></span>
 <span id="cb880-7"><a href="two-parameters.html#cb880-7"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>,</span>
 <span id="cb880-8"><a href="two-parameters.html#cb880-8"></a>         <span class="dt">subtitle =</span> <span class="st">"Average height among American adult men in 2009"</span>,</span>
@@ -1252,7 +1247,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <div class="sourceCode" id="cb881"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb881-1"><a href="two-parameters.html#cb881-1"></a>fit_obj <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb881-2"><a href="two-parameters.html#cb881-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb881-3"><a href="two-parameters.html#cb881-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> sigma)) <span class="op">+</span></span>
-<span id="cb881-4"><a href="two-parameters.html#cb881-4"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> ..count..<span class="op">/</span><span class="kw">sum</span>(..count..)), <span class="dt">binwidth =</span> <span class="fl">0.01</span>, </span>
+<span id="cb881-4"><a href="two-parameters.html#cb881-4"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))), <span class="dt">binwidth =</span> <span class="fl">0.01</span>, </span>
 <span id="cb881-5"><a href="two-parameters.html#cb881-5"></a>                   <span class="dt">color =</span> <span class="st">"white"</span>) <span class="op">+</span></span>
 <span id="cb881-6"><a href="two-parameters.html#cb881-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>,</span>
 <span id="cb881-7"><a href="two-parameters.html#cb881-7"></a>         <span class="dt">subtitle =</span> <span class="st">"Height standard deviation among American adult men in 2009"</span>,</span>
@@ -1418,7 +1413,7 @@ are 1814 because the matrix provides a (potentially) different posterior predict
 <a href="three-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-04
+2020-10-05
 </p>
 </div>
 </div>
