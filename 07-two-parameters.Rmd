@@ -528,11 +528,33 @@ This is almost the simplest model we can construct. Note:
 
 Consider this framework:
 
-$$outcome = model + what is not in the model$$
+$$outcome = model + what\ is\ not\ in\ the\ model$$
 In this case, the *outcome* is the height of an individual male. This, also called the "response," is what we are trying to understand and/or explain and/or predict. The *model* is our creation, a mixture of data and parameters, an attempt to capture the underlying structure in the world which generates the outcome. 
 
 What is the difference between the *outcome* and the *model*? By definition, it is *what is not in the model*, all the blooming and buzzing complexity of the real world. The model will always be wrong in that it won't capture everything. Whatever the model misses is thrown into the error term. 
 
+The Preceptor Table for this problem is almost identical to the one we saw in Chapter \@ref(rubin-causal-model):
+
+```{r echo = FALSE}
+tibble(ID = c("1", "2", "...", "473", "474",
+              "...", "3,258", "3,259", "...", "N"),
+       Heights = c("?", "?", "...", "172", "?", "...", "?", "162", "...", "?")) %>%
+  
+  # Then, we use the gt function to make it pretty
+  
+  gt() %>%
+  cols_label(ID = md("ID"),
+                Heights = "Heights (cm)") %>%
+  tab_style(cell_borders(sides = "right"),
+            location = cells_body(columns = vars(ID))) %>%
+  tab_style(style = cell_text(align = "left", v_align = "middle"), 
+            locations = cells_column_labels(columns = vars(ID))) %>%
+  cols_align(align = "center", columns = TRUE) %>%
+  cols_align(align = "left", columns = vars(ID)) %>%
+  tab_spanner(label = "Outcome", columns = vars(Heights))
+```
+
+Since this is not a causal model, there is only one potential outcome --- which is to say, only one outcome: an individual's height. 
 
 ### Courage
 
@@ -702,7 +724,11 @@ m[, 2]
 
 Note how matrices with just one dimension "collapse" into single vectors. Tibbles, on the other hand, always maintain their rectangular shapes, even with only one column or row. Matrices are important because `posterior_predict()` and other functions from **rstanarm** return matrices.
 
-We have a model. What can we do with it? Let's start off with a simple problem. *What are the chances that the next man we meet is taller than 180 centimeters.* We have a model of American male height from 2009, `fit_obj`, which we can use for this purpose.
+We have a model. What can we do with it? Let's revisit the three questions with which we started this section:
+
+* What is the probability that the next adult male we meet will be taller than 180 centimeters?
+
+We have a model of American male height from 2009, `fit_obj`, which we can use for this purpose.
 
 
 ```{r}
@@ -731,7 +757,9 @@ tibble(pred = pp[, 1]) %>%
   summarize(answer = sum(gt_180) / n())
 ```
 
-Somewhere around 28% to 30% or so. 
+Somewhere around 28% or so. 
+
+* What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
 
 Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. Consider something more complex: What are the chances that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest? With simulation, we just need to answer this step by step.
 
@@ -751,7 +779,27 @@ tibble(pred_1 = pp[, 1],
 
 There is about a 75% chance that, when meeting 4 random men, the tallest with be at least 10 cm taller than the shortest.
 
+* What is our posterior probability of the height of the 3rd tallest man out of the next 100 we meet?
+
+The same approach will work for almost any question.
+
+```{r}
+pp[, 1:100] %>% 
+  as_tibble() %>% 
+  rowwise() %>% 
+  mutate(third_tallest = sort(c_across(`1`:`100`), decreasing = TRUE)[3]) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = third_tallest, y = after_stat(count / sum(count)))) +
+    geom_histogram(bins = 100) +
+    labs(title = "Posterior Probability of 3rd Tallest from One Hundreds",
+         x = "Height (cm)",
+         y = "Probability")
+    
+```
+
+
 <!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
+
 
 ## Conclusion
 
