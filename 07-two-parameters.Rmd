@@ -482,7 +482,7 @@ Data science is ultimately a moral act, so we will use the four [Cardinal Virtue
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numerical value. Given that decision, we should make a model of the world to help us.
+What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numeric value. Given that decision, we should make a model of the world to help us.
 
 In any textbook, it will be tough to avoid the "toy problem" trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires a great deal of context. We do not have the time to get into that level of detail. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer three questions:
 
@@ -501,7 +501,7 @@ Yet this data is relevant. Right? It is certainly better than nothing. That is, 
 
 Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Toyko, I doubt that our data is at all relevant for that problem. Wisdom is all about realizing that instead of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. Better to just use your common sense and experience.
 
-The other aspect of Wisdom is ethics. Just because we *can* make a model does not mean we *should* make that model. Models can be used for evil and, if at all possible, you should do no evil. Fortunately, it is hard to generate much ethical worries about height models. If, instead, we were modeling criminality, the ethics become much more complex . . .
+The other aspect of Wisdom is ethics. Just because we *can* make a model does not mean we *should* make that model. Models can be used for evil and, if at all possible, you should do no evil. Fortunately, it is hard to generate many ethical worries about height models. If, instead, we were modeling criminality, the ethics become much more complex . . .
 
 ### Justice
 
@@ -526,12 +526,14 @@ This is almost the simplest model we can construct. Note:
 
 * The parameter we most care about is $\mu$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about its value. Parameters like $\sigma$ in this context are *nuisance* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
 
-Consider this framework:
+* $\mu$ is not the average height of the men in the sample. We can calculate that directly. It is `r mean(ch7_male$height)`. No estimation required! Instead, $\mu$ is the average height of men in the *population*. Recall from the discussions in \@ref(one-parameter) that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, the the population we really care about, in order to answer our three questions, is the set of adult men into which we might run today. This is not the same as the population of adult men in the US in 2009. But is it close enough? Is it better than nothing? Might we consider, instead, of a *super-population* of all adult men in the world, anytime between 2000 and now? Perhaps. Each case is a different and the details matter.
+
+Consider:
 
 $$outcome = model + what\ is\ not\ in\ the\ model$$
 In this case, the *outcome* is the height of an individual male. This, also called the "response," is what we are trying to understand and/or explain and/or predict. The *model* is our creation, a mixture of data and parameters, an attempt to capture the underlying structure in the world which generates the outcome. 
 
-What is the difference between the *outcome* and the *model*? By definition, it is *what is not in the model*, all the blooming and buzzing complexity of the real world. The model will always be wrong in that it won't capture everything. Whatever the model misses is thrown into the error term. 
+What is the difference between the *outcome* and the *model*? By definition, it is *what is not in the model*, all the blooming and buzzing complexity of the real world. The model will always be incomplete in that it won't capture everything. Whatever the model misses is thrown into the error term. 
 
 The Preceptor Table for this problem is almost identical to the one we saw in Chapter \@ref(rubin-causal-model):
 
@@ -569,18 +571,27 @@ In data science, we deal with math, words, and code, but the most important of t
 Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the `stan_glm()` function which, when fed the correct inputs, creates a Bayesian generalized linear model of height. This function comes from the **rstanarm** package, which is very useful for Bayesian models in general.
 
 
-The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7_male` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want the function to build a model around. In this case, since we have no predictor variables, our equation will be `height ~ 1`. Details:
+The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7_male` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want to build a model around. In this case, since we have no predictor variables, our equation will be `height ~ 1`. Details:
 
 
 ```{r, cache = TRUE}
-fit_obj <- stan_glm(data = ch7_male, height ~ 1, refresh = 0)
+fit_obj <- stan_glm(data = ch7_male, 
+                    height ~ 1, 
+                    family = gaussian(), 
+                    refresh = 0)
 ```
 
 * This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were --- and, to some extent, still are --- little used. When creating your own models, you will often want to use the `cache = TRUE` code chunk option. This saves the result of the model so that you don't recalculate it every time you knit.
 
+* The `data` argument, like all such usage in R, is used for the input data for the model.
+
 * If you don't set `refresh = 0`, the model will puke out many lines of confusing output. You can learn more about that output by reading the help page for `stan_glm()`. The output provides details on the fitting process as it runs as well as diagnostics about the final result. All of those details are beyond the scope of this book.
 
 * You should always assign the result of the call of `stan_glm()` to an object, as we do above. By convention, the name of that object will often included the word "fit" to indicate that it is a *fitted* model object.
+
+* There is a direct connection between the mathematical form of the model created under Justice an the code we use to fit the model under Courage. `height ~ 1` is the code equivalent of $$ y_i =  \mu $$. 
+
+* The default value for `family` is `gaussian()`, so we did not need to include it in the call above. From the Justice section, the assumption that $\epsilon_i \sim N(0, \sigma^2)$ is equivalent to using `gaussian()`. If $\epsilon_i$ has a different distribution, we would need to use a different `family`.
 
 
 ##### Printed model
@@ -604,9 +615,9 @@ The fourth and fifth lines of the output tell us that we have `r nobs(fit_obj)` 
 
 We knew all this information before we fit the model. R records it in the `fit_obj` because we don't want to forget what we did. The second half of the display gives a summary of the parameter values.
 
-We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is $\mu$, the average height. If we had the ideal Preceptor Table --- with a row for every adult American male in 2009 and no missing data --- $\mu$ would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter $\mu$. All that R sees is the `1` in the formula. In most fields of statistics, this constant term is called the "intercept." So, now we have three things --- $\mu$, `1` and "intercept" --- all of which refer to the exact same concept. This will not be the last time that terminology will be confusing.
+We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is $\mu$, the average height in the population. If we had the ideal Preceptor Table --- with a row for every adult male in the population we care about and no missing data --- $\mu$ would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter $\mu$. All that R sees is the `1` in the formula. In most fields of statistics, this constant term is called the "intercept." So, now we have three things --- $\mu$, `1` and "intercept" --- all of which refer to the exact same concept. This will not be the last time that terminology will be confusing.
 
-At this point, `stan_glm()` --- or rather the `print()` method for rstan objects --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show you the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the median of the posterior and the "MAD_SD." 
+At this point, `stan_glm()` --- or rather the `print()` method for rstan objects --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the median of the posterior and the "MAD_SD." 
 
 * Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its *location*. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less stable measure.
 
@@ -621,13 +632,13 @@ print(fit_obj, detail = FALSE)
 
 <!-- DK: Are we sure that coef() and sigma() give us the median values? -->
 
-Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2009. The median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of American men in 2009, once we account for our estimate of $\mu$.
+Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2009. The median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of men, once we account for our estimate of $\mu$.
 
-The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between 175.6 and 176.4. 
+The MAD SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between 175.6 and 176.3. 
 
 ##### Plotting the posterior distributions
 
-Instead of doing this math in our heads, we can display both posterior distributions. *Pictures speak where math mumbles.* Fortunately, getting values for those posteriors is easy:
+Instead of doing this math in our heads, we can display both posterior distributions. *Pictures speak where math mumbles.* Fortunately, getting draws from those posteriors is easy:
 
 ```{r}
 fit_obj %>% 
@@ -672,29 +683,29 @@ Again, $\sigma$ is usually a nuisance parameter. We don't really care what its v
 
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
 
-##### Model in a table
+<!-- ##### Model in a table -->
 
 <!-- DK: Could not get this to work. It seems like these gt objects are already text, so there is no easy way to, for example, change the formatting but adding decimals.  Maybe we should use model_summary, which seems to work nicely. -->
 
 <!-- DK: Maybe I don't need to show posterior_linpred at all? One less thing to worry about. -->
 
-A third way to display the model is to use `modelsummary()` from the **modelsummary** package. (Note that this will often require the **broom.mixed** package as well.)
+<!-- A third way to display the model is to use `modelsummary()` from the **modelsummary** package. (Note that this will often require the **broom.mixed** package as well.) -->
 
-```{r, eval=FALSE}
-library(broom.mixed)
-library(modelsummary)
-```
+<!-- ```{r, eval=FALSE} -->
+<!-- library(broom.mixed) -->
+<!-- library(modelsummary) -->
+<!-- ``` -->
 
-```{r}
-library(modelsummary)
-modelsummary(fit_obj, 
-             statistic = 'conf.int', 
-             statistic_vertical = FALSE,
-             title = "Average Height of American Men in 2009")
-```
+<!-- ```{r} -->
+<!-- library(modelsummary) -->
+<!-- modelsummary(fit_obj,  -->
+<!--              statistic = 'conf.int',  -->
+<!--              statistic_vertical = FALSE, -->
+<!--              title = "Average Height of American Men in 2009") -->
+<!-- ``` -->
 
 
-Keep in mind, again, that we are just looking at the same model in a different way. The `fit_obj` has not changed. Instead, we are just exploring a third way to consider it. Much of this information is the same that we have seen before. At the same time, other information is omitted. For example, and by default, `modelsummary()` does not even bother to show any numbers associated with $\sigma$. It doubts that you, or your readers, will care.
+<!-- Keep in mind, again, that we are just looking at the same model in a different way. The `fit_obj` has not changed. Instead, we are just exploring a third way to consider it. Much of this information is the same that we have seen before. At the same time, other information is omitted. For example, and by default, `modelsummary()` does not even bother to show any numbers associated with $\sigma$. It doubts that you, or your readers, will care. -->
 
 
 <!-- DK: More details. And don't forget to compare this confidence interval to the bootstrapped one. -->
@@ -724,7 +735,7 @@ m[, 2]
 
 Note how matrices with just one dimension "collapse" into single vectors. Tibbles, on the other hand, always maintain their rectangular shapes, even with only one column or row. Matrices are important because `posterior_predict()` and other functions from **rstanarm** return matrices.
 
-We have a model. What can we do with it? Let's revisit the three questions with which we started this section:
+We have a model. What can we do with it? Let's answer the three questions with which we started this section.
 
 * What is the probability that the next adult male we meet will be taller than 180 centimeters?
 
@@ -759,9 +770,11 @@ tibble(pred = pp[, 1]) %>%
 
 Somewhere around 28% or so. 
 
+Again, the key difficulty is the population. The problem we actually have involves walking around London today. The data we actually have involve America in 2009. Those are not the same things! But they are not totally different. Knowing whether the data we have is "close enough" to the problem we want to solve is at the heart of Wisdom.
+
 * What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
 
-Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. Consider something more complex: What are the chances that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest? With simulation, we just need to answer this step by step.
+Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. With simulation, we just need to answer this step by step.
 
 ```{r}
 tibble(pred_1 = pp[, 1],
@@ -778,6 +791,8 @@ tibble(pred_1 = pp[, 1],
 ```
 
 There is about a 75% chance that, when meeting 4 random men, the tallest with be at least 10 cm taller than the shortest.
+
+<!-- DK: Discuss all the reasons why this might not be true. -->
 
 * What is our posterior probability of the height of the 3rd tallest man out of the next 100 we meet?
 
@@ -803,13 +818,13 @@ pp[, 1:100] %>%
 
 ## Conclusion
 
-The next five chapters will follow the same process we have just completed here. We start with a decision we have to make. With luck, we will have some data to guide us. (Without data, even the best data scientist will struggle to make progress.) Wisdom asks us: "Is the data we have close enough to the decision we face to make using that data likely to be helpful?" Often times, the answer is "No." Even if we do have data, and the ability to make a model, Wisdom will tap us on the shoulder and say, "Even if you can make a model, don't forget to ask yourself if you should." Ethics matter.
+The next five chapters will follow the same process we have just completed here. We start with a decision we have to make. With luck, we will have some data to guide us. (Without data, even the best data scientist will struggle to make progress.) *Wisdom* asks us: "Is the data we have close enough to the decision we face to make using that data likely to be helpful?" Often times, the answer is "No." Even if we do have data, and the ability to make a model, Wisdom will tap us on the shoulder and say, "Even if you can make a model, don't forget to ask yourself if you should." Ethics matter.
 
-Once we start to build the model, Justice will guide us. Is the model descriptive or causal? What is the mathematical relationship between the dependent variable we are trying to explain and the independent variables we can use to explain it? What assumptions are we making about distributions, especially with regard to the error term?
+Once we start to build the model, *Justice* will guide us. Is the model descriptive or causal? What is the mathematical relationship between the dependent variable we are trying to explain and the independent variables we can use to explain it? What assumptions are we making about distributions, especially with regard to the error term?
 
-Having set up the model framework, we need Courage to implement the model in code. Without code, all the math in the world is useless. Once we have created the model, we need to understand it. What are the posterior distributions of the unknown parameters? Do they seem sensible? How should we interpret them?
+Having set up the model framework, we need *Courage* to implement the model in code. Without code, all the math in the world is useless. Once we have created the model, we need to understand it. What are the posterior distributions of the unknown parameters? Do they seem sensible? How should we interpret them?
 
-Temperance guides the final step. With a model, we can finally get back to the decision which motivated the exercise in the first place. We can use the model to make statements about the world, both to confirm that the model is consistent with the world and to use the model to make predictions about numbers which we do not know. 
+*Temperance* guides the final step. With a model, we can finally get back to the decision which motivated the exercise in the first place. We can use the model to make statements about the world, both to confirm that the model is consistent with the world and to use the model to make predictions about numbers which we do not know. 
 
 Let's practice this process another dozen or so times.
 
