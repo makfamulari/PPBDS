@@ -104,20 +104,22 @@ There are few more important concepts in statistics and data science than the "D
 
 In simple cases, the DGM is so simple that it barely merits such a fancy name. But, in the professional world, the DGM is often complex. However, the basic ideas are always the same. Recall the key equations:
 
-$$outcome = model + what is not in the model$$
+$$outcome = model + what\ is\ not\ in\ the\ model$$
 
-The next step is to create the fitted values for the model. This is harder than it sounds! First, there is no simple version, for a Bayesian, of the frequentist approach. You can't just estimate a $\hat{\beta}$, plug it and the Xs into a formula and do the algebra for get your $\hat{y_i}$. There is not a single value for $\beta$. There is a posterior distribution, over which you need to sample. We go through those ideas fairly slowly in chapters 5 and 6. But, at this point, we just use `posterior_linpred()` and interpret the results in a Bayesian fashion.
+The next step is to create the fitted values for the model. This is harder than it sounds! First, there is no simple version, for a Bayesian, of the frequentist approach. You can't just estimate a $\hat{\beta}$, plug it and the Xs into a formula and do the algebra for get your $\hat{y_i}$. There is not a single value for $\beta$. There is a posterior distribution, over which you need to sample. We go through those ideas fairly slowly in chapters 5 and 6. But, at this point, we just use `fitted()` and interpret the results in a Bayesian fashion.
 
-The definition of a "fitted value" is then somewhat arbitrary, a fact we should make clear. The two most common choices would be the mean or the median of the posterior distribution produced by posterior_linpred(). Which is the "true" one? It all depends on your goal. If you want to minimize the squared errors of your predictions, use the mean. But if want to minimize the absolute values of the errors, the median is better. In a more advanced book (volume 2 anyone?!?) we would illustrate that point with an example. Here, we might just use the mean and call it a win.
+The definition of a "fitted value" is then somewhat arbitrary, a fact we should make clear, or maybe it is too confusing for this book. The two most common choices would be the mean or the median of the posterior distribution produced by posterior_linpred(). Which is the "true" one? It all depends on your goal. If you want to minimize the squared errors of your predictions, use the mean. But if want to minimize the absolute values of the errors, the median is better. In a more advanced book (volume 2 anyone?!?) we would illustrate that point with an example. Here, we might just use the mean and call it a win.
 
 ### Residuals
 
 The main reason we need a specific fitted value is that having one for each observation allows us to calculate a residual, defined as $r_i = y_i - \hat{y_i}$. Examining the residuals closely allows us to look for problems in our models. In this book, we probably won't have a lot of time to spend on residuals, but we need to discuss them.
 
+We will use the `residuals()` function to calculate the residual values. I need to understand more thoroughly how `fiited()` and `residuals()` work on stanreg objects.
+
 Of course, in the full Bayesian framework, we have a posterior for the predicted value for observation $i$. That posterior would allow us to calculate a posterior for the residual. But that is way too hard a concept for this book, except perhaps as a mention in the margin. The key point is that the residuals are the unmodeled variation. I think we should give this formula in each chapter, at least once.
 
 
-$$outcome = fitted value + unmodeled variation$$
+$$outcome = fitted\ value + unmodeled\ variation$$
 
 After noting this formula, each example should create a plot with three histograms in a row --- left-to-right, the outcome (i.e., a histogram or density of Y), the fitted values (which is sometimes a spike, sometimes two spikes and so on) and, finally, the residuals. This highlights how we have *decomposed* the outcome into two parts: the model and the unmodeled variation. This belongs in the Courage chapter because it is a way of understanding the model we have made.
 

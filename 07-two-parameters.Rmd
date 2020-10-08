@@ -683,6 +683,56 @@ Again, $\sigma$ is usually a nuisance parameter. We don't really care what its v
 
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
 
+
+#### Decomposing the outcome
+
+Two other important concepts in model creation are "fitted" values and residuals. 
+
+
+```{r, echo=FALSE}
+set.seed(9)
+```
+```{r}
+ch7_male %>% 
+  mutate(fitted_value = fitted(fit_obj)) %>% 
+  mutate(residual = residuals(fit_obj)) %>% 
+  sample_n(5)
+```
+
+The fitted value represents the model's best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, we already know what the actual value is. The residual is the difference between the outcome of the fitted value. These definitions lead to a natural decomposition of the outcome data:
+
+
+```{r, echo = FALSE}
+# These are tough to create! Why does scale_x_continuous(limits = c(140, 210))
+# cause some weird warnings in the first graphic? Seems like it would be nice to
+# have similar axes across the first two plots at least. I suspect I should be
+# using posterior_linpred rather than hard-coding the fitted value. Want to make
+# this easier to do in later chapters and standardize the approach/code.
+
+outcome <- ch7_male %>% 
+  ggplot(aes(height)) +
+    geom_histogram(bins = 100) +
+    labs(x = "Height (cm)",
+         y = "Count") 
+
+fitted <- tibble(height = fitted(fit_obj)) %>% 
+  ggplot(aes(height)) +
+    geom_bar() +
+    labs(x = "Fitted Values",
+         y = NULL) +
+    scale_x_continuous(limits = c(150, 200)) 
+
+res <- tibble(resids = residuals(fit_obj)) %>% 
+  ggplot(aes(resids)) +
+    geom_histogram(bins = 100) +
+    labs(x = "Residuals",
+         y = NULL) 
+  
+
+outcome + fitted + res +
+  plot_annotation(title = "Decomposition of Height into Fitted Values and Residuals")
+```
+
 <!-- ##### Model in a table -->
 
 <!-- DK: Could not get this to work. It seems like these gt objects are already text, so there is no easy way to, for example, change the formatting but adding decimals.  Maybe we should use model_summary, which seems to work nicely. -->
