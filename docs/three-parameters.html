@@ -253,12 +253,12 @@ Create some memes. Any way to add Batman to Justice section?
 </h2>
 <!-- DK: Still need to standardize the method we use for providing references. -->
 <p>As always, it makes sense to start with some exploratory data analysis (EDA). To demonstrate modeling with three parameters, we will use the <code>trains</code> data set from the <strong>PPBDS.data</strong> package. Recall the discussion from Chapter <a href="rubin-causal-model.html#rubin-causal-model">3</a>. Enos (2014) randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers – the <code>treatment</code> – influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let’s load the libraries we will need in this chapter, all of which we have used before, and look at the data.</p>
-<div class="sourceCode" id="cb897"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb897-1"><a href="three-parameters.html#cb897-1"></a><span class="kw">library</span>(PPBDS.data)</span>
-<span id="cb897-2"><a href="three-parameters.html#cb897-2"></a><span class="kw">library</span>(rstanarm)</span>
-<span id="cb897-3"><a href="three-parameters.html#cb897-3"></a><span class="kw">library</span>(broom.mixed)</span>
-<span id="cb897-4"><a href="three-parameters.html#cb897-4"></a><span class="kw">library</span>(skimr)</span>
-<span id="cb897-5"><a href="three-parameters.html#cb897-5"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
-<div class="sourceCode" id="cb898"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb898-1"><a href="three-parameters.html#cb898-1"></a><span class="kw">glimpse</span>(trains)</span></code></pre></div>
+<div class="sourceCode" id="cb898"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb898-1"><a href="three-parameters.html#cb898-1"></a><span class="kw">library</span>(PPBDS.data)</span>
+<span id="cb898-2"><a href="three-parameters.html#cb898-2"></a><span class="kw">library</span>(rstanarm)</span>
+<span id="cb898-3"><a href="three-parameters.html#cb898-3"></a><span class="kw">library</span>(broom.mixed)</span>
+<span id="cb898-4"><a href="three-parameters.html#cb898-4"></a><span class="kw">library</span>(skimr)</span>
+<span id="cb898-5"><a href="three-parameters.html#cb898-5"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
+<div class="sourceCode" id="cb899"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb899-1"><a href="three-parameters.html#cb899-1"></a><span class="kw">glimpse</span>(trains)</span></code></pre></div>
 <pre><code>## Rows: 115
 ## Columns: 8
 ## $ gender    &lt;chr&gt; "Female", "Female", "Male", "Male", "Male", "Female", "Fema…
@@ -270,11 +270,11 @@ Create some memes. Any way to add Batman to Justice section?
 ## $ treatment &lt;fct&gt; Treated, Treated, Treated, Treated, Control, Treated, Contr…
 ## $ att_end   &lt;dbl&gt; 11, 10, 5, 11, 5, 13, 13, 11, 12, 10, 9, 9, 13, 7, 8, 13, 8…</code></pre>
 <p>Here, we can see variables that indicate each respondent’s gender, political affiliations, age, and income. Additionally, we have variables that indicate whether a subject was in the control or treatment group, and their attitudes toward immigration both before (<code>att_start</code>) and after (<code>att_end</code>) the experiment. You can type <code>?trains</code> to read the help page for more information about each variable. Let’s restrict attention to a subset of the variables.</p>
-<div class="sourceCode" id="cb900"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb900-1"><a href="three-parameters.html#cb900-1"></a>ch8 &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb900-2"><a href="three-parameters.html#cb900-2"></a><span class="st">  </span><span class="kw">select</span>(age, att_end, party, treatment)</span></code></pre></div>
+<div class="sourceCode" id="cb901"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb901-1"><a href="three-parameters.html#cb901-1"></a>ch8 &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb901-2"><a href="three-parameters.html#cb901-2"></a><span class="st">  </span><span class="kw">select</span>(age, att_end, party, treatment)</span></code></pre></div>
 <p>It is always smart to look at a some random samples of the data:</p>
-<div class="sourceCode" id="cb901"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb901-1"><a href="three-parameters.html#cb901-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb901-2"><a href="three-parameters.html#cb901-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb902"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb902-1"><a href="three-parameters.html#cb902-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb902-2"><a href="three-parameters.html#cb902-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">5</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 4
 ##     age att_end party      treatment
 ##   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;      &lt;fct&gt;    
@@ -284,8 +284,8 @@ Create some memes. Any way to add Batman to Justice section?
 ## 4    56      11 Democrat   Treated  
 ## 5    46       6 Republican Control</code></pre>
 <p><code>att_end</code> is a measure of person’s attitude toward immigration, a higher number means more conservative, i.e., a more exclusionary stance on immigration into the United States. Running <code>glimpse()</code> is another way of exploring a data set.</p>
-<div class="sourceCode" id="cb903"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb903-1"><a href="three-parameters.html#cb903-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb903-2"><a href="three-parameters.html#cb903-2"></a><span class="st">  </span><span class="kw">glimpse</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb904"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb904-1"><a href="three-parameters.html#cb904-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb904-2"><a href="three-parameters.html#cb904-2"></a><span class="st">  </span><span class="kw">glimpse</span>()</span></code></pre></div>
 <pre><code>## Rows: 115
 ## Columns: 4
 ## $ age       &lt;dbl&gt; 31, 34, 63, 45, 55, 37, 53, 36, 54, 42, 33, 50, 24, 40, 53,…
@@ -294,11 +294,11 @@ Create some memes. Any way to add Batman to Justice section?
 ## $ treatment &lt;fct&gt; Treated, Treated, Treated, Treated, Control, Treated, Contr…</code></pre>
 <p>Pay attention to the variable types. Do they make sense? Perhaps. But there are certainly grounds for suspicion. Why are <code>age</code> and <code>att_end</code> doubles rather than integers? All the values in the data appear to be integers, so there is no benefit is having these variables be doubles. Why is <code>party</code> a character variable and <code>treatment</code> a factor variable? It could be that these are intentional choices made by the creator of the tibble, i.e., us. These could be mistakes. Or, most likely, these choices are a mixture of sensible and arbitrary. Regardless, it is your responsibility to notice them. You can’t make a good model without looking closely at the data which you are using.</p>
 <p><code>skim</code> from the <strong>skimr</strong> package is the best way to get an overview of a tibble.</p>
-<div class="sourceCode" id="cb905"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb905-1"><a href="three-parameters.html#cb905-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb905-2"><a href="three-parameters.html#cb905-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb906"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb906-1"><a href="three-parameters.html#cb906-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb906-2"><a href="three-parameters.html#cb906-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <table style="width: auto;" class="table table-condensed">
 <caption>
-<span id="tab:unnamed-chunk-702">TABLE 8.1: </span>Data summary
+<span id="tab:unnamed-chunk-704">TABLE 8.1: </span>Data summary
 </caption>
 <thead><tr>
 <th style="text-align:left;">
@@ -596,45 +596,45 @@ att_end
 </table>
 <p><code>skim()</code> shows us what the different values of <code>treatment</code> are because it is a factor. Unfortunately, it does not do the same for character variables like <code>party</code>. The ranges for <code>age</code> and <code>att_end</code> seem reasonable. Recall that participants were asked three questions about immigration issues, each of which allowed for an answer indicated strength of agreement on a scale form 1 to 5, with higher values indicating more agreement with conservative viewpoints. <code>att_end</code> is the sum of the responses to the three questions, so the most liberal possible value is 3 and the most conservative is 15.</p>
 <p>Always plot your data.</p>
-<div class="sourceCode" id="cb906"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb906-1"><a href="three-parameters.html#cb906-1"></a>ch8 <span class="op">%&gt;%</span></span>
-<span id="cb906-2"><a href="three-parameters.html#cb906-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> party, <span class="dt">y =</span> age)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb906-3"><a href="three-parameters.html#cb906-3"></a><span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>, <span class="dt">height =</span> <span class="dv">0</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb906-4"><a href="three-parameters.html#cb906-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Age by Party Affiliation in Trains Dataset"</span>,</span>
-<span id="cb906-5"><a href="three-parameters.html#cb906-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Where are the old Republicans?"</span>,</span>
-<span id="cb906-6"><a href="three-parameters.html#cb906-6"></a>       <span class="dt">x =</span> <span class="st">"Party"</span>,</span>
-<span id="cb906-7"><a href="three-parameters.html#cb906-7"></a>       <span class="dt">y =</span> <span class="st">"Age"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-703-1.png" width="672"></p>
-<p>From this plot, we can gather that there are many more Democrats in this dataset than Republicans. Democrats also span a wider range of ages than Republicans. The mode age for Democrats appears to be 50.</p>
 <div class="sourceCode" id="cb907"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb907-1"><a href="three-parameters.html#cb907-1"></a>ch8 <span class="op">%&gt;%</span></span>
-<span id="cb907-2"><a href="three-parameters.html#cb907-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> treatment, <span class="dt">y =</span> att_end)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb907-3"><a href="three-parameters.html#cb907-3"></a><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb907-4"><a href="three-parameters.html#cb907-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Attitude End by Treatment in Trains Dataset"</span>,</span>
-<span id="cb907-5"><a href="three-parameters.html#cb907-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Did the treatment make people more conservative?"</span>,</span>
-<span id="cb907-6"><a href="three-parameters.html#cb907-6"></a>       <span class="dt">x =</span> <span class="st">"Treatment"</span>,</span>
-<span id="cb907-7"><a href="three-parameters.html#cb907-7"></a>       <span class="dt">y =</span> <span class="st">"Attitude After Experiment"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-704-1.png" width="672"></p>
+<span id="cb907-2"><a href="three-parameters.html#cb907-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> party, <span class="dt">y =</span> age)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb907-3"><a href="three-parameters.html#cb907-3"></a><span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>, <span class="dt">height =</span> <span class="dv">0</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb907-4"><a href="three-parameters.html#cb907-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Age by Party Affiliation in Trains Dataset"</span>,</span>
+<span id="cb907-5"><a href="three-parameters.html#cb907-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Where are the old Republicans?"</span>,</span>
+<span id="cb907-6"><a href="three-parameters.html#cb907-6"></a>       <span class="dt">x =</span> <span class="st">"Party"</span>,</span>
+<span id="cb907-7"><a href="three-parameters.html#cb907-7"></a>       <span class="dt">y =</span> <span class="st">"Age"</span>)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-705-1.png" width="672"></p>
+<p>From this plot, we can gather that there are many more Democrats in this dataset than Republicans. Democrats also span a wider range of ages than Republicans. The mode age for Democrats appears to be 50.</p>
+<div class="sourceCode" id="cb908"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb908-1"><a href="three-parameters.html#cb908-1"></a>ch8 <span class="op">%&gt;%</span></span>
+<span id="cb908-2"><a href="three-parameters.html#cb908-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> treatment, <span class="dt">y =</span> att_end)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb908-3"><a href="three-parameters.html#cb908-3"></a><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb908-4"><a href="three-parameters.html#cb908-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Attitude End by Treatment in Trains Dataset"</span>,</span>
+<span id="cb908-5"><a href="three-parameters.html#cb908-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Did the treatment make people more conservative?"</span>,</span>
+<span id="cb908-6"><a href="three-parameters.html#cb908-6"></a>       <span class="dt">x =</span> <span class="st">"Treatment"</span>,</span>
+<span id="cb908-7"><a href="three-parameters.html#cb908-7"></a>       <span class="dt">y =</span> <span class="st">"Attitude After Experiment"</span>)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-706-1.png" width="672"></p>
 <p>On a boxplot, the top and bottom borders of the box denotes the 75th and 25th percentiles, respectively. The line inside the box denotes the mean of the data. Treated individuals have a higher mean <code>att_end</code> than the control group, and a higher distribution in general, with its 25th percentile lining up with the mean of the control group. The control group has one outlier, while the treatment group has none.</p>
 </div>
 <div id="age-as-a-function-of-party" class="section level2">
 <h2>
 <span class="header-section-number">8.2</span> <code>age</code> as a function of <code>party</code>
 </h2>
-<p>We want to build a predictive model and then use that model to draw conclusions about the world. What are the odds that, if a Republican and Democrat show up at the train station, their ages will be at least 5 years apart? We can answer this and similar questions by creating a model that uses party affiliation to predict someone’s age, again following our four key themes.</p>
+<p>We want to build a predictive model and then use that model to draw conclusions about the world. What are the odds that, if a Democrat shows up at the train station, he will be over 50 years old? In a group of three Democrats and three Republicans, what age difference should we expect the oldest Democrat and the youngest Republican? We can answer these and similar questions by creating a model that uses party affiliation to predict someone’s age, again following our four key themes.</p>
 <div id="wisdom" class="section level3">
 <h3>
 <span class="header-section-number">8.2.1</span> Wisdom</h3>
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-705"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-707"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 8.1: Wisdom<!--</p>-->
 <!--</div>--></span>
 </p>
-<p>Before we write any line of code, the first thing we should do is make it clear that our approach is correct. As already seen in other chapters, there are two aspects to clarify. First, is the data suitable to answer our question? And second, is our estimand appropriate?</p>
-<p>First, let’s clarify what we want to know. The goal is to find out what age we can expect to find among people of a certain party affiliation. Let’s assume we don’t want to limit ourselves to people in a certain place, but we are interested in an estimate for the whole US. As far as party affiliation is concerned, we will probably only want to consider Democrats or Republicans. Returning to the first point, is our data suitable to answer our question? <code>trains' includes a variable</code>age’ which indicates the age of a person in years, and a variable `party’ with values ‘Democrat’ or ‘Republican’ which shows their party affiliation. In terms of content this seems to be exactly what we are looking for. Methodologically, however, there could be problems. The data from this study only come from Boston, so the question arises whether we can really draw conclusions for the whole country. In 2018, the median age was 38.8 years in the US, but 39.4 years in Massachusetts. Although the difference is small, we do not know whether this also applies to Democrats and Republicans separately. Another problem could arise from the fact that Massachusetts (and Boston as an urban area) is very Democratic. As noted earlier, the party affiliates in ‘trains’ are indeed very unequally distributed:</p>
-<div class="sourceCode" id="cb908"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb908-1"><a href="three-parameters.html#cb908-1"></a>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb908-2"><a href="three-parameters.html#cb908-2"></a><span class="st">  </span><span class="kw">count</span>(party)</span></code></pre></div>
+<p>Before we write any line of code, the first thing we should do is make it clear that our approach is correct. As already seen in other chapters, there are two aspects to clarify. First, is the data suitable to answer our question? And second, is our parameter appropriate?</p>
+<p>First, let’s clarify what we want to know. The goal is to find out what age we can expect to find among people of a certain party affiliation. Let’s assume we don’t want to limit ourselves to people in a certain place, but we are interested in an estimate for the whole US. As far as party affiliation is concerned, we will probably only want to consider Democrats or Republicans. Returning to the first point, is our data suitable to answer our question? <code>trains</code> includes a variable <code>age</code> which indicates the age of a person in years, and a variable <code>party</code> with values ‘Democrat’ or ‘Republican’ which shows their party affiliation. In terms of content this seems to be exactly what we are looking for. Methodologically, however, there could be problems. The data from this study only come from Boston, so the question arises whether we can really draw conclusions for the whole country. In 2018, the median age was 38.8 years in the US, but 39.4 years in Massachusetts. Although the difference is small, we do not know whether this also applies to Democrats and Republicans separately. Another problem could arise from the fact that Massachusetts (and Boston as an urban area) is very Democratic. As noted earlier, the party affiliates in ‘trains’ are indeed very unequally distributed:</p>
+<div class="sourceCode" id="cb909"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb909-1"><a href="three-parameters.html#cb909-1"></a>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb909-2"><a href="three-parameters.html#cb909-2"></a><span class="st">  </span><span class="kw">count</span>(party)</span></code></pre></div>
 <pre><code>## # A tibble: 2 x 2
 ##   party          n
 ##   &lt;chr&gt;      &lt;int&gt;
@@ -642,10 +642,10 @@ att_end
 ## 2 Republican    19</code></pre>
 <p>With 96 Democrats we could already determine an acceptable estimate of the median age. The sample of 19 Republicans is very small in comparison, and hence more prone to errors. Perhaps Enos happened to catch some Republicans in his study who are significantly younger than the rest? If so, our estimate may not even be representative of Massachusetts.</p>
 <p>Overall, there seem to be potential sources of error in our data, but that doesn’t necessarily mean that our estimates will be useless in answering our question. In fact, we will rarely have perfect data sets in which all eventualities have been considered. Our job as data scientists is to apply wisdom to recognize the strengths and weaknesses of our data.</p>
-<p>What about the second aspect, the estimand? Before we discuss whether it can answer our question, it is worth thinking again about what the estimand actually is. First of all, remember that an estimand is the size we are looking for. We want to determine the body heights of two different groups, so in our model we are looking for two estimands:</p>
-<p><span class="math display">\[Estimand_{1} = MeanHeightReps\]</span>
-<span class="math display">\[Estimand_{2} = MeanHeightDems\]</span></p>
-<p>In other words, we simply use the mean to get an estimate for each group. Now that we know our estimands, are they suitable to answer our question? The two estimands give us exactly what we want to know, namely the body sizes for members of both parties - so yes. However, they are based on our data set, so there are the same possible sources of error as before. For example, if Enos surveyed too many young Republicans, then estimand 1 would be too low. But again, small inaccuracies are usually not a problem as long as we apply Wisdom and become aware of them.</p>
+<p>What about the second aspect, the parameter? Before we discuss whether it can answer our question, it is worth thinking again about what a parameter actually is. First of all, remember that an parameter is the size we are looking for. We want to determine the body heights of two different groups, so in our model we are looking for two parameters:</p>
+<p><span class="math display">\[Parameter_{1} = AgeReps\]</span>
+<span class="math display">\[Parameter_{2} = AgeDems\]</span>
+Now that we know about the parameter we want to find, are they suitable to answer our question? The two parameters give us exactly what we want to know, namely the body sizes for members of both parties - so yes. However, they are based on our data set, so there are the same possible sources of error as before. For example, if Enos surveyed too many young Republicans, then parameter 1 would be too low. But again, small inaccuracies are usually not a problem as long as we apply Wisdom and become aware of them.</p>
 <p><br><br></p>
 </div>
 <div id="justice" class="section level3">
@@ -654,12 +654,12 @@ att_end
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-707"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-710"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.2: Justice<!--</p>-->
 <!--</div>--></span>
 </p>
-<p>We have made sure that the data and the estimands are suitable to answer our question. These are the building blocks of our model, and the next step is to investigate whether the model itself is adequate. This involves deciding between prediction and causality, and defining the formal mathematical model.</p>
+<p>We have made sure that the data and the parameters are suitable to answer our question. These are the building blocks of our model, and the next step is to investigate whether the model itself is adequate. This involves deciding between prediction and causality, and defining the formal mathematical model.</p>
 <div id="prediction-vs-causality" class="section level4">
 <h4>
 <span class="header-section-number">8.2.2.1</span> Prediction vs Causality</h4>
@@ -1594,7 +1594,7 @@ att_end
     </tr>
 </tbody>
 </table></div>
-<p>Of course, our actual Preceptor Table has a lot of question marks, because in reality we have much less information. However, this one will look a bit like the one we have seen so far. What’s the same as in the previous chapters is that we only have data for a small group of people - in our case 115 people interviewed by Enos. Another problem is that Enos’ paper is from March 2014, which is why we have no data at all for 2020. So, we only have data for 03/2014, and only for a sample of 115 people:</p>
+<p>Of course, our <strong>actual</strong> Preceptor Table has a lot of question marks, because in reality we have much less information. However, this one will look a bit like the one we have seen so far. What’s the same as in the previous chapters is that we only have data for a small group of people - in our case 115 people interviewed by Enos. Another problem is that Enos’ paper is from March 2014, which is why we have no data at all for 2020. So, we only have data for 03/2014, and only for a sample of 115 people:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -2070,7 +2070,7 @@ att_end
 </tbody>
 </table></div>
 <p>Notice two things about this table. First, we always have question marks at the lines 2020 to always, even if we know the age in 2014. Since we do not know the birthday of these people, we don’t know whether the age difference is 5 or 6 years. Second, this table works just like the ones we have already seen. For example, we know the age and party of person 1 in 2014, but not in 2020 - that’s not much different than if we had two different people, but we lack data for one of them. Our approach will therefore be the same, i.e., obtaining estimates to replace the question marks.</p>
-<p>Before we proceed, there is one more thing to clarify. You may have noticed that this table is different from the one in chapter 3. Back then we had two columns for each observation, one with a number and one with a question mark. Now we have either two question marks or none at all. Also, in chapter three there was a column for the estimand, and now there is none. The explanation for this is quite simple, and it has to do with the fact that we now have a predictive and not a causal model. Look at the following table, which is simply a different representation from the one above:</p>
+<p>Before we proceed, there is one more thing to clarify. You may have noticed that this table is different from the one in chapter 3. Back then we had two columns for each observation, one with a number and one with a question mark. Now we have either two question marks or none at all. Also, in chapter three there was a column for the parameter, and now there is none. The explanation for this is quite simple, and it has to do with the fact that we now have a predictive and not a causal model. Look at the following (<strong>wrong</strong>) table, which is simply a different representation from the one above:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -2545,8 +2545,8 @@ att_end
     </tr>
 </tbody>
 </table></div>
-<p>This table has the same content as the previous one, but it does not make much sense. Unlike before, we now have two outcome variables, the age if the person is a Democrat and if they are Republican. But as explained earlier, a person does not suddenly get a few years younger or older by voting for another party. We have left the column for the Estimand, but it should be clear that this wouldn’t make sense either. The point is that these tables are only suitable for causal models as we have seen in chapter 3 and will see again later in this chapter.</p>
-<p>Preceptor tables for predictive models like age vs party look like the one we have seen before. In this case there is only <strong>one column for the outcome variable</strong>, and therefore <strong>no column for the estimand</strong>. A column for the estimand would imply that there is a causal effect for each individual person, which is obviously not the case. We can still calculate an estimand here, as we did in chapter 3, but we do not put it in the table for every person. This difference will become clearer in a few minutes when we estimate the model in R.</p>
+<p>This table has the same content as the previous one, but it does not make much sense. Unlike before, we now have two outcome variables, the age if the person is a Democrat and if they are Republican. But as explained earlier, a person does not suddenly get a few years younger or older by voting for another party. We have left the column for the parameter, but it should be clear that this wouldn’t make sense either. The point is that these tables are only suitable for causal models as we have seen in chapter 3 and will see again later in this chapter.</p>
+<p>Preceptor tables for predictive models like age vs party look like the one we have seen before. In this case there is only <strong>one column for the outcome variable</strong>, and therefore <strong>no column for the parameter</strong>. A column for the parameter would imply that there is a causal effect for each individual person, which is not the case. We can still calculate an parameter here, as we did in chapter 3, but we do not put it in the table for every person. This difference will become clearer in later in this chapter when we estimate the model in R.</p>
 </div>
 <div id="the-mathematical-model" class="section level4">
 <h4>
@@ -2554,26 +2554,26 @@ att_end
 <p>We now know that we are working with a predictive model, and that the associated Preceptor Table looks slightly different from causal models. Fortunately, the mathematical model looks the same in both cases. Remember chapter 3 where we saw that each outcome is described by 2 parts:</p>
 <p><span class="math display">\[outcome = in\ the\ model + not\ in\ the\ model\]</span></p>
 <p>In words, any event depends on our explicitly described model as well as on influences unknown to us.Everything that happens in the world is the result of various factors, and we can only ever consider a part of them in our model (because we do not know about some influences, or because we have no data about them). The fact that you are reading this chapter today depends not only on your motivation, but also on how much you have to do in other courses, whether you are sick, whether your Internet connection is good enough to access PPBDS, …</p>
-<p>So far we have only treated the equation above conceptually, but in fact it works just like any other equation. Let’s be a bit more concrete. Our model with 2 estimands would formally look like this:</p>
-<p><span class="math display">\[ \underbrace{y_i}_{outcome} = \underbrace{\beta_1 x_{ir} + \beta_2 x_{id}}_{in\ the\ model} + \underbrace{\epsilon_i}_{not\ in\ the\ model}\]</span></p>
+<p>So far we have only treated the equation above conceptually, but in fact it works just like any other equation. Let’s be a bit more concrete. Our model would formally look like this:</p>
+<p><span class="math display">\[ \underbrace{y_i}_{outcome} = \underbrace{\beta_1 x_{r,i} + \beta_2 x_{d,i}}_{in\ the\ model} + \underbrace{\epsilon_i}_{not\ in\ the\ model}\]</span></p>
 <p>where 
 <span class="math display">\[x_{r}, x_{d} \in \{0,1\}\]</span> 
 <span class="math display">\[\epsilon_i \sim N(0, \sigma^2)\]</span></p>
 <p>Don’t panic dear poets and philosophers, the whole thing is easier than it looks at first sight.</p>
 <ul>
 <li><p>On the left-hand side we have the outcome, <span class="math inline">\(y_i\)</span>, which is the variable to be explained. In our case, this is the age in years of a person.</p></li>
-<li><p>On the right-hand side we first have the part contained in the model, consisting of two similar looking terms. The two terms stand for Republicans and Democrats and work as follows. Each term consists of a beta and an x. The betas are our estimands; <span class="math inline">\(\beta_1\)</span> is the age if someone is a Republican and <span class="math inline">\(\beta_2\)</span> is the age if someone is a Democrat. The x’s are our explanatory variables and take the values 1 or 0, whichever is applicable. If someone is a Republican we have <span class="math inline">\(x_{ir} = 1\)</span> and <span class="math inline">\(x_{id} = 0\)</span>, if someone is a Democrat we have <span class="math inline">\(x_{ir} = 0\)</span> and <span class="math inline">\(x_{id} = 1\)</span>. In other words, the x’s are binary variables and are mutually exclusive (if you are a Democrat, you cannot also be a Republican).</p></li>
+<li><p>On the right-hand side we first have the part contained in the model, consisting of two similar looking terms. The two terms stand for Republicans and Democrats and work as follows. Each term consists of a beta and an x. The betas are our two parameters; <span class="math inline">\(\beta_1\)</span> is the age if someone is a Republican and <span class="math inline">\(\beta_2\)</span> is the age if someone is a Democrat. The x’s are our explanatory variables and take the values 1 or 0, whichever is applicable. If someone is a Republican we have <span class="math inline">\(x_{ir} = 1\)</span> and <span class="math inline">\(x_{id} = 0\)</span>, if someone is a Democrat we have <span class="math inline">\(x_{ir} = 0\)</span> and <span class="math inline">\(x_{id} = 1\)</span>. In other words, the x’s are binary variables and are mutually exclusive (if you are a Democrat, you cannot also be a Republican).</p></li>
 <li><p>The last part, <span class="math inline">\(\epsilon_i\)</span> (“epsilon”), represents the unexplained part and is called error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone’s age but are not explained by party affiliation. We assume that this error follows a normal distribution with an expected value of 0, i.e., it is 0 on average.</p></li>
 <li><p>The small i’s are an index to number observations in our data set. It is equivalent to the “ID” column in our Preceptor Table and simply states that the outcome for person i is explained by the modeled and non-modelled factors for person i. The betas are numbered with 1, 2, 3, etc. The corresponding x’s have an “r” or “d” subscript instead, for Republicans or Democrats.</p></li>
 </ul>
-<p>Note that this equation represents the population values, meaning all people in the US. But since we cannot ask all people in the country about their political views and age, the <em>true</em> values of <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> are unknown. For this reason we build models that give us <em>estimates</em> for the estimands based on <em>samples</em>. And because we do not know the size of the error term, it is not included in the equation (we assume it is zero). The equation we will actually use therefore looks like this:</p>
-<p><span class="math display">\[ \hat{y_i} = \hat\beta_1 x_{ir} + \hat\beta_2 x_{id}\]</span>
+<p>Note that this equation represents the population values, meaning all people in the US. But since we cannot ask all people in the country about their political views and age, the <em>true</em> values of <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> will always be unknown. For this reason we build models that give us <em>estimates</em> for the parameters based on <em>samples</em>. And because we do not know the size of the error term, it is not included in the equation (we assume it is zero). The equation we will actually use therefore looks like this:</p>
+<p><span class="math display">\[ \hat{y_i} = \hat\beta_1 x_{r,i} + \hat\beta_2 x_{d,i}\]</span>
 where 
-<span class="math display">\[x_{r}, x_{d} \in \{0,1\}\]</span></p>
-<p>All these new concepts can be quite confusing, especially what the difference between the estimated equation and the population equation above is. The best way to understand this is to look at an example. Imagine we have made an estimate in R with the 115 commuters in the ‘trains’ data set, and obtained the following estimates:</p>
+<span class="math display">\[x_{r}, x_{d} \in \{0,1\}\]</span>
+All these new concepts can be quite confusing, especially what the difference between the sample equation and the population equation is. The best way to understand this is to look at an example. Imagine we have made an estimate in R with the 115 commuters in the ‘trains’ data set, and obtained the following estimates:</p>
 <p><span class="math display">\[\hat\beta_1 = 38.9\]</span> 
 <span class="math display">\[\hat\beta_2 = 41.2\]</span></p>
-<p>In other words, our best estimate for the age of a random person is 38.9 years if they are a Republican and 41.2 years if they are a Democrat. If we put this into our equation for <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>, it looks like this:</p>
+<p>In other words, our best estimate for the age of a random person is 38.9 years if they are a Republican and 41.2 years if they are a Democrat. If we put this into our sample equation for <span class="math inline">\(\hat\beta_1\)</span> and <span class="math inline">\(\hat\beta_2\)</span>, it looks like this:</p>
 <p><span class="math display">\[ \hat{y_i} = 38.9 x_{ir} + 41.2 x_{id}\]</span>
 This can now be used to make predictions about the age of people. Suppose we are walking around in Boston and meet Pete, a Democrat, and Arnold, a Republican. We get an estimate of their age by using the corresponding values for x. Pete is a Democrat, so we set the variable <span class="math inline">\(x_{ir} = 0\)</span> and <span class="math inline">\(x_{id} = 1\)</span> to get the following estimate for his age:</p>
 <p><span class="math display">\[ \hat{y}_{pete} = 38.9*0 + 41.2*1\]</span>
@@ -2581,10 +2581,10 @@ This can now be used to make predictions about the age of people. Suppose we are
 We do the same for Arnold, but here we set the variable for Republicans to 1:</p>
 <p><span class="math display">\[ \hat{y}_{arnold} = 38.9*1 + 41.2*0\]</span>
 <span class="math display">\[ \hat{y}_{arnold} = 38.9\ years\]</span>
-And voila, we just produced two estimates. Simple, right? The only thing we need to know is how to get the estimands. That’s what we’ll look at in the next section. But before we do that, let’s have a quick look at the connection between the two equations seen above. Suppose that Pete and Arnold tell us their real ages, 38 and 73, respectively. Obviously we were a bit off with our estimates. This difference between our estimates and the real data, <span class="math inline">\(\epsilon_i\)</span>, is the unexplained part we did not take into account in our model:<br></p>
+Great, we just produced two estimates! Simple, right? The only thing we need to know is how to get the betas. That’s what we’ll look at in the next section. But before we do that, let’s have a quick look at the connection between the the two equations seen above. Suppose that Pete and Arnold tell us their real ages, 38 and 73, respectively. Obviously we were a bit off with our estimates. This difference between our estimates and the real data, <span class="math inline">\(\epsilon_i\)</span>, is the unexplained part we did not take into account in our model:<br></p>
 <p><span class="math display">\[ y_{pete} = \underbrace{38}_{outcome} = \underbrace{41.2}_{in\ the\ model} - \underbrace{3.2}_{not\ in\ the\ model}\]</span>
-<span class="math display">\[ y_{arnold} = \underbrace{73}_{outcome} = \underbrace{38.9}_{in\ the\ model} + \underbrace{34.1}_{not\ in\ the\ model}\]</span>
-Almost always when we apply our model to real data, we will at least be a little off. Given that it is unlikely that anyone is <em>exactly</em> 41.2 years old, this is not very surprising. But this does not mean that our estimate is useless. As long as our sample is representative of the population, our error will be 0 on average (i.e., we will underestimate ourselves by about as many years as we overestimate ourselves).</p>
+<span class="math display">\[ y_{arnold} = \underbrace{73}_{outcome} = \underbrace{38.9}_{in\ the\ model} + \underbrace{34.1}_{not\ in\ the\ model}\]</span></p>
+<p>Almost always when we apply our model to real data, we will at least be a little off. Given that it is unlikely that anyone is <em>exactly</em> 41.2 years old, this is not very surprising. But this does not mean that our estimate is useless. As long as our sample is representative of the population, our error will be 0 on average (i.e., we will underestimate ourselves by about as many years as we overestimate ourselves).</p>
 <p><br><br></p>
 </div>
 </div>
@@ -2594,7 +2594,7 @@ Almost always when we apply our model to real data, we will at least be a little
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-712"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-717"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 8.3: Courage<!--</p>-->
 <!--</div>--></span>
@@ -2603,16 +2603,16 @@ Almost always when we apply our model to real data, we will at least be a little
 <div id="the-fitted-model" class="section level4">
 <h4>
 <span class="header-section-number">8.2.3.1</span> The fitted model</h4>
-<p>To get our estimates for our two estimands, we will again use the <code>stan_glm()</code> function from chapter 7. If we take a look at the formula, we can see that it is similar to the equation from before.</p>
+<p>To get estimates for our two parameters, we will again use the <code>stan_glm()</code> function from chapter 7. If we take a look at the formula, we can see that it is similar to the equation from before.</p>
 <ul>
 <li>The variable before the tilde, <code>age</code>, is our outcome.</li>
 <li>The tilde is equivalent to “=“.</li>
-<li>The only explanatory variable is ‘party’. This variable has only two values, ‘Democrat’ and ‘Republican’, and R automatically creates an estimand for each of the two groups. We therefore end up with two explanatory variables as seen in the equation.</li>
+<li>The only explanatory variable is ‘party’. This variable has only two values, ‘Democrat’ and ‘Republican’, and R automatically creates an estimate for each of the two groups. We therefore end up with two explanatory variables as seen in the equation.</li>
 </ul>
 <p>We have also added “- 1” at the end of the equation, telling R that we do not want an intercept (this is otherwise added by default). We will deal both intercepts and slope parameters in chapter 9, but for now don’t worry about this. Running this code in R, we get the following output:</p>
-<div class="sourceCode" id="cb910"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb910-1"><a href="three-parameters.html#cb910-1"></a>obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(age <span class="op">~</span><span class="st"> </span>party <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> trains, <span class="dt">refresh =</span> <span class="dv">0</span>)</span>
-<span id="cb910-2"><a href="three-parameters.html#cb910-2"></a></span>
-<span id="cb910-3"><a href="three-parameters.html#cb910-3"></a>obj</span></code></pre></div>
+<div class="sourceCode" id="cb911"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb911-1"><a href="three-parameters.html#cb911-1"></a>fit_obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(age <span class="op">~</span><span class="st"> </span>party <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> trains, <span class="dt">refresh =</span> <span class="dv">0</span>)</span>
+<span id="cb911-2"><a href="three-parameters.html#cb911-2"></a></span>
+<span id="cb911-3"><a href="three-parameters.html#cb911-3"></a>fit_obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      age ~ party - 1
@@ -2630,18 +2630,17 @@ Almost always when we apply our model to real data, we will at least be a little
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
-<p>Compared to chapter 7 we now have two estimates, “partyDemocrat” and “partyRepublican” instead of one. Our two estimands are therefore:</p>
+<p>Compared to chapter 7 we now have two estimates, “partyDemocrat” and “partyRepublican” instead of one. Our two parameters are therefore:</p>
 <p><span class="math display">\[\hat\beta_{1} = 41.1\]</span> 
 <span class="math display">\[\hat\beta_{2} = 42.6\]</span>
 Our best estimate of the age of a randomly selected person is 41.1 years if they are a Republican and 42.6 years if they are a Democrat. In addition, we get the information from R that the standard deviations for both are <span class="math inline">\(\pm\)</span> 1.3 years and <span class="math inline">\(\pm\)</span> 2.9 years, respectively. Notice how the smaller sample size leads to more uncertainty in the estimate for Republicans. Again inserting it into the equation we used in the previous section, we get:</p>
-<p><span class="math display">\[ \hat{y_i} = 42.6 x_{ir} + 41.1 x_{id}\]</span></p>
+<p><span class="math display">\[ \hat{y_i} = 42.6 x_{r,i} + 41.1 x_{d,i}\]</span></p>
 <p>Like before, this fitted model allows us to find the predicted outcome, or <em>fitted value</em>, for specific individuals. But as we have seen, this only explains part of the actual outcomes. The other part, the error term, represents unmodeled variation and gives us an indication of how accurate our predictions will be.</p>
 </div>
 <div id="unmodeled-variation" class="section level4">
 <h4>
 <span class="header-section-number">8.2.3.2</span> Unmodeled variation</h4>
 <p>To continue our discussion of these values, we’ll bring back our Preceptor table (the actual one). For your reference, it looked like this:</p>
-<p><br><br></p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -3116,9 +3115,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
     </tr>
 </tbody>
 </table></div>
-<p><br><br></p>
-<p>To keep it simple, the table will use now displays only a sample of eight people from the <code>trains</code> data set instead of all N commuters. We have also added two more columns to show the prediction and the error term for each person. The first one in the table, Age, is the <em>actual</em> outcome variable (<span class="math inline">\(y_i\)</span>). The second one, called “fitted value”, is our <em>prediction</em> of the outcome variable (<span class="math inline">\(\hat{y_i}\)</span>). The third one, called “residual”, is our error term (<span class="math inline">\(\epsilon_i,\ also\ r_i\)</span>). The actual age of each person is the addition of the model prediction and the unmodeled variation (<span class="math inline">\(y_i = \hat{y_i} + r_i\)</span>.</p>
-<p><br><br></p>
+<p>Recall that when creating a model, our goal is to replace the question marks in that table. To keep it simple, the table will use now displays only a sample of eight people from the <code>trains</code> data set instead of all N commuters. We have also added two more columns to show the prediction and the error term for each person. The first one in the table, Age, is the <em>actual</em> outcome variable (<span class="math inline">\(y_i\)</span>). The second one, called “fitted value”, is our <em>prediction</em> of the outcome variable (<span class="math inline">\(\hat{y_i}\)</span>). The third one, called “residual”, is our error term (<span class="math inline">\(\epsilon_i,\ also\ r_i\)</span>). The actual age of each person is the addition of the model prediction and the unmodeled variation (<span class="math inline">\(y_i = \hat{y_i} + r_i\)</span>).</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -3467,8 +3464,8 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>ID</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Age</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>fitted</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>residual</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Fitted</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Residual</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Party</strong></th>
     </tr></thead>
 <tbody class="gt_table_body">
@@ -3610,18 +3607,17 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
     </tr>
 </tbody>
 </table></div>
-<p><br><br></p>
 <p>The fitted values are the same for all Republicans and for all Democrats, as the fitted value is one of the two estimates output by our model. However, almost all of the residuals are different due to each observation’s own variation from the fitted value estimate. The only observations with the same residual are 4 and 41. This is because they are both Democrats that are the same age: with the same <span class="math inline">\(y_i\)</span> and <span class="math inline">\(\hat{y_i}\)</span>, the calculation of their residuals is identical. This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual who walks in the room even using our model.</p>
 <p>We can get a better picture of the unmodeled variation in our sample if we plot these three values for all individuals in our data set. The following three histograms show the actual outcomes, fitted values and residuals of all people in <code>trains</code>:</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-717-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-723-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>The three plots are structured like our equation and table above, i.e. a value in the left plot is the addition of one value in the middle and one in the right plot. The actual age distribution looks like a normal distribution, centered around 43 and with a standard deviation of about 12 years (the distribution could be random, but the exact reasons are not important here). The plot for the fitted values shows only two adjacent spikes, which represent the estimates for Democrats and Republicans. Since the residuals represent the difference between the two plots, their distribution looks like a mirror image of the first plot around the value 43. Indeed, our model seems to be quite inaccurate.</p>
-<p>We already learned about another method to reveal the distribution of the residuals. When we estimate a model with stan_glm() we automatically get the standard deviation of the residuals, or <em>sigma</em>. A look at the output from before shows a value of 12.3, indicating that the actual age within <span class="math inline">\(\pm\)</span> is 12.3 years around our predicted value for about 68% of the people in <code>trains</code>, and <span class="math inline">\(\pm\)</span> 2*12.3 = 24.6 years around our prediction for about 95% of the people.</p>
+<p>We already learned about another method to reveal the distribution of the residuals. When we estimate a model with stan_glm() we automatically get the standard deviation of the residuals, or <em>sigma</em>. Recall that sigma is the third parameter of our model, but we have ignored it so far since it was not useful for any of the analysis above. A look at the output from before shows a sigma of 12.3, indicating that the actual age within <span class="math inline">\(\pm\)</span> is 12.3 years around our predicted value for about 68% of the people in <code>trains</code>, and <span class="math inline">\(\pm\)</span> 2*12.3 = 24.6 years around our prediction for about 95% of the people.</p>
 <p>The main reason and the solution for this strong deviation can be seen by looking at the histograms again. A bar on the left is always the result of the bars in the middle and right. The better our prediction is, i.e. the more the fitted values match the real ones, the more the middle histogram looks like the one on the left. Only the part that does not coincide is “moved” to the right plot. Apparently we need more bars in the middle, that is, we need a model that can predict more than just two values. We can achieve this by adding more (meaningful) variables to our model. An example would be a variable that shows whether the person has ever used Windows 95; if so, we would probably add a few more years to our estimate. But don’t worry about that now, we will learn in the next chapter how to create models with more variables.</p>
 <!-- Are separate plots for Democrats and Republicans useful?
 
-<img src="book_temp_files/figure-html/unnamed-chunk-718-1.png" width="672"  />
+<img src="book_temp_files/figure-html/unnamed-chunk-724-1.png" width="672"  />
 
-<img src="book_temp_files/figure-html/unnamed-chunk-719-1.png" width="672"  />
+<img src="book_temp_files/figure-html/unnamed-chunk-725-1.png" width="672"  />
 
 -->
 <p><br><br></p>
@@ -3633,7 +3629,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-720"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-726"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.4: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -3642,91 +3638,110 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <div id="making-predictions" class="section level4">
 <h4>
 <span class="header-section-number">8.2.4.1</span> Making Predictions</h4>
-<!-- I don't think the newdata argument should be used here. We do not want to exclude any of the two groups, and setting no argument gives us simulations for both groups, which is what we want. -->
-<p>Some questions can be answered with the simple equation we have learned before. But often it is more useful to make use of the simulation results of ‘stan_glm’. For this we can use the <code>posterior_predict</code> function, which we’ve already seen in chapter 7. Suppose we run into a person; what are the chances that this person is over 50 years old?</p>
-<p>We start by generating a series of simulation results. By running <code>posterior_predict</code> on our model ‘object’ we get a data frame with 4000x115 observations (4000 estimates for the age of each of the 115 people in ‘trains’). In addition, we draw a random number from all numbers from 1-115, which becomes our random person.</p>
-<div class="sourceCode" id="cb912"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb912-1"><a href="three-parameters.html#cb912-1"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(obj)</span>
-<span id="cb912-2"><a href="three-parameters.html#cb912-2"></a></span>
-<span id="cb912-3"><a href="three-parameters.html#cb912-3"></a>no &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">115</span>, <span class="dv">1</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb913"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb913-1"><a href="three-parameters.html#cb913-1"></a>perc &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="st">"pred"</span> =<span class="st"> </span>pp[, no]) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb913-2"><a href="three-parameters.html#cb913-2"></a><span class="st">          </span><span class="kw">mutate</span>(<span class="st">"ot_50"</span> =<span class="st"> </span><span class="kw">ifelse</span>(pred <span class="op">&gt;</span><span class="st"> </span><span class="dv">50</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb913-3"><a href="three-parameters.html#cb913-3"></a><span class="st">          </span><span class="kw">summarize</span>(<span class="dt">perc =</span> <span class="kw">sum</span>(ot_<span class="dv">50</span>)<span class="op">/</span><span class="kw">n</span>() <span class="op">*</span><span class="st"> </span><span class="dv">100</span>) </span>
-<span id="cb913-4"><a href="three-parameters.html#cb913-4"></a>perc</span></code></pre></div>
+<p>Some questions can be answered with the simple equation we have learned before However, instead of using the two pre-calculated values for Democrats and Republicans returned by <code>stan_glm</code>, it can be helpful to directly use simulation results. Recall from chapter 7 that when running <code>stan_glm</code>, an algorithm creates thousands of simulations, each of which contains an estimate. The median of these thousands of parameters estimates is then returned as single estimate. This means that behind each of our two estimates for Democrats’ and Republicans’ age, there are actually thousand of values. The long series of simulation results are especially helpful when we want to make predictions involving probabilities.</p>
+<p>What sounds complicated is actually just a matter of a few extra lines of code. To start with a simple question, what are the chances that a random Democrat is over 50 years old? First, we create a tibble with the desired input for our model. In our case the tibble has a column named “party” which contains a single observation named “Democrat”. This is a bit different than before, when we only specified the input to be 0 or 1. Next, we’ll use the <code>posterior_predict</code> function from chapter 7 to get some simulation results. <code>posterior_predict</code> takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from ‘Courage’ and the tibble is the one we just created in the previous step.</p>
+<div class="sourceCode" id="cb913"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb913-1"><a href="three-parameters.html#cb913-1"></a><span class="co"># Creating a tibble with a column named "party" and</span></span>
+<span id="cb913-2"><a href="three-parameters.html#cb913-2"></a><span class="co"># a single observation, "Democrat". We will use this to </span></span>
+<span id="cb913-3"><a href="three-parameters.html#cb913-3"></a><span class="co"># tell R that we want simulation results for a single </span></span>
+<span id="cb913-4"><a href="three-parameters.html#cb913-4"></a><span class="co"># Democrat.</span></span>
+<span id="cb913-5"><a href="three-parameters.html#cb913-5"></a></span>
+<span id="cb913-6"><a href="three-parameters.html#cb913-6"></a>new &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">party =</span> <span class="st">"Democrat"</span>)</span>
+<span id="cb913-7"><a href="three-parameters.html#cb913-7"></a></span>
+<span id="cb913-8"><a href="three-parameters.html#cb913-8"></a><span class="co"># Generating simulation results. The first argument </span></span>
+<span id="cb913-9"><a href="three-parameters.html#cb913-9"></a><span class="co"># specifies the fitted model to be used, which in our</span></span>
+<span id="cb913-10"><a href="three-parameters.html#cb913-10"></a><span class="co"># case is the one we generated in "Courage". The second</span></span>
+<span id="cb913-11"><a href="three-parameters.html#cb913-11"></a><span class="co"># argument specifies the input, and takes tibbles only.</span></span>
+<span id="cb913-12"><a href="three-parameters.html#cb913-12"></a></span>
+<span id="cb913-13"><a href="three-parameters.html#cb913-13"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">newdata =</span> new)</span>
+<span id="cb913-14"><a href="three-parameters.html#cb913-14"></a></span>
+<span id="cb913-15"><a href="three-parameters.html#cb913-15"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##        1
+##  [1,] 38
+##  [2,] 41
+##  [3,] 50
+##  [4,] 19
+##  [5,] 43
+##  [6,] 32
+##  [7,] 47
+##  [8,] 60
+##  [9,] 36
+## [10,] 67</code></pre>
+<p>A look at the first few observations shows that we simply get ten different estimates for the age of a person. Since we have defined in our tibble that the value of “party” for this person is “Democrat”, these are estimates for a random Democrat. It is important to understand that this is not a concrete person from the <code>trains</code> dataset - the algorithm in <code>posterior_predict</code> simply uses the existing data of all democrats in <code>trains</code> to predict how old a random additional democrat could be in 4000 different scenarios (that’s how many rows the tibble has). When the values from all 4000 scenarios are plotted in a histogram, you can see that they are centered around the single estimate of 42.6 that we calculated in “Courage.” So, instead of this single like before estimate, we now use the thousands of simulations that lie behind it.</p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-728-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>Once we have the simulation results for our random democrat, we just have to use our wrangling skills. For this, we proceed in a similar way as in chapter 7:</p>
+<div class="sourceCode" id="cb915"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb915-1"><a href="three-parameters.html#cb915-1"></a><span class="kw">as_tibble</span>(pp) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb915-2"><a href="three-parameters.html#cb915-2"></a><span class="st">  </span></span>
+<span id="cb915-3"><a href="three-parameters.html#cb915-3"></a><span class="st">  </span><span class="co"># Renaming the column containing</span></span>
+<span id="cb915-4"><a href="three-parameters.html#cb915-4"></a><span class="st">  </span><span class="co"># the simulation results.</span></span>
+<span id="cb915-5"><a href="three-parameters.html#cb915-5"></a><span class="st">  </span></span>
+<span id="cb915-6"><a href="three-parameters.html#cb915-6"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">age =</span> <span class="st">"1"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb915-7"><a href="three-parameters.html#cb915-7"></a><span class="st">  </span></span>
+<span id="cb915-8"><a href="three-parameters.html#cb915-8"></a><span class="st">  </span><span class="co"># Creating a new column that is TRUE if someone </span></span>
+<span id="cb915-9"><a href="three-parameters.html#cb915-9"></a><span class="st">  </span><span class="co"># is over 50 years old, and FALSE otherwise.</span></span>
+<span id="cb915-10"><a href="three-parameters.html#cb915-10"></a><span class="st">  </span></span>
+<span id="cb915-11"><a href="three-parameters.html#cb915-11"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ot_50 =</span> <span class="kw">ifelse</span>(age <span class="op">&gt;</span><span class="st"> </span><span class="dv">50</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb915-12"><a href="three-parameters.html#cb915-12"></a><span class="st">  </span></span>
+<span id="cb915-13"><a href="three-parameters.html#cb915-13"></a><span class="st">  </span><span class="co"># Calculating the percentage of TRUEs.</span></span>
+<span id="cb915-14"><a href="three-parameters.html#cb915-14"></a><span class="st">  </span></span>
+<span id="cb915-15"><a href="three-parameters.html#cb915-15"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">perc =</span> <span class="kw">sum</span>(ot_<span class="dv">50</span>)<span class="op">/</span><span class="kw">n</span>() <span class="op">*</span><span class="st"> </span><span class="dv">100</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 1
 ##    perc
 ##   &lt;dbl&gt;
-## 1  27.4</code></pre>
-<div class="sourceCode" id="cb915"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb915-1"><a href="three-parameters.html#cb915-1"></a><span class="kw">set.seed</span>(<span class="dv">100</span>)</span>
-<span id="cb915-2"><a href="three-parameters.html#cb915-2"></a></span>
-<span id="cb915-3"><a href="three-parameters.html#cb915-3"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(obj)</span>
-<span id="cb915-4"><a href="three-parameters.html#cb915-4"></a></span>
-<span id="cb915-5"><a href="three-parameters.html#cb915-5"></a>dems_no &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb915-6"><a href="three-parameters.html#cb915-6"></a><span class="st">              </span><span class="kw">mutate</span>(<span class="dt">id =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">115</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb915-7"><a href="three-parameters.html#cb915-7"></a><span class="st">              </span><span class="kw">filter</span>(party <span class="op">==</span><span class="st"> "Democrat"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb915-8"><a href="three-parameters.html#cb915-8"></a><span class="st">              </span><span class="kw">pull</span>(id) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb915-9"><a href="three-parameters.html#cb915-9"></a><span class="st">              </span><span class="kw">sample</span>(., <span class="dv">3</span>)</span>
-<span id="cb915-10"><a href="three-parameters.html#cb915-10"></a></span>
-<span id="cb915-11"><a href="three-parameters.html#cb915-11"></a>dems_no</span></code></pre></div>
-<pre><code>## [1] 39 75  5</code></pre>
-<div class="sourceCode" id="cb917"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb917-1"><a href="three-parameters.html#cb917-1"></a>reps_no &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb917-2"><a href="three-parameters.html#cb917-2"></a><span class="st">              </span><span class="kw">mutate</span>(<span class="dt">id =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">115</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb917-3"><a href="three-parameters.html#cb917-3"></a><span class="st">              </span><span class="kw">filter</span>(party <span class="op">==</span><span class="st"> "Republican"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb917-4"><a href="three-parameters.html#cb917-4"></a><span class="st">              </span><span class="kw">pull</span>(id) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb917-5"><a href="three-parameters.html#cb917-5"></a><span class="st">              </span><span class="kw">sample</span>(., <span class="dv">3</span>)</span>
-<span id="cb917-6"><a href="three-parameters.html#cb917-6"></a></span>
-<span id="cb917-7"><a href="three-parameters.html#cb917-7"></a>reps_no</span></code></pre></div>
-<pre><code>## [1] 81 43 10</code></pre>
-<div class="sourceCode" id="cb919"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb919-1"><a href="three-parameters.html#cb919-1"></a>dems &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="kw">data.frame</span>(<span class="st">"pred"</span> =<span class="st"> </span>pp[, <span class="kw">c</span>(<span class="dv">39</span>, <span class="dv">75</span>, <span class="dv">5</span>)])) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb919-2"><a href="three-parameters.html#cb919-2"></a><span class="st">                </span><span class="kw">rowwise</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb919-3"><a href="three-parameters.html#cb919-3"></a><span class="st">                </span><span class="kw">mutate</span>(<span class="dt">dems_oldest =</span> <span class="kw">max</span>(<span class="kw">c</span>(pred<span class="fl">.39</span>, pred<span class="fl">.75</span>, pred<span class="fl">.5</span>))) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb919-4"><a href="three-parameters.html#cb919-4"></a><span class="st">                </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb919-5"><a href="three-parameters.html#cb919-5"></a><span class="st">                </span><span class="kw">mutate</span>(<span class="dt">sim_no =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4000</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb919-6"><a href="three-parameters.html#cb919-6"></a><span class="st">                </span><span class="kw">select</span>(dems_oldest, sim_no)</span>
+## 1    26</code></pre>
+<p>Therefore we can assume with 27.8% probability that a random democrat is over 50 years old. We can also use simulation results to answer questions involving several persons or groups. Suppose three democrats and three republicans show up. What age difference should we expect between the youngest Republican and the oldest Democrat?</p>
+<p>As before we start by creating a tibble with the desired input. Note that the name of the column (“party”) and the observations (“Democrat”, “Republican”) must always be named <em>exactly</em> as in the data set. This tibble as well as our model can then be used as arguments for <code>posterior_predict</code>:</p>
+<div class="sourceCode" id="cb917"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb917-1"><a href="three-parameters.html#cb917-1"></a>new &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">party =</span> <span class="kw">c</span>(<span class="st">"Democrat"</span>, <span class="st">"Democrat"</span>, <span class="st">"Democrat"</span>, </span>
+<span id="cb917-2"><a href="three-parameters.html#cb917-2"></a>                        <span class="st">"Republican"</span>, <span class="st">"Republican"</span>,<span class="st">"Republican"</span>))</span>
+<span id="cb917-3"><a href="three-parameters.html#cb917-3"></a></span>
+<span id="cb917-4"><a href="three-parameters.html#cb917-4"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">newdata =</span> new)</span>
+<span id="cb917-5"><a href="three-parameters.html#cb917-5"></a></span>
+<span id="cb917-6"><a href="three-parameters.html#cb917-6"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##        1  2  3  4  5  6
+##  [1,] 68 38 59 51 32 49
+##  [2,] 31 41 60 58 30 68
+##  [3,] 25 58 36 52 39 31
+##  [4,] 36 39 52 48 41 40
+##  [5,] 59 34 23 38 41 69
+##  [6,] 50 41 45 54 41 53
+##  [7,] 62 42 52 29 33 32
+##  [8,] 62 25 42 42 43 78
+##  [9,] 19 22 32 45 66 50
+## [10,] 39 34 39 47 21 37</code></pre>
+<p>A look at the output shows that we now have 6 columns: one for each person. R does not name the columns, but they are arranged in the same order in which we specified the persons in the tibble (D, D, R, R, R). Notice that all values in a row belong to the same scenario, i.e. each row represents a scenario where the 6 people meet.</p>
+<p>To determine the expected age difference, we can then proceed as follows:</p>
+<div class="sourceCode" id="cb919"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb919-1"><a href="three-parameters.html#cb919-1"></a><span class="kw">as_tibble</span>(pp) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb919-2"><a href="three-parameters.html#cb919-2"></a><span class="st">  </span></span>
+<span id="cb919-3"><a href="three-parameters.html#cb919-3"></a><span class="st">  </span><span class="co"># Using more meaningful names.</span></span>
+<span id="cb919-4"><a href="three-parameters.html#cb919-4"></a><span class="st">  </span></span>
+<span id="cb919-5"><a href="three-parameters.html#cb919-5"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">dem_1 =</span> <span class="st">"1"</span>, <span class="dt">dem_2 =</span> <span class="st">"2"</span>, <span class="dt">dem_3 =</span> <span class="st">"3"</span>,</span>
+<span id="cb919-6"><a href="three-parameters.html#cb919-6"></a>         <span class="dt">rep_1 =</span> <span class="st">"4"</span>, <span class="dt">rep_2 =</span> <span class="st">"5"</span>, <span class="dt">rep_3 =</span> <span class="st">"6"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb919-7"><a href="three-parameters.html#cb919-7"></a></span>
-<span id="cb919-8"><a href="three-parameters.html#cb919-8"></a>dems</span></code></pre></div>
-<pre><code>## # A tibble: 4,000 x 2
-##    dems_oldest sim_no
-##          &lt;dbl&gt;  &lt;int&gt;
-##  1        55.8      1
-##  2        64.7      2
-##  3        48.1      3
-##  4        38.0      4
-##  5        61.2      5
-##  6        53.3      6
-##  7        51.4      7
-##  8        44.1      8
-##  9        63.5      9
-## 10        76.3     10
-## # … with 3,990 more rows</code></pre>
-<div class="sourceCode" id="cb921"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb921-1"><a href="three-parameters.html#cb921-1"></a>reps &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="kw">data.frame</span>(<span class="st">"pred"</span> =<span class="st"> </span>pp[, <span class="kw">c</span>(<span class="dv">81</span>, <span class="dv">43</span>, <span class="dv">10</span>)])) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb921-2"><a href="three-parameters.html#cb921-2"></a><span class="st">                </span><span class="kw">rowwise</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb921-3"><a href="three-parameters.html#cb921-3"></a><span class="st">                </span><span class="kw">mutate</span>(<span class="dt">reps_youngest =</span> <span class="kw">min</span>(<span class="kw">c</span>(pred<span class="fl">.81</span>, pred<span class="fl">.43</span>, pred<span class="fl">.10</span>))) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb921-4"><a href="three-parameters.html#cb921-4"></a><span class="st">                </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb921-5"><a href="three-parameters.html#cb921-5"></a><span class="st">                </span><span class="kw">mutate</span>(<span class="dt">sim_no =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4000</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb921-6"><a href="three-parameters.html#cb921-6"></a><span class="st">                </span><span class="kw">select</span>(reps_youngest, sim_no)</span>
-<span id="cb921-7"><a href="three-parameters.html#cb921-7"></a></span>
-<span id="cb921-8"><a href="three-parameters.html#cb921-8"></a>reps</span></code></pre></div>
-<pre><code>## # A tibble: 4,000 x 2
-##    reps_youngest sim_no
-##            &lt;dbl&gt;  &lt;int&gt;
-##  1          16.9      1
-##  2          22.1      2
-##  3          44.9      3
-##  4          33.8      4
-##  5          35.9      5
-##  6          30.0      6
-##  7          30.7      7
-##  8          44.0      8
-##  9          48.8      9
-## 10          36.1     10
-## # … with 3,990 more rows</code></pre>
-<div class="sourceCode" id="cb923"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb923-1"><a href="three-parameters.html#cb923-1"></a><span class="kw">inner_join</span>(dems, reps, <span class="dt">by =</span> <span class="st">"sim_no"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb923-2"><a href="three-parameters.html#cb923-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age_diff =</span> dems_oldest <span class="op">-</span><span class="st"> </span>reps_youngest) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb923-3"><a href="three-parameters.html#cb923-3"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_diff =</span> <span class="kw">mean</span>(age_diff)) </span></code></pre></div>
+<span id="cb919-8"><a href="three-parameters.html#cb919-8"></a><span class="st">  </span><span class="co"># Grouping the data by rows.</span></span>
+<span id="cb919-9"><a href="three-parameters.html#cb919-9"></a><span class="st">  </span></span>
+<span id="cb919-10"><a href="three-parameters.html#cb919-10"></a><span class="st">  </span><span class="kw">rowwise</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb919-11"><a href="three-parameters.html#cb919-11"></a><span class="st">  </span></span>
+<span id="cb919-12"><a href="three-parameters.html#cb919-12"></a><span class="st">  </span><span class="co"># Creating three new columns. The first two are the </span></span>
+<span id="cb919-13"><a href="three-parameters.html#cb919-13"></a><span class="st">  </span><span class="co"># highest age among Democrats and the lowest age</span></span>
+<span id="cb919-14"><a href="three-parameters.html#cb919-14"></a><span class="st">  </span><span class="co"># among Republicans, respectively. The third one is</span></span>
+<span id="cb919-15"><a href="three-parameters.html#cb919-15"></a><span class="st">  </span><span class="co"># the difference between the first two.</span></span>
+<span id="cb919-16"><a href="three-parameters.html#cb919-16"></a><span class="st">  </span></span>
+<span id="cb919-17"><a href="three-parameters.html#cb919-17"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">dems_oldest =</span> <span class="kw">max</span>(<span class="kw">c</span>(dem_<span class="dv">1</span>, dem_<span class="dv">2</span>, dem_<span class="dv">3</span>)),</span>
+<span id="cb919-18"><a href="three-parameters.html#cb919-18"></a>         <span class="dt">reps_youngest =</span> <span class="kw">min</span>(<span class="kw">c</span>(rep_<span class="dv">1</span>, rep_<span class="dv">2</span>, rep_<span class="dv">3</span>)),</span>
+<span id="cb919-19"><a href="three-parameters.html#cb919-19"></a>         <span class="dt">age_diff =</span> dems_oldest <span class="op">-</span><span class="st"> </span>reps_youngest) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb919-20"><a href="three-parameters.html#cb919-20"></a><span class="st">  </span></span>
+<span id="cb919-21"><a href="three-parameters.html#cb919-21"></a><span class="st">  </span><span class="co"># Ungroup to tell R not to perform rowwise operations</span></span>
+<span id="cb919-22"><a href="three-parameters.html#cb919-22"></a><span class="st">  </span><span class="co"># anymore.</span></span>
+<span id="cb919-23"><a href="three-parameters.html#cb919-23"></a><span class="st">  </span></span>
+<span id="cb919-24"><a href="three-parameters.html#cb919-24"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb919-25"><a href="three-parameters.html#cb919-25"></a><span class="st">  </span></span>
+<span id="cb919-26"><a href="three-parameters.html#cb919-26"></a><span class="st">  </span><span class="co"># Calculate the average age difference.</span></span>
+<span id="cb919-27"><a href="three-parameters.html#cb919-27"></a><span class="st">  </span></span>
+<span id="cb919-28"><a href="three-parameters.html#cb919-28"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">avg_diff =</span> <span class="kw">mean</span>(age_diff))</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 1
-##   mean_diff
-##       &lt;dbl&gt;
-## 1      22.0</code></pre>
+##   avg_diff
+##      &lt;dbl&gt;
+## 1     21.8</code></pre>
+<p>In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican.</p>
 </div>
 <div id="unknown-unknowns" class="section level4">
 <h4>
@@ -3749,7 +3764,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-726"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-732"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 8.5: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -3761,7 +3776,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-727"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-733"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.6: Justice<!--</p>-->
 <!--</div>--></span>
@@ -3773,14 +3788,14 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-728"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-734"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 8.7: Courage<!--</p>-->
 <!--</div>--></span>
 </p>
-<div class="sourceCode" id="cb925"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb925-1"><a href="three-parameters.html#cb925-1"></a>obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> trains, <span class="dt">refresh =</span> <span class="dv">0</span>)</span>
-<span id="cb925-2"><a href="three-parameters.html#cb925-2"></a></span>
-<span id="cb925-3"><a href="three-parameters.html#cb925-3"></a>obj</span></code></pre></div>
+<div class="sourceCode" id="cb921"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb921-1"><a href="three-parameters.html#cb921-1"></a>obj &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> trains, <span class="dt">refresh =</span> <span class="dv">0</span>)</span>
+<span id="cb921-2"><a href="three-parameters.html#cb921-2"></a></span>
+<span id="cb921-3"><a href="three-parameters.html#cb921-3"></a>obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      att_end ~ treatment - 1
@@ -3789,7 +3804,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 ## ------
 ##                  Median MAD_SD
 ## treatmentTreated 10.0    0.4  
-## treatmentControl  8.4    0.4  
+## treatmentControl  8.4    0.3  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
@@ -3806,7 +3821,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zhcjmbxifi .gt_table {
+#xctudxsgjm .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3831,7 +3846,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-left-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_heading {
+#xctudxsgjm .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3843,7 +3858,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_title {
+#xctudxsgjm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3853,7 +3868,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-width: 0;
 }
 
-#zhcjmbxifi .gt_subtitle {
+#xctudxsgjm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3863,13 +3878,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-width: 0;
 }
 
-#zhcjmbxifi .gt_bottom_border {
+#xctudxsgjm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_col_headings {
+#xctudxsgjm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3884,7 +3899,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_col_heading {
+#xctudxsgjm .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3904,7 +3919,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#zhcjmbxifi .gt_column_spanner_outer {
+#xctudxsgjm .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3916,15 +3931,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 4px;
 }
 
-#zhcjmbxifi .gt_column_spanner_outer:first-child {
+#xctudxsgjm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zhcjmbxifi .gt_column_spanner_outer:last-child {
+#xctudxsgjm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zhcjmbxifi .gt_column_spanner {
+#xctudxsgjm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3936,7 +3951,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   width: 100%;
 }
 
-#zhcjmbxifi .gt_group_heading {
+#xctudxsgjm .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3958,7 +3973,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#zhcjmbxifi .gt_empty_group_heading {
+#xctudxsgjm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3973,15 +3988,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#zhcjmbxifi .gt_from_md > :first-child {
+#xctudxsgjm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zhcjmbxifi .gt_from_md > :last-child {
+#xctudxsgjm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zhcjmbxifi .gt_row {
+#xctudxsgjm .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4000,7 +4015,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#zhcjmbxifi .gt_stub {
+#xctudxsgjm .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4012,7 +4027,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-left: 12px;
 }
 
-#zhcjmbxifi .gt_summary_row {
+#xctudxsgjm .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4022,7 +4037,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#zhcjmbxifi .gt_first_summary_row {
+#xctudxsgjm .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4032,7 +4047,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_grand_summary_row {
+#xctudxsgjm .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4042,7 +4057,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#zhcjmbxifi .gt_first_grand_summary_row {
+#xctudxsgjm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4052,11 +4067,11 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_striped {
+#xctudxsgjm .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zhcjmbxifi .gt_table_body {
+#xctudxsgjm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4065,7 +4080,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_footnotes {
+#xctudxsgjm .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4079,13 +4094,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_footnote {
+#xctudxsgjm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#zhcjmbxifi .gt_sourcenotes {
+#xctudxsgjm .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4099,46 +4114,46 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#zhcjmbxifi .gt_sourcenote {
+#xctudxsgjm .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#zhcjmbxifi .gt_left {
+#xctudxsgjm .gt_left {
   text-align: left;
 }
 
-#zhcjmbxifi .gt_center {
+#xctudxsgjm .gt_center {
   text-align: center;
 }
 
-#zhcjmbxifi .gt_right {
+#xctudxsgjm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zhcjmbxifi .gt_font_normal {
+#xctudxsgjm .gt_font_normal {
   font-weight: normal;
 }
 
-#zhcjmbxifi .gt_font_bold {
+#xctudxsgjm .gt_font_bold {
   font-weight: bold;
 }
 
-#zhcjmbxifi .gt_font_italic {
+#xctudxsgjm .gt_font_italic {
   font-style: italic;
 }
 
-#zhcjmbxifi .gt_super {
+#xctudxsgjm .gt_super {
   font-size: 65%;
 }
 
-#zhcjmbxifi .gt_footnote_marks {
+#xctudxsgjm .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="zhcjmbxifi" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="xctudxsgjm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -4197,7 +4212,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-731"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-737"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.8: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -4216,16 +4231,16 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <span class="header-section-number">8.3.5</span> Model Structure</h3>
 <p>Our predictive model helped us make guesses as to what an individual’s age is. However, that’s just about all we can do with this relationship. Recall that the trains dataset was originally introduced in the context of the Rubin Causal Model back in Chapter <a href="rubin-causal-model.html#rubin-causal-model">3</a>. That model cannot be applied to the relationship between party and income because these values were independently decided outside the experiment — although we were able to identify correlations between those two variables, the combinations of party and income were predetermined and not randomly assigned in a way that allows us to establish a causal relationship. If an individual suddenly decided to change party affiliations, we wouldn’t suddenly expect his or her income to spike or plummet.</p>
 <p>In conclusion, while we can explore correlations or trends between party and income, we cannot label these correlations or trends as causal. However, <code>treatment</code> was a variable that was randomly assigned to subjects, and we have a variable that was measured after this random assignment, <code>att_end</code>. With this setup, we can calculate the Average Treatment Effect, or the average difference in <code>att_end</code> for treated subjects and control subjects.</p>
-<div class="sourceCode" id="cb927"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb927-1"><a href="three-parameters.html#cb927-1"></a>mean_ends &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb927-2"><a href="three-parameters.html#cb927-2"></a><span class="st">  </span><span class="kw">group_by</span>(treatment) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb927-3"><a href="three-parameters.html#cb927-3"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_att_end =</span> <span class="kw">mean</span>(att_end))</span></code></pre></div>
-<div class="sourceCode" id="cb928"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb928-1"><a href="three-parameters.html#cb928-1"></a>ATE &lt;-<span class="st"> </span>mean_ends<span class="op">$</span>mean_att_end[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>mean_ends<span class="op">$</span>mean_att_end[<span class="dv">1</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb923"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb923-1"><a href="three-parameters.html#cb923-1"></a>mean_ends &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb923-2"><a href="three-parameters.html#cb923-2"></a><span class="st">  </span><span class="kw">group_by</span>(treatment) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb923-3"><a href="three-parameters.html#cb923-3"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_att_end =</span> <span class="kw">mean</span>(att_end))</span></code></pre></div>
+<div class="sourceCode" id="cb924"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb924-1"><a href="three-parameters.html#cb924-1"></a>ATE &lt;-<span class="st"> </span>mean_ends<span class="op">$</span>mean_att_end[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>mean_ends<span class="op">$</span>mean_att_end[<span class="dv">1</span>]</span></code></pre></div>
 <p>Now, let’s make a Preceptor Table for this data:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zbyxmfticq .gt_table {
+#btigeztqlw .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -4250,7 +4265,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-left-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_heading {
+#btigeztqlw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -4262,7 +4277,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_title {
+#btigeztqlw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -4272,7 +4287,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-width: 0;
 }
 
-#zbyxmfticq .gt_subtitle {
+#btigeztqlw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -4282,13 +4297,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-width: 0;
 }
 
-#zbyxmfticq .gt_bottom_border {
+#btigeztqlw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_col_headings {
+#btigeztqlw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4303,7 +4318,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_col_heading {
+#btigeztqlw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4323,7 +4338,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#zbyxmfticq .gt_column_spanner_outer {
+#btigeztqlw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4335,15 +4350,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 4px;
 }
 
-#zbyxmfticq .gt_column_spanner_outer:first-child {
+#btigeztqlw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zbyxmfticq .gt_column_spanner_outer:last-child {
+#btigeztqlw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zbyxmfticq .gt_column_spanner {
+#btigeztqlw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -4355,7 +4370,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   width: 100%;
 }
 
-#zbyxmfticq .gt_group_heading {
+#btigeztqlw .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4377,7 +4392,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#zbyxmfticq .gt_empty_group_heading {
+#btigeztqlw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4392,15 +4407,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#zbyxmfticq .gt_from_md > :first-child {
+#btigeztqlw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zbyxmfticq .gt_from_md > :last-child {
+#btigeztqlw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zbyxmfticq .gt_row {
+#btigeztqlw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4419,7 +4434,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#zbyxmfticq .gt_stub {
+#btigeztqlw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4431,7 +4446,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-left: 12px;
 }
 
-#zbyxmfticq .gt_summary_row {
+#btigeztqlw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4441,7 +4456,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#zbyxmfticq .gt_first_summary_row {
+#btigeztqlw .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4451,7 +4466,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_grand_summary_row {
+#btigeztqlw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4461,7 +4476,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#zbyxmfticq .gt_first_grand_summary_row {
+#btigeztqlw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4471,11 +4486,11 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_striped {
+#btigeztqlw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zbyxmfticq .gt_table_body {
+#btigeztqlw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4484,7 +4499,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_footnotes {
+#btigeztqlw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4498,13 +4513,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_footnote {
+#btigeztqlw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#zbyxmfticq .gt_sourcenotes {
+#btigeztqlw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4518,46 +4533,46 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#zbyxmfticq .gt_sourcenote {
+#btigeztqlw .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#zbyxmfticq .gt_left {
+#btigeztqlw .gt_left {
   text-align: left;
 }
 
-#zbyxmfticq .gt_center {
+#btigeztqlw .gt_center {
   text-align: center;
 }
 
-#zbyxmfticq .gt_right {
+#btigeztqlw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zbyxmfticq .gt_font_normal {
+#btigeztqlw .gt_font_normal {
   font-weight: normal;
 }
 
-#zbyxmfticq .gt_font_bold {
+#btigeztqlw .gt_font_bold {
   font-weight: bold;
 }
 
-#zbyxmfticq .gt_font_italic {
+#btigeztqlw .gt_font_italic {
   font-style: italic;
 }
 
-#zbyxmfticq .gt_super {
+#btigeztqlw .gt_super {
   font-size: 65%;
 }
 
-#zbyxmfticq .gt_footnote_marks {
+#btigeztqlw .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="zbyxmfticq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="btigeztqlw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of att_end ~ treatment</th>
@@ -4708,33 +4723,33 @@ When the individual is treated (<span class="math inline">\(x_t\)</span>=1 and <
 <span class="math display">\[ y_i = \hat{b_1}x_r + \hat{b_2} x_d + \epsilon_i \]</span>
 Note that the math for both the predictive model we worked on earlier and this model is <em>identical</em>. It is not the calculations for the residual, fitted value, or parameter estimates that differ between these two model types; rather, it is how one uses and interprets these numbers. While predictive models are simply used for predicting another variable’s value (in the previous case, age), we can use these numbers to calculate the effect of one variable (treatment) on another (att_end) for each individual observation.</p>
 <p>Now, we’ll create a Rubin Causal Model table of possible outcomes, as we did back in ch3. We’ll do this using 7 random observations from the trains dataset.</p>
-<div class="sourceCode" id="cb929"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb929-1"><a href="three-parameters.html#cb929-1"></a><span class="co">#Adding question marks where necessary</span></span>
-<span id="cb929-2"><a href="three-parameters.html#cb929-2"></a></span>
-<span id="cb929-3"><a href="three-parameters.html#cb929-3"></a>trains_RCM &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb929-4"><a href="three-parameters.html#cb929-4"></a><span class="st">  </span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> treatment, <span class="dt">values_from =</span> att_end) <span class="op">%&gt;%</span></span>
-<span id="cb929-5"><a href="three-parameters.html#cb929-5"></a><span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) <span class="op">%&gt;%</span></span>
-<span id="cb929-6"><a href="three-parameters.html#cb929-6"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">subject =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) <span class="op">%&gt;%</span></span>
-<span id="cb929-7"><a href="three-parameters.html#cb929-7"></a><span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">Treated =</span> <span class="st">"?"</span>, <span class="dt">Control =</span> <span class="st">"?"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb929-8"><a href="three-parameters.html#cb929-8"></a><span class="st">  </span><span class="kw">select</span>(subject, Control, Treated)</span>
-<span id="cb929-9"><a href="three-parameters.html#cb929-9"></a></span>
-<span id="cb929-10"><a href="three-parameters.html#cb929-10"></a>trains_RCM<span class="op">$</span>subject &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"7"</span>, <span class="st">"6,041"</span>, <span class="st">"67"</span>, <span class="st">"40,080"</span>, <span class="st">"758"</span>, <span class="st">"32"</span>, <span class="st">"8,809"</span>)</span>
-<span id="cb929-11"><a href="three-parameters.html#cb929-11"></a></span>
-<span id="cb929-12"><a href="three-parameters.html#cb929-12"></a><span class="co">#Mathematical notation</span></span>
-<span id="cb929-13"><a href="three-parameters.html#cb929-13"></a></span>
-<span id="cb929-14"><a href="three-parameters.html#cb929-14"></a>trains_RCM <span class="op">%&gt;%</span></span>
-<span id="cb929-15"><a href="three-parameters.html#cb929-15"></a><span class="st">  </span><span class="kw">gt</span>() <span class="op">%&gt;%</span></span>
-<span id="cb929-16"><a href="three-parameters.html#cb929-16"></a><span class="st">  </span><span class="kw">cols_label</span>(<span class="dt">subject =</span> <span class="kw">md</span>(<span class="st">"**Subject**"</span>),</span>
-<span id="cb929-17"><a href="three-parameters.html#cb929-17"></a>                <span class="dt">Control =</span> <span class="kw">md</span>(<span class="st">"**$$Y_c(u)$$**"</span>),</span>
-<span id="cb929-18"><a href="three-parameters.html#cb929-18"></a>                <span class="dt">Treated =</span> <span class="kw">md</span>(<span class="st">"**$$Y_t(u)$$**"</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb929-19"><a href="three-parameters.html#cb929-19"></a><span class="st">  </span><span class="kw">tab_style</span>(<span class="kw">cell_borders</span>(<span class="dt">sides =</span> <span class="st">"right"</span>),</span>
-<span id="cb929-20"><a href="three-parameters.html#cb929-20"></a>            <span class="dt">location =</span> <span class="kw">cells_body</span>(<span class="dt">columns =</span> <span class="kw">vars</span>(subject))) <span class="op">%&gt;%</span></span>
-<span id="cb929-21"><a href="three-parameters.html#cb929-21"></a><span class="st">  </span><span class="kw">cols_align</span>(<span class="dt">align =</span> <span class="st">"center"</span>, <span class="dt">columns =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></span>
-<span id="cb929-22"><a href="three-parameters.html#cb929-22"></a><span class="st">  </span><span class="kw">tab_header</span>(<span class="dt">title =</span> <span class="st">"Ending Attitudes on Immigration of 7 Random Respondents"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb925"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb925-1"><a href="three-parameters.html#cb925-1"></a><span class="co">#Adding question marks where necessary</span></span>
+<span id="cb925-2"><a href="three-parameters.html#cb925-2"></a></span>
+<span id="cb925-3"><a href="three-parameters.html#cb925-3"></a>trains_RCM &lt;-<span class="st"> </span>trains <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb925-4"><a href="three-parameters.html#cb925-4"></a><span class="st">  </span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> treatment, <span class="dt">values_from =</span> att_end) <span class="op">%&gt;%</span></span>
+<span id="cb925-5"><a href="three-parameters.html#cb925-5"></a><span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) <span class="op">%&gt;%</span></span>
+<span id="cb925-6"><a href="three-parameters.html#cb925-6"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">subject =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) <span class="op">%&gt;%</span></span>
+<span id="cb925-7"><a href="three-parameters.html#cb925-7"></a><span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">Treated =</span> <span class="st">"?"</span>, <span class="dt">Control =</span> <span class="st">"?"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb925-8"><a href="three-parameters.html#cb925-8"></a><span class="st">  </span><span class="kw">select</span>(subject, Control, Treated)</span>
+<span id="cb925-9"><a href="three-parameters.html#cb925-9"></a></span>
+<span id="cb925-10"><a href="three-parameters.html#cb925-10"></a>trains_RCM<span class="op">$</span>subject &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"7"</span>, <span class="st">"6,041"</span>, <span class="st">"67"</span>, <span class="st">"40,080"</span>, <span class="st">"758"</span>, <span class="st">"32"</span>, <span class="st">"8,809"</span>)</span>
+<span id="cb925-11"><a href="three-parameters.html#cb925-11"></a></span>
+<span id="cb925-12"><a href="three-parameters.html#cb925-12"></a><span class="co">#Mathematical notation</span></span>
+<span id="cb925-13"><a href="three-parameters.html#cb925-13"></a></span>
+<span id="cb925-14"><a href="three-parameters.html#cb925-14"></a>trains_RCM <span class="op">%&gt;%</span></span>
+<span id="cb925-15"><a href="three-parameters.html#cb925-15"></a><span class="st">  </span><span class="kw">gt</span>() <span class="op">%&gt;%</span></span>
+<span id="cb925-16"><a href="three-parameters.html#cb925-16"></a><span class="st">  </span><span class="kw">cols_label</span>(<span class="dt">subject =</span> <span class="kw">md</span>(<span class="st">"**Subject**"</span>),</span>
+<span id="cb925-17"><a href="three-parameters.html#cb925-17"></a>                <span class="dt">Control =</span> <span class="kw">md</span>(<span class="st">"**$$Y_c(u)$$**"</span>),</span>
+<span id="cb925-18"><a href="three-parameters.html#cb925-18"></a>                <span class="dt">Treated =</span> <span class="kw">md</span>(<span class="st">"**$$Y_t(u)$$**"</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb925-19"><a href="three-parameters.html#cb925-19"></a><span class="st">  </span><span class="kw">tab_style</span>(<span class="kw">cell_borders</span>(<span class="dt">sides =</span> <span class="st">"right"</span>),</span>
+<span id="cb925-20"><a href="three-parameters.html#cb925-20"></a>            <span class="dt">location =</span> <span class="kw">cells_body</span>(<span class="dt">columns =</span> <span class="kw">vars</span>(subject))) <span class="op">%&gt;%</span></span>
+<span id="cb925-21"><a href="three-parameters.html#cb925-21"></a><span class="st">  </span><span class="kw">cols_align</span>(<span class="dt">align =</span> <span class="st">"center"</span>, <span class="dt">columns =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></span>
+<span id="cb925-22"><a href="three-parameters.html#cb925-22"></a><span class="st">  </span><span class="kw">tab_header</span>(<span class="dt">title =</span> <span class="st">"Ending Attitudes on Immigration of 7 Random Respondents"</span>)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zzeujofhou .gt_table {
+#ctsutuqimg .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -4759,7 +4774,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_heading {
+#ctsutuqimg .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -4771,7 +4786,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_title {
+#ctsutuqimg .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -4781,7 +4796,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#zzeujofhou .gt_subtitle {
+#ctsutuqimg .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -4791,13 +4806,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#zzeujofhou .gt_bottom_border {
+#ctsutuqimg .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_col_headings {
+#ctsutuqimg .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4812,7 +4827,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_col_heading {
+#ctsutuqimg .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4832,7 +4847,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#zzeujofhou .gt_column_spanner_outer {
+#ctsutuqimg .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4844,15 +4859,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#zzeujofhou .gt_column_spanner_outer:first-child {
+#ctsutuqimg .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zzeujofhou .gt_column_spanner_outer:last-child {
+#ctsutuqimg .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zzeujofhou .gt_column_spanner {
+#ctsutuqimg .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -4864,7 +4879,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#zzeujofhou .gt_group_heading {
+#ctsutuqimg .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4886,7 +4901,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#zzeujofhou .gt_empty_group_heading {
+#ctsutuqimg .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4901,15 +4916,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#zzeujofhou .gt_from_md > :first-child {
+#ctsutuqimg .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zzeujofhou .gt_from_md > :last-child {
+#ctsutuqimg .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zzeujofhou .gt_row {
+#ctsutuqimg .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4928,7 +4943,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#zzeujofhou .gt_stub {
+#ctsutuqimg .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4940,7 +4955,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#zzeujofhou .gt_summary_row {
+#ctsutuqimg .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4950,7 +4965,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#zzeujofhou .gt_first_summary_row {
+#ctsutuqimg .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4960,7 +4975,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_grand_summary_row {
+#ctsutuqimg .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4970,7 +4985,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#zzeujofhou .gt_first_grand_summary_row {
+#ctsutuqimg .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4980,11 +4995,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_striped {
+#ctsutuqimg .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zzeujofhou .gt_table_body {
+#ctsutuqimg .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4993,7 +5008,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_footnotes {
+#ctsutuqimg .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5007,13 +5022,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_footnote {
+#ctsutuqimg .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#zzeujofhou .gt_sourcenotes {
+#ctsutuqimg .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5027,46 +5042,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#zzeujofhou .gt_sourcenote {
+#ctsutuqimg .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#zzeujofhou .gt_left {
+#ctsutuqimg .gt_left {
   text-align: left;
 }
 
-#zzeujofhou .gt_center {
+#ctsutuqimg .gt_center {
   text-align: center;
 }
 
-#zzeujofhou .gt_right {
+#ctsutuqimg .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zzeujofhou .gt_font_normal {
+#ctsutuqimg .gt_font_normal {
   font-weight: normal;
 }
 
-#zzeujofhou .gt_font_bold {
+#ctsutuqimg .gt_font_bold {
   font-weight: bold;
 }
 
-#zzeujofhou .gt_font_italic {
+#ctsutuqimg .gt_font_italic {
   font-style: italic;
 }
 
-#zzeujofhou .gt_super {
+#ctsutuqimg .gt_super {
   font-size: 65%;
 }
 
-#zzeujofhou .gt_footnote_marks {
+#ctsutuqimg .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="zzeujofhou" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="ctsutuqimg" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -5123,7 +5138,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#leuracxmxj .gt_table {
+#cftutjaskk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -5148,7 +5163,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_heading {
+#cftutjaskk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -5160,7 +5175,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_title {
+#cftutjaskk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -5170,7 +5185,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#leuracxmxj .gt_subtitle {
+#cftutjaskk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -5180,13 +5195,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#leuracxmxj .gt_bottom_border {
+#cftutjaskk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_col_headings {
+#cftutjaskk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5201,7 +5216,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_col_heading {
+#cftutjaskk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5221,7 +5236,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#leuracxmxj .gt_column_spanner_outer {
+#cftutjaskk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5233,15 +5248,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#leuracxmxj .gt_column_spanner_outer:first-child {
+#cftutjaskk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#leuracxmxj .gt_column_spanner_outer:last-child {
+#cftutjaskk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#leuracxmxj .gt_column_spanner {
+#cftutjaskk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -5253,7 +5268,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#leuracxmxj .gt_group_heading {
+#cftutjaskk .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5275,7 +5290,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#leuracxmxj .gt_empty_group_heading {
+#cftutjaskk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5290,15 +5305,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#leuracxmxj .gt_from_md > :first-child {
+#cftutjaskk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#leuracxmxj .gt_from_md > :last-child {
+#cftutjaskk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#leuracxmxj .gt_row {
+#cftutjaskk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5317,7 +5332,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#leuracxmxj .gt_stub {
+#cftutjaskk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5329,7 +5344,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#leuracxmxj .gt_summary_row {
+#cftutjaskk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5339,7 +5354,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#leuracxmxj .gt_first_summary_row {
+#cftutjaskk .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5349,7 +5364,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_grand_summary_row {
+#cftutjaskk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5359,7 +5374,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#leuracxmxj .gt_first_grand_summary_row {
+#cftutjaskk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5369,11 +5384,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_striped {
+#cftutjaskk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#leuracxmxj .gt_table_body {
+#cftutjaskk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5382,7 +5397,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_footnotes {
+#cftutjaskk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5396,13 +5411,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_footnote {
+#cftutjaskk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#leuracxmxj .gt_sourcenotes {
+#cftutjaskk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5416,46 +5431,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#leuracxmxj .gt_sourcenote {
+#cftutjaskk .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#leuracxmxj .gt_left {
+#cftutjaskk .gt_left {
   text-align: left;
 }
 
-#leuracxmxj .gt_center {
+#cftutjaskk .gt_center {
   text-align: center;
 }
 
-#leuracxmxj .gt_right {
+#cftutjaskk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#leuracxmxj .gt_font_normal {
+#cftutjaskk .gt_font_normal {
   font-weight: normal;
 }
 
-#leuracxmxj .gt_font_bold {
+#cftutjaskk .gt_font_bold {
   font-weight: bold;
 }
 
-#leuracxmxj .gt_font_italic {
+#cftutjaskk .gt_font_italic {
   font-style: italic;
 }
 
-#leuracxmxj .gt_super {
+#cftutjaskk .gt_super {
   font-size: 65%;
 }
 
-#leuracxmxj .gt_footnote_marks {
+#cftutjaskk .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="leuracxmxj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="cftutjaskk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -5519,7 +5534,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#pepmwroszv .gt_table {
+#sstyveaxny .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -5544,7 +5559,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_heading {
+#sstyveaxny .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -5556,7 +5571,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_title {
+#sstyveaxny .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -5566,7 +5581,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#pepmwroszv .gt_subtitle {
+#sstyveaxny .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -5576,13 +5591,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#pepmwroszv .gt_bottom_border {
+#sstyveaxny .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_col_headings {
+#sstyveaxny .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5597,7 +5612,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_col_heading {
+#sstyveaxny .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5617,7 +5632,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#pepmwroszv .gt_column_spanner_outer {
+#sstyveaxny .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5629,15 +5644,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#pepmwroszv .gt_column_spanner_outer:first-child {
+#sstyveaxny .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#pepmwroszv .gt_column_spanner_outer:last-child {
+#sstyveaxny .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#pepmwroszv .gt_column_spanner {
+#sstyveaxny .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -5649,7 +5664,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#pepmwroszv .gt_group_heading {
+#sstyveaxny .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5671,7 +5686,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#pepmwroszv .gt_empty_group_heading {
+#sstyveaxny .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5686,15 +5701,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#pepmwroszv .gt_from_md > :first-child {
+#sstyveaxny .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#pepmwroszv .gt_from_md > :last-child {
+#sstyveaxny .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#pepmwroszv .gt_row {
+#sstyveaxny .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5713,7 +5728,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#pepmwroszv .gt_stub {
+#sstyveaxny .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5725,7 +5740,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#pepmwroszv .gt_summary_row {
+#sstyveaxny .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5735,7 +5750,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#pepmwroszv .gt_first_summary_row {
+#sstyveaxny .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5745,7 +5760,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_grand_summary_row {
+#sstyveaxny .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5755,7 +5770,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#pepmwroszv .gt_first_grand_summary_row {
+#sstyveaxny .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5765,11 +5780,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_striped {
+#sstyveaxny .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#pepmwroszv .gt_table_body {
+#sstyveaxny .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5778,7 +5793,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_footnotes {
+#sstyveaxny .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5792,13 +5807,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_footnote {
+#sstyveaxny .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#pepmwroszv .gt_sourcenotes {
+#sstyveaxny .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5812,46 +5827,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#pepmwroszv .gt_sourcenote {
+#sstyveaxny .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#pepmwroszv .gt_left {
+#sstyveaxny .gt_left {
   text-align: left;
 }
 
-#pepmwroszv .gt_center {
+#sstyveaxny .gt_center {
   text-align: center;
 }
 
-#pepmwroszv .gt_right {
+#sstyveaxny .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#pepmwroszv .gt_font_normal {
+#sstyveaxny .gt_font_normal {
   font-weight: normal;
 }
 
-#pepmwroszv .gt_font_bold {
+#sstyveaxny .gt_font_bold {
   font-weight: bold;
 }
 
-#pepmwroszv .gt_font_italic {
+#sstyveaxny .gt_font_italic {
   font-style: italic;
 }
 
-#pepmwroszv .gt_super {
+#sstyveaxny .gt_super {
   font-size: 65%;
 }
 
-#pepmwroszv .gt_footnote_marks {
+#sstyveaxny .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="pepmwroszv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="sstyveaxny" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -5909,19 +5924,19 @@ Note that the math for both the predictive model we worked on earlier and this m
 <h3>
 <span class="header-section-number">8.3.6</span> Parameter Uncertainty</h3>
 <p>Here, we see that the average treatment effect is -1.55; this is the average change in att_end caused by treatment (if this statistic looks unfamiliar, refer back to chapter 3 for a refresher on ATE). But how confident are we in this ATE? We can use <code>lm()</code> again to generate confidence intervals for our parameters and for this value:</p>
-<div class="sourceCode" id="cb931"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb931-1"><a href="three-parameters.html#cb931-1"></a><span class="co">#This is necessary so we can see the offset as caused by treatmentTreated, not treatmentControl.</span></span>
-<span id="cb931-2"><a href="three-parameters.html#cb931-2"></a></span>
-<span id="cb931-3"><a href="three-parameters.html#cb931-3"></a>trains<span class="op">$</span>treatment &lt;-<span class="kw">fct_relevel</span>(trains<span class="op">$</span>treatment, <span class="st">"Control"</span>, <span class="st">"Treated"</span>)</span>
-<span id="cb931-4"><a href="three-parameters.html#cb931-4"></a></span>
-<span id="cb931-5"><a href="three-parameters.html#cb931-5"></a><span class="kw">lm</span>(<span class="dt">data =</span> trains, att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb931-6"><a href="three-parameters.html#cb931-6"></a><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">conf.int =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></span>
-<span id="cb931-7"><a href="three-parameters.html#cb931-7"></a><span class="st">  </span><span class="kw">select</span>(term, estimate, conf.low, conf.high)</span></code></pre></div>
+<div class="sourceCode" id="cb927"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb927-1"><a href="three-parameters.html#cb927-1"></a><span class="co">#This is necessary so we can see the offset as caused by treatmentTreated, not treatmentControl.</span></span>
+<span id="cb927-2"><a href="three-parameters.html#cb927-2"></a></span>
+<span id="cb927-3"><a href="three-parameters.html#cb927-3"></a>trains<span class="op">$</span>treatment &lt;-<span class="kw">fct_relevel</span>(trains<span class="op">$</span>treatment, <span class="st">"Control"</span>, <span class="st">"Treated"</span>)</span>
+<span id="cb927-4"><a href="three-parameters.html#cb927-4"></a></span>
+<span id="cb927-5"><a href="three-parameters.html#cb927-5"></a><span class="kw">lm</span>(<span class="dt">data =</span> trains, att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb927-6"><a href="three-parameters.html#cb927-6"></a><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">conf.int =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></span>
+<span id="cb927-7"><a href="three-parameters.html#cb927-7"></a><span class="st">  </span><span class="kw">select</span>(term, estimate, conf.low, conf.high)</span></code></pre></div>
 <pre><code>## # A tibble: 2 x 4
 ##   term             estimate conf.low conf.high
 ##   &lt;chr&gt;               &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
 ## 1 treatmentControl     8.45     7.77      9.14
 ## 2 treatmentTreated    10.       9.23     10.8</code></pre>
-<div class="sourceCode" id="cb933"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb933-1"><a href="three-parameters.html#cb933-1"></a><span class="kw">summary</span>(<span class="kw">lm</span>(<span class="dt">data =</span> trains, att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb929"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb929-1"><a href="three-parameters.html#cb929-1"></a><span class="kw">summary</span>(<span class="kw">lm</span>(<span class="dt">data =</span> trains, att_end <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = att_end ~ treatment - 1, data = trains)
