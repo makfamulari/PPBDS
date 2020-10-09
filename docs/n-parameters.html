@@ -49,8 +49,6 @@ if(f.classList.contains('fa-plus-square')) {
 <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
 <link href="libs/str_view-0.1.0/str_view.css" rel="stylesheet" />
 <script src="libs/str_view-binding-1.4.0/str_view.js"></script>
-<script src="libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -224,425 +222,191 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Let’s run <code>sample_n()</code>:</p>
 <div class="sourceCode" id="cb935"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb935-1"><a href="n-parameters.html#cb935-1"></a><span class="kw">sample_n</span>(ch9_gov, <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 8
-##    last_name  year state        sex   status     won   alive_post alive_pre
-##    &lt;chr&gt;     &lt;int&gt; &lt;chr&gt;        &lt;chr&gt; &lt;chr&gt;      &lt;lgl&gt;      &lt;int&gt;     &lt;int&gt;
-##  1 Taft       1976 Rhode Island Male  Challenger FALSE      12722     16564
-##  2 Metzger    1952 Colorado     Male  Challenger FALSE      11403     15191
-##  3 Bowen      1976 Indiana      Male  Incumbent  TRUE       13329     21437
-##  4 Sinner     1988 North Dakota Male  Incumbent  TRUE       10716     22085
-##  5 Folmar     1982 Alabama      Male  Challenger FALSE      10598     19148
-##  6 Melich     1964 Utah         Male  Challenger FALSE      12637     19271
-##  7 Thornton   1952 Colorado     Male  Incumbent  TRUE        8474     15254
-##  8 Herring    1954 Iowa         Male  Challenger FALSE       7994     14471
-##  9 Goddard    1966 Arizona      Male  Incumbent  FALSE      14333     17256
-## 10 Conrad     1976 Indiana      Male  Challenger FALSE       4992     15246</code></pre>
+##    last_name   year state       sex    status     won   alive_post alive_pre
+##    &lt;chr&gt;      &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;      &lt;lgl&gt;      &lt;int&gt;     &lt;int&gt;
+##  1 Knous       1948 Colorado    Male   Incumbent  TRUE        4053     21825
+##  2 Brown       1958 California  Male   Challenger TRUE       13617     19556
+##  3 Fordice     1995 Mississippi Male   Incumbent  TRUE        3229     22548
+##  4 Egan        1962 Alaska      Male   Incumbent  TRUE        7853     17560
+##  5 Carvel      1960 Delaware    Male   Challenger TRUE       16164     18532
+##  6 Mcconaughy  1946 Connecticut Male   Challenger TRUE         488     21564
+##  7 Topinka     2006 Illinois    Female Challenger FALSE       2957     22939
+##  8 Ray         1978 Iowa        Male   Incumbent  TRUE       14490     18302
+##  9 Clement     1952 Tennessee   Male   Challenger TRUE        6208     11844
+## 10 Daddario    1970 Connecticut Male   Challenger FALSE      14489     19035</code></pre>
 <p>From this sample, we can see some trends start to appear. For example, we see that <code>sex</code> is most often “Male”, and status is most often “Challenger” rather than “Incumbent”.</p>
 <p>Let’s summarize the data with <code>skim()</code>:</p>
 <div class="sourceCode" id="cb937"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb937-1"><a href="n-parameters.html#cb937-1"></a><span class="kw">skim</span>(ch9_gov)</span></code></pre></div>
-<table style="width: auto;" class="table table-condensed">
-<caption>
-<span id="tab:unnamed-chunk-752">TABLE 9.1: </span>Data summary
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:left;">
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Name
-</td>
-<td style="text-align:left;">
-ch9_gov
-</td>
+<p><!--
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-753">TABLE 9.1: </span>Data summary</span><!--</caption>--></p>
+<table><tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">ch9_gov</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Number of rows
-</td>
-<td style="text-align:left;">
-1092
-</td>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">1092</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Number of columns
-</td>
-<td style="text-align:left;">
-8
-</td>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">8</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-_______________________
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Column type frequency:
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-character
-</td>
-<td style="text-align:left;">
-4
-</td>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">4</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-logical
-</td>
-<td style="text-align:left;">
-1
-</td>
+<tr class="odd">
+<td align="left">logical</td>
+<td align="left">1</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-numeric
-</td>
-<td style="text-align:left;">
-3
-</td>
+<tr class="even">
+<td align="left">numeric</td>
+<td align="left">3</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-________________________
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="odd">
+<td align="left">________________________</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Group variables
-</td>
-<td style="text-align:left;">
-None
-</td>
+<tr class="even">
+<td align="left">Group variables</td>
+<td align="left">None</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>Variable type: character</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:right;">
-min
-</th>
-<th style="text-align:right;">
-max
-</th>
-<th style="text-align:right;">
-empty
-</th>
-<th style="text-align:right;">
-n_unique
-</th>
-<th style="text-align:right;">
-whitespace
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-last_name
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-11
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-615
-</td>
-<td style="text-align:right;">
-0
-</td>
+<tr class="odd">
+<td align="left">last_name</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">11</td>
+<td align="right">0</td>
+<td align="right">615</td>
+<td align="right">0</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-state
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-50
-</td>
-<td style="text-align:right;">
-0
-</td>
+<tr class="even">
+<td align="left">state</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">14</td>
+<td align="right">0</td>
+<td align="right">50</td>
+<td align="right">0</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-sex
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-0
-</td>
+<tr class="odd">
+<td align="left">sex</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-status
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-0
-</td>
+<tr class="even">
+<td align="left">status</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">9</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Variable type: logical</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:right;">
-mean
-</th>
-<th style="text-align:left;">
-count
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="left">count</th>
 </tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-won
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.53
-</td>
-<td style="text-align:left;">
-TRU: 576, FAL: 516
-</td>
+<tbody><tr class="odd">
+<td align="left">won</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.53</td>
+<td align="left">TRU: 576, FAL: 516</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: numeric</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:right;">
-mean
-</th>
-<th style="text-align:right;">
-sd
-</th>
-<th style="text-align:right;">
-p0
-</th>
-<th style="text-align:right;">
-p25
-</th>
-<th style="text-align:right;">
-p50
-</th>
-<th style="text-align:right;">
-p75
-</th>
-<th style="text-align:right;">
-p100
-</th>
-<th style="text-align:left;">
-hist
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-year
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1965
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-1945
-</td>
-<td style="text-align:right;">
-1954
-</td>
-<td style="text-align:right;">
-1962
-</td>
-<td style="text-align:right;">
-1974
-</td>
-<td style="text-align:right;">
-2011
-</td>
-<td style="text-align:left;">
-▇▆▃▂▁
-</td>
+<tr class="odd">
+<td align="left">year</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1965</td>
+<td align="right">13</td>
+<td align="right">1945</td>
+<td align="right">1954</td>
+<td align="right">1962</td>
+<td align="right">1974</td>
+<td align="right">2011</td>
+<td align="left">▇▆▃▂▁</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-alive_post
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-10310
-</td>
-<td style="text-align:right;">
-4886
-</td>
-<td style="text-align:right;">
-46
-</td>
-<td style="text-align:right;">
-6419
-</td>
-<td style="text-align:right;">
-10811
-</td>
-<td style="text-align:right;">
-14124
-</td>
-<td style="text-align:right;">
-22067
-</td>
-<td style="text-align:left;">
-▃▆▇▆▂
-</td>
+<tr class="even">
+<td align="left">alive_post</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">10310</td>
+<td align="right">4886</td>
+<td align="right">46</td>
+<td align="right">6419</td>
+<td align="right">10811</td>
+<td align="right">14124</td>
+<td align="right">22067</td>
+<td align="left">▃▆▇▆▂</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-alive_pre
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-18892
-</td>
-<td style="text-align:right;">
-3181
-</td>
-<td style="text-align:right;">
-11450
-</td>
-<td style="text-align:right;">
-16561
-</td>
-<td style="text-align:right;">
-18758
-</td>
-<td style="text-align:right;">
-20996
-</td>
-<td style="text-align:right;">
-30633
-</td>
-<td style="text-align:left;">
-▂▇▆▂▁
-</td>
+<tr class="odd">
+<td align="left">alive_pre</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">18892</td>
+<td align="right">3181</td>
+<td align="right">11450</td>
+<td align="right">16561</td>
+<td align="right">18758</td>
+<td align="right">20996</td>
+<td align="right">30633</td>
+<td align="left">▂▇▆▂▁</td>
 </tr>
 </tbody>
 </table>
@@ -651,13 +415,13 @@ alive_pre
 <div class="sourceCode" id="cb938"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb938-1"><a href="n-parameters.html#cb938-1"></a>ch9_gov <span class="op">%&gt;%</span></span>
 <span id="cb938-2"><a href="n-parameters.html#cb938-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year, <span class="dt">y =</span> alive_post)) <span class="op">+</span></span>
 <span id="cb938-3"><a href="n-parameters.html#cb938-3"></a><span class="st">  </span><span class="kw">geom_point</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-753-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-754-1.png" width="672"></p>
 <p>Starting with the relationship between <code>alive_post</code> and <code>year</code>, we can see that the data is skewed right and that there is a defined line that data points do not exist above. There are no data points in the top right portion of the graph because it is not possible to have run in 2011, lived 20,000 days after the election took place, and still have died before the data set was created. This line represents the most a candidate could have possibly lived - and still have died - to be included the data set. The reason this line is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a longer time after the election and still have died prior to the data set creation, giving them higher <code>alive_post</code> values than those who ran for office in later years.</p>
 <p>There are fewer observations in later years because fewer candidates have died. The vast maajority of candidates who ran for office in the 21st century are still alive today and therefore excluded from this data set.</p>
 <div class="sourceCode" id="cb939"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb939-1"><a href="n-parameters.html#cb939-1"></a>ch9_gov <span class="op">%&gt;%</span></span>
 <span id="cb939-2"><a href="n-parameters.html#cb939-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> won, <span class="dt">y =</span> alive_post)) <span class="op">+</span></span>
 <span id="cb939-3"><a href="n-parameters.html#cb939-3"></a><span class="st">  </span><span class="kw">geom_boxplot</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-754-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-755-1.png" width="672"></p>
 <p>This box plot is interesting in that it takes a direct look at the relationship we are trying to learn more about: whether winning an election influences the lifespan of politicians.</p>
 <!-- Clean up and add more discussion here -->
 </div>
@@ -667,7 +431,7 @@ alive_pre
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-755"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-756"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 9.1: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -679,7 +443,7 @@ alive_pre
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-756"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-757"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.2: Justice<!--</p>-->
 <!--</div>--></span>
@@ -687,7 +451,7 @@ alive_pre
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-757"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-758"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 9.3: Courage<!--</p>-->
 <!--</div>--></span>
@@ -708,12 +472,12 @@ alive_pre
 <p>Most of the time, we are only interested in the parameter values.</p>
 <div class="sourceCode" id="cb941"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb941-1"><a href="n-parameters.html#cb941-1"></a><span class="kw">print</span>(fit_gov_<span class="dv">1</span>, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##             Median  MAD_SD 
-## (Intercept) 26496.8   762.6
+## (Intercept) 26500.9   772.9
 ## alive_pre      -0.9     0.0
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4054.6   88.9</code></pre>
+## sigma 4057.2   85.7</code></pre>
 <p>As is almost always the case, <span class="math inline">\(\sigma\)</span> is a nuisance parameter, somethings whose value we are not interested in. This is why <code>stan_glm()</code> refers to it as an “auxiliary” parameter.</p>
 <p>The posterior distributions of <span class="math inline">\(\beta_0\)</span> (the intercept) and <span class="math inline">\(\beta_1\)</span> (the coefficient of <code>alive_pre</code>), on the other hand, are very important. Before looking at the posteriors themselves, let’s see what happens when we place the medians into the model:</p>
 <p><span class="math display">\[ alive.post_i =  26,524 - 0.9 alive.pre_i + \epsilon_i\]</span></p>
@@ -730,7 +494,7 @@ alive_pre
 <span id="cb943-5"><a href="n-parameters.html#cb943-5"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Distribution of the Coefficient of `alive_pre`"</span>,</span>
 <span id="cb943-6"><a href="n-parameters.html#cb943-6"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
 <span id="cb943-7"><a href="n-parameters.html#cb943-7"></a>         <span class="dt">x =</span> <span class="st">"Coefficient of `alive_pre`"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-760-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-761-1.png" width="672"></p>
 <!-- DK: Add some interpretation. -->
 <p>Centering is a tool that is used when the model’s intercept does not make logical sense. To center a model, we pick a constant value, usually the mean of the independent variable, and subtract that constant from every value of the independent variable. This changes the zero point for the variable and shifts the model over.</p>
 <p>In this example, we want to center the value for <code>alive_pre</code>, the independent variable First, we must pick the value that we will center by. Here, we will use the mean of <code>alive_pre</code>. Once we find this value, we will subtract it to every <code>alive_pre</code> value, creating a new variable called <code>alive_pre_centered</code>. We then use <code>alive_pre_centered</code> as the indepdent variable to explain <code>alive_post</code>.</p>
@@ -741,12 +505,12 @@ alive_pre
 <span id="cb945-4"><a href="n-parameters.html#cb945-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb946"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb946-1"><a href="n-parameters.html#cb946-1"></a><span class="kw">print</span>(fit_gov_<span class="fl">1.</span>centered, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##                    Median  MAD_SD 
-## (Intercept)        10309.5   119.2
+## (Intercept)        10312.1   120.0
 ## alive_pre_centered    -0.9     0.0
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4057.4   87.2</code></pre>
+## sigma 4054.9   89.2</code></pre>
 <p>In this model, we can see that the intercept has increased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the lifespan of a candidate who was alive for zero days before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of days before running. In this instance, our center value is approximately 18,892, so we will use this value in our interpretation. If a candidate was alive for 18,892 days before running for governor (the mean value in this data set), they are expected to live for 10,309 days after the election, on average.</p>
 <p>Since all values of the predictor variable decreased by the same amount, the model shifted over but the slope of the linear model did not change. In fact, any linear change in the predictor variables has no effect on other aspects of the model, which is one reason why linear models are so commonly used.</p>
 <p>Let’s now regress <code>sex</code> on <code>alive_post</code> to see how sex affects candidates’ post-election lifespans.</p>
@@ -756,12 +520,12 @@ alive_pre
 <span id="cb948-4"><a href="n-parameters.html#cb948-4"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb949"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb949-1"><a href="n-parameters.html#cb949-1"></a><span class="kw">print</span>(fit_gov_<span class="dv">2</span>, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##           Median  MAD_SD 
-## sexFemale  5870.3  1058.9
-## sexMale   10399.0   144.6
+## sexFemale  5834.7  1068.9
+## sexMale   10394.2   152.8
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4846.3  103.6</code></pre>
+## sigma 4849.0  106.2</code></pre>
 <p>In this regression, we use the -1 in the formula to make the output more straightforward, with no intercept to interpret. Now looking at the regression table output, let’s interpret the Beta values for Female and Male, starting with a mathematical formula.</p>
 <p>You may recall from algebra that the equation of a line is <span class="math display">\[ y = a + b*x \]</span>. It is defined by two coefficients <em>a</em> and <em>b</em>. The intercept coefficient <em>a</em> is the value of <em>y</em> when <span class="math display">\[ x = 0 \]</span>. The slope coefficient <em>b</em> for <em>x</em> is the increase in <em>y</em> for every increase of one in <em>x</em>.</p>
 <p>However, when defining a regression line, we use slightly different notation: the equation of the regression line is <span class="math display">\[ \hat{y} = {b_0} + {b_1} x  \]</span>. The intercept coefficient is <span class="math display">\[ {b_0} \]</span>, so <span class="math display">\[ {b_0} \]</span> is the value of <span class="math display">\[ \hat{y} \]</span> when <span class="math display">\[ x = 0 \]</span>. The slope coefficient for <em>x</em> is <span class="math display">\[ {b_1} \]</span>, i.e., the increase in <span class="math display">\[ \hat{y} \]</span> for every increase of one in <em>x</em>. Why do we put a “hat” on top of the <em>y</em>? It’s a form of notation commonly used in regression to indicate that we have a “fitted value,” or the value of <em>y</em> on the regression line for a given <em>x</em> value. This fitted value that falls on the regression line may differ from the observed value of <em>y</em> given that particular <em>x</em> value. The difference between the observed y-value and the predicted, or fitted, y-value is called the <em>residual</em>.</p>
@@ -782,7 +546,7 @@ alive_pre
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#nlmhzodjee .gt_table {
+#earpbgmpey .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -807,7 +571,7 @@ alive_pre
   border-left-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_heading {
+#earpbgmpey .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -819,7 +583,7 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_title {
+#earpbgmpey .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -829,7 +593,7 @@ alive_pre
   border-bottom-width: 0;
 }
 
-#nlmhzodjee .gt_subtitle {
+#earpbgmpey .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -839,13 +603,13 @@ alive_pre
   border-top-width: 0;
 }
 
-#nlmhzodjee .gt_bottom_border {
+#earpbgmpey .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_col_headings {
+#earpbgmpey .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -860,7 +624,7 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_col_heading {
+#earpbgmpey .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -880,7 +644,7 @@ alive_pre
   overflow-x: hidden;
 }
 
-#nlmhzodjee .gt_column_spanner_outer {
+#earpbgmpey .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -892,15 +656,15 @@ alive_pre
   padding-right: 4px;
 }
 
-#nlmhzodjee .gt_column_spanner_outer:first-child {
+#earpbgmpey .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#nlmhzodjee .gt_column_spanner_outer:last-child {
+#earpbgmpey .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#nlmhzodjee .gt_column_spanner {
+#earpbgmpey .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -912,7 +676,7 @@ alive_pre
   width: 100%;
 }
 
-#nlmhzodjee .gt_group_heading {
+#earpbgmpey .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -934,7 +698,7 @@ alive_pre
   vertical-align: middle;
 }
 
-#nlmhzodjee .gt_empty_group_heading {
+#earpbgmpey .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -949,15 +713,15 @@ alive_pre
   vertical-align: middle;
 }
 
-#nlmhzodjee .gt_from_md > :first-child {
+#earpbgmpey .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#nlmhzodjee .gt_from_md > :last-child {
+#earpbgmpey .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#nlmhzodjee .gt_row {
+#earpbgmpey .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -976,7 +740,7 @@ alive_pre
   overflow-x: hidden;
 }
 
-#nlmhzodjee .gt_stub {
+#earpbgmpey .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -988,7 +752,7 @@ alive_pre
   padding-left: 12px;
 }
 
-#nlmhzodjee .gt_summary_row {
+#earpbgmpey .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -998,7 +762,7 @@ alive_pre
   padding-right: 5px;
 }
 
-#nlmhzodjee .gt_first_summary_row {
+#earpbgmpey .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1008,7 +772,7 @@ alive_pre
   border-top-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_grand_summary_row {
+#earpbgmpey .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1018,7 +782,7 @@ alive_pre
   padding-right: 5px;
 }
 
-#nlmhzodjee .gt_first_grand_summary_row {
+#earpbgmpey .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1028,11 +792,11 @@ alive_pre
   border-top-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_striped {
+#earpbgmpey .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#nlmhzodjee .gt_table_body {
+#earpbgmpey .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1041,7 +805,7 @@ alive_pre
   border-bottom-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_footnotes {
+#earpbgmpey .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1055,13 +819,13 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_footnote {
+#earpbgmpey .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#nlmhzodjee .gt_sourcenotes {
+#earpbgmpey .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1075,46 +839,46 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#nlmhzodjee .gt_sourcenote {
+#earpbgmpey .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#nlmhzodjee .gt_left {
+#earpbgmpey .gt_left {
   text-align: left;
 }
 
-#nlmhzodjee .gt_center {
+#earpbgmpey .gt_center {
   text-align: center;
 }
 
-#nlmhzodjee .gt_right {
+#earpbgmpey .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#nlmhzodjee .gt_font_normal {
+#earpbgmpey .gt_font_normal {
   font-weight: normal;
 }
 
-#nlmhzodjee .gt_font_bold {
+#earpbgmpey .gt_font_bold {
   font-weight: bold;
 }
 
-#nlmhzodjee .gt_font_italic {
+#earpbgmpey .gt_font_italic {
   font-style: italic;
 }
 
-#nlmhzodjee .gt_super {
+#earpbgmpey .gt_super {
   font-size: 65%;
 }
 
-#nlmhzodjee .gt_footnote_marks {
+#earpbgmpey .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="nlmhzodjee" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="earpbgmpey" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -1125,8 +889,8 @@ alive_pre
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">5842</td>
-      <td class="gt_row gt_center">3776, 7913</td>
+      <td class="gt_row gt_center">5866</td>
+      <td class="gt_row gt_center">3810, 7966</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex</td>
@@ -1140,8 +904,8 @@ alive_pre
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">4549</td>
-      <td class="gt_row gt_center">2499, 6631</td>
+      <td class="gt_row gt_center">4536</td>
+      <td class="gt_row gt_center">2409, 6564</td>
     </tr>
 </tbody>
 <tfoot><tr class="gt_footnotes">
@@ -1167,7 +931,7 @@ alive_pre
 <span id="cb953-7"><a href="n-parameters.html#cb953-7"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(sex, alive_post)) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb953-8"><a href="n-parameters.html#cb953-8"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb953-9"><a href="n-parameters.html#cb953-9"></a><span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">data =</span> sex_means, <span class="kw">aes</span>(<span class="dt">y =</span> avg), <span class="dt">color =</span> <span class="st">"red"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-768-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-769-1.png" width="672"></p>
 <!-- use posterior lin pred instead of sex_means to get fitted values -->
 <!-- DK: All the above happens before this -->
 <div class="sourceCode" id="cb954"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb954-1"><a href="n-parameters.html#cb954-1"></a>fit_gov_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
@@ -1179,7 +943,7 @@ alive_pre
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#yxytspcvfq .gt_table {
+#rqqwsspfgv .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1204,7 +968,7 @@ alive_pre
   border-left-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_heading {
+#rqqwsspfgv .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1216,7 +980,7 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_title {
+#rqqwsspfgv .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1226,7 +990,7 @@ alive_pre
   border-bottom-width: 0;
 }
 
-#yxytspcvfq .gt_subtitle {
+#rqqwsspfgv .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1236,13 +1000,13 @@ alive_pre
   border-top-width: 0;
 }
 
-#yxytspcvfq .gt_bottom_border {
+#rqqwsspfgv .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_col_headings {
+#rqqwsspfgv .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1257,7 +1021,7 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_col_heading {
+#rqqwsspfgv .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1277,7 +1041,7 @@ alive_pre
   overflow-x: hidden;
 }
 
-#yxytspcvfq .gt_column_spanner_outer {
+#rqqwsspfgv .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1289,15 +1053,15 @@ alive_pre
   padding-right: 4px;
 }
 
-#yxytspcvfq .gt_column_spanner_outer:first-child {
+#rqqwsspfgv .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#yxytspcvfq .gt_column_spanner_outer:last-child {
+#rqqwsspfgv .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#yxytspcvfq .gt_column_spanner {
+#rqqwsspfgv .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1309,7 +1073,7 @@ alive_pre
   width: 100%;
 }
 
-#yxytspcvfq .gt_group_heading {
+#rqqwsspfgv .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1331,7 +1095,7 @@ alive_pre
   vertical-align: middle;
 }
 
-#yxytspcvfq .gt_empty_group_heading {
+#rqqwsspfgv .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1346,15 +1110,15 @@ alive_pre
   vertical-align: middle;
 }
 
-#yxytspcvfq .gt_from_md > :first-child {
+#rqqwsspfgv .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#yxytspcvfq .gt_from_md > :last-child {
+#rqqwsspfgv .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#yxytspcvfq .gt_row {
+#rqqwsspfgv .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1373,7 +1137,7 @@ alive_pre
   overflow-x: hidden;
 }
 
-#yxytspcvfq .gt_stub {
+#rqqwsspfgv .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1385,7 +1149,7 @@ alive_pre
   padding-left: 12px;
 }
 
-#yxytspcvfq .gt_summary_row {
+#rqqwsspfgv .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1395,7 +1159,7 @@ alive_pre
   padding-right: 5px;
 }
 
-#yxytspcvfq .gt_first_summary_row {
+#rqqwsspfgv .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1405,7 +1169,7 @@ alive_pre
   border-top-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_grand_summary_row {
+#rqqwsspfgv .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1415,7 +1179,7 @@ alive_pre
   padding-right: 5px;
 }
 
-#yxytspcvfq .gt_first_grand_summary_row {
+#rqqwsspfgv .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1425,11 +1189,11 @@ alive_pre
   border-top-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_striped {
+#rqqwsspfgv .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#yxytspcvfq .gt_table_body {
+#rqqwsspfgv .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1438,7 +1202,7 @@ alive_pre
   border-bottom-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_footnotes {
+#rqqwsspfgv .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1452,13 +1216,13 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_footnote {
+#rqqwsspfgv .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#yxytspcvfq .gt_sourcenotes {
+#rqqwsspfgv .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1472,46 +1236,46 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#yxytspcvfq .gt_sourcenote {
+#rqqwsspfgv .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#yxytspcvfq .gt_left {
+#rqqwsspfgv .gt_left {
   text-align: left;
 }
 
-#yxytspcvfq .gt_center {
+#rqqwsspfgv .gt_center {
   text-align: center;
 }
 
-#yxytspcvfq .gt_right {
+#rqqwsspfgv .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#yxytspcvfq .gt_font_normal {
+#rqqwsspfgv .gt_font_normal {
   font-weight: normal;
 }
 
-#yxytspcvfq .gt_font_bold {
+#rqqwsspfgv .gt_font_bold {
   font-weight: bold;
 }
 
-#yxytspcvfq .gt_font_italic {
+#rqqwsspfgv .gt_font_italic {
   font-style: italic;
 }
 
-#yxytspcvfq .gt_super {
+#rqqwsspfgv .gt_super {
   font-size: 65%;
 }
 
-#yxytspcvfq .gt_footnote_marks {
+#rqqwsspfgv .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="yxytspcvfq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="rqqwsspfgv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -1522,8 +1286,8 @@ alive_pre
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">24033</td>
-      <td class="gt_row gt_center">21718, 26423</td>
+      <td class="gt_row gt_center">24104</td>
+      <td class="gt_row gt_center">21626, 26540</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex</td>
@@ -1537,8 +1301,8 @@ alive_pre
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">2316</td>
-      <td class="gt_row gt_center">500, 4047</td>
+      <td class="gt_row gt_center">2274</td>
+      <td class="gt_row gt_center">507, 4005</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">alive_pre</td>
@@ -1571,7 +1335,7 @@ alive_pre
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#kibaoplynu .gt_table {
+#fnyexwteny .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1596,7 +1360,7 @@ alive_pre
   border-left-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_heading {
+#fnyexwteny .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1608,7 +1372,7 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_title {
+#fnyexwteny .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1618,7 +1382,7 @@ alive_pre
   border-bottom-width: 0;
 }
 
-#kibaoplynu .gt_subtitle {
+#fnyexwteny .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1628,13 +1392,13 @@ alive_pre
   border-top-width: 0;
 }
 
-#kibaoplynu .gt_bottom_border {
+#fnyexwteny .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_col_headings {
+#fnyexwteny .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1649,7 +1413,7 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_col_heading {
+#fnyexwteny .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1669,7 +1433,7 @@ alive_pre
   overflow-x: hidden;
 }
 
-#kibaoplynu .gt_column_spanner_outer {
+#fnyexwteny .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1681,15 +1445,15 @@ alive_pre
   padding-right: 4px;
 }
 
-#kibaoplynu .gt_column_spanner_outer:first-child {
+#fnyexwteny .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kibaoplynu .gt_column_spanner_outer:last-child {
+#fnyexwteny .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kibaoplynu .gt_column_spanner {
+#fnyexwteny .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1701,7 +1465,7 @@ alive_pre
   width: 100%;
 }
 
-#kibaoplynu .gt_group_heading {
+#fnyexwteny .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1723,7 +1487,7 @@ alive_pre
   vertical-align: middle;
 }
 
-#kibaoplynu .gt_empty_group_heading {
+#fnyexwteny .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1738,15 +1502,15 @@ alive_pre
   vertical-align: middle;
 }
 
-#kibaoplynu .gt_from_md > :first-child {
+#fnyexwteny .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kibaoplynu .gt_from_md > :last-child {
+#fnyexwteny .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kibaoplynu .gt_row {
+#fnyexwteny .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1765,7 +1529,7 @@ alive_pre
   overflow-x: hidden;
 }
 
-#kibaoplynu .gt_stub {
+#fnyexwteny .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1777,7 +1541,7 @@ alive_pre
   padding-left: 12px;
 }
 
-#kibaoplynu .gt_summary_row {
+#fnyexwteny .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1787,7 +1551,7 @@ alive_pre
   padding-right: 5px;
 }
 
-#kibaoplynu .gt_first_summary_row {
+#fnyexwteny .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1797,7 +1561,7 @@ alive_pre
   border-top-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_grand_summary_row {
+#fnyexwteny .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1807,7 +1571,7 @@ alive_pre
   padding-right: 5px;
 }
 
-#kibaoplynu .gt_first_grand_summary_row {
+#fnyexwteny .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1817,11 +1581,11 @@ alive_pre
   border-top-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_striped {
+#fnyexwteny .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kibaoplynu .gt_table_body {
+#fnyexwteny .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1830,7 +1594,7 @@ alive_pre
   border-bottom-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_footnotes {
+#fnyexwteny .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1844,13 +1608,13 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_footnote {
+#fnyexwteny .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#kibaoplynu .gt_sourcenotes {
+#fnyexwteny .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1864,46 +1628,46 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#kibaoplynu .gt_sourcenote {
+#fnyexwteny .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#kibaoplynu .gt_left {
+#fnyexwteny .gt_left {
   text-align: left;
 }
 
-#kibaoplynu .gt_center {
+#fnyexwteny .gt_center {
   text-align: center;
 }
 
-#kibaoplynu .gt_right {
+#fnyexwteny .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kibaoplynu .gt_font_normal {
+#fnyexwteny .gt_font_normal {
   font-weight: normal;
 }
 
-#kibaoplynu .gt_font_bold {
+#fnyexwteny .gt_font_bold {
   font-weight: bold;
 }
 
-#kibaoplynu .gt_font_italic {
+#fnyexwteny .gt_font_italic {
   font-style: italic;
 }
 
-#kibaoplynu .gt_super {
+#fnyexwteny .gt_super {
   font-size: 65%;
 }
 
-#kibaoplynu .gt_footnote_marks {
+#fnyexwteny .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="kibaoplynu" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="fnyexwteny" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -1914,8 +1678,8 @@ alive_pre
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">7250</td>
-      <td class="gt_row gt_center">-7880, 23204</td>
+      <td class="gt_row gt_center">7603</td>
+      <td class="gt_row gt_center">-8667, 24183</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex</td>
@@ -1929,13 +1693,13 @@ alive_pre
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">19251</td>
-      <td class="gt_row gt_center">3207, 34634</td>
+      <td class="gt_row gt_center">18888</td>
+      <td class="gt_row gt_center">2217, 34997</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">alive_pre</td>
-      <td class="gt_row gt_center">-0.07</td>
-      <td class="gt_row gt_center">-0.81, 0.63</td>
+      <td class="gt_row gt_center">-0.08</td>
+      <td class="gt_row gt_center">-0.83, 0.67</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex * alive_pre</td>
@@ -1944,8 +1708,8 @@ alive_pre
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male * alive_pre</td>
-      <td class="gt_row gt_center">-0.79</td>
-      <td class="gt_row gt_center">-1.5, -0.04</td>
+      <td class="gt_row gt_center">-0.78</td>
+      <td class="gt_row gt_center">-1.5, -0.02</td>
     </tr>
 </tbody>
 <tfoot><tr class="gt_footnotes">
@@ -1970,7 +1734,7 @@ alive_pre
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#iqnuurqxau .gt_table {
+#gljybfdqsc .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1995,7 +1759,7 @@ alive_pre
   border-left-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_heading {
+#gljybfdqsc .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2007,7 +1771,7 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_title {
+#gljybfdqsc .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2017,7 +1781,7 @@ alive_pre
   border-bottom-width: 0;
 }
 
-#iqnuurqxau .gt_subtitle {
+#gljybfdqsc .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2027,13 +1791,13 @@ alive_pre
   border-top-width: 0;
 }
 
-#iqnuurqxau .gt_bottom_border {
+#gljybfdqsc .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_col_headings {
+#gljybfdqsc .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2048,7 +1812,7 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_col_heading {
+#gljybfdqsc .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2068,7 +1832,7 @@ alive_pre
   overflow-x: hidden;
 }
 
-#iqnuurqxau .gt_column_spanner_outer {
+#gljybfdqsc .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2080,15 +1844,15 @@ alive_pre
   padding-right: 4px;
 }
 
-#iqnuurqxau .gt_column_spanner_outer:first-child {
+#gljybfdqsc .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#iqnuurqxau .gt_column_spanner_outer:last-child {
+#gljybfdqsc .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#iqnuurqxau .gt_column_spanner {
+#gljybfdqsc .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2100,7 +1864,7 @@ alive_pre
   width: 100%;
 }
 
-#iqnuurqxau .gt_group_heading {
+#gljybfdqsc .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2122,7 +1886,7 @@ alive_pre
   vertical-align: middle;
 }
 
-#iqnuurqxau .gt_empty_group_heading {
+#gljybfdqsc .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2137,15 +1901,15 @@ alive_pre
   vertical-align: middle;
 }
 
-#iqnuurqxau .gt_from_md > :first-child {
+#gljybfdqsc .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#iqnuurqxau .gt_from_md > :last-child {
+#gljybfdqsc .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#iqnuurqxau .gt_row {
+#gljybfdqsc .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2164,7 +1928,7 @@ alive_pre
   overflow-x: hidden;
 }
 
-#iqnuurqxau .gt_stub {
+#gljybfdqsc .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2176,7 +1940,7 @@ alive_pre
   padding-left: 12px;
 }
 
-#iqnuurqxau .gt_summary_row {
+#gljybfdqsc .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2186,7 +1950,7 @@ alive_pre
   padding-right: 5px;
 }
 
-#iqnuurqxau .gt_first_summary_row {
+#gljybfdqsc .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2196,7 +1960,7 @@ alive_pre
   border-top-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_grand_summary_row {
+#gljybfdqsc .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2206,7 +1970,7 @@ alive_pre
   padding-right: 5px;
 }
 
-#iqnuurqxau .gt_first_grand_summary_row {
+#gljybfdqsc .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2216,11 +1980,11 @@ alive_pre
   border-top-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_striped {
+#gljybfdqsc .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#iqnuurqxau .gt_table_body {
+#gljybfdqsc .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2229,7 +1993,7 @@ alive_pre
   border-bottom-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_footnotes {
+#gljybfdqsc .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2243,13 +2007,13 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_footnote {
+#gljybfdqsc .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#iqnuurqxau .gt_sourcenotes {
+#gljybfdqsc .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2263,46 +2027,46 @@ alive_pre
   border-right-color: #D3D3D3;
 }
 
-#iqnuurqxau .gt_sourcenote {
+#gljybfdqsc .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#iqnuurqxau .gt_left {
+#gljybfdqsc .gt_left {
   text-align: left;
 }
 
-#iqnuurqxau .gt_center {
+#gljybfdqsc .gt_center {
   text-align: center;
 }
 
-#iqnuurqxau .gt_right {
+#gljybfdqsc .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#iqnuurqxau .gt_font_normal {
+#gljybfdqsc .gt_font_normal {
   font-weight: normal;
 }
 
-#iqnuurqxau .gt_font_bold {
+#gljybfdqsc .gt_font_bold {
   font-weight: bold;
 }
 
-#iqnuurqxau .gt_font_italic {
+#gljybfdqsc .gt_font_italic {
   font-style: italic;
 }
 
-#iqnuurqxau .gt_super {
+#gljybfdqsc .gt_super {
   font-size: 65%;
 }
 
-#iqnuurqxau .gt_footnote_marks {
+#gljybfdqsc .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="iqnuurqxau" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="gljybfdqsc" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
@@ -2313,8 +2077,8 @@ alive_pre
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">(Intercept)</td>
-      <td class="gt_row gt_center">6086</td>
-      <td class="gt_row gt_center">-9532, 21485</td>
+      <td class="gt_row gt_center">6181</td>
+      <td class="gt_row gt_center">-9368, 21659</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">state</td>
@@ -2328,248 +2092,248 @@ alive_pre
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Alaska</td>
-      <td class="gt_row gt_center">1091</td>
-      <td class="gt_row gt_center">-1685, 3869</td>
+      <td class="gt_row gt_center">1129</td>
+      <td class="gt_row gt_center">-1640, 3919</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Arizona</td>
-      <td class="gt_row gt_center">2919</td>
-      <td class="gt_row gt_center">720, 5213</td>
+      <td class="gt_row gt_center">2954</td>
+      <td class="gt_row gt_center">682, 5194</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Arkansas</td>
-      <td class="gt_row gt_center">515</td>
-      <td class="gt_row gt_center">-1679, 2797</td>
+      <td class="gt_row gt_center">545</td>
+      <td class="gt_row gt_center">-1741, 2783</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">California</td>
-      <td class="gt_row gt_center">1998</td>
-      <td class="gt_row gt_center">-420, 4484</td>
+      <td class="gt_row gt_center">2029</td>
+      <td class="gt_row gt_center">-473, 4430</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Colorado</td>
-      <td class="gt_row gt_center">1467</td>
-      <td class="gt_row gt_center">-816, 3896</td>
+      <td class="gt_row gt_center">1501</td>
+      <td class="gt_row gt_center">-834, 3874</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Connecticut</td>
-      <td class="gt_row gt_center">1022</td>
-      <td class="gt_row gt_center">-1345, 3418</td>
+      <td class="gt_row gt_center">1050</td>
+      <td class="gt_row gt_center">-1437, 3465</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Delaware</td>
-      <td class="gt_row gt_center">3107</td>
-      <td class="gt_row gt_center">669, 5664</td>
+      <td class="gt_row gt_center">3153</td>
+      <td class="gt_row gt_center">649, 5615</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Florida</td>
-      <td class="gt_row gt_center">-1561</td>
-      <td class="gt_row gt_center">-4129, 1105</td>
+      <td class="gt_row gt_center">-1515</td>
+      <td class="gt_row gt_center">-4136, 1097</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Georgia</td>
-      <td class="gt_row gt_center">1793</td>
-      <td class="gt_row gt_center">-982, 4581</td>
+      <td class="gt_row gt_center">1820</td>
+      <td class="gt_row gt_center">-988, 4584</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Hawaii</td>
-      <td class="gt_row gt_center">1585</td>
-      <td class="gt_row gt_center">-1459, 4591</td>
+      <td class="gt_row gt_center">1595</td>
+      <td class="gt_row gt_center">-1421, 4614</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Idaho</td>
-      <td class="gt_row gt_center">1700</td>
-      <td class="gt_row gt_center">-680, 4179</td>
+      <td class="gt_row gt_center">1750</td>
+      <td class="gt_row gt_center">-729, 4150</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Illinois</td>
-      <td class="gt_row gt_center">-188</td>
-      <td class="gt_row gt_center">-2723, 2460</td>
+      <td class="gt_row gt_center">-122</td>
+      <td class="gt_row gt_center">-2718, 2449</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Indiana</td>
-      <td class="gt_row gt_center">1247</td>
-      <td class="gt_row gt_center">-1176, 3700</td>
+      <td class="gt_row gt_center">1268</td>
+      <td class="gt_row gt_center">-1182, 3712</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Iowa</td>
-      <td class="gt_row gt_center">939</td>
-      <td class="gt_row gt_center">-1279, 3223</td>
+      <td class="gt_row gt_center">971</td>
+      <td class="gt_row gt_center">-1296, 3240</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Kansas</td>
-      <td class="gt_row gt_center">-152</td>
-      <td class="gt_row gt_center">-2418, 2170</td>
+      <td class="gt_row gt_center">-123</td>
+      <td class="gt_row gt_center">-2394, 2136</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Kentucky</td>
-      <td class="gt_row gt_center">1492</td>
-      <td class="gt_row gt_center">-987, 4029</td>
+      <td class="gt_row gt_center">1499</td>
+      <td class="gt_row gt_center">-1004, 3983</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Louisiana</td>
-      <td class="gt_row gt_center">1407</td>
-      <td class="gt_row gt_center">-1375, 4286</td>
+      <td class="gt_row gt_center">1431</td>
+      <td class="gt_row gt_center">-1404, 4272</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Maine</td>
-      <td class="gt_row gt_center">2112</td>
-      <td class="gt_row gt_center">-435, 4692</td>
+      <td class="gt_row gt_center">2150</td>
+      <td class="gt_row gt_center">-466, 4741</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Maryland</td>
-      <td class="gt_row gt_center">1666</td>
-      <td class="gt_row gt_center">-700, 4127</td>
+      <td class="gt_row gt_center">1711</td>
+      <td class="gt_row gt_center">-769, 4128</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Massachusetts</td>
-      <td class="gt_row gt_center">90</td>
-      <td class="gt_row gt_center">-2100, 2391</td>
+      <td class="gt_row gt_center">121</td>
+      <td class="gt_row gt_center">-2147, 2376</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Michigan</td>
-      <td class="gt_row gt_center">-1178</td>
-      <td class="gt_row gt_center">-3457, 1185</td>
+      <td class="gt_row gt_center">-1135</td>
+      <td class="gt_row gt_center">-3501, 1165</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Minnesota</td>
-      <td class="gt_row gt_center">1641</td>
-      <td class="gt_row gt_center">-602, 4006</td>
+      <td class="gt_row gt_center">1681</td>
+      <td class="gt_row gt_center">-655, 3902</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Mississippi</td>
-      <td class="gt_row gt_center">753</td>
-      <td class="gt_row gt_center">-1818, 3383</td>
+      <td class="gt_row gt_center">800</td>
+      <td class="gt_row gt_center">-1815, 3360</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Missouri</td>
-      <td class="gt_row gt_center">485</td>
-      <td class="gt_row gt_center">-2081, 3072</td>
+      <td class="gt_row gt_center">498</td>
+      <td class="gt_row gt_center">-2124, 3062</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Montana</td>
-      <td class="gt_row gt_center">860</td>
-      <td class="gt_row gt_center">-1576, 3327</td>
+      <td class="gt_row gt_center">883</td>
+      <td class="gt_row gt_center">-1630, 3308</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Nebraska</td>
-      <td class="gt_row gt_center">791</td>
-      <td class="gt_row gt_center">-1452, 3140</td>
+      <td class="gt_row gt_center">831</td>
+      <td class="gt_row gt_center">-1516, 3120</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Nevada</td>
-      <td class="gt_row gt_center">1517</td>
-      <td class="gt_row gt_center">-1056, 4144</td>
+      <td class="gt_row gt_center">1537</td>
+      <td class="gt_row gt_center">-1085, 4121</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">New Hampshire</td>
-      <td class="gt_row gt_center">1296</td>
-      <td class="gt_row gt_center">-946, 3601</td>
+      <td class="gt_row gt_center">1326</td>
+      <td class="gt_row gt_center">-969, 3577</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">New Jersey</td>
-      <td class="gt_row gt_center">359</td>
-      <td class="gt_row gt_center">-2151, 2926</td>
+      <td class="gt_row gt_center">400</td>
+      <td class="gt_row gt_center">-2168, 2925</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">New Mexico</td>
-      <td class="gt_row gt_center">1002</td>
-      <td class="gt_row gt_center">-1148, 3253</td>
+      <td class="gt_row gt_center">1034</td>
+      <td class="gt_row gt_center">-1201, 3233</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">New York</td>
-      <td class="gt_row gt_center">873</td>
-      <td class="gt_row gt_center">-1454, 3254</td>
+      <td class="gt_row gt_center">901</td>
+      <td class="gt_row gt_center">-1463, 3258</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">North Carolina</td>
-      <td class="gt_row gt_center">-1457</td>
-      <td class="gt_row gt_center">-4198, 1404</td>
+      <td class="gt_row gt_center">-1408</td>
+      <td class="gt_row gt_center">-4204, 1332</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">North Dakota</td>
-      <td class="gt_row gt_center">2152</td>
-      <td class="gt_row gt_center">-190, 4544</td>
+      <td class="gt_row gt_center">2180</td>
+      <td class="gt_row gt_center">-210, 4499</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Ohio</td>
-      <td class="gt_row gt_center">2178</td>
-      <td class="gt_row gt_center">-99, 4523</td>
+      <td class="gt_row gt_center">2195</td>
+      <td class="gt_row gt_center">-142, 4505</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Oklahoma</td>
-      <td class="gt_row gt_center">-592</td>
-      <td class="gt_row gt_center">-3144, 2040</td>
+      <td class="gt_row gt_center">-538</td>
+      <td class="gt_row gt_center">-3178, 2029</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Oregon</td>
-      <td class="gt_row gt_center">202</td>
-      <td class="gt_row gt_center">-2203, 2758</td>
+      <td class="gt_row gt_center">239</td>
+      <td class="gt_row gt_center">-2223, 2695</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Pennsylvania</td>
-      <td class="gt_row gt_center">1265</td>
-      <td class="gt_row gt_center">-1135, 3759</td>
+      <td class="gt_row gt_center">1308</td>
+      <td class="gt_row gt_center">-1172, 3788</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Rhode Island</td>
-      <td class="gt_row gt_center">1937</td>
-      <td class="gt_row gt_center">-160, 4128</td>
+      <td class="gt_row gt_center">1975</td>
+      <td class="gt_row gt_center">-203, 4071</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">South Carolina</td>
-      <td class="gt_row gt_center">2441</td>
-      <td class="gt_row gt_center">-134, 5165</td>
+      <td class="gt_row gt_center">2497</td>
+      <td class="gt_row gt_center">-233, 5111</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">South Dakota</td>
-      <td class="gt_row gt_center">-1844</td>
-      <td class="gt_row gt_center">-4024, 419</td>
+      <td class="gt_row gt_center">-1816</td>
+      <td class="gt_row gt_center">-4066, 414</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Tennessee</td>
-      <td class="gt_row gt_center">-453</td>
-      <td class="gt_row gt_center">-2915, 2083</td>
+      <td class="gt_row gt_center">-421</td>
+      <td class="gt_row gt_center">-2942, 2057</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Texas</td>
-      <td class="gt_row gt_center">1186</td>
-      <td class="gt_row gt_center">-986, 3482</td>
+      <td class="gt_row gt_center">1227</td>
+      <td class="gt_row gt_center">-1033, 3418</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Utah</td>
-      <td class="gt_row gt_center">1198</td>
-      <td class="gt_row gt_center">-1188, 3714</td>
+      <td class="gt_row gt_center">1226</td>
+      <td class="gt_row gt_center">-1179, 3648</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Vermont</td>
-      <td class="gt_row gt_center">564</td>
-      <td class="gt_row gt_center">-1707, 2828</td>
+      <td class="gt_row gt_center">571</td>
+      <td class="gt_row gt_center">-1737, 2802</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Virginia</td>
-      <td class="gt_row gt_center">2553</td>
-      <td class="gt_row gt_center">-184, 5350</td>
+      <td class="gt_row gt_center">2581</td>
+      <td class="gt_row gt_center">-243, 5376</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Washington</td>
-      <td class="gt_row gt_center">2767</td>
-      <td class="gt_row gt_center">325, 5264</td>
+      <td class="gt_row gt_center">2797</td>
+      <td class="gt_row gt_center">253, 5254</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">West Virginia</td>
-      <td class="gt_row gt_center">2397</td>
-      <td class="gt_row gt_center">-59, 4946</td>
+      <td class="gt_row gt_center">2431</td>
+      <td class="gt_row gt_center">-80, 4915</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Wisconsin</td>
-      <td class="gt_row gt_center">2439</td>
-      <td class="gt_row gt_center">295, 4711</td>
+      <td class="gt_row gt_center">2488</td>
+      <td class="gt_row gt_center">220, 4686</td>
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Wyoming</td>
-      <td class="gt_row gt_center">-532</td>
-      <td class="gt_row gt_center">-2936, 1993</td>
+      <td class="gt_row gt_center">-487</td>
+      <td class="gt_row gt_center">-2994, 1960</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex</td>
@@ -2583,13 +2347,13 @@ alive_pre
     </tr>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male</td>
-      <td class="gt_row gt_center">19923</td>
-      <td class="gt_row gt_center">4324, 35551</td>
+      <td class="gt_row gt_center">19794</td>
+      <td class="gt_row gt_center">4077, 35551</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">alive_pre</td>
-      <td class="gt_row gt_center">-0.06</td>
-      <td class="gt_row gt_center">-0.78, 0.66</td>
+      <td class="gt_row gt_center">-0.07</td>
+      <td class="gt_row gt_center">-0.79, 0.66</td>
     </tr>
 <tr>
 <td class="gt_row gt_left">sex * alive_pre</td>
@@ -2599,7 +2363,7 @@ alive_pre
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Male * alive_pre</td>
       <td class="gt_row gt_center">-0.82</td>
-      <td class="gt_row gt_center">-1.6, -0.10</td>
+      <td class="gt_row gt_center">-1.5, -0.09</td>
     </tr>
 </tbody>
 <tfoot><tr class="gt_footnotes">
@@ -2621,7 +2385,7 @@ alive_pre
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-775"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-776"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.4: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -2681,346 +2445,154 @@ alive_pre
 <p>We create the variable <code>solo</code>, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not.</p>
 <div class="sourceCode" id="cb965"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb965-1"><a href="n-parameters.html#cb965-1"></a>ch9 <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb965-2"><a href="n-parameters.html#cb965-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
-<table style="width: auto;" class="table table-condensed">
-<caption>
-<span id="tab:unnamed-chunk-779">TABLE 9.2: </span>Data summary
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:left;">
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Name
-</td>
-<td style="text-align:left;">
-Piped data
-</td>
+<p><!--
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-780">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
+<table><tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">Piped data</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Number of rows
-</td>
-<td style="text-align:left;">
-344084
-</td>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">344084</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Number of columns
-</td>
-<td style="text-align:left;">
-5
-</td>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">5</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-_______________________
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Column type frequency:
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-character
-</td>
-<td style="text-align:left;">
-1
-</td>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">1</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-factor
-</td>
-<td style="text-align:left;">
-1
-</td>
+<tr class="odd">
+<td align="left">factor</td>
+<td align="left">1</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-logical
-</td>
-<td style="text-align:left;">
-1
-</td>
+<tr class="even">
+<td align="left">logical</td>
+<td align="left">1</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-numeric
-</td>
-<td style="text-align:left;">
-2
-</td>
+<tr class="odd">
+<td align="left">numeric</td>
+<td align="left">2</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-________________________
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="even">
+<td align="left">________________________</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Group variables
-</td>
-<td style="text-align:left;">
-None
-</td>
+<tr class="odd">
+<td align="left">Group variables</td>
+<td align="left">None</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>Variable type: character</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:right;">
-min
-</th>
-<th style="text-align:right;">
-max
-</th>
-<th style="text-align:right;">
-empty
-</th>
-<th style="text-align:right;">
-n_unique
-</th>
-<th style="text-align:right;">
-whitespace
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
 </tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-sex
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-0
-</td>
+<tbody><tr class="odd">
+<td align="left">sex</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: factor</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:left;">
-ordered
-</th>
-<th style="text-align:right;">
-n_unique
-</th>
-<th style="text-align:left;">
-top_counts
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="left">ordered</th>
+<th align="right">n_unique</th>
+<th align="left">top_counts</th>
 </tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-treatment
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:left;">
-Con: 191243, Civ: 38218, Sel: 38218, Haw: 38204
-</td>
+<tbody><tr class="odd">
+<td align="left">treatment</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="left">FALSE</td>
+<td align="right">5</td>
+<td align="left">Con: 191243, Civ: 38218, Sel: 38218, Haw: 38204</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: logical</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:right;">
-mean
-</th>
-<th style="text-align:left;">
-count
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="left">count</th>
 </tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-solo
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.14
-</td>
-<td style="text-align:left;">
-FAL: 296250, TRU: 47834
-</td>
+<tbody><tr class="odd">
+<td align="left">solo</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.14</td>
+<td align="left">FAL: 296250, TRU: 47834</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: numeric</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:right;">
-mean
-</th>
-<th style="text-align:right;">
-sd
-</th>
-<th style="text-align:right;">
-p0
-</th>
-<th style="text-align:right;">
-p25
-</th>
-<th style="text-align:right;">
-p50
-</th>
-<th style="text-align:right;">
-p75
-</th>
-<th style="text-align:right;">
-p100
-</th>
-<th style="text-align:left;">
-hist
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-primary_06
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.32
-</td>
-<td style="text-align:right;">
-0.46
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-▇▁▁▁▃
-</td>
+<tr class="odd">
+<td align="left">primary_06</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.32</td>
+<td align="right">0.46</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">▇▁▁▁▃</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-age
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-49.79
-</td>
-<td style="text-align:right;">
-14.45
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-41
-</td>
-<td style="text-align:right;">
-50
-</td>
-<td style="text-align:right;">
-59
-</td>
-<td style="text-align:right;">
-106
-</td>
-<td style="text-align:left;">
-▃▇▅▁▁
-</td>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">49.79</td>
+<td align="right">14.45</td>
+<td align="right">20</td>
+<td align="right">41</td>
+<td align="right">50</td>
+<td align="right">59</td>
+<td align="right">106</td>
+<td align="left">▃▇▅▁▁</td>
 </tr>
 </tbody>
 </table>
@@ -3031,281 +2603,135 @@ age
 <pre><code>## # A tibble: 10 x 5
 ##    primary_06 treatment  solo  sex      age
 ##         &lt;int&gt; &lt;fct&gt;      &lt;lgl&gt; &lt;chr&gt;  &lt;dbl&gt;
-##  1          0 Control    FALSE Male      23
-##  2          0 Control    FALSE Male      68
-##  3          0 Hawthorne  TRUE  Female    40
-##  4          0 Civic Duty FALSE Female    20
-##  5          0 Control    TRUE  Female    61
-##  6          0 Control    FALSE Female    43
-##  7          0 Civic Duty FALSE Female    55
-##  8          1 Control    TRUE  Male      66
-##  9          0 Control    FALSE Male      68
-## 10          0 Control    FALSE Female    46</code></pre>
+##  1          1 Self       FALSE Female    58
+##  2          1 Control    TRUE  Male      65
+##  3          1 Civic Duty FALSE Male      26
+##  4          0 Control    FALSE Male      22
+##  5          1 Control    FALSE Female    36
+##  6          0 Civic Duty FALSE Female    53
+##  7          1 Control    FALSE Female    36
+##  8          0 Neighbors  FALSE Male      37
+##  9          0 Control    FALSE Male      58
+## 10          1 Control    FALSE Male      66</code></pre>
 <p>Now we have a table with 5 random observations and the respondents’ information in a regular table output. By taking a few random samples, we may start to see some patterns within the data.</p>
 <p>Now we have a table with 5 random observations and the respondents’ information in a regular table output. By taking a few random samples, we may start to see some patterns within the data. Do you notice anything in particular about the variable <code>treatment</code>?</p>
 <p>One other helpful summarizing technique we can use is <code>skim()</code>. To make the information it contains simpler, we will only be looking at three variables: <code>primary_06</code>, <code>treatment</code>, and <code>sex</code>.</p>
 <div class="sourceCode" id="cb968"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb968-1"><a href="n-parameters.html#cb968-1"></a>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb968-2"><a href="n-parameters.html#cb968-2"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb968-3"><a href="n-parameters.html#cb968-3"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
-<table style="width: auto;" class="table table-condensed">
-<caption>
-<span id="tab:unnamed-chunk-781">TABLE 9.3: </span>Data summary
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:left;">
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Name
-</td>
-<td style="text-align:left;">
-Piped data
-</td>
+<p><!--
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-782">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
+<table><tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">Piped data</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Number of rows
-</td>
-<td style="text-align:left;">
-344084
-</td>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">344084</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Number of columns
-</td>
-<td style="text-align:left;">
-3
-</td>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">3</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-_______________________
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Column type frequency:
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-character
-</td>
-<td style="text-align:left;">
-1
-</td>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">1</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-factor
-</td>
-<td style="text-align:left;">
-1
-</td>
+<tr class="odd">
+<td align="left">factor</td>
+<td align="left">1</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-numeric
-</td>
-<td style="text-align:left;">
-1
-</td>
+<tr class="even">
+<td align="left">numeric</td>
+<td align="left">1</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-________________________
-</td>
-<td style="text-align:left;">
-</td>
+<tr class="odd">
+<td align="left">________________________</td>
+<td align="left"></td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Group variables
-</td>
-<td style="text-align:left;">
-None
-</td>
+<tr class="even">
+<td align="left">Group variables</td>
+<td align="left">None</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>Variable type: character</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:right;">
-min
-</th>
-<th style="text-align:right;">
-max
-</th>
-<th style="text-align:right;">
-empty
-</th>
-<th style="text-align:right;">
-n_unique
-</th>
-<th style="text-align:right;">
-whitespace
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
 </tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-sex
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-0
-</td>
+<tbody><tr class="odd">
+<td align="left">sex</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: factor</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:left;">
-ordered
-</th>
-<th style="text-align:right;">
-n_unique
-</th>
-<th style="text-align:left;">
-top_counts
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="left">ordered</th>
+<th align="right">n_unique</th>
+<th align="left">top_counts</th>
 </tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-treatment
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:left;">
-Con: 191243, Civ: 38218, Sel: 38218, Haw: 38204
-</td>
+<tbody><tr class="odd">
+<td align="left">treatment</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="left">FALSE</td>
+<td align="right">5</td>
+<td align="left">Con: 191243, Civ: 38218, Sel: 38218, Haw: 38204</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: numeric</strong></p>
 <table>
-<thead><tr>
-<th style="text-align:left;">
-skim_variable
-</th>
-<th style="text-align:right;">
-n_missing
-</th>
-<th style="text-align:right;">
-complete_rate
-</th>
-<th style="text-align:right;">
-mean
-</th>
-<th style="text-align:right;">
-sd
-</th>
-<th style="text-align:right;">
-p0
-</th>
-<th style="text-align:right;">
-p25
-</th>
-<th style="text-align:right;">
-p50
-</th>
-<th style="text-align:right;">
-p75
-</th>
-<th style="text-align:right;">
-p100
-</th>
-<th style="text-align:left;">
-hist
-</th>
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
 </tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-primary_06
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.32
-</td>
-<td style="text-align:right;">
-0.46
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-▇▁▁▁▃
-</td>
+<tbody><tr class="odd">
+<td align="left">primary_06</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.32</td>
+<td align="right">0.46</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">▇▁▁▁▃</td>
 </tr></tbody>
 </table>
 <p>By running the <code>skim()</code> command, we get a summary of the data set as a whole, as well as the types of variables and individual variable summaries. At the top we see the number of columns and rows within the selected data set. Below this we are given a list with the different types of variables, or columns, and how often they appear within the data we are skimming. Following this, the variables are then separated by their column type, and we are given individual summaries based on the type.</p>
@@ -3322,7 +2748,7 @@ primary_06
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-782"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-783"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 9.5: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -3334,7 +2760,7 @@ primary_06
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-783"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-784"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.6: Justice<!--</p>-->
 <!--</div>--></span>
@@ -3346,7 +2772,7 @@ primary_06
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-784"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-785"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 9.7: Courage<!--</p>-->
 <!--</div>--></span>
@@ -3358,7 +2784,7 @@ primary_06
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-785"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-786"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.8: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -3413,50 +2839,14 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <!-- cces looks perfect for this project. There are 400,000 rows, so it seems like you ought to have plenty of data for anything you want, but once you realize there are 51 states and 10 years, things get sparse fast. We only have 15 observations, for example, for Wyoming in 2007. Once you start subsetting by race and education, you have no choice but to start borrowing strength.  -->
 <!-- So, just what will we use? rstanarm(). If so (and if we have not introduced it earlier), we can begin with seeing how it is similar to lm() and then expand. This means that, in one paramter chapter, we should be doing lm( ~ 1). In two parameter, lm( ~ treatment) --- if treatment is zero one --- or, perhaps better, lm( ~ -1 + treatment) if treatment is a factor/character with two levels. We might also have introduced  -->
 
-<!-- This chapter does three things.  -->
-<!-- First, it provides a general discussion about how we select models. What makes one model better than another? How do we decide which variables to include? How do we select one functional form over another?  -->
-<!-- Second, the initial discussion --- which covers basic stuff that you might find in any regression textbook --- then morphs into a more formal discussion about model choice, but includes the full machine learning approach, with an emphasis on holdout samples. -->
-<!-- Third, now that we understand the basic ideas of model choice, how do we actually do it? Answer: **tidymodels**! We need to provide a thorough tour of tidymodels, perhaps using a bunch of text from TMWR: https://www.tmwr.org. -->
-<!-- DK: To discuss. What belongs here? Overfitting? Type m/s errors? Diff-in-diff, RDD, et cetera? How to make model? -->
-<!-- To Do: -->
-<!-- 2. Read the latest version of themes.Rmd. Some of it is inspired but what was in the previous version of this chapter. But it is now more serious. So, it might be that we just cut everything here and start again. Discuss all 4 virtues and show their paintings within the qscores data set. -->
-<!-- Outline: -->
-<!-- Preamble: Life is hard. Things were difficult in Chapter 9. Let us teach you some stuff to make your life easier! And you will get to practice in Chapters 11 and 12. Review themes.Rmd briefly, in two or three sentences. Review the key dificulties which were discussed in chapter 9: model selection, overfitting and causal inference. Finish with specific questions. A new professor is planning to teach a course. She knows the work she will assign and the enrollment. What will her Q scores be?   -->
-<!-- 1. EDA of qscores. Keep all the rows for now. Change rating to rating*100. (That will make coefficients easy to deal with later.) -->
-<!-- 2. rating ~ term + enrollment + hours. Do this first for just MUSIC classes. All with rstanarm. Fully explain.  All the way through posterior_linpred() and posterior_predict(). Add key items from style.Rmd, e.g., parameter uncertainty, unmodelled variation and so on. -->
-<!-- 3. Explore the issue of which model to use. We did the above, and answered the question, using just data from Music courses. That seems sensible if it is a Music professor who asked the question. But isn't the other data relevant also? What would be the answer to her question if we used all the data to answer it? The answer will be different. Which is correct? Discuss. Key: There is not a single best model. Indeed, there is not a single best set of data to include. There is only a process, and the assumptions we make. -->
-<!-- 4. Figuring out causal effects from observational data. Doing so stupidly. Doing so smart. We need a Rubin Causal Model section.  Set up a Zoom with Cass to discuss. She is a good source for information about how to make nice looking tables and about how to think about the issue. We might use qscores and just pretend/assume random assignment or we might use a different data set. Key is to set up a Rubin Table in which the potential outcomes are clear. For example, what would my rating be in a assigned 5 hours of work? What about 10 hours? 15 hours? Each of these is a differnt treatment and, therefore, generates a different potential outcome. -->
-<!-- 5. The other key tool set is the one for tidymodels. We need a thorough discussion of them. I think we can put stan_glm within the tidymodels framework. So, do that! -->
-<!-- 6. Use tidymodels framework to overfitting/underfitting and how we use bootstrap and cross-validation to fight against it.  -->
-<!-- Other comments: -->
-<!-- The key goal of this chapter is to walk students through all the most common pitfalls with creating models and then show them how to deal with those pitfalls. Then, in chapters 11 and 12, students put what we have taught them to work. The problem is that I only have a hazy idea of what the key pitfalls are and how to deal with them. -->
-<!-- Type M/S errors. Seeing effects when none are there. -->
-<!-- 5. Deriving causal estimates from observational data. -->
-<!-- 6. Prediction only. rating ~ hours + department + enrollment + enrollment*course + whatever. Follow the Gelman advice on how to make a regression. What model do I make? Why? Think about goals? Teach tidymodels syntax. -->
-<!-- 7. underfitting versus overfitting. Big idea. How to deal with? Bayes? Overfitting/underfitting. It would be nice to nail all the complexities of this down. Should we even bother to explore it in chapter 9? Holdout samples? -->
-<!-- 8. Finish by answering question. -->
-<!-- 
-
-Tidymodels syntax. Again, get this settled before the "graduation exercise" of chapters 11/12.
-
-M and S errors. This stuff is so important that it deserves placement in the main body of the book. Also, the governors data provides a great example to work with. Just use Gelman's blog post!
-
-Estimating causal relationships which are somewhere between purely observational and perfect experiments: regression discontinuity designs, difference-in-difference and so on.
-
-Dealing with parameter uncertainty correctly. That is, in previous chapters, we treated the betas as estimated perfectly. We did not incorporate uncertainty in their estimation into our prediction intervals. (Unless we did that with rstanarm in chapter 9. Or maybe this is a reason to save rstanarm for this chapter.)
-
-Perhaps all this is enough to both fill this chapter and set the stage for 11 and 12.
-
--->
-<!-- 6. We explicitly avoid talking about Bayesian models here because we are only estimating a one or two parameters in each of the models above. So, there is no occasion for pooling, or any of the other Bayesian magic. But you can see how estimating a 100 rating ~ hours models, one for each department, lends itself to a Bayesian approach. On to chapter 11. -->
-<!-- Packages: tidyverse, broom -->
-<!-- Commands:  -->
-<!-- How do we solve the problems which were identified in chapter 9? -->
-<!-- no bootstrap;  introduce tidymodels here for first time; -->
-<!-- holdout sample, cross validation, machine learning, test  -->
-<!-- DK: Maybe build this from tidymodels, while also mentioning the traditional way of just using lm()? The problem with raw lm() is that it does not work natively in a pipe since the first argument is a formula instead of the data. (Or maybe a lm(y ~ x, data = .) hack is OK?) -->
-<!-- DK: Change the smoking example to political campaigns. If you work on the NYT, all you care about is forecasting election results conditional on campaign spending. If you are a (rich!) candidate, you care about the causal effect of spending on votes. Same model might be estimated by both! But the latter needs to be much more careful in deciding whether or not the results are real. -->
-<!-- Albert points out a difficulty in combining the RCM with regression. You can't easily put in a distribution for the unknown potential outcome, even if you have a good regression model. You can't just add to the observed outcome because . . . actually I am confused about this!  -->
+<!-- 1) bake(..., newdata = NULL) fails in several places. Are they using an old version of make? -->
+<!-- 2) Each section ends with the code we have done. That seems redundant and confusing. -->
+<!-- 3) Need to make the approach here mesh with the approaches used in chapter 11 and 12. What can we cut from here that is not used? How should we change later chapters to be consistent with this modern approach? -->
+<!-- 4) I am concerned about the ames_snippets.R code used in the original but, maybe, not needed here. -->
+<!-- 5) I totally skipped the workflow chapter (8) in the original. Is that OK? -->
+<!-- 6) Many sections begun with a weird code chunk. These should be cleaned up and organized. -->
+<!-- 7) Deal with the missing references. Need to add them to the bib. -->
+<!-- 8) Maybe follow their example with r pkg(dplyr) instead of **dplyr**. -->
 </div>
 </div>
 </div></body></html>
@@ -3466,7 +2856,7 @@ Perhaps all this is enough to both fill this chapter and set the stage for 11 an
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-07
+2020-10-08
 </p>
 </div>
 </div>
