@@ -40,12 +40,13 @@ output_yaml:
 
 <!-- Might also use Topic 16 from the Workshop here, or save it for the next chapter. -->
 
+<!-- DK: Why does this video fail? -->
 
 ```{r, echo=FALSE}
-knitr::include_app("https://www.youtube.com/watch?v=v98Rh9qzmPs")
+knitr::include_app("https://www.youtube.com/watch?v=e3PJ3Du_zDc")
 ```
 
-This scene is from the popular YA series, *The Hunger Games*, written by Suzanne Collins. *The Hunger Games*, for those unfamiliar, is a dystopian novel in which children are selected from a lottery to fight to the death. The basic elements of this event, called the "Reaping", are:
+This scene is from the popular YA series, *The Hunger Games*, a dystopian novel in which children are selected via a lottery to fight to the death. The basic elements of this event, called the "Reaping", are:
 
 - All children ages 12 and above are entered into the lottery. 
 
@@ -226,7 +227,7 @@ In the previous Section \@ref(sampling-activity), we performed a *tactile* sampl
 
 ### Using the virtual shovel once
 
-Let's start by performing the virtual analog of the tactile sampling exercise we performed in Section \@ref(sampling-activity). We first need a virtual analog of the urn seen in the beginning of our chapter. To this end, we creat a data frame named `urn`. The rows of `urn` correspond exactly with the contents of the actual urn. 
+Let's start by performing the virtual analog of the tactile sampling exercise we performed in Section \@ref(sampling-activity). We first need a virtual analog of the urn seen in the beginning of our chapter. To this end, we create a data frame named `urn`. The rows of `urn` correspond exactly with the contents of the actual urn. 
 
 `r margin_note("For reference, sample-frac() merely re-arranges the rows of the tibble. We use set.seed() to ensure that the beads in our virtual urn are always in the same order. This makes certain that the figures in the book match their written descriptions.")` 
 
@@ -662,11 +663,13 @@ glimpse(shovels_100)
 
 Now, we have the standard deviation of `prop_red` for all shovel sizes from 1 to 100.  Let's plot that value to see how it changes as the shovel gets larger:
 
-```{r, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels"}
+```{r, echo-FALSE, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases as the square root of shovel size."}
 shovels_100 %>%
  ggplot(aes(x = shovel_size, y = prop_red_sd)) +
  geom_point() +
- stat_function(aes(x = 1:100, colour = "red"), fun = sqrt, show.legend = FALSE) +
+ stat_function(aes(x = 1:100, colour = "red"), 
+               fun = function(.x) 1/(2 * sqrt(.x)), 
+               show.legend = FALSE) +
  labs(x = "Shovel size",
       y = "Standard deviation of the proportion red")
 ```
