@@ -3,11 +3,11 @@ output_yaml:
   - _output.yml
 ---
 
-<!-- Drop all the class imbalance stuff? Need to simplify! Does it change any result that much? -->
-
 <!-- Replace lm() with stan_glm()? -->
 
-<!-- 1) bake(..., newdata = NULL) fails in several places. Are they using an old version of make? -->
+<!-- Do we need to discuss `x`/`y` interface so much?  -->
+
+<!-- 1) bake(..., new_data = NULL) fails in several places. Are they using an old version of make? -->
 
 <!-- 2) Each section ends with the code we have done. That seems redundant and confusing. -->
 
@@ -184,44 +184,7 @@ dim(ames_train)
 
 These objects are data frames with the same _columns_ as the original data but only the appropriate _rows_ for each set. 
 
-Simple random sampling is appropriate in many cases but there are exceptions. When there is a dramatic _class imbalance_ in classification problems, one class occurs much less frequently than another. Using a simple random sample may haphazardly allocate these infrequent samples disproportionately into the training or test set. To avoid this, _stratified sampling_ can be used. The training/test split is conducted separately within each class and then these subsamples are combined into the overall training and test set. For regression problems, the outcome data can be artificially binned into _quartiles_ and then stratified sampling conducted four separate times. This is an effective method for keeping the distributions of the outcome similar between the training and test set. 
-
-```{r, echo = FALSE, fig.cap = "The distribution of the sale price (in log units) for the Ames housing data. The vertical lines indicate the quartiles of the data."}
-
-sale_dens <- 
-  density(ames$Sale_Price, n = 2^10) %>% 
-  tidy() 
-
-quartiles <- quantile(ames$Sale_Price, probs = c(1:3)/4)
-quartiles <- tibble(prob = (1:3/4), value = unname(quartiles))
-quartiles$y <- approx(sale_dens$x, sale_dens$y, xout = quartiles$value)$y
-
-quart_plot <-
-  ggplot(ames, aes(x = Sale_Price)) +
-  geom_line(stat = "density") +
-  geom_segment(data = quartiles,
-               aes(x = value, xend = value, y = 0, yend = y),
-               lty = 2) +
-  xlab("Sale Price (log-10 USD)")
-quart_plot
-```
-
-Consider the distribution of the sale price outcome for the Ames housing data. As previously discussed, the sale price distribution is right-skewed, with proportionally more expensive houses than inexpensive houses on either side of the center of the distribution. The worry here is that the more expensive houses would not be represented in the training set well with simple splitting; this would increase the risk that our model would be ineffective at predicting the price for such properties.  The dotted vertical lines indicate the four quartiles for these data. A stratified random sample would conduct the 80/20 split within each of these data subsets and then pool the results together. In **rsample**, this is achieved using the `strata` argument: 
-
-<!-- DK: Cut this strata stuff? -->
-
-```{r}
-set.seed(123)
-ames_split <- initial_split(ames, prob = 0.80, strata = Sale_Price)
-ames_train <- training(ames_split)
-ames_test  <-  testing(ames_split)
-
-dim(ames_train)
-```
-
-Only a single column can be used for stratification. 
-
-Are there situations when random sampling is not the best choice? One case is when the data have a significant _time_ component, such as time series data. Here, it is more common to use the most recent data as the test set. The **rsample** package contains a function called `initial_time_split()` that is very similar to `initial_split()`. Instead of using random sampling, the `prop` argument denotes what proportion of the first part of the data should be used as the training set; the function assumes that the data have been pre-sorted in an appropriate order. 
+Simple random sampling is appropriate in many cases but there are exceptions. When there is a dramatic _class imbalance_ in classification problems, one class occurs much less frequently than another. Using a simple random sample may haphazardly allocate these infrequent samples disproportionately into the training or test set. To avoid this, _stratified sampling_ can be used. Another difficult case is when the data have a significant _time_ component, such as time series data. Here, it is more common to use the most recent data as the test set. The **rsample** package contains a function called `initial_time_split()` that is very similar to `initial_split()`. Instead of using random sampling, the `prop` argument denotes what proportion of the first part of the data should be used as the training set; the function assumes that the data have been pre-sorted in an appropriate order. 
 
 ### What proportion should be used? 
 
@@ -623,7 +586,8 @@ For example, in our Ames data set, the original raw data contained a field for a
 To solve this, the `add_role()`, `remove_role()`, and `update_role()` functions can be helpful. For example, for the house price data, the street address column could be modified using
 
 ```r
-ames_rec %>% update_role(address, new_role = "street address")
+ames_rec %>% 
+  update_role(address, new_role = "street address")
 ```
 
 Any character string can be used as a role. Also, columns can have multiple roles so that they can be selected under more than one context. 
@@ -635,7 +599,7 @@ Finally, all step functions have a `role` field that can assign roles to the res
 You have learned about using recipes for flexible feature engineering and data preprocessing, from creating dummy variables to handling class imbalance and more. Feature engineering is an important part of the modeling process where information leakage can easily occur and good practices must be adopted. Between the **recipes** package and other packages that extend recipes, there are over 100 available steps. All possible recipe steps are enumerated at [`tidymodels.org/find`](https://www.tidymodels.org/find/). The recipes framework provides a rich data manipulation environment for preprocessing and transforming data prior to modeling. 
 Additionally, [`tidymodels.org/learn/develop/recipes/`](https://www.tidymodels.org/learn/develop/recipes/) shows how custom steps can be created.
 
-The code that we will use in later is:
+Our code so far:
 
 ```{r, eval = FALSE}
 library(tidymodels)
@@ -645,7 +609,7 @@ ames <- mutate(ames, Sale_Price = log10(Sale_Price))
 set.seed(123)
 ames_split <- initial_split(ames, prob = 0.80, strata = Sale_Price)
 ames_train <- training(ames_split)
-ames_test  <-  testing(ames_split)
+ames_test  <- testing(ames_split)
 
 ames_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
@@ -683,20 +647,22 @@ In R, the **stats** package can be used for the first case. The syntax for `lm()
 model <- lm(formula, data, ...)
 ```
 
-where `...` symbolizes other options to pass to `lm()`. The function does _not_ have an `x`/`y` interface, where we might pass in our outcome as `y` and our predictors as `x`. 
+where `...` symbolizes other options to pass to `lm()`. 
 
-To estimate with regularization, a Bayesian model can be fit using the **rstanarm** package: 
+To estimate a Bayesian model, we use `stan_glm()` from the **rstanarm** package, as we have done in the last few chapters. 
 
 ```r
-model <- stan_glm(formula, data, family = "gaussian", ...)
+model <- stan_glm(formula, 
+                  data, 
+                  family = "gaussian", ...)
 ```
 
-
-
-A popular non-Bayesian approach to regularized regression is the glmnet model. Its syntax is:
+A popular non-Bayesian approach to regression is the glmnet model. Its syntax is:
 
 ```r
-model <- glmnet(x = matrix, y = vector, family = "gaussian", ...)
+model <- glmnet(x = matrix, 
+                y = vector, 
+                family = "gaussian", ...)
 ```
 
 In this case, the predictor data must already be formatted into a numeric matrix; there is only and `x`/`y` method and no formula method. 
@@ -714,11 +680,14 @@ For tidymodels, the approach to specifying a model is intended to be more unifie
 These specifications are built _without referencing the data_. For example, for the three cases above: 
 
 ```{r}
-linear_reg() %>% set_engine("lm")
+linear_reg() %>% 
+  set_engine("lm")
 
-linear_reg() %>% set_engine("glmnet") 
+linear_reg() %>% 
+  set_engine("glmnet") 
 
-linear_reg() %>% set_engine("stan")
+linear_reg() %>% 
+  set_engine("stan")
 ```
 
 
