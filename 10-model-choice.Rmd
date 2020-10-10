@@ -3,6 +3,10 @@ output_yaml:
   - _output.yml
 ---
 
+<!-- Drop all the class imbalance stuff? Need to simplify! Does it change any result that much? -->
+
+<!-- Replace lm() with stan_glm()? -->
+
 <!-- 1) bake(..., newdata = NULL) fails in several places. Are they using an old version of make? -->
 
 <!-- 2) Each section ends with the code we have done. That seems redundant and confusing. -->
@@ -21,18 +25,30 @@ output_yaml:
 
 # Model Choice
 
+```{r, echo=FALSE}
+val_list <- function(x){
+  x <- format(table(x), big.mark = ",")
+  x <- paste0("`", names(x), "` ($n = ", unname(x), "$)")
+  knitr::combine_words(x)
+}
+```
+
+
 Still a draft. Come back in a few weeks.
 
 ## The Ames housing data {#ames}
 
-```{r, echo = FALSE, message = FALSE}
-data(ames, package = "modeldata")
+Start as usual:
+
+```{r, message = FALSE}
 library(tidyverse)
 library(tidymodels)
+data(ames)
 ```
 
+The **tidymodels** library includes all the necessary libraries, in the same way that **tidyverse** includes libraries like **ggplot2** and **dplyr**. The `ames` data lives in the **modeldata** library, which is part of **tidymodels**.
 
-The Ames housing data set is an excellent resource for learning about models that we will use throughout this book. It contains data on `r format(nrow(ames), big.mark = ",")` properties in Ames, Iowa, including columns related to 
+The Ames housing data set is an excellent resource for learning about models. It contains data on `r format(nrow(ames), big.mark = ",")` properties in Ames, Iowa, including columns related to 
 
  * house characteristics (bedrooms, garage, fireplace, pool, porch, etc.),
  * location (neighborhood),
@@ -41,29 +57,9 @@ The Ames housing data set is an excellent resource for learning about models tha
  * sale price.
 
 
-We use a transformed version available in the **modeldata** package. This version has several changes and improvements to the data. For example, the longitude and latitude values have been determined for each property. Also, some columns were modified to be more analysis ready. For example: 
-
- * In the raw data, if a house did not have a particular feature, it was implicitly encoded as missing. For example, there were `r format(sum(ames$Alley == "No_Alley_Access"), big.mark = ",")` properties that did not have an alleyway. Instead of leaving these as missing, they were relabeled in the transformed version to indicate that no alley was available.
-
- * The categorical predictors were converted to R's factor data type. While both the tidyverse and base R have moved away from importing data as factors by default, this data type is a better approach for storing qualitative data for _modeling_ than simple strings.  
- 
- * We removed a set of quality descriptors for each house since they are more like outcomes than predictors.
-
-To load the data: 
-
-```{r ames-load, warning = FALSE, message = FALSE}
-library(modeldata) # This is also loaded by the tidymodels package
-data(ames)
-
-# or, in one line:
-data(ames, package = "modeldata")
-
-dim(ames)
-```
-
-### Exploring important features
-
 It makes sense to start with the outcome we want to predict: the last sale price of the house (in USD): 
+
+<!-- DK: Clean up these plots? -->
 
 ```{r}
 ggplot(ames, aes(x = Sale_Price)) + 
@@ -83,12 +79,14 @@ While not perfect, this will probably result in better models than using the unt
 
 The units of the model coefficients might be more difficult to interpret, as will measures of performance. For example, the root mean squared error (RMSE) is a common performance metric that is used in regression models. It uses the difference between the observed and predicted values in its calculations. If the sale price is on the log scale, these differences (i.e. the residuals) are also in log units. For this reason, it can be difficult to understand the quality of a model whose RMSE is 0.15 log units. 
 
-Despite these drawbacks, the models used in this book utilize the log transformation for this outcome. _From this point on_, the outcome column is pre-logged in the `ames` data frame: 
+Despite these drawbacks, we will utilize the log transformation for this outcome. _From this point on_, the outcome column is pre-logged in the `ames` data frame: 
 
 ```{r}
 ames <- ames %>% 
   mutate(Sale_Price = log10(Sale_Price))
 ```
+
+<!-- DK: Delete this interesting geographic stuff? It is good but the chapter is too long. -->
 
 Another important aspect of these data for our modeling are their geographic locations. This spatial information is contained in the data in two ways: a qualitative `Neighborhood` label as well as quantitative longitude and latitude data. To visualize the spatial information, let's use both together to plot the data on a map and color by neighborhood: 
 
@@ -114,7 +112,7 @@ A detailed inspection of the map also shows that the neighborhood labels are not
 knitr::include_graphics("10-model-choice/images/northridge.png")
 ```
 
-Also, there are ten isolated houses labeled as being in Crawford but are not close to the majority of the other houses in that neighborhood:
+Also, there are ten isolated houses labeled as being in Crawford but which are not close to the majority of the other houses in that neighborhood:
 
 ```{r, echo = FALSE}
 knitr::include_graphics("10-model-choice/images/crawford.png")
@@ -159,14 +157,16 @@ The primary approach for empirical model validation is to split the existing poo
 The other portion of the observations are placed into the _test set_. This is held in reserve until one or two models are chosen as the methods that are mostly likely to succeed. The test set is then used as the final arbiter to determine the efficacy of the model. It is critical to only look at the test set once; otherwise, it becomes part of the modeling process. 
 
 
-Suppose we allocate 80% of the data to the training set and the remaining 20% for testing.  The most common method is to use simple random sampling. The **rsample** package has tools for making data splits such as this; the function `intial_split()` was created for this purpose. It takes the data frame as an argument as well as the proportion to be placed into training. Using the previous data frame produced by the code snippet from the summary in Section \@ref(ames-summary): 
+Suppose we allocate 80% of the data to the training set and the remaining 20% for testing.  The most common method is to use simple random sampling. The **rsample** package has tools for making data splits such as this; the function `intial_split()` was created for this purpose. It takes the data frame as an argument as well as the proportion to be placed into training. 
 
 ```{r, message = FALSE, warning = FALSE}
-# Set the random number stream using `set.seed()` so that the results can be 
-# reproduced later. 
+# Set the random number stream using `set.seed()` so that the results can be
+# reproduced later.
+
 set.seed(123)
 
 # Save the split information for an 80/20 split of the data
+
 ames_split <- initial_split(ames, prob = 0.80)
 ames_split
 ```
@@ -234,43 +234,6 @@ Previously, when describing the goals of data splitting, we singled out the test
 It is common to hear about _validation sets_ as an answer to this question, especially in the neural network and deep learning literature. The validation set was originally defined in the early days of neural networks when researchers realized that measuring performance by re-predicting the training set samples led to results that were overly optimistic (significantly, unrealistically so). This led to models that overfit, meaning that they performed very well on the training set but poorly on the test set. To combat this issue, a small validation set of data were held back and used to measure performance as the network was trained. Once the validation set error rate began to rise, the training would be halted. In other words, the validation set was a means to get a rough sense of how well the model performed prior to the test set. It is largely semantics as to whether validation sets are a subset of the training set or a third allocation in the initial split of the data.
 
 
-
-
-### Other considerations 
-
-Throughout this book, notice which data are exposed to the model at any given time. Remember that it is critical to quarantine the test set from any model building activities.  The problem of _information leakage_ occurs when data outside of the training set are used in the modeling process. 
-
-
-For example, in a machine learning competition, the test set data might be provided without the true outcome values so that the model can be scored and ranked. One potential method for improving the score might be to fit the model using the training set points that are most similar to the test set values. While the test set isn't directly used to fit the model, it still has a heavy influence. In general, this technique is highly problematic since it reduces the _generalization error_ of the model to optimize performance on a specific data set. There are more subtle ways that the test set data can be utilized during training. Keeping the training data in a separate data frame from the test set is a one small check to make sure that information leakage does not occur by accident. 
-
-We will discuss techniques to subsample the training set to mitigate specific issues (e.g., class imbalances). This is a valid and common technique that deliberately results in the training set data diverging from the population from which the data were drawn. It is critical that the test set continue to mirror what the model would encounter _in the wild_. In other words, the test set should always resemble new data that will be given to the model. 
-
-
-Data splitting is the fundamental tool for empirical validation for models. Even in the era of unrestrained data collection, a typical modeling project has a limited amount of appropriate data and wise "spending" of a project's data is necessary. In this chapter, we discussed several strategies for partitioning the data into distinct groups for modeling and evaluation. 
-
-At this checkpoint, the important code snippets are:
-
-```{r, eval = FALSE}
-library(tidymodels)
-data(ames)
-ames <- ames %>% mutate(Sale_Price = log10(Sale_Price))
-
-set.seed(123)
-ames_split <- initial_split(ames, prob = 0.80, strata = Sale_Price)
-ames_train <- training(ames_split)
-ames_test  <-  testing(ames_split)
-```
-
-
-```{r, include = FALSE}
-val_list <- function(x) {
-  x <- format(table(x), big.mark = ",")
-  x <- paste0("`", names(x), "` ($n = ", unname(x), "$)")
-  knitr::combine_words(x)
-}
-
-```
-
 ## Feature engineering with recipes {#recipes}
 
 Feature engineering encompasses activities that reformat predictor values to make them easier for a model to use effectively. This includes transformations and encodings of the data to best represent their important characteristics. Imagine that you have two predictors in a data set that can be more effectively represented in your model of interest as a ratio; creating a new predictor from the ratio of the original two is a simple example of feature engineering. 
@@ -302,7 +265,7 @@ In this section, we will focus on a small subset of the predictors available in 
 
  * The type of building (`Bldg_Type` with values `r val_list(ames_train$Bldg_Type)`)
 
-Suppose that an initial ordinary linear regression model were fit to these data. Recalling that, in Chapter \@ref(ames), the sale prices were pre-logged, a standard call to `lm()`, a function similar to `stan_glm()`, might look like:
+Suppose that an initial ordinary linear regression model were fit to these data. A  standard call to `lm()`, a function similar to `stan_glm()`, might look like:
 
 ```{r, eval = FALSE}
 lm(Sale_Price ~ Neighborhood + log10(Gr_Liv_Area) + Year_Built + Bldg_Type)
@@ -318,13 +281,14 @@ When this function is executed, the data are converted from a data frame to a nu
 
 The formula method will apply these data manipulations to any data, including new data, that are passed to the `predict()` function. 
 
-A recipe is also an object that defines a series of steps for data processing. Unlike the formula method inside a modeling function, the recipe defines the steps without immediately executing them; it is only a specification of what _should_ be done. Here is a recipe equivalent to the formula above that builds on the code summary in Section \@ref(splitting-summary):
+A recipe is also an object that defines a series of steps for data processing. Unlike the formula method inside a modeling function, the recipe defines the steps without immediately executing them; it is only a specification of what _should_ be done. Here is a recipe equivalent to the formula above:
 
 ```{r}
 library(tidymodels) # Includes the recipes package
 
 simple_ames <- 
-  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type,
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
+           Year_Built + Bldg_Type,
          data = ames_train) %>%
   step_log(Gr_Liv_Area, base = 10) %>% 
   step_dummy(all_nominal())
