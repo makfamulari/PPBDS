@@ -208,14 +208,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">7.1.2</span> What was the average year of US pennies in 2019?</h3>
 <p>Try to imagine all the pennies being used in the United States in 2019. That’s a lot of pennies! Now say we’re interested in the average year of minting of <em>all</em> these pennies. One way to compute this value would be to gather up all pennies being used in the US, record the year, and compute the average. However, this would be near impossible! So instead, let’s collect a <em>sample</em> of 50 pennies from a local bank in downtown Northampton, Massachusetts, USA as seen in the photo below</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-653-1"></span>
+<span id="fig:unnamed-chunk-652-1"></span>
 <p class="caption marginnote shownote">
 FIGURE 7.1: Collecting a sample of 50 US pennies from a local bank.
 </p>
 <img src="07-two-parameters/images/bank.jpg" alt="Collecting a sample of 50 US pennies from a local bank." width="2016">
 </div>
 <div class="figure">
-<span id="fig:unnamed-chunk-653-2"></span>
+<span id="fig:unnamed-chunk-652-2"></span>
 <p class="caption marginnote shownote">
 FIGURE 7.2: Collecting a sample of 50 US pennies from a local bank.
 </p>
@@ -223,7 +223,7 @@ FIGURE 7.2: Collecting a sample of 50 US pennies from a local bank.
 </div>
 <p>An image of these 50 pennies can be seen in below. For each of the 50 pennies starting in the top left, progressing row-by-row, and ending in the bottom right, note there is an “ID” identification variable printed in black and the year of minting printed in white.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-654"></span>
+<span id="fig:unnamed-chunk-653"></span>
 <p class="caption marginnote shownote">
 FIGURE 7.3: 50 US pennies labelled.
 </p>
@@ -278,11 +278,11 @@ FIGURE 7.3: 50 US pennies labelled.
 <span id="cb846-2"><a href="two-parameters.html#cb846-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year)) <span class="op">+</span></span>
 <span id="cb846-3"><a href="two-parameters.html#cb846-3"></a><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> <span class="dv">10</span>, <span class="dt">color =</span> <span class="st">"white"</span>)</span></code></pre></div>
 <div class="figure">
-<span id="fig:unnamed-chunk-656"></span>
+<span id="fig:unnamed-chunk-655"></span>
 <p class="caption marginnote shownote">
 FIGURE 7.4: Distribution of year on 50 US pennies.
 </p>
-<img src="book_temp_files/figure-html/unnamed-chunk-656-1.png" alt="Distribution of year on 50 US pennies." width="672">
+<img src="book_temp_files/figure-html/unnamed-chunk-655-1.png" alt="Distribution of year on 50 US pennies." width="672">
 </div>
 <p>Observe a slightly left-skewed distribution, since most pennies fall between 1980 and 2010 with only a few pennies older than 1970. What is the average year for the 50 sampled pennies? Eyeballing the histogram it appears to be around 1990. Let’s now compute this value exactly using our data wrangling tools from Chapter <a href="wrangling.html#wrangling">2</a>.</p>
 <div class="sourceCode" id="cb847"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb847-1"><a href="two-parameters.html#cb847-1"></a>pennies_sample <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -813,7 +813,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <span id="cb857-6"><a href="two-parameters.html#cb857-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Mean Year"</span>, </span>
 <span id="cb857-7"><a href="two-parameters.html#cb857-7"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
 <span id="cb857-8"><a href="two-parameters.html#cb857-8"></a>         <span class="dt">title =</span> <span class="st">"Posterior Distribution for the Mean Year of American Pennies in 2019"</span>) </span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-664-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-663-1.png" width="672"></p>
 <p>How did we sneak in the word “posterior” into this discussion. Recall in Chapter <a href="probability.html#probability">5</a> that we defined a posterior distribution as our beliefs about an unknown number: either a number which we don’t know now but which we will know, like Biden’s electoral vote total or parameter. In the case of the bootstrap samples we made, the posterior distribution represents our beliefs about <span class="math inline">\(\mu\)</span>, the mean year of American pennies in 2019 after taking into account the information from our bootstrap sample means. As demonstrated in the plot above, we can see that <span class="math inline">\(\mu\)</span> — an unknown parameter, the true value of which we will never know — is most likely between 1992 and 1998.</p>
 <p>Have we proved how the bootstrap, almost magically, can create a reasonable posterior? Not at all! The mathematics of that proof are beyond the scope of this book.</p>
 <!-- In the "resampling with replacement" scenario we are illustrating here, this histogram has a special name: the *bootstrap distribution of the sample mean*. Furthermore, recall it is an approximation to the *sampling distribution* of the sample mean, a concept you saw before. This distribution allows us to study the effect of sampling variation on our estimates of the true population mean, in this case the true mean year for *all* US pennies. However, unlike in Chapter \@ref(one-parameter) where we took multiple samples (something one would never do in practice), bootstrap distributions are constructed by taking multiple resamples from a *single* sample: in this case, the 50 original pennies from the bank.  -->
@@ -892,7 +892,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <div class="sourceCode" id="cb866"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb866-1"><a href="two-parameters.html#cb866-1"></a>ch7 <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb866-2"><a href="two-parameters.html#cb866-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-670">TABLE 7.1: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-669">TABLE 7.1: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -1022,7 +1022,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <span id="cb868-3"><a href="two-parameters.html#cb868-3"></a><span class="st">  </span><span class="kw">geom_density</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb868-4"><a href="two-parameters.html#cb868-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Height"</span>,</span>
 <span id="cb868-5"><a href="two-parameters.html#cb868-5"></a>       <span class="dt">title =</span> <span class="st">"Height by Gender in Nhanes Dataset"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-672-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-671-1.png" width="672"></p>
 <p>The plot shows some interesting stuff. Since the distributions of height for both genders are skewed left, we can infer that this data set included children and thus age played a role in our data. Additionally, we can see the the most probable heights for both genders and that men are generally taller than women.</p>
 <!-- ## Using Bootstraps with `nhanes` -->
 <!-- 4. Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.   -->
@@ -1071,7 +1071,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <span id="cb872-6"><a href="two-parameters.html#cb872-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Mean Height"</span>, </span>
 <span id="cb872-7"><a href="two-parameters.html#cb872-7"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
 <span id="cb872-8"><a href="two-parameters.html#cb872-8"></a>         <span class="dt">title =</span> <span class="st">"Posterior Distribution for the Mean Height of American Males in 2009"</span>) </span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-675-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-674-1.png" width="672"></p>
 <p>The posterior distribution includes all the information we have about the unknown parameter — mean height of American males — which we have used our data to estimate. But we don’t always want the entire object. Instead, we might want to know the:</p>
 <ul>
 <li><p>Mean: 175.97</p></li>
@@ -1640,7 +1640,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <span id="cb880-9"><a href="two-parameters.html#cb880-9"></a>         <span class="dt">x =</span> <span class="st">"Height in Centimeters"</span>,</span>
 <span id="cb880-10"><a href="two-parameters.html#cb880-10"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
 <span id="cb880-11"><a href="two-parameters.html#cb880-11"></a><span class="st">    </span><span class="kw">theme_classic</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-684-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-683-1.png" width="672"></p>
 <p>Although it is possible to have variables names like (Intercept), it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Better, rename them, as we do above.</p>
 <div class="sourceCode" id="cb881"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb881-1"><a href="two-parameters.html#cb881-1"></a>fit_obj <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb881-2"><a href="two-parameters.html#cb881-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -1652,7 +1652,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <span id="cb881-8"><a href="two-parameters.html#cb881-8"></a>         <span class="dt">x =</span> <span class="st">"Sigma in Centimeters"</span>,</span>
 <span id="cb881-9"><a href="two-parameters.html#cb881-9"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
 <span id="cb881-10"><a href="two-parameters.html#cb881-10"></a><span class="st">    </span><span class="kw">theme_classic</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-685-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-684-1.png" width="672"></p>
 <p>Again, <span class="math inline">\(\sigma\)</span> is usually a nuisance parameter. We don’t really care what its value us, so we rarely plot it.</p>
 <!-- DK: Discuss the meaning in more detail. -->
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
@@ -1675,7 +1675,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## 4   183.         176.    7.32 
 ## 5   182.         176.    6.12</code></pre>
 <p>The fitted value represents the model’s best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, we already know what the actual value is. The residual is the difference between the outcome of the fitted value. These definitions lead to a natural decomposition of the outcome data:</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-688-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-687-1.png" width="672"></p>
 <!-- ##### Model in a table -->
 <!-- DK: Could not get this to work. It seems like these gt objects are already text, so there is no easy way to, for example, change the formatting but adding decimals.  Maybe we should use model_summary, which seems to work nicely. -->
 <!-- DK: Maybe I don't need to show posterior_linpred at all? One less thing to worry about. -->
@@ -1789,7 +1789,7 @@ are 1814 because the matrix provides a (potentially) different posterior predict
 <span id="cb897-8"><a href="two-parameters.html#cb897-8"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability of 3rd Tallest from One Hundreds"</span>,</span>
 <span id="cb897-9"><a href="two-parameters.html#cb897-9"></a>         <span class="dt">x =</span> <span class="st">"Height (cm)"</span>,</span>
 <span id="cb897-10"><a href="two-parameters.html#cb897-10"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-697-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-696-1.png" width="672"></p>
 <!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
 </div>
 </div>
@@ -1810,7 +1810,7 @@ are 1814 because the matrix provides a (potentially) different posterior predict
 <a href="three-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-08
+2020-10-10
 </p>
 </div>
 </div>
