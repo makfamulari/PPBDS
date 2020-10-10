@@ -1106,15 +1106,13 @@ In order to investigate this concept, let's revisit our Preceptor Tables.
 
 Recall that a Preceptor Table is a table with rows and columns for all the data we would (reasonably) like to have. There are two different types of Preceptor Tables that are applicable to our urn example: actual and ideal.
 
-```{r, echo=FALSE, fig.cap="When you see another Precetor Table section."}
+```{r, echo=FALSE, fig.cap="When you see another Precetor Table section.", fig.margin = TRUE}
 knitr::include_graphics("06-one-parameter/images/here_we_go.png")
 ```
 
-An actual Preceptor Table shows what we *actually* know. Accordingly, the table is riddled with question marks that the real world saddles us with. The ideal Preceptor Table is the Preceptor Table with no question marks, and a reasonable number of rows and columns. With an ideal Preceptor Table, there is need for inference; the estimand is a simple matter of arithmetic. 
+An actual Preceptor Table shows what we *actually* know. Accordingly, the table is riddled with question marks that the real world saddles us with. The ideal Preceptor Table is the Preceptor Table with no question marks, and a reasonable number of rows and columns. With an ideal Preceptor Table, there is no need for inference; the estimand is a simple matter of arithmetic. 
 
 To visualize the different Preceptor Tables and their usefulness to us data scientists, let's revisit our urn.
-
-### Ideal Preceptor Table: What we wish we knew
 
 As is the case in the Rubin Causal Model, we *wish* we knew the values for every single unit in every possible scenario. The analogous ideal here would be a table where we know the color identity of every single bead. To compare to our previous Preceptor Table, this is what our ideal Preceptor Table would look like: 
 
@@ -1136,13 +1134,12 @@ urn %>%
   cols_align(align = "center", columns = TRUE)
 ```
 
-This Preceptor Table is possible by performing the exhaustive hand count of the entire urn. Let's say that, after this tedious process, we find that the **true** and **real** proportion of red beads is exactly 37.5%. We know each bead's color identity in the entire urn. To revisit the terminology of Chapter 5, we would be dealing with P(A|B), the probability of bead 1 being red given that we know the color_ID of every single bead in the urn. If the proportion of red beads is **exactly** 37.5%, we can say whether bead 1 is red or not with 100% certainty, since we know the exact number of red and white beads in the urn. 
+We can create the ideal Preceptor Table by performing the exhaustive census of the entire urn. Let's say that, after this tedious process, we find that the **true** and **real** proportion of red beads is exactly 37.5%. We know the color of every bead. 
 
 In this world, the estimand, the proportion of red beads in the urn, is a simple matter of arithmetic. However, as has been emphasized before, performing an exhaustive count is not the easiest way to estimate the proportion of red beads. Real-life sampling is far more complex. The process is **extremely** prone to error. Despite that, most people overestimate the validity of conclusions drawn from sampling. To stress the unknowns in sampling, let's look at our actual Preceptor Table.
 
-### Actual Preceptor Table: What we know
 
-Let's imagine we use our shovel and sample 100 beads from the urn. After taking our sample, we find that 40% of the *sampled* beads are red. Let's visualize this by looking at the entire urn after our sample in an actual Preceptor Table. We only know the colors of our randomly sampled 100 beads, the rest of the bead colors is our missing data!
+Let's imagine we use our shovel and sample 100 beads from the urn. After taking our sample, we find that 40% of the *sampled* beads are red. Let's visualize this by looking at the entire urn after we have taken our sample. This is an actual Preceptor Table. We only know the colors of our randomly sampled 100 beads, the remaining bead colors are our missing data!
 
 `r margin_note("Not all the rows in our actual Preceptor Table are shown, but you can imagine we have a lot of missing data with only some values filled in for the colors.")`
 
@@ -1162,15 +1159,14 @@ tibble(ID = c("1", "2", "...", "...", "200", "201", "...", "...", "2399", "2400"
   cols_align(align = "center", columns = TRUE)
 ```
 
-Where is all of our data? Well, when we took a sample of 100 beads from the total urn, we only have color identifications for 100 of the total 2400 beads in the urn. The rest of the beads were not sampled and we cannot say for certain whether they are white or red.
+Where is all of our data? Well, when we take a sample of 100 beads, we only have color identifications for 100 of the total 2400 beads in the urn. The rest of the beads were not sampled and we cannot say for certain whether they are white or red.
 
-Something else we must consider is why some beads **do** get sampled, while others do not. This is a consequence of the sampling mechanism. Because we are drawing the sample using a shovel with 100 slots, we only have 100 known values. Therefore, our shovel (in addition to mixing the urn beforehand) is our sampling mechanism!
+Something else we must consider is why some beads **do** get sampled, while others do not. This is a consequence of the sampling mechanism. Because we are drawing the sample using a shovel with 100 slots, we only have 100 known values. Therefore, our shovel (in addition to mixing the urn beforehand) is our sampling mechanism.
 
-Consider this: what does this information tell us, specifically, about Bead 1? Bead 2? We know the proportion of red beads in our sample is 40%. Does this mean that bead 1 has a 40% chance of being red? As we learned in Chapter 5, this is not true! Let's delve into why this assumption is wrong. 
+Consider this: what does this information tell us, specifically, about Bead 1? Bead 2? We know the proportion of red beads in our sample is 40%. Does this mean that bead 1 has *precisely* a 40% chance of being red? As we learned in Chapter 5, this is not true! There is uncertainty.
 
-We can only claim *for certain* that, of the 100 beads that we sampled (of the total 2400 beads in the urn), 40% were red. If we were making a prediction of the probability of one of our **sampled** beads being red, 40% would be the correct guess! If we were making a prediction of the probability that an **unsampled** bead was red, the answer of 40% would be incorrect. 
+We can only claim *for certain* that, of the 100 beads that we sampled (of the total 2400 beads in the urn), 40% were red. If we were making a prediction of the probability of one of our **sampled** beads being red, 40% would be the correct probability. If we were making a prediction of the probability that an **unsampled** bead was red, the answer of 40% would be incorrect, but nor is it likely to be extremely incorrect. The sample does tell us something.
 
-This is why we run many simulations to make the *best possible prediction*. To make the best possible predicition, our point estimates must be **accurate** and **precise**. What do those two words mean in terms of sampling? Let's find out!
 
 ### Precision versus accuracy (or bias versus variance)
 
@@ -1196,27 +1192,11 @@ knitr::include_graphics("06-one-parameter/images/el_jefes.png")
 knitr::include_graphics("06-one-parameter/images/felipes.png")
 ```
 
-To apply this to a more complex example than an urn, imagine we are conducting a poll to gather information on whether Harvard students prefer El Jefe's Taqueria or Felipe's Taqueria. We are given two options: 1) we can conduct the poll on 200 students walking out of Lamont Library or 2) we can conduct the poll on 300 students walking outside of El Jefe's Taqueria. 
+To apply this to a more complex example than an urn, imagine we are conducting a poll to gather information on whether Harvard students prefer El Jefe's Taqueria or Felipe's Taqueria. We are given two options: 1) we can conduct the poll on 50 students walking out of Lamont Library or 2) we can conduct the poll on 300 students walking outside of El Jefe's Taqueria. 
 
-The first scenario provides a more accurate estimate, since Lamont Library ensures an unbiased sample. The second scenario, however, provides a more precise estimate due to the larger sample size. Even though the students **outside** of El Jefe's might not be patrons, it is safe to assume that at least some will be patrons, making our sample somewhat biased. What is the better option? Here, the risk of bias is too high in the second scenario, even if our estimate would be more precise. Choosing the first scenario means sacrificing some precision for the sake of an unbiased result. Here, accuracy beats precision.
+The first scenario provides a more accurate estimate, since the students outside of Lamont Library are much less likely to be a biased sample. The second scenario, however, provides a more precise estimate due to the larger sample size. Even though the students **outside** of El Jefe's might not be patrons, it is safe to assume that at least some will be patrons, making our sample somewhat biased. What is the better option? It depends on your views of the trade-offs between accuracy and precision. The more that precision matters, the more you should prefer the larger sample.
 
-### Shake Shack or Tasty Burger?
 
-```{r, echo=FALSE, fig.cap="Shake Shack is known for its plethora of shake flavors, crinkle cut fries, and interaction-less checkout stands.", fig.margin = TRUE}
-knitr::include_graphics("06-one-parameter/images/shake_shack.png")
-```
-
-```{r, echo=FALSE, fig.cap="Tasty Burger is famous for its late-night hours, huge vats of mustard, and beer (for those of drinking age).", fig.margin = TRUE}
-knitr::include_graphics("06-one-parameter/images/tasty_burger.png")
-``` 
-
-Now, let's imagine we are conducting a different poll to gather information on whether Harvard students prefer Tasty Burger or Shake Shack. We are given two different options: 1) we can conduct the poll on 25 students walking out of Widener Library or 2) we can conduct the poll on 600 students walking outside of Tasty Burger. 
-
-Though our first scenario involves polling in a food neutral space (ensuring an unbiased and therefore accurate sample), the sample size is rather small. A sample of 25 students to represent the opinions of over 6000 Harvard students is sacrificing a lot of precision. The second scenario presents the same issue as the Felipe's example: though it is not guaranteed, it is likely that sampling outside of one of our two dining options will result in biased data. However, the significantly larger sample size, which would show the results for almost 10% of the total student population, means that our estimate is likely to be closer to the truth. In this case, precision wins over accuracy. 
-
-```{r, echo=FALSE, fig.cap="Which one? Hard choice!", fig.margin = TRUE}
-knitr::include_graphics("06-one-parameter/images/accurate_precise_meme.png")
-```
 
 ### Sampling is hard!
 
