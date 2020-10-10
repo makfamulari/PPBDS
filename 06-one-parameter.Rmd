@@ -41,12 +41,18 @@ output_yaml:
 
 <!-- Might also use Topic 16 from the Workshop here, or save it for the next chapter. -->
 
-<!-- DK: Why does this video fail? MF: After looking at Cass' work, I think the link had to be embedded. I can't actually check if this works since my RStudio isn't working (I'm editing on GitHub). Hopefully that works!
+<!-- DK: Why does this video fail? MF: After looking at Cass' work, I think the link had to be embedded. I can't actually check if this works since my RStudio isn't working (I'm editing on GitHub). Hopefully that works! -->
 
 
-```{r, echo=FALSE}
-knitr::include_app("https://www.youtube.com/embed/e3PJ3Du_zDc")
+<!-- ```{r, echo=FALSE} -->
+<!-- knitr::include_app("https://www.youtube.com/embed/e3PJ3Du_zDc") -->
+<!-- ``` -->
+
+```{r, echo = FALSE}
+knitr::include_graphics("06-one-parameter/images/Reaping_ball.webp")
 ```
+
+
 
 This scene is from  *The Hunger Games*, a dystopian novel in which children are selected via lottery to fight to the death. The basic elements of this event, called the "Reaping", are:
 
@@ -234,7 +240,7 @@ Let's start by performing the virtual analog of the tactile sampling exercise we
 `r margin_note("For reference, sample-frac() merely re-arranges the rows of the tibble. We use set.seed() to ensure that the beads in our virtual urn are always in the same order. This makes certain that the figures in the book match their written descriptions.")` 
 
 ```{r, echo=TRUE}
-set.seed(9)
+set.seed(10)
 urn <- tibble(color = c(rep("red", 900), rep("white", 1500))) %>%
   sample_frac() %>% 
   mutate(ID = 1:2400) %>% 
@@ -665,10 +671,14 @@ glimpse(shovels_100)
 
 Now, we have the standard deviation of `prop_red` for all shovel sizes from 1 to 100.  Let's plot that value to see how it changes as the shovel gets larger:
 
+
 ```{r, echo-FALSE, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases as the square root of shovel size."}
 shovels_100 %>%
  ggplot(aes(x = shovel_size, y = prop_red_sd)) +
  geom_point() +
+ stat_function(aes(x = 1:100, colour = "red"), 
+               fun = function(.x) 1/(2 * sqrt(.x)), 
+               show.legend = FALSE) +
  labs(x = "Shovel size",
       y = "Standard deviation of the proportion red")
 ```
@@ -1115,7 +1125,7 @@ urn %>%
   mutate(ID = as.character(ID),
          color = as.character(color)) %>%
   add_row(ID = "...", color = "...", .after  = 2) %>%
-  add_row(ID = "...", color = "...", .after  = 201) %>% 
+  add_row(ID = "...", color = "...", .after  = 5) %>% 
   gt() %>%
   cols_label(ID = md("**ID**"),
              color = "Year") %>%
@@ -1141,7 +1151,7 @@ Let's imagine we use our shovel and sample 100 beads from the urn. After taking 
 # Actual Preceptor Table to be created by the very helpful Cass!
 
 tibble(ID = c("1", "2", "...", "...", "200", "201", "...", "...", "2399", "2400"),
-       color = c("?", "?", "...", "...", "white", "?", "...", "...", "red", "?")) %>%
+       color = c("?", "?", "...", "...", "red", "?", "...", "...", "red", "?")) %>%
   gt() %>%
   cols_label(ID = md("**ID**"),
              color = "Color") %>%
@@ -1334,9 +1344,9 @@ We need a "machine" which generates these predictions, which is the same thing a
 
 ```
 
-### The Leap to Continuous
 
-<!-- DK: I will take a shot at this. -->
+
+<!-- DK: Add a section about The Leap to Continuous -->
 
 
 ## Conclusion
