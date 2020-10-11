@@ -7,8 +7,6 @@ output_yaml:
 
 <!-- Do we need to discuss `x`/`y` interface so much?  -->
 
-<!-- 1) bake(..., new_data = NULL) fails in several places. Are they using an old version of make? -->
-
 <!-- 2) Each section ends with the code we have done. That seems redundant and confusing. -->
 
 <!-- 3) Need to make the approach here mesh with the approaches used in chapter 11 and 12. What can we cut from here that is not used? How should we change later chapters to be consistent with this modern approach? -->
@@ -311,12 +309,12 @@ Note the dummy variable columns starting with `Neighborhood_`. The `bake()` func
 bake(simple_ames, ames_test, starts_with("Neighborhood_"))
 ```
 
-To get the processed version of the training set, we could use `bake()` and pass in the argument `ames_train` but, as previously mentioned, this would repeat calculations that have already been executed. Instead, we can use `new_data = NULL` to quickly return the training set (if `retain = TRUE` was used). It accesses the data component of the prepared recipe. 
+To get the processed version of the training set, we use `bake()` and pass in the argument `ames_train`.
 
 <!-- DK: Why doesn't this work? NULL seems unacceptable. -->
 
-```{r, eval = FALSE}
-bake(simple_ames, new_data = NULL) %>% 
+```{r}
+bake(simple_ames, new_data = ames_train) %>% 
   nrow()
 
 ames_train %>% 
@@ -436,7 +434,7 @@ This will cause a failure when the recipe is applied to new properties when the 
 
 However, there are other circumstances where this is not an adequate solution. For example, in classification models where there is a severe class imbalance, it is common to conduct _subsampling_ of the data that are given to the modeling function. For example, suppose that there were two classes and a 10% event rate. A simple, albeit controversial, approach would be to _down-sample_ the data so that the model is provided with all of the events and a random 10% of the non-event samples. 
 
-The problem is that the same subsampling process **should not be applied** to the data being predicted. As a result, when using a recipe, we need a mechanism to ensure that some operations are only applied to the data that are given to the model. Each step function has an option called `skip` that, when set to `TRUE`, will be ignored by the `bake()` function used with a data set argument. In this way, you can isolate the steps that affect the modeling data without causing errors when applied to new samples. However, all steps are applied when using `bake(new_data = NULL)`. 
+The problem is that the same subsampling process **should not be applied** to the data being predicted. As a result, when using a recipe, we need a mechanism to ensure that some operations are only applied to the data that are given to the model. Each step function has an option called `skip` that, when set to `TRUE`, will be ignored by the `bake()` function used with a data set argument. In this way, you can isolate the steps that affect the modeling data without causing errors when applied to new samples. 
 
 ### Spline functions {-}
 
@@ -508,36 +506,37 @@ ames_rec <-
 
 To get the recipe ready, we prepare it, and then extract the training set using `bake()` with `new_data = NULL`. When calling `prep()`, if the `training` argument is not given, it uses the data that was initially given to the `recipe()` function call.
 
-<!-- DK: Third NULL error. -->
 
 ```{r}
 ames_rec_prepped <- prep(ames_rec)
-# ames_train_prepped <- bake(ames_rec_prepped, new_data = NULL)
+ames_train_prepped <- bake(ames_rec_prepped, new_data = ames_train)
 ames_test_prepped <- bake(ames_rec_prepped, ames_test)
 
 # Fit the model; Note that the column Sale_Price has already been
 # log transformed.
 
-# lm_fit <- lm(Sale_Price ~ ., data = ames_train_prepped)
+lm_fit <- lm(Sale_Price ~ ., data = ames_train_prepped)
 ```
 
 The **broom** package has methods that make it easier to work with model objects. First, `broom::glance()` shows a succinct summary of the model in a handy tibble format:
 
 ```{r}
-# glance(lm_fit)
+glance(lm_fit)
 ```
 
 The model coefficients can be extracted using the `tidy()` method:
 
 ```{r}
-# tidy(lm_fit)
+tidy(lm_fit)
 ```
 
 To make predictions on the test set, we use the standard syntax:
 
+<!-- DK: This was originally something else with the `%>%  head()` within the predict parentheses. That seemed obviously wrong. But similar code shows up below.  -->
+
 ```{r}
-# predict(lm_fit, ames_test_prepped %>% 
-#           head())
+predict(lm_fit, ames_test_prepped) %>% 
+           head()
 ```
 
 ### Tidy a recipe
@@ -1050,9 +1049,11 @@ where `data` is a data frame or tibble and `truth` is the column with the observ
 
 To illustrate, let's take the model from Section \@ref(workflows-summary). The `lm_wflow_fit` object was a linear regression model whose predictor set was supplemented with an interaction and spline functions for longitude and latitude. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
 
+<!-- DK: Is this correct? The pipe within new_data? -->
 
 ```{r}
-ames_test_res <- predict(lm_fit, new_data = ames_test %>% select(-Sale_Price))
+ames_test_res <- predict(lm_fit, new_data = ames_test %>% 
+                           select(-Sale_Price))
 ames_test_res
 ```
 
