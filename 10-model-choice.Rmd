@@ -122,7 +122,7 @@ Also notable is the "Iowa Department of Transportation (DOT) and Rail Road" neig
 knitr::include_graphics("10-model-choice/images/dot_rr.png")
 ```
 
-It is critical to conduct _exploratory data analysis_ prior to beginning any modeling. These housing data have characteristics that present interesting challenges about how the data should be processed and modeled. We describe many of these in later chapters. Some basic questions that could be examined include: 
+It is critical to conduct _exploratory data analysis_ prior to beginning any modeling. These housing data have characteristics that present interesting challenges about how the data should be processed and modeled. We describe many of these in later sections. Some basic questions that could be examined include: 
 
  * Are there any odd or noticeable things about the distributions of the individual predictors? Is there much skewness or any pathological distributions? 
 
@@ -232,7 +232,7 @@ Suppose that an initial ordinary linear regression model were fit to these data.
 lm(Sale_Price ~ Neighborhood + log10(Gr_Liv_Area) + Year_Built + Bldg_Type)
 ```
 
-When this function is executed, the data are converted from a data frame to a numeric _design matrix_ (also called a _model matrix_) and then the least squares method is used to estimate parameters.  What the formula above does can be decomposed into a series of _steps_:
+What the formula above does can be decomposed into a series of _steps_:
 
 1. Sale price is defined as the outcome while neighborhood, general living area, the year built, and building type variables are all defined as predictors. 
 
@@ -290,8 +290,6 @@ simple_ames
 ``` 
 
 Note that, after preparing the recipe, the print statement shows the results of the selectors (e.g., `Neighborhood` and `Bldg_Type` are listed instead of `all_nominal`). 
-
-One important argument to `prep()` is `retain`. When `TRUE` (the default), the prepared version of the training set is kept within the recipe. This data set has been pre-processed using all of the steps listed in the recipe. Since `prep()` has to execute the recipe as it proceeds, it may be advantageous to keep this version of the training set so that, if that data set is to be used later, redundant calculations can be avoided. However, if the training set is big, it may be problematic to keep such a large amount of data in memory. Use `retain = FALSE` to avoid this. 
 
 The third phase of recipe usage is to apply the preprocessing operations to a data set using the `bake()` function. The `bake()` function can apply the recipe to _any_ data set. To use the test set, the syntax would be:
 
@@ -381,10 +379,6 @@ The full set of encodings can be used for some models. This is traditionally cal
 
 One helpful feature of `step_dummy()` is that there is more control over how the resulting dummy variables are named. In base R, dummy variable names mash the variable name with the level, resulting in names like `NeighborhoodVeenker`. Recipes, by default, use an underscore as the separator between the name and level (e.g., `Neighborhood_Veenker`) and there is an option to use custom formatting for the names. The default naming convention in recipes makes it easier to capture those new columns in future steps using a selector, such as `starts_with("Neighborhood_")`. 
 
-Traditional dummy variables require that all of the possible categories be known to create a full set of numeric features. There are other methods for doing this transformation to a numeric format. _Feature hashing_ methods only consider the value of the category to assign it to a predefined pool of dummy variables. This can be a good strategy when there are a large number of possible categories, but the statistical properties may not be optimal. For example, it may unnecessarily _alias_ categories together (by assigning them to the same dummy variable). This reduces the specificity of the encoding and, if that dummy variable were important, it would be difficult to determine which of the categories is driving the effect. 
-
-Another method that is useful when there are a large number of categories is called _effect_ or _likelihood encodings_. This method replaces the original data with a single numeric column that measures the _effect_ of those data. For example, for the neighborhood predictor, the mean sale price is computed for each neighborhood and these means are substituted for the original data values. This can be effective but should be used with care. In effect, a mini-model is being added to the actual model and this can lead to over-fitting. To be cautious, this type of encoding should be rigorously resampled. Within a recipe, the **embed** package has several step functions, such as `step_lencode_mixed()`, for effect encodings. Both feature hashing and effect encoding methods can also seamlessly handle situations where a novel factor level is encountered in the data. 
-
 
 Different recipe steps can have different effects on columns of the data. For example, `step_log()` modifies a column in-place without changing the name. Other steps, such as `step_dummy()` eliminate the original data column and replace it with one or more columns with different names. This behavior depends on the type of operation being done. 
 
@@ -421,22 +415,7 @@ simple_ames <-
 Additional interactions can be specified in this formula by separating them by `+`. Also note that the recipe will only utilize interactions between different variables; if the formula uses `var_1:var_1`, this term will be ignored. 
 
 
-### Skipping steps for new data {#skip-equals-true}
-
-The sale price data are already log transformed in the `ames` data frame. Why not use:
-
-```r
- step_log(Sale_Price, base = 10)
-```
-
-This will cause a failure when the recipe is applied to new properties when the sale price is not known. Since price is what we are trying to predict, there probably won't be a column in the data for this variable. In fact, to avoid _information leakage_, many tidymodels packages isolate the data being used when making any predictions. This means that the training set and any outcome columns are not available for use at prediction time. 
-
-
-However, there are other circumstances where this is not an adequate solution. For example, in classification models where there is a severe class imbalance, it is common to conduct _subsampling_ of the data that are given to the modeling function. For example, suppose that there were two classes and a 10% event rate. A simple, albeit controversial, approach would be to _down-sample_ the data so that the model is provided with all of the events and a random 10% of the non-event samples. 
-
-The problem is that the same subsampling process **should not be applied** to the data being predicted. As a result, when using a recipe, we need a mechanism to ensure that some operations are only applied to the data that are given to the model. Each step function has an option called `skip` that, when set to `TRUE`, will be ignored by the `bake()` function used with a data set argument. In this way, you can isolate the steps that affect the modeling data without causing errors when applied to new samples. 
-
-### Spline functions {-}
+### Spline functions
 
 When a predictor has a nonlinear relationship with the outcome, some types of predictive models can adaptively approximate this relationship during training. However, simpler is usually better and it is not uncommon to try to use a simple model, such as a linear fit, and add in specific non-linear features for predictors that may need them. One common method for doing this is to use _spline_ functions to represent the data. Splines replace the existing numeric predictor with a set of columns that allow a model to emulate a flexible, non-linear relationship. As more spline terms are added to the data, the capacity to non-linearly represent the relationship increases. Unfortunately, it may also increase the likelihood of picking up on data trends that occur by chance (i.e., over-fitting). 
 
@@ -487,94 +466,7 @@ Data are given to recipes at different stages. When calling `recipe(..., data)`,
 
 When using `bake(recipe, new_data)`, no quantities are re-estimated using the values in `new_data`. Take centering and scaling using `step_normalize()` as an example. Using this step, the means and standard deviations from the appropriate columns are determined from the training set; new samples are standardized using these values when `bake()` is invoked. 
 
-### Using a recipe with traditional modeling functions {#recipes-manual}
 
-Previously, we introduced high-level interfaces that take a recipe as an input argument and automatically handle the `prep()`/`bake()` process of preparing data for modeling. However, recipes can be used with traditional R modeling functions as well; this section shows how to use a recipe outside those high-level interfaces.
-
-Let's use a slightly augmented version of the last recipe, now including longitude:
-
-```{r}
-ames_rec <- 
-  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
-           Latitude + Longitude, data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_other(Neighborhood, threshold = 0.01) %>% 
-  step_dummy(all_nominal()) %>% 
-  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) %>% 
-  step_ns(Latitude, Longitude, deg_free = 20)
-```
-
-To get the recipe ready, we prepare it, and then extract the training set using `bake()` with `new_data = NULL`. When calling `prep()`, if the `training` argument is not given, it uses the data that was initially given to the `recipe()` function call.
-
-
-```{r}
-ames_rec_prepped <- prep(ames_rec)
-ames_train_prepped <- bake(ames_rec_prepped, new_data = ames_train)
-ames_test_prepped <- bake(ames_rec_prepped, ames_test)
-
-# Fit the model; Note that the column Sale_Price has already been
-# log transformed.
-
-lm_fit <- lm(Sale_Price ~ ., data = ames_train_prepped)
-```
-
-The **broom** package has methods that make it easier to work with model objects. First, `broom::glance()` shows a succinct summary of the model in a handy tibble format:
-
-```{r}
-glance(lm_fit)
-```
-
-The model coefficients can be extracted using the `tidy()` method:
-
-```{r}
-tidy(lm_fit)
-```
-
-To make predictions on the test set, we use the standard syntax:
-
-<!-- DK: This was originally something else with the `%>%  head()` within the predict parentheses. That seemed obviously wrong. But similar code shows up below.  -->
-
-```{r}
-predict(lm_fit, ames_test_prepped) %>% 
-           head()
-```
-
-### Tidy a recipe
-
-There is also a `tidy()` method for recipes. Calling it with no other arguments gives a summary of the recipe steps:
-
-```{r}
-tidy(ames_rec_prepped)
-```
-
-We can specify the `id` field in a step function call but otherwise it is generated using a random suffix. This field can be helpful if the same type of step is added to the recipe more than once. Let's specify the `id` ahead of time for `step_log()`, since we want to `tidy()` it:
-
-```{r}
-ames_rec <- 
-  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
-           Latitude + Longitude, data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10, id = "my_id") %>% 
-  step_other(Neighborhood, threshold = 0.01) %>% 
-  step_dummy(all_nominal()) %>% 
-  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) %>% 
-  step_ns(Latitude, Longitude, deg_free = 20)
-
-ames_rec_prepped <- prep(ames_rec)
-```
-
-The `tidy()` method can be called again along with the `id` identifier we specified to get these results:
-
-```{r}
-tidy(ames_rec_prepped, id = "my_id")
-```
-
-The `tidy()` method can be called with the `number` identifier as well, if we know which step in the recipe we need:
-
-```{r}
-tidy(ames_rec_prepped, number = 2)
-```
-
-Each `tidy()` method returns the relevant information about that step. For example, the `tidy()` method for `step_dummy()` returns a column with the variables that were converted to dummy variables and another column with all of the known levels for each column. 
 
 ### Column roles
 
@@ -589,11 +481,6 @@ ames_rec %>%
   update_role(address, new_role = "street address")
 ```
 
-Any character string can be used as a role. Also, columns can have multiple roles so that they can be selected under more than one context. 
-
-This can be helpful when the data are _resampled_. It helps to keep the columns that are _not_ involved with the model fit in the same data frame (rather than in an external vector). Resampling creates alternate versions of the data mostly by row subsampling. If the street address were in another column, additional subsampling would be required and might lead to more complex code and a higher likelihood of errors. 
-
-Finally, all step functions have a `role` field that can assign roles to the results of the step. In many cases, columns affected by a step retain their existing role. For example, the `step_log()` calls to the `ames_rec` object above affected the `Gr_Liv_Area` column. For that step, the default behavior is to keep the existing role for this column since no new column is created. As a counter-example, the step to produce splines defaults new columns to have a role of `"predictor"` since that is usually how spline columns are used in a model. Most steps have sensible defaults but, since the defaults can be different, be sure to check the documentation page to understand what which role(s) will be assigned. 
 
 You have learned about using recipes for flexible feature engineering and data preprocessing, from creating dummy variables to handling class imbalance and more. Feature engineering is an important part of the modeling process where information leakage can easily occur and good practices must be adopted. Between the **recipes** package and other packages that extend recipes, there are over 100 available steps. All possible recipe steps are enumerated at [`tidymodels.org/find`](https://www.tidymodels.org/find/). The recipes framework provides a rich data manipulation environment for preprocessing and transforming data prior to modeling. 
 Additionally, [`tidymodels.org/learn/develop/recipes/`](https://www.tidymodels.org/learn/develop/recipes/) shows how custom steps can be created.
@@ -622,9 +509,7 @@ ames_rec <-
 
 ## Fitting models with parsnip {#models}
 
-The **parsnip** package provides a fluent and standardized interface for a variety of different models. In this chapter, we both give some motivation for why a common interface is beneficial and show how the use the package. 
-
-In Chapter \@ref(recipes), we discussed recipe objects for feature engineering and data preprocessing prior to modeling. Recipes are not discussed in this chapter in order to focus on the model itself; Chapter \@ref(workflows) illustrates how to combine models and recipes together into something called a `workflow` object. 
+The **parsnip** package provides a fluent and standardized interface for a variety of different models. In this section, we both give some motivation for why a common interface is beneficial and show how the use the package. 
  
 ### Create a model
 
@@ -692,23 +577,7 @@ linear_reg() %>%
 
 Once the details of the model have been specified, the model estimation can be done with either the `fit()` function (to use a formula) or the `fit_xy()` function (when your data are already pre-processed). The **parsnip** package allows the user to be indifferent to the interface of the underlying model; you can always use a formula even if the modeling package's function only has the `x`/`y` interface. 
 
-The `translate()` function can provide details on how **parsnip** converts the user's code to the package's syntax: 
 
-```{r}
-linear_reg() %>% 
-  set_engine("lm") %>% 
-  translate()
-
-linear_reg() %>% 
-  set_engine("glmnet") %>% 
-  translate()
-
-linear_reg() %>% 
-  set_engine("stan") %>% 
-  translate()
-```
-
-Note that `missing_arg()` is just a placeholder for the data that has yet to be provided. 
 
 Let's walk through how to predict the sale price of houses in the Ames data as a function of only longitude and latitude. 
 
@@ -734,68 +603,11 @@ lm_xy_fit
 ```
 
 
-Not only does **parsnip** enable a consistent model interface for different packages, it also provides consistency in the _model arguments_. It is common for different functions which fit the same model to have different argument names. Random forest model functions are a good example. Three commonly used arguments are the number of trees in the ensemble, the number of predictors to randomly sample with each split within a tree, and the number of data points required to make a split. For three different R packages implementing this algorithm, those arguments are:
-
-```{r, echo = FALSE, eval = FALSE}
-arg_info <- 
-  tribble(
-    ~ `Argument Type`, ~parsnip,
-    "# trees", "trees",
-    "# sampled predictors", "mtry",
-    "# data points to split", "min_n"
-  )
-
-arg_info <-
-  get_from_env("rand_forest_args") %>% 
-  select(engine, parsnip, original) %>% 
-  full_join(arg_info, by = "parsnip") %>% 
-  mutate(package = ifelse(engine == "spark", "sparklyr", engine))
-
-arg_info %>%
-  select(package, `Argument Type`, original) %>%
-  pivot_wider(id_cols = c(`Argument Type`),
-              values_from = c(original),
-              names_from = c(package)) 
-```
-
-
-In an effort to make argument specification less painful, **parsnip** uses common argument names within and between packages. For random forests, **parsnip** models use: 
-
-```{r, echo = FALSE, eval = FALSE}
-arg_info %>%
-  select(`Argument Type`, parsnip) %>%
-  distinct() 
-```
-
-
-Admittedly, this is one more set of arguments to memorize. However, when other types of models have the same argument types, these names still apply. For example, boosted tree ensembles also create a large number of tree-based models, so `trees` is also used there, as is `num_n`, and so on. The **parsnip** argument names have also been standardized with similar recipe arguments. 
-
-Some of the original argument names can be fairly jargon-y. For example, to specify the amount of regularization to use in a glmnet model, the Greek letter `lambda` is used. While this mathematical notation is commonly used in the statistics literature, it is not obvious to many people what `lambda` represents (especially those who consume the model results). Since this is the penalty used in regularization, **parsnip** standardizes on the argument name `penalty`. Similarly, the number of neighbors in a _K_-nearest neighbors model is called `neighbors` instead of `k`. Our rule of thumb when standardizing argument names is:
-
-> If a practitioner were to include these names in a plot or table, would the people viewing those results understand the name? 
-
-To understand how the **parsnip** argument names map to the original names, use the help file for the model (available via `?rand_forest`) as well as the `translate()` function: 
-
-```{r}
-rand_forest(trees = 1000, min_n = 5) %>% 
-  set_engine("ranger") %>% 
-  set_mode("regression") %>% 
-  translate()
-```
-
-Modeling functions in **parsnip** separate model arguments into two categories: 
+Not only does **parsnip** enable a consistent model interface for different packages, it also provides consistency in the _model arguments_. Modeling functions in **parsnip** separate model arguments into two categories: 
 
  * _Main arguments_ are more commonly used and tend to be available across engines. 
 
  * _Engine arguments_ are either specific to a particular engine or used more rarely. 
-
-For example, in the translation of the random forest code above, the arguments `num.threads`, `verbose`, and `seed` were added by default. These arguments are specific to the ranger implementation of random forest models and wouldn't make sense as main arguments. Engine-specific arguments can be specified in `set_engine()`. For example, to have the `ranger::ranger()` function print out more information about the fit:
-
-```{r}
-rand_forest(trees = 1000, min_n = 5) %>% 
-  set_engine("ranger", verbose = TRUE) %>% 
-  set_mode("regression") 
-```
 
 
 ### Use the model results
@@ -938,7 +750,7 @@ ad_folds <- vfold_cv(ad_data, repeats = 5)
 Once we have a model, we need to know how well it works. A quantitative approach for estimating effectiveness allows us to understand the model, to compare different models, or to tweak the model to improve performance. Our focus in tidymodels is on _empirical validation_; this usually means using data that were not used to create the model as the substrate to measure effectiveness. 
 
 
-The choice of which metrics to examine can be critical. In later chapters, certain model parameters will be empirically optimized and a primary performance metric will be used to choose the best _sub-model_. Choosing the wrong method can easily result in unintended consequences. For example, two common metrics for regression models are the root mean squared error (RMSE) and the coefficient of determination (a.k.a. $R^2$). The former measures _accuracy_ while the latter measures _correlation_. These are not necessarily the same thing. This figure demonstrates the difference between the two: 
+The choice of which metrics to examine can be critical. For example, two common metrics for regression models are the root mean squared error (RMSE) and the coefficient of determination (a.k.a. $R^2$). The former measures _accuracy_ while the latter measures _correlation_. These are not necessarily the same thing. This figure demonstrates the difference between the two: 
 
 ```{r, echo = FALSE}
 set.seed(234)
@@ -962,7 +774,7 @@ ggplot(reg_ex, aes(x = observed, y = predicted)) +
 
 A model optimized for RMSE has more variability but has relatively uniform accuracy across the range of the outcome. The right panel shows that there is a tighter correlation between the observed and predicted values but this model performs poorly in the tails. 
 
-This chapter will largely focus on the **yardstick** package. Before illustrating syntax, let's explore whether empirical validation using performance metrics is worthwhile when a model is focused on inference rather than prediction. 
+This section will largely focus on the **yardstick** package. Before illustrating syntax, let's explore whether empirical validation using performance metrics is worthwhile when a model is focused on inference rather than prediction. 
 
 ### Performance metrics and inference
 
@@ -1012,7 +824,7 @@ two_factor_res <-
   pull(mean)
 ```
 
-The effectiveness of any given model depends on how the model will be used. An inferential model is used primarily to understand relationships, and typically is discussed with a strong focus on the choice (and validity) of probabilistic distributions and other generative qualities that define the model. For a model used primarily for prediction, by contrast, predictive strength is primary and concerns about underlying statistical qualities may be less important. Predictive strength is usually focused on how close our predictions come to the observed data, i.e., fidelity of the model predictions to the actual results. This chapter focuses on functions that can be used to measure predictive strength. However, our advice for those developing inferential models is to use these techniques _even when the model will not be used with the primary goal of prediction_. 
+The effectiveness of any given model depends on how the model will be used. An inferential model is used primarily to understand relationships, and typically is discussed with a strong focus on the choice (and validity) of probabilistic distributions and other generative qualities that define the model. For a model used primarily for prediction, by contrast, predictive strength is primary and concerns about underlying statistical qualities may be less important. Predictive strength is usually focused on how close our predictions come to the observed data, i.e., fidelity of the model predictions to the actual results. This section focuses on functions that can be used to measure predictive strength. However, our advice for those developing inferential models is to use these techniques _even when the model will not be used with the primary goal of prediction_. 
 
 A longstanding issue with the practice of inferential statistics is that, with a focus purely on inference, it is difficult to assess the credibility of a model. For example, consider the Alzheimer's disease data  when `r nrow(ad_data)` patients were studied to determine the factors that influence cognitive impairment. An analysis might take the known risk factors and build a logistic regression model where the outcome is binary (impaired/non-impaired). Let's consider predictors for age, sex, and the Apolipoprotein E genotype. The latter is a categorical variable with the six possible combinations of the three main variants of this gene. Apolipoprotein E is known to have an association with dementia.
 
@@ -1026,7 +838,7 @@ A superficial, but not uncommon, approach to this analysis would be to fit a lar
 
 While shallow, this analysis strategy is common in practice as well as in the literature. This is especially true if the practitioner has limited formal training in data analysis. 
 
-One missing piece of information in this approach is how closely this model fits the actual data. Using resampling methods, discussed in Chapter \@ref(resampling), we can estimate the accuracy of this model to be about `r round(two_factor_res * 100, 1)`%. Accuracy is often a poor measure of model performance; we use it here because it is commonly understood. If the model has `r round(two_factor_res * 100, 1)`% fidelity to the data, should we trust the conclusions produced by the model? We might think so until we realize that the baseline rate of non-impaired patients in the data is `r round(mean(ad_data$Class == "Control") * 100, 1)`%. This means that, despite our statistical analysis, the two-factor model appears to be _only `r round((two_factor_res - mean(ad_data$Class == "Control")) * 100, 1)`% better than a simple heuristic that always predicts patients to be unimpaired_, irregardless of the observed data. 
+One missing piece of information in this approach is how closely this model fits the actual data. Using resampling methods, we can estimate the accuracy of this model to be about `r round(two_factor_res * 100, 1)`%. Accuracy is often a poor measure of model performance; we use it here because it is commonly understood. If the model has `r round(two_factor_res * 100, 1)`% fidelity to the data, should we trust the conclusions produced by the model? We might think so until we realize that the baseline rate of non-impaired patients in the data is `r round(mean(ad_data$Class == "Control") * 100, 1)`%. This means that, despite our statistical analysis, the two-factor model appears to be _only `r round((two_factor_res - mean(ad_data$Class == "Control")) * 100, 1)`% better than a simple heuristic that always predicts patients to be unimpaired_, irregardless of the observed data. 
 
 <!-- DK: Never seen this sort of object before. -->
 
@@ -1034,7 +846,7 @@ One missing piece of information in this approach is how closely this model fits
 The point of this analysis is to demonstrate the idea that **optimization of statistical characteristics of the model does not imply that the model fits the data well.** Even for purely inferential models, some measure of fidelity to the data should accompany the inferential results. Using this, the consumers of the analyses can calibrate their expectations of the results of the statistical analysis. 
 ```
 
-In the remainder of this chapter, general approaches for evaluating models via empirical validation are discussed. These approaches are grouped by the nature of the outcome data: purely numeric, binary classes, and three or more class levels. 
+In the remainder of this section, general approaches for evaluating models via empirical validation are discussed. These approaches are grouped by the nature of the outcome data: purely numeric, binary classes, and three or more class levels. 
 
 ### Regression metrics 
 
@@ -1169,7 +981,7 @@ data(hpc_cv)
 str(hpc_cv)
 ```
 
-As before, there are factors for the observed and predicted outcomes along with four other columns of predicted probabilities for each class. These data also include a `Resample` column. These results are for out-of-sample predictions associated with 10-fold cross-validation (discussed in Chapter \@ref(resampling)). For the time being, this column will be ignored. 
+As before, there are factors for the observed and predicted outcomes along with four other columns of predicted probabilities for each class. These data also include a `Resample` column. These results are for out-of-sample predictions associated with 10-fold cross-validation. For the time being, this column will be ignored. 
 
 The functions for metrics that use the discrete class probabilities are identical: 
 
