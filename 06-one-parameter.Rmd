@@ -91,7 +91,7 @@ knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
 
 One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads and the number of white beads, and divide the number of red beads by the total number of beads. However, this would be a long and tedious process. Therefore, we will use sampling!
 
-Our final question, once we have mastered sampling, will be: if we pull out 16 red beads with a sample of size 50, what is the distribution of possibilities for the total number of red beads in the entire urn?
+Motivating example: "If we get 16 red beads in a random sample of size 50 taken from an urn with 2,400 (white or red) beads, how many red beads are in the urn?" 
 
 As always, we will need the **tidyverse** package. The **infer** package has a handy function, `rep_sample_n()`, for simulating the process of sampling.
 
@@ -672,7 +672,7 @@ glimpse(shovels_100)
 Now, we have the standard deviation of `prop_red` for all shovel sizes from 1 to 100.  Let's plot that value to see how it changes as the shovel gets larger:
 
 
-```{r, echo-FALSE, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases as the square root of shovel size."}
+```{r, echo=FALSE, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases as the square root of shovel size."}
 shovels_100 %>%
  ggplot(aes(x = shovel_size, y = prop_red_sd)) +
  geom_point() +
@@ -869,7 +869,7 @@ The sampling activity involving the urn is merely an *idealized version* of how 
 1. The effect of sampling variation.
 1. The effect of sample size on sampling variation.
 
-This is not how sampling is done in real life. In a real-life scenario, we won't know what the true value of the population parameter is. Furthermore, we wouldn't be able to take 1,000 replicated samples. Rather, we take a single sample that's as large as we can afford. In the next section, we'll study a real-life example of sampling: polls.
+This is not how sampling is done in real life. In a real life scenario, we won't know what the true value of the population parameter is. Furthermore, we wouldn't be able to take 1,000 replicated samples. Rather, we take a single sample that's as large as we can afford. In the next section, we'll study a real life example of sampling: polls.
 
 ```{r, echo=FALSE, fig.cap="Real life sampling is hard! In most scenarios, it's impossible to ask the entire population for their opinions."}
 knitr::include_graphics("06-one-parameter/images/that_would_be_great.png")
@@ -885,7 +885,7 @@ On December 4, 2013, National Public Radio in the US reported on a poll of Presi
 > 
 > According to a new Harvard University Institute of Politics poll, just 41 percent of millennials — adults ages 18-29 — approve of Obama's job performance, his lowest-ever standing among the group and an 11-point drop from April.
 
-Let's tie elements of the real-life poll in this new article with our "tactile" and "virtual" urn activity from Sections \@ref(sampling-activity) and \@ref(sampling-simulation) using the terminology, notations, and definitions we learned in Section \@ref(sampling-framework). You'll see that our sampling activity with the urn is an idealized version of what pollsters are trying to do in real life. 
+Let's tie elements of the real life poll in this new article with our "tactile" and "virtual" urn activity from Sections \@ref(sampling-activity) and \@ref(sampling-simulation) using the terminology, notations, and definitions we learned in Section \@ref(sampling-framework). You'll see that our sampling activity with the urn is an idealized version of what pollsters are trying to do in real life. 
 
 First, who is the **(Study) Population** of $N$ individuals or observations of interest? 
 
@@ -962,7 +962,7 @@ Let's now revisit the sampling paradigm from Subsection \@ref(terminology-and-no
 
 So as you can see, it was critical for the sample obtained by Kennedy School's Institute of Politics at Harvard University to be truly random in order to infer about *all* young Americans' opinions about Obama. Was their sample truly random? It's hard to answer such questions without knowing about the *sampling methodology* they used. 
 
-For example, what if Kennedy School's Institute of Politics at Harvard University conducted this poll using only mobile phone numbers? People without mobile phones would be left out and therefore not represented in the sample. This flaw is an example of **censoring**, the exclusion of certain datapoints due to an issue with data collection. This results in an incomplete observation and increases the prediction uncertainty of the estimand, Obama's approval rating among young Americans. Ensuring that our samples were random was easy to do in our sampling urn exercises; however, in a real-life situation like the Obama poll, this is much harder to do.
+For example, what if Kennedy School's Institute of Politics at Harvard University conducted this poll using only mobile phone numbers? People without mobile phones would be left out and therefore not represented in the sample. This flaw is an example of **censoring**, the exclusion of certain datapoints due to an issue with data collection. This results in an incomplete observation and increases the prediction uncertainty of the estimand, Obama's approval rating among young Americans. Ensuring that our samples were random was easy to do in our sampling urn exercises; however, in a real life situation like the Obama poll, this is much harder to do.
 
 `r margin_note("What you have visualized in this chapter was a demonstration of a famous theorem, or mathematically proven truth, called the *Central Limit Theorem*. It loosely states that when sample means are based on larger and larger sample sizes, the sampling distribution of these sample means becomes both more and more normally shaped and more and more narrow. In other words, the sampling distribution increasingly follows a *normal distribution* and the variation of these sampling distributions gets smaller, as quantified by their standard errors.")`
 
@@ -1136,7 +1136,7 @@ urn %>%
 
 We can create the ideal Preceptor Table by performing the exhaustive census of the entire urn. Let's say that, after this tedious process, we find that the **true** and **real** proportion of red beads is exactly 37.5%. We know the color of every bead. 
 
-In this world, the estimand, the proportion of red beads in the urn, is a simple matter of arithmetic. However, as has been emphasized before, performing an exhaustive count is not the easiest way to estimate the proportion of red beads. Real-life sampling is far more complex. The process is **extremely** prone to error. Despite that, most people overestimate the validity of conclusions drawn from sampling. To stress the unknowns in sampling, let's look at our actual Preceptor Table.
+In this world, the estimand, the proportion of red beads in the urn, is a simple matter of arithmetic. However, as has been emphasized before, performing an exhaustive count is not the easiest way to estimate the proportion of red beads. Real life sampling is far more complex. The process is **extremely** prone to error. Despite that, most people overestimate the validity of conclusions drawn from sampling. To stress the unknowns in sampling, let's look at our actual Preceptor Table.
 
 
 Let's imagine we use our shovel and sample 100 beads from the urn. After taking our sample, we find that 40% of the *sampled* beads are red. Let's visualize this by looking at the entire urn after we have taken our sample. This is an actual Preceptor Table. We only know the colors of our randomly sampled 100 beads, the remaining bead colors are our missing data!
@@ -1178,9 +1178,9 @@ So random sampling ensures our point estimates are *accurate*, while on the othe
 knitr::include_graphics("06-one-parameter/images/accuracy_vs_precision.jpg")
 ```
 
-Now, it's obvious that the best case scenario is the most precise and the most accurate option. However, real-life sampling isn't so easy!
+Now, it's obvious that the best case scenario is the most precise and the most accurate option. However, real life sampling isn't so easy!
 
-What if we had the option to use a shovel with **200** slots, but it had a minor magnetic property that caused it to pick up slightly more red beads than the 100 slotted shovel? On one hand, the larger shovel gives us increased precision due to a larger sample size. On the other, its magnetic property gives us decreased accuracy due to a sampling bias. Here, as is often the case in the real-world, there is a tradeoff! 
+What if we had the option to use a shovel with **200** slots, but it had a minor magnetic property that caused it to pick up slightly more red beads than the 100 slotted shovel? On one hand, the larger shovel gives us increased precision due to a larger sample size. On the other, its magnetic property gives us decreased accuracy due to a sampling bias. Here, as is often the case in the real world, there is a tradeoff! 
 
 ### El Jefe's or Felipe's?
 
@@ -1216,10 +1216,10 @@ $$p(models, data)$$
 We then add the specific results of the experiment, and calculate the conditional distribution of the models, given the data that we have seen:
 
 
-$$p(models | data = results-of-experiment)$$
+$$p(models | data = results\ of\ experiment)$$
 The rest is just details.
 
-We can do the same thing with our sampling problem. Assume that we know that there are 2,400 beads in the urn, and that all of them are either red or white. Our experiment involves the one time use of a paddle with 50 slots. We have 2,401 models under consideration. There might be zero red beads or one red bead or ... 2,399 red beads or 2,400 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate the joint distribution of models which we are considering and experiment results we might observe. 
+We can do the same thing with our sampling problem. Assume that we know that there are 2,400 beads in the urn, and that all of them are either red or white. Our experiment involves the one time use of a paddle with 50 slots. We have 2,401 models under consideration. There might be zero red beads or one red bead or ... 2,399 red beads or 2,400 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate *the joint distribution of models which we are considering and the experiment results we might observe.* Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample. 
 
 <!-- Note to future authors: I am somewhat concerned that this is not exactly correct since we really ought to sample what happens when you pick 50 beads out of an urn. This can be approximated with the binomial, which is what we have done here. And, with such big numbers, it is a good approximation. But it is not exactly correct. -->
 
@@ -1279,39 +1279,39 @@ To visualize this in a 3D plot, see the slice in the figure below. There are a f
 
 For any value of red beads found in the paddle (from 1 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion may be. 
 
-Therefore, when answering our chapter's complex question, "what is our best guess at the number of red beads in the entire urn if we get a result of 16 red beads in a sample of size 50", there is not one singular answer. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the total number of red beads in the entire urn. Certain totals of red beads, like the extremes close to 0 or 2400, are impossible due to our sample of 32%. Other totals, like 1000, occur far more frequently than other totals. 
+Recall the opening question: "If we get 16 red beads in a random sample of size 50, how many red beads are in the entire urn?" The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the total number of red beads in the entire urn. Certain totals of red beads, like the extremes close to 0 or 2400, are essentially impossible due to our sample value of 32%. Some totals, like 1,000, occur far more frequently than other totals. 
 
-This means that, while we can provide a range of possibilies (and we can know which of those possibilities occurs most frequently), we can never say that we know the total number of red beads with certainty. 
+This means that, while we can provide a range of possibilities (and we can estimate which of those possibilities occur most frequently), we can never say that we know the total number of red beads with certainty. 
 
-The key issue with the urn paradigm is that, unlike real-world data science, we *can* technically find the total number of red beads. We just have to perform that exhuaustive count that we've been so desperately avoiding! In the real-world, the "true" solution can never be known. This is why we require inference, and why tools like sampling are so helpful for making assumptions about the world around us. 
+The key issue with the urn paradigm is that, unlike real world data science, we *can* technically find the total number of red beads. We just have to perform that exhaustive count that we've been so desperately avoiding. In the real world, the "true" solution can never be known. This is why we require inference, and why tools like sampling are so helpful for making assumptions about the world around us. 
 
 ```{r, echo=FALSE, fig.cap="A 3D image of our joint distribution created with Rayshader."}
 knitr::include_graphics("06-one-parameter/images/slice_rayshader.png")
 ```
 ### Data Generating Mechanism (DGM)
 
-To answer our question, "what is the proportion of red beads in the urn?", we used a Data Generating Mechanism (DGM). First, we created a virtual analog of our real-life urn. Then, we used a virtual shovel to draw samples from our virtual urn. We then used handy data science tools to 1) simulate the proportion of red beads using different virtual shovel sizes, 2) calculate the proportion of red beads using a thousand repetitions of different shovel sizes, and 3) show the standard error between the different shovel sizes and their respective proportions of red beads. 
+To answer our question, "what is the proportion of red beads in the urn?", we used a Data Generating Mechanism (DGM). First, we created a virtual analog of our real life urn. Then, we used a virtual shovel to draw samples from our virtual urn. We then used handy data science tools to 1) simulate the proportion of red beads using different virtual shovel sizes, 2) calculate the proportion of red beads using a thousand repetitions of different shovel sizes, and 3) show the standard error between the different shovel sizes and their respective proportions of red beads. 
 
 We need a "machine" which generates these predictions, which is the same thing as a machine which fills in all the question marks in the Actual Preceptor Table, which is the same thing as a machine which produces "fake data" which looks a lot like our actual data. This part of the work (the code, our virtual machine) is the DGM. 
 
 <!-- ELABORATE on fitted model & unmodeled variation here -->
 
-```{r, echo=FALSE}
+<!-- ```{r, echo=FALSE} -->
 
-# probs_from_experiment = x %>% 
-#   filter(red_paddle == 16) %>% 
-#   group_by(red_urn) %>% 
-#   summarize(total = n(), .groups = "drop") %>%
-#   mutate(probs = total/sum(total)) %>% 
-#   pull(probs)
-# 
-# tibble(posterior_p = probs_from_experiment) %>% 
-#   mutate(results = map_int(posterior_p, ~ rbinom(n = 1, 
-#                                                 size = 100, 
-#                                                 prob = .))) %>% 
-#   mutate(bigger_than_33 = ifelse(results > 33, TRUE, FALSE))
+<!-- probs_from_experiment = x %>% -->
+<!--   filter(red_paddle == 16) %>% -->
+<!--   group_by(red_urn) %>% -->
+<!--   summarize(total = n(), .groups = "drop") %>% -->
+<!--   mutate(probs = total/sum(total)) %>% -->
+<!--   pull(probs) -->
 
-```
+<!-- tibble(posterior_p = probs_from_experiment) %>% -->
+<!--   mutate(results = map_int(posterior_p, ~ rbinom(n = 1, -->
+<!--                                                 size = 100, -->
+<!--                                                 prob = .))) %>% -->
+<!--   mutate(bigger_than_33 = ifelse(results > 33, TRUE, FALSE)) -->
+
+<!-- ``` -->
 
 
 
