@@ -978,39 +978,7 @@ function(data, truth, ...)
 where `data` is a data frame or tibble and `truth` is the column with the observed outcome values. The ellipses or other arguments are used to specify the column(s) containing the predictions. 
 
 
-To illustrate, let's evaluate the model we have constructed for the Ames house price data. Recall:
-
-The code for modeling the Ames data that we will use moving forward is:
-
-```{r, eval = FALSE}
-library(tidymodels)
-data(ames)
-ames <- mutate(ames, Sale_Price = log10(Sale_Price))
-
-set.seed(123)
-ames_split <- initial_split(ames, prob = 0.80, strata = Sale_Price)
-ames_train <- training(ames_split)
-ames_test  <-  testing(ames_split)
-
-ames_rec <- 
-  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
-           Latitude + Longitude, data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_other(Neighborhood, threshold = 0.01) %>% 
-  step_dummy(all_nominal()) %>% 
-  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) %>% 
-  step_ns(Latitude, Longitude, deg_free = 20)
-
-lm_model <- linear_reg() %>% 
-  set_engine("lm")
-
-
-  
-```
-
-
-
-The `lm_fit` object was a linear regression model whose predictor set was supplemented with an interaction and spline functions for longitude and latitude. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
+To illustrate, let's evaluate the model we have constructed for the Ames house price data. Recall that the `lm_fit` object was a linear regression model whose predictor set was supplemented with an interaction and spline functions for longitude and latitude. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
 
 <!-- DK: Is this correct? The pipe within new_data? -->
 
