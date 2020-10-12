@@ -885,7 +885,7 @@ We have learned that the modeling process encompasses more than just estimating 
 
 For the Ames data, the updated code:
 
-```{r workflows-summary, eval = FALSE}
+```{r, message=FALSE}
 library(tidymodels)
 data(ames)
 
@@ -919,16 +919,6 @@ lm_fit <- fit(lm_wflow, ames_train)
 
 
 ## Judging model effectiveness {#performance}
-
-
-<!-- DK: Calculate the lm_fit objects on the fly. Need to tie this example more closely together, as we move through the chapter. -->
-
-<!-- DK: Cut out all the details of the Alzthemia example. -->
-
-```{r, echo=FALSE}
-load("10-model-choice/data/lm_fit.RData")
-
-```
 
 
 Once we have a model, we need to know how well it works. A quantitative approach for estimating effectiveness allows us to understand the model, to compare different models, or to tweak the model to improve performance. Our focus in tidymodels is on _empirical validation_; this usually means using data that were not used to create the model as the substrate to measure effectiveness. 
@@ -1020,7 +1010,7 @@ lm_model <- linear_reg() %>%
 
 
 
-The `lm_wflow_fit` object was a linear regression model whose predictor set was supplemented with an interaction and spline functions for longitude and latitude. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
+The `lm_fit` object was a linear regression model whose predictor set was supplemented with an interaction and spline functions for longitude and latitude. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
 
 <!-- DK: Is this correct? The pipe within new_data? -->
 
