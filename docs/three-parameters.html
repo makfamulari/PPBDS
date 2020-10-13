@@ -242,7 +242,7 @@ Don’t use or mention lm(), only use stan_glm(). Also, don’t mention prior di
 Create some memes. Any way to add Batman to Justice section?
 
 -->
-<p>Models have parameters. In Chapter <a href="one-parameter.html#one-parameter">6</a> we created models with a single parameter <span class="math inline">\(p\)</span>, the proportion of red beads in an urn. In Chapter <a href="two-parameters.html#two-parameters">7</a> , we used models with two parameters: <span class="math inline">\(\mu\)</span> (the average height in the population, genericly known as a model “intercept”) and <span class="math inline">\(\sigma\)</span> (the variation in height in the population). In this Chapter — can you guess where this is going? — we will buold models with three parameters: <span class="math inline">\(\sigma\)</span> (which serves the same role throughout the book) and two intercepts, <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>. All this notation is confusing, not least because different academic fields use inconsistent schemes. The key is to just follow the cardinal virtues and tackle your problem set by step.</p>
+<p>Models have parameters. In Chapter <a href="one-parameter.html#one-parameter">6</a> we created models with a single parameter <span class="math inline">\(p\)</span>, the proportion of red beads in an urn. In Chapter <a href="two-parameters.html#two-parameters">7</a> , we used models with two parameters: <span class="math inline">\(\mu\)</span> (the average height in the population, generically known as a model “intercept”) and <span class="math inline">\(\sigma\)</span> (the variation in height in the population). Here — can you guess where this is going? — we will build models with three parameters: <span class="math inline">\(\sigma\)</span> (which serves the same role throughout the book) and two intercepts: <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>. All this notation is confusing, not least because different academic fields use inconsistent schemes. The key is to just follow the cardinal virtues and tackle your problem step by step.</p>
 <div id="eda-for-trains" class="section level2">
 <h2>
 <span class="header-section-number">8.1</span> EDA for <code>trains</code>
@@ -275,11 +275,11 @@ Create some memes. Any way to add Batman to Justice section?
 <pre><code>## # A tibble: 5 x 4
 ##     age att_end party      treatment
 ##   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;      &lt;fct&gt;    
-## 1    31       9 Democrat   Control  
-## 2    45      11 Democrat   Control  
-## 3    35       8 Democrat   Treated  
-## 4    45       6 Democrat   Control  
-## 5    53      13 Republican Control</code></pre>
+## 1    44       9 Democrat   Control  
+## 2    67       9 Democrat   Control  
+## 3    42      10 Democrat   Treated  
+## 4    52      10 Republican Treated  
+## 5    46      12 Democrat   Control</code></pre>
 <p><code>att_end</code> is a measure of person’s attitude toward immigration, a higher number means more conservative, i.e., a more exclusionary stance on immigration into the United States. Running <code>glimpse()</code> is another way of exploring a data set.</p>
 <div class="sourceCode" id="cb906"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb906-1"><a href="three-parameters.html#cb906-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb906-2"><a href="three-parameters.html#cb906-2"></a><span class="st">  </span><span class="kw">glimpse</span>()</span></code></pre></div>
@@ -294,7 +294,7 @@ Create some memes. Any way to add Batman to Justice section?
 <div class="sourceCode" id="cb908"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb908-1"><a href="three-parameters.html#cb908-1"></a>ch8 <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb908-2"><a href="three-parameters.html#cb908-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-702">TABLE 8.1: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-701">TABLE 8.1: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -432,7 +432,7 @@ Create some memes. Any way to add Batman to Justice section?
 <span id="cb909-5"><a href="three-parameters.html#cb909-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Where are the old Republicans?"</span>,</span>
 <span id="cb909-6"><a href="three-parameters.html#cb909-6"></a>       <span class="dt">x =</span> <span class="st">"Party"</span>,</span>
 <span id="cb909-7"><a href="three-parameters.html#cb909-7"></a>       <span class="dt">y =</span> <span class="st">"Age"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-703-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-702-1.png" width="672"></p>
 <p>From this plot, we can gather that there are many more Democrats in this dataset than Republicans. Democrats also span a wider range of ages than Republicans. The mode age for Democrats appears to be 50.</p>
 <div class="sourceCode" id="cb910"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb910-1"><a href="three-parameters.html#cb910-1"></a>ch8 <span class="op">%&gt;%</span></span>
 <span id="cb910-2"><a href="three-parameters.html#cb910-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> treatment, <span class="dt">y =</span> att_end)) <span class="op">+</span><span class="st"> </span></span>
@@ -441,13 +441,14 @@ Create some memes. Any way to add Batman to Justice section?
 <span id="cb910-5"><a href="three-parameters.html#cb910-5"></a>       <span class="dt">subtitle =</span> <span class="st">"Did the treatment make people more conservative?"</span>,</span>
 <span id="cb910-6"><a href="three-parameters.html#cb910-6"></a>       <span class="dt">x =</span> <span class="st">"Treatment"</span>,</span>
 <span id="cb910-7"><a href="three-parameters.html#cb910-7"></a>       <span class="dt">y =</span> <span class="st">"Attitude After Experiment"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-704-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-703-1.png" width="672"></p>
 <p>On a boxplot, the top and bottom borders of the box denotes the 75th and 25th percentiles, respectively. The line inside the box denotes the mean of the data. Treated individuals have a higher mean <code>att_end</code> than the control group, and a higher distribution in general, with its 25th percentile lining up with the mean of the control group. The control group has one outlier, while the treatment group has none.</p>
 </div>
 <div id="age-as-a-function-of-party" class="section level2">
 <h2>
 <span class="header-section-number">8.2</span> <code>age</code> as a function of <code>party</code>
 </h2>
+<!-- DK: Add a third question with a posterior distribution as the answer. -->
 <p>We want to build a predictive model and then use that model to draw conclusions about the world. What are the odds that, if a Democrat shows up at the train station, he will be over 50 years old? In a group of three Democrats and three Republicans, what age difference should we expect the oldest Democrat and the youngest Republican? We can answer these and similar questions by creating a model that uses party affiliation to predict someone’s age, again following our four key themes.</p>
 <div id="wisdom" class="section level3">
 <h3>
@@ -455,7 +456,7 @@ Create some memes. Any way to add Batman to Justice section?
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-705"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-704"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 8.1: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -483,7 +484,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-708"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-707"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.2: Justice<!--</p>-->
 <!--</div>--></span>
@@ -500,7 +501,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hemwiadabx .gt_table {
+#xcmooxjmvw .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -525,7 +526,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-left-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_heading {
+#xcmooxjmvw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -537,7 +538,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_title {
+#xcmooxjmvw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -547,7 +548,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-bottom-width: 0;
 }
 
-#hemwiadabx .gt_subtitle {
+#xcmooxjmvw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -557,13 +558,13 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-width: 0;
 }
 
-#hemwiadabx .gt_bottom_border {
+#xcmooxjmvw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_col_headings {
+#xcmooxjmvw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -578,7 +579,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_col_heading {
+#xcmooxjmvw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -598,7 +599,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   overflow-x: hidden;
 }
 
-#hemwiadabx .gt_column_spanner_outer {
+#xcmooxjmvw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -610,15 +611,15 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 4px;
 }
 
-#hemwiadabx .gt_column_spanner_outer:first-child {
+#xcmooxjmvw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hemwiadabx .gt_column_spanner_outer:last-child {
+#xcmooxjmvw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hemwiadabx .gt_column_spanner {
+#xcmooxjmvw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -630,7 +631,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   width: 100%;
 }
 
-#hemwiadabx .gt_group_heading {
+#xcmooxjmvw .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -652,7 +653,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   vertical-align: middle;
 }
 
-#hemwiadabx .gt_empty_group_heading {
+#xcmooxjmvw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -667,15 +668,15 @@ Now that we know about the parameter we want to find, are they suitable to answe
   vertical-align: middle;
 }
 
-#hemwiadabx .gt_from_md > :first-child {
+#xcmooxjmvw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hemwiadabx .gt_from_md > :last-child {
+#xcmooxjmvw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hemwiadabx .gt_row {
+#xcmooxjmvw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -694,7 +695,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   overflow-x: hidden;
 }
 
-#hemwiadabx .gt_stub {
+#xcmooxjmvw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -706,7 +707,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-left: 12px;
 }
 
-#hemwiadabx .gt_summary_row {
+#xcmooxjmvw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -716,7 +717,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 5px;
 }
 
-#hemwiadabx .gt_first_summary_row {
+#xcmooxjmvw .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -726,7 +727,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_grand_summary_row {
+#xcmooxjmvw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -736,7 +737,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 5px;
 }
 
-#hemwiadabx .gt_first_grand_summary_row {
+#xcmooxjmvw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -746,11 +747,11 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_striped {
+#xcmooxjmvw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hemwiadabx .gt_table_body {
+#xcmooxjmvw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -759,7 +760,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-bottom-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_footnotes {
+#xcmooxjmvw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -773,13 +774,13 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_footnote {
+#xcmooxjmvw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#hemwiadabx .gt_sourcenotes {
+#xcmooxjmvw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -793,46 +794,46 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#hemwiadabx .gt_sourcenote {
+#xcmooxjmvw .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#hemwiadabx .gt_left {
+#xcmooxjmvw .gt_left {
   text-align: left;
 }
 
-#hemwiadabx .gt_center {
+#xcmooxjmvw .gt_center {
   text-align: center;
 }
 
-#hemwiadabx .gt_right {
+#xcmooxjmvw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hemwiadabx .gt_font_normal {
+#xcmooxjmvw .gt_font_normal {
   font-weight: normal;
 }
 
-#hemwiadabx .gt_font_bold {
+#xcmooxjmvw .gt_font_bold {
   font-weight: bold;
 }
 
-#hemwiadabx .gt_font_italic {
+#xcmooxjmvw .gt_font_italic {
   font-style: italic;
 }
 
-#hemwiadabx .gt_super {
+#xcmooxjmvw .gt_super {
   font-size: 65%;
 }
 
-#hemwiadabx .gt_footnote_marks {
+#xcmooxjmvw .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="hemwiadabx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="xcmooxjmvw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of age ~ party</th>
@@ -997,7 +998,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ghthlkqsjz .gt_table {
+#hbvlgpbjhq .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1022,7 +1023,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-left-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_heading {
+#hbvlgpbjhq .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1034,7 +1035,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_title {
+#hbvlgpbjhq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1044,7 +1045,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-bottom-width: 0;
 }
 
-#ghthlkqsjz .gt_subtitle {
+#hbvlgpbjhq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1054,13 +1055,13 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-width: 0;
 }
 
-#ghthlkqsjz .gt_bottom_border {
+#hbvlgpbjhq .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_col_headings {
+#hbvlgpbjhq .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1075,7 +1076,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_col_heading {
+#hbvlgpbjhq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1095,7 +1096,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   overflow-x: hidden;
 }
 
-#ghthlkqsjz .gt_column_spanner_outer {
+#hbvlgpbjhq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1107,15 +1108,15 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 4px;
 }
 
-#ghthlkqsjz .gt_column_spanner_outer:first-child {
+#hbvlgpbjhq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ghthlkqsjz .gt_column_spanner_outer:last-child {
+#hbvlgpbjhq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ghthlkqsjz .gt_column_spanner {
+#hbvlgpbjhq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1127,7 +1128,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   width: 100%;
 }
 
-#ghthlkqsjz .gt_group_heading {
+#hbvlgpbjhq .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1149,7 +1150,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   vertical-align: middle;
 }
 
-#ghthlkqsjz .gt_empty_group_heading {
+#hbvlgpbjhq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1164,15 +1165,15 @@ Now that we know about the parameter we want to find, are they suitable to answe
   vertical-align: middle;
 }
 
-#ghthlkqsjz .gt_from_md > :first-child {
+#hbvlgpbjhq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ghthlkqsjz .gt_from_md > :last-child {
+#hbvlgpbjhq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ghthlkqsjz .gt_row {
+#hbvlgpbjhq .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1191,7 +1192,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   overflow-x: hidden;
 }
 
-#ghthlkqsjz .gt_stub {
+#hbvlgpbjhq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1203,7 +1204,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-left: 12px;
 }
 
-#ghthlkqsjz .gt_summary_row {
+#hbvlgpbjhq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1213,7 +1214,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 5px;
 }
 
-#ghthlkqsjz .gt_first_summary_row {
+#hbvlgpbjhq .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1223,7 +1224,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_grand_summary_row {
+#hbvlgpbjhq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1233,7 +1234,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 5px;
 }
 
-#ghthlkqsjz .gt_first_grand_summary_row {
+#hbvlgpbjhq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1243,11 +1244,11 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_striped {
+#hbvlgpbjhq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ghthlkqsjz .gt_table_body {
+#hbvlgpbjhq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1256,7 +1257,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-bottom-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_footnotes {
+#hbvlgpbjhq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1270,13 +1271,13 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_footnote {
+#hbvlgpbjhq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ghthlkqsjz .gt_sourcenotes {
+#hbvlgpbjhq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1290,46 +1291,46 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#ghthlkqsjz .gt_sourcenote {
+#hbvlgpbjhq .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ghthlkqsjz .gt_left {
+#hbvlgpbjhq .gt_left {
   text-align: left;
 }
 
-#ghthlkqsjz .gt_center {
+#hbvlgpbjhq .gt_center {
   text-align: center;
 }
 
-#ghthlkqsjz .gt_right {
+#hbvlgpbjhq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ghthlkqsjz .gt_font_normal {
+#hbvlgpbjhq .gt_font_normal {
   font-weight: normal;
 }
 
-#ghthlkqsjz .gt_font_bold {
+#hbvlgpbjhq .gt_font_bold {
   font-weight: bold;
 }
 
-#ghthlkqsjz .gt_font_italic {
+#hbvlgpbjhq .gt_font_italic {
   font-style: italic;
 }
 
-#ghthlkqsjz .gt_super {
+#hbvlgpbjhq .gt_super {
   font-size: 65%;
 }
 
-#ghthlkqsjz .gt_footnote_marks {
+#hbvlgpbjhq .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ghthlkqsjz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="hbvlgpbjhq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of age ~ party</th>
@@ -1428,7 +1429,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ufqlhajfde .gt_table {
+#vfikssankr .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1453,7 +1454,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-left-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_heading {
+#vfikssankr .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1465,7 +1466,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_title {
+#vfikssankr .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1475,7 +1476,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-bottom-width: 0;
 }
 
-#ufqlhajfde .gt_subtitle {
+#vfikssankr .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1485,13 +1486,13 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-width: 0;
 }
 
-#ufqlhajfde .gt_bottom_border {
+#vfikssankr .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_col_headings {
+#vfikssankr .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1506,7 +1507,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_col_heading {
+#vfikssankr .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1526,7 +1527,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   overflow-x: hidden;
 }
 
-#ufqlhajfde .gt_column_spanner_outer {
+#vfikssankr .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1538,15 +1539,15 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 4px;
 }
 
-#ufqlhajfde .gt_column_spanner_outer:first-child {
+#vfikssankr .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ufqlhajfde .gt_column_spanner_outer:last-child {
+#vfikssankr .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ufqlhajfde .gt_column_spanner {
+#vfikssankr .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1558,7 +1559,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   width: 100%;
 }
 
-#ufqlhajfde .gt_group_heading {
+#vfikssankr .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1580,7 +1581,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   vertical-align: middle;
 }
 
-#ufqlhajfde .gt_empty_group_heading {
+#vfikssankr .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1595,15 +1596,15 @@ Now that we know about the parameter we want to find, are they suitable to answe
   vertical-align: middle;
 }
 
-#ufqlhajfde .gt_from_md > :first-child {
+#vfikssankr .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ufqlhajfde .gt_from_md > :last-child {
+#vfikssankr .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ufqlhajfde .gt_row {
+#vfikssankr .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1622,7 +1623,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   overflow-x: hidden;
 }
 
-#ufqlhajfde .gt_stub {
+#vfikssankr .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1634,7 +1635,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-left: 12px;
 }
 
-#ufqlhajfde .gt_summary_row {
+#vfikssankr .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1644,7 +1645,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 5px;
 }
 
-#ufqlhajfde .gt_first_summary_row {
+#vfikssankr .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1654,7 +1655,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_grand_summary_row {
+#vfikssankr .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1664,7 +1665,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 5px;
 }
 
-#ufqlhajfde .gt_first_grand_summary_row {
+#vfikssankr .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1674,11 +1675,11 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_striped {
+#vfikssankr .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ufqlhajfde .gt_table_body {
+#vfikssankr .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1687,7 +1688,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-bottom-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_footnotes {
+#vfikssankr .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1701,13 +1702,13 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_footnote {
+#vfikssankr .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ufqlhajfde .gt_sourcenotes {
+#vfikssankr .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1721,46 +1722,46 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#ufqlhajfde .gt_sourcenote {
+#vfikssankr .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ufqlhajfde .gt_left {
+#vfikssankr .gt_left {
   text-align: left;
 }
 
-#ufqlhajfde .gt_center {
+#vfikssankr .gt_center {
   text-align: center;
 }
 
-#ufqlhajfde .gt_right {
+#vfikssankr .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ufqlhajfde .gt_font_normal {
+#vfikssankr .gt_font_normal {
   font-weight: normal;
 }
 
-#ufqlhajfde .gt_font_bold {
+#vfikssankr .gt_font_bold {
   font-weight: bold;
 }
 
-#ufqlhajfde .gt_font_italic {
+#vfikssankr .gt_font_italic {
   font-style: italic;
 }
 
-#ufqlhajfde .gt_super {
+#vfikssankr .gt_super {
   font-size: 65%;
 }
 
-#ufqlhajfde .gt_footnote_marks {
+#vfikssankr .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ufqlhajfde" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="vfikssankr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of age ~ party</th>
@@ -1904,7 +1905,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#lvhrctlmgl .gt_table {
+#ssiydwqzcx .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1929,7 +1930,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-left-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_heading {
+#ssiydwqzcx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1941,7 +1942,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_title {
+#ssiydwqzcx .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1951,7 +1952,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-bottom-width: 0;
 }
 
-#lvhrctlmgl .gt_subtitle {
+#ssiydwqzcx .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1961,13 +1962,13 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-width: 0;
 }
 
-#lvhrctlmgl .gt_bottom_border {
+#ssiydwqzcx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_col_headings {
+#ssiydwqzcx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1982,7 +1983,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_col_heading {
+#ssiydwqzcx .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2002,7 +2003,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   overflow-x: hidden;
 }
 
-#lvhrctlmgl .gt_column_spanner_outer {
+#ssiydwqzcx .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2014,15 +2015,15 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 4px;
 }
 
-#lvhrctlmgl .gt_column_spanner_outer:first-child {
+#ssiydwqzcx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lvhrctlmgl .gt_column_spanner_outer:last-child {
+#ssiydwqzcx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lvhrctlmgl .gt_column_spanner {
+#ssiydwqzcx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2034,7 +2035,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   width: 100%;
 }
 
-#lvhrctlmgl .gt_group_heading {
+#ssiydwqzcx .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2056,7 +2057,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   vertical-align: middle;
 }
 
-#lvhrctlmgl .gt_empty_group_heading {
+#ssiydwqzcx .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2071,15 +2072,15 @@ Now that we know about the parameter we want to find, are they suitable to answe
   vertical-align: middle;
 }
 
-#lvhrctlmgl .gt_from_md > :first-child {
+#ssiydwqzcx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lvhrctlmgl .gt_from_md > :last-child {
+#ssiydwqzcx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lvhrctlmgl .gt_row {
+#ssiydwqzcx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2098,7 +2099,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   overflow-x: hidden;
 }
 
-#lvhrctlmgl .gt_stub {
+#ssiydwqzcx .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2110,7 +2111,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-left: 12px;
 }
 
-#lvhrctlmgl .gt_summary_row {
+#ssiydwqzcx .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2120,7 +2121,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 5px;
 }
 
-#lvhrctlmgl .gt_first_summary_row {
+#ssiydwqzcx .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2130,7 +2131,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_grand_summary_row {
+#ssiydwqzcx .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2140,7 +2141,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   padding-right: 5px;
 }
 
-#lvhrctlmgl .gt_first_grand_summary_row {
+#ssiydwqzcx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2150,11 +2151,11 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-top-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_striped {
+#ssiydwqzcx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#lvhrctlmgl .gt_table_body {
+#ssiydwqzcx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2163,7 +2164,7 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-bottom-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_footnotes {
+#ssiydwqzcx .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2177,13 +2178,13 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_footnote {
+#ssiydwqzcx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#lvhrctlmgl .gt_sourcenotes {
+#ssiydwqzcx .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2197,46 +2198,46 @@ Now that we know about the parameter we want to find, are they suitable to answe
   border-right-color: #D3D3D3;
 }
 
-#lvhrctlmgl .gt_sourcenote {
+#ssiydwqzcx .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#lvhrctlmgl .gt_left {
+#ssiydwqzcx .gt_left {
   text-align: left;
 }
 
-#lvhrctlmgl .gt_center {
+#ssiydwqzcx .gt_center {
   text-align: center;
 }
 
-#lvhrctlmgl .gt_right {
+#ssiydwqzcx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lvhrctlmgl .gt_font_normal {
+#ssiydwqzcx .gt_font_normal {
   font-weight: normal;
 }
 
-#lvhrctlmgl .gt_font_bold {
+#ssiydwqzcx .gt_font_bold {
   font-weight: bold;
 }
 
-#lvhrctlmgl .gt_font_italic {
+#ssiydwqzcx .gt_font_italic {
   font-style: italic;
 }
 
-#lvhrctlmgl .gt_super {
+#ssiydwqzcx .gt_super {
   font-size: 65%;
 }
 
-#lvhrctlmgl .gt_footnote_marks {
+#ssiydwqzcx .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="lvhrctlmgl" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="ssiydwqzcx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of age ~ party</th>
@@ -2423,7 +2424,7 @@ Great, we just produced two estimates! Simple, right? The only thing we need to 
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-715"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-714"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 8.3: Courage<!--</p>-->
 <!--</div>--></span>
@@ -2449,12 +2450,12 @@ Great, we just produced two estimates! Simple, right? The only thing we need to 
 ##  predictors:   2
 ## ------
 ##                 Median MAD_SD
-## partyDemocrat   42.5    1.3  
-## partyRepublican 41.2    2.8  
+## partyDemocrat   42.6    1.2  
+## partyRepublican 41.0    2.8  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 12.3    0.8  
+## sigma 12.3    0.9  
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
@@ -2474,7 +2475,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#nvimrkfirj .gt_table {
+#mwpnvhibij .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2499,7 +2500,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-left-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_heading {
+#mwpnvhibij .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2511,7 +2512,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_title {
+#mwpnvhibij .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2521,7 +2522,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-width: 0;
 }
 
-#nvimrkfirj .gt_subtitle {
+#mwpnvhibij .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2531,13 +2532,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-width: 0;
 }
 
-#nvimrkfirj .gt_bottom_border {
+#mwpnvhibij .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_col_headings {
+#mwpnvhibij .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2552,7 +2553,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_col_heading {
+#mwpnvhibij .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2572,7 +2573,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#nvimrkfirj .gt_column_spanner_outer {
+#mwpnvhibij .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2584,15 +2585,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 4px;
 }
 
-#nvimrkfirj .gt_column_spanner_outer:first-child {
+#mwpnvhibij .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#nvimrkfirj .gt_column_spanner_outer:last-child {
+#mwpnvhibij .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#nvimrkfirj .gt_column_spanner {
+#mwpnvhibij .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2604,7 +2605,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   width: 100%;
 }
 
-#nvimrkfirj .gt_group_heading {
+#mwpnvhibij .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2626,7 +2627,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#nvimrkfirj .gt_empty_group_heading {
+#mwpnvhibij .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2641,15 +2642,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#nvimrkfirj .gt_from_md > :first-child {
+#mwpnvhibij .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#nvimrkfirj .gt_from_md > :last-child {
+#mwpnvhibij .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#nvimrkfirj .gt_row {
+#mwpnvhibij .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2668,7 +2669,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#nvimrkfirj .gt_stub {
+#mwpnvhibij .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2680,7 +2681,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-left: 12px;
 }
 
-#nvimrkfirj .gt_summary_row {
+#mwpnvhibij .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2690,7 +2691,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#nvimrkfirj .gt_first_summary_row {
+#mwpnvhibij .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2700,7 +2701,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_grand_summary_row {
+#mwpnvhibij .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2710,7 +2711,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#nvimrkfirj .gt_first_grand_summary_row {
+#mwpnvhibij .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2720,11 +2721,11 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_striped {
+#mwpnvhibij .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#nvimrkfirj .gt_table_body {
+#mwpnvhibij .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2733,7 +2734,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_footnotes {
+#mwpnvhibij .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2747,13 +2748,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_footnote {
+#mwpnvhibij .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#nvimrkfirj .gt_sourcenotes {
+#mwpnvhibij .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2767,46 +2768,46 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#nvimrkfirj .gt_sourcenote {
+#mwpnvhibij .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#nvimrkfirj .gt_left {
+#mwpnvhibij .gt_left {
   text-align: left;
 }
 
-#nvimrkfirj .gt_center {
+#mwpnvhibij .gt_center {
   text-align: center;
 }
 
-#nvimrkfirj .gt_right {
+#mwpnvhibij .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#nvimrkfirj .gt_font_normal {
+#mwpnvhibij .gt_font_normal {
   font-weight: normal;
 }
 
-#nvimrkfirj .gt_font_bold {
+#mwpnvhibij .gt_font_bold {
   font-weight: bold;
 }
 
-#nvimrkfirj .gt_font_italic {
+#mwpnvhibij .gt_font_italic {
   font-style: italic;
 }
 
-#nvimrkfirj .gt_super {
+#mwpnvhibij .gt_super {
   font-size: 65%;
 }
 
-#nvimrkfirj .gt_footnote_marks {
+#mwpnvhibij .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="nvimrkfirj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="mwpnvhibij" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of age ~ party</th>
@@ -2949,7 +2950,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#spbfbgjpih .gt_table {
+#tnjdhbrkxz .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2974,7 +2975,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-left-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_heading {
+#tnjdhbrkxz .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2986,7 +2987,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_title {
+#tnjdhbrkxz .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2996,7 +2997,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-width: 0;
 }
 
-#spbfbgjpih .gt_subtitle {
+#tnjdhbrkxz .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3006,13 +3007,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-width: 0;
 }
 
-#spbfbgjpih .gt_bottom_border {
+#tnjdhbrkxz .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_col_headings {
+#tnjdhbrkxz .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3027,7 +3028,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_col_heading {
+#tnjdhbrkxz .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3047,7 +3048,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#spbfbgjpih .gt_column_spanner_outer {
+#tnjdhbrkxz .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3059,15 +3060,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 4px;
 }
 
-#spbfbgjpih .gt_column_spanner_outer:first-child {
+#tnjdhbrkxz .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#spbfbgjpih .gt_column_spanner_outer:last-child {
+#tnjdhbrkxz .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#spbfbgjpih .gt_column_spanner {
+#tnjdhbrkxz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3079,7 +3080,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   width: 100%;
 }
 
-#spbfbgjpih .gt_group_heading {
+#tnjdhbrkxz .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3101,7 +3102,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#spbfbgjpih .gt_empty_group_heading {
+#tnjdhbrkxz .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3116,15 +3117,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#spbfbgjpih .gt_from_md > :first-child {
+#tnjdhbrkxz .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#spbfbgjpih .gt_from_md > :last-child {
+#tnjdhbrkxz .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#spbfbgjpih .gt_row {
+#tnjdhbrkxz .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3143,7 +3144,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#spbfbgjpih .gt_stub {
+#tnjdhbrkxz .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3155,7 +3156,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-left: 12px;
 }
 
-#spbfbgjpih .gt_summary_row {
+#tnjdhbrkxz .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3165,7 +3166,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#spbfbgjpih .gt_first_summary_row {
+#tnjdhbrkxz .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3175,7 +3176,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_grand_summary_row {
+#tnjdhbrkxz .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3185,7 +3186,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#spbfbgjpih .gt_first_grand_summary_row {
+#tnjdhbrkxz .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3195,11 +3196,11 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_striped {
+#tnjdhbrkxz .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#spbfbgjpih .gt_table_body {
+#tnjdhbrkxz .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3208,7 +3209,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_footnotes {
+#tnjdhbrkxz .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3222,13 +3223,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_footnote {
+#tnjdhbrkxz .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#spbfbgjpih .gt_sourcenotes {
+#tnjdhbrkxz .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3242,46 +3243,46 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#spbfbgjpih .gt_sourcenote {
+#tnjdhbrkxz .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#spbfbgjpih .gt_left {
+#tnjdhbrkxz .gt_left {
   text-align: left;
 }
 
-#spbfbgjpih .gt_center {
+#tnjdhbrkxz .gt_center {
   text-align: center;
 }
 
-#spbfbgjpih .gt_right {
+#tnjdhbrkxz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#spbfbgjpih .gt_font_normal {
+#tnjdhbrkxz .gt_font_normal {
   font-weight: normal;
 }
 
-#spbfbgjpih .gt_font_bold {
+#tnjdhbrkxz .gt_font_bold {
   font-weight: bold;
 }
 
-#spbfbgjpih .gt_font_italic {
+#tnjdhbrkxz .gt_font_italic {
   font-style: italic;
 }
 
-#spbfbgjpih .gt_super {
+#tnjdhbrkxz .gt_super {
   font-size: 65%;
 }
 
-#spbfbgjpih .gt_footnote_marks {
+#tnjdhbrkxz .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="spbfbgjpih" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="tnjdhbrkxz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="5" class="gt_heading gt_title gt_font_normal" style>8 Observations from Trains Dataset</th>
@@ -3438,15 +3439,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 </table></div>
 <p>The fitted values are the same for all Republicans and for all Democrats, as the fitted value is one of the two estimates output by our model. However, almost all of the residuals are different due to each observation’s own variation from the fitted value estimate. The only observations with the same residual are 4 and 41. This is because they are both Democrats that are the same age: with the same <span class="math inline">\(y_i\)</span> and <span class="math inline">\(\hat{y_i}\)</span>, the calculation of their residuals is identical. This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual who walks in the room even using our model.</p>
 <p>We can get a better picture of the unmodeled variation in our sample if we plot these three values for all individuals in our data set. The following three histograms show the actual outcomes, fitted values and residuals of all people in <code>trains</code>:</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-721-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-720-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>The three plots are structured like our equation and table above, i.e. a value in the left plot is the addition of one value in the middle and one in the right plot. The actual age distribution looks like a normal distribution, centered around 43 and with a standard deviation of about 12 years (the distribution could be random, but the exact reasons are not important here). The plot for the fitted values shows only two adjacent spikes, which represent the estimates for Democrats and Republicans. Since the residuals represent the difference between the two plots, their distribution looks like a mirror image of the first plot around the value 43. Indeed, our model seems to be quite inaccurate.</p>
 <p>We already learned about another method to reveal the distribution of the residuals. When we estimate a model with stan_glm() we automatically get the standard deviation of the residuals, or <em>sigma</em>. Recall that sigma is the third parameter of our model, but we have ignored it so far since it was not useful for any of the analysis above. A look at the output from before shows a sigma of 12.3, indicating that the actual age within <span class="math inline">\(\pm\)</span> is 12.3 years around our predicted value for about 68% of the people in <code>trains</code>, and <span class="math inline">\(\pm\)</span> 2*12.3 = 24.6 years around our prediction for about 95% of the people.</p>
 <p>The main reason and the solution for this strong deviation can be seen by looking at the histograms again. A bar on the left is always the result of the bars in the middle and right. The better our prediction is, i.e. the more the fitted values match the real ones, the more the middle histogram looks like the one on the left. Only the part that does not coincide is “moved” to the right plot. Apparently we need more bars in the middle, that is, we need a model that can predict more than just two values. We can achieve this by adding more (meaningful) variables to our model. An example would be a variable that shows whether the person has ever used Windows 95; if so, we would probably add a few more years to our estimate. But don’t worry about that now, we will learn in the next chapter how to create models with more variables.</p>
 <!-- Are separate plots for Democrats and Republicans useful?
 
-<img src="book_temp_files/figure-html/unnamed-chunk-722-1.png" width="672"  />
+<img src="book_temp_files/figure-html/unnamed-chunk-721-1.png" width="672"  />
 
-<img src="book_temp_files/figure-html/unnamed-chunk-723-1.png" width="672"  />
+<img src="book_temp_files/figure-html/unnamed-chunk-722-1.png" width="672"  />
 
 -->
 <p><br><br></p>
@@ -3458,7 +3459,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-724"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-723"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.4: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -3485,18 +3486,18 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <span id="cb915-14"><a href="three-parameters.html#cb915-14"></a></span>
 <span id="cb915-15"><a href="three-parameters.html#cb915-15"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>##        1
-##  [1,] 35
-##  [2,] 15
-##  [3,] 26
-##  [4,] 36
-##  [5,] 49
-##  [6,] 29
-##  [7,] 24
-##  [8,] 29
-##  [9,] 36
-## [10,] 28</code></pre>
+##  [1,] 48
+##  [2,] 55
+##  [3,] 42
+##  [4,] 50
+##  [5,] 21
+##  [6,] 54
+##  [7,] 38
+##  [8,] 53
+##  [9,] 27
+## [10,] 62</code></pre>
 <p>A look at the first few observations shows that we simply get ten different estimates for the age of a person. Since we have defined in our tibble that the value of “party” for this person is “Democrat”, these are estimates for a random Democrat. It is important to understand that this is not a concrete person from the <code>trains</code> dataset - the algorithm in <code>posterior_predict</code> simply uses the existing data of all democrats in <code>trains</code> to predict how old a random additional democrat could be in 4000 different scenarios (that’s how many rows the tibble has). When the values from all 4000 scenarios are plotted in a histogram, you can see that they are centered around the single estimate of 42.6 that we calculated in “Courage.” So, instead of this single like before estimate, we now use the thousands of simulations that lie behind it.</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-726-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-725-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>Once we have the simulation results for our random democrat, we just have to use our wrangling skills. For this, we proceed in a similar way as in chapter 7:</p>
 <div class="sourceCode" id="cb917"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb917-1"><a href="three-parameters.html#cb917-1"></a><span class="kw">as_tibble</span>(pp) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb917-2"><a href="three-parameters.html#cb917-2"></a><span class="st">  </span></span>
@@ -3516,7 +3517,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <pre><code>## # A tibble: 1 x 1
 ##    perc
 ##   &lt;dbl&gt;
-## 1  27.8</code></pre>
+## 1  27.6</code></pre>
 <p>Therefore we can assume with 27.8% probability that a random democrat is over 50 years old. We can also use simulation results to answer questions involving several persons or groups. Suppose three democrats and three republicans show up. What age difference should we expect between the youngest Republican and the oldest Democrat?</p>
 <p>As before we start by creating a tibble with the desired input. Note that the name of the column (“party”) and the observations (“Democrat”, “Republican”) must always be named <em>exactly</em> as in the data set. This tibble as well as our model can then be used as arguments for <code>posterior_predict</code>:</p>
 <div class="sourceCode" id="cb919"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb919-1"><a href="three-parameters.html#cb919-1"></a>new &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">party =</span> <span class="kw">c</span>(<span class="st">"Democrat"</span>, <span class="st">"Democrat"</span>, <span class="st">"Democrat"</span>, </span>
@@ -3525,17 +3526,17 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <span id="cb919-4"><a href="three-parameters.html#cb919-4"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">newdata =</span> new)</span>
 <span id="cb919-5"><a href="three-parameters.html#cb919-5"></a></span>
 <span id="cb919-6"><a href="three-parameters.html#cb919-6"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>##        1  2     3     4  5  6
-##  [1,] 56 27 64.63 58.46 33 52
-##  [2,] 59 55 53.80 36.14 51 38
-##  [3,] 36 41 56.07 32.72 20 50
-##  [4,] 45 24 46.53 50.29 47 44
-##  [5,] 62 22 23.69 49.41 39 40
-##  [6,] 42 29 49.96 47.38 42 51
-##  [7,] 51 64 52.60 61.47 71 66
-##  [8,] 50 47 -0.49 60.45 26 54
-##  [9,] 38 21 53.46 15.94 13 41
-## [10,] 36 49 60.25  0.27 24 39</code></pre>
+<pre><code>##        1  2  3  4  5  6
+##  [1,] 54 31 35 35 41 61
+##  [2,] 48 24 29 32 57 37
+##  [3,] 46 31 41 53 29 55
+##  [4,] 35 19 26 31 50 42
+##  [5,] 35 61 49 59 46 44
+##  [6,] 65 32 44 55 45 40
+##  [7,] 61 47 37 42 43 31
+##  [8,] 37 55 34 63 48 55
+##  [9,] 34 75 38 45 35 50
+## [10,] 56 55 48 57 43 49</code></pre>
 <p>A look at the output shows that we now have 6 columns: one for each person. R does not name the columns, but they are arranged in the same order in which we specified the persons in the tibble (D, D, R, R, R). Notice that all values in a row belong to the same scenario, i.e. each row represents a scenario where the 6 people meet.</p>
 <p>To determine the expected age difference, we can then proceed as follows:</p>
 <div class="sourceCode" id="cb921"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb921-1"><a href="three-parameters.html#cb921-1"></a><span class="kw">as_tibble</span>(pp) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -3569,7 +3570,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <pre><code>## # A tibble: 1 x 1
 ##   avg_diff
 ##      &lt;dbl&gt;
-## 1     22.5</code></pre>
+## 1     22.4</code></pre>
 <p>In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican.</p>
 </div>
 <div id="unknown-unknowns" class="section level4">
@@ -3593,7 +3594,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-730"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-729"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 8.5: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -3605,7 +3606,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-731"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-730"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.6: Justice<!--</p>-->
 <!--</div>--></span>
@@ -3617,7 +3618,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-732"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-731"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 8.7: Courage<!--</p>-->
 <!--</div>--></span>
@@ -3633,7 +3634,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 ## ------
 ##                  Median MAD_SD
 ## treatmentTreated 10.0    0.4  
-## treatmentControl  8.4    0.3  
+## treatmentControl  8.5    0.3  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
@@ -3650,7 +3651,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#szsqbplkfg .gt_table {
+#xtguwrzspl .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3675,7 +3676,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-left-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_heading {
+#xtguwrzspl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3687,7 +3688,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_title {
+#xtguwrzspl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3697,7 +3698,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-width: 0;
 }
 
-#szsqbplkfg .gt_subtitle {
+#xtguwrzspl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3707,13 +3708,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-width: 0;
 }
 
-#szsqbplkfg .gt_bottom_border {
+#xtguwrzspl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_col_headings {
+#xtguwrzspl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3728,7 +3729,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_col_heading {
+#xtguwrzspl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3748,7 +3749,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#szsqbplkfg .gt_column_spanner_outer {
+#xtguwrzspl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3760,15 +3761,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 4px;
 }
 
-#szsqbplkfg .gt_column_spanner_outer:first-child {
+#xtguwrzspl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#szsqbplkfg .gt_column_spanner_outer:last-child {
+#xtguwrzspl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#szsqbplkfg .gt_column_spanner {
+#xtguwrzspl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3780,7 +3781,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   width: 100%;
 }
 
-#szsqbplkfg .gt_group_heading {
+#xtguwrzspl .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3802,7 +3803,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#szsqbplkfg .gt_empty_group_heading {
+#xtguwrzspl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3817,15 +3818,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#szsqbplkfg .gt_from_md > :first-child {
+#xtguwrzspl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#szsqbplkfg .gt_from_md > :last-child {
+#xtguwrzspl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#szsqbplkfg .gt_row {
+#xtguwrzspl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3844,7 +3845,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#szsqbplkfg .gt_stub {
+#xtguwrzspl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3856,7 +3857,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-left: 12px;
 }
 
-#szsqbplkfg .gt_summary_row {
+#xtguwrzspl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3866,7 +3867,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#szsqbplkfg .gt_first_summary_row {
+#xtguwrzspl .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3876,7 +3877,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_grand_summary_row {
+#xtguwrzspl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3886,7 +3887,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#szsqbplkfg .gt_first_grand_summary_row {
+#xtguwrzspl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3896,11 +3897,11 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_striped {
+#xtguwrzspl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#szsqbplkfg .gt_table_body {
+#xtguwrzspl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3909,7 +3910,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_footnotes {
+#xtguwrzspl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3923,13 +3924,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_footnote {
+#xtguwrzspl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#szsqbplkfg .gt_sourcenotes {
+#xtguwrzspl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3943,46 +3944,46 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#szsqbplkfg .gt_sourcenote {
+#xtguwrzspl .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#szsqbplkfg .gt_left {
+#xtguwrzspl .gt_left {
   text-align: left;
 }
 
-#szsqbplkfg .gt_center {
+#xtguwrzspl .gt_center {
   text-align: center;
 }
 
-#szsqbplkfg .gt_right {
+#xtguwrzspl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#szsqbplkfg .gt_font_normal {
+#xtguwrzspl .gt_font_normal {
   font-weight: normal;
 }
 
-#szsqbplkfg .gt_font_bold {
+#xtguwrzspl .gt_font_bold {
   font-weight: bold;
 }
 
-#szsqbplkfg .gt_font_italic {
+#xtguwrzspl .gt_font_italic {
   font-style: italic;
 }
 
-#szsqbplkfg .gt_super {
+#xtguwrzspl .gt_super {
   font-size: 65%;
 }
 
-#szsqbplkfg .gt_footnote_marks {
+#xtguwrzspl .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="szsqbplkfg" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="xtguwrzspl" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -4041,7 +4042,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-735"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-734"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 8.8: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -4069,7 +4070,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#omoarmrxda .gt_table {
+#grhixuxsvj .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -4094,7 +4095,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-left-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_heading {
+#grhixuxsvj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -4106,7 +4107,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_title {
+#grhixuxsvj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -4116,7 +4117,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-width: 0;
 }
 
-#omoarmrxda .gt_subtitle {
+#grhixuxsvj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -4126,13 +4127,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-width: 0;
 }
 
-#omoarmrxda .gt_bottom_border {
+#grhixuxsvj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_col_headings {
+#grhixuxsvj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4147,7 +4148,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_col_heading {
+#grhixuxsvj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4167,7 +4168,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#omoarmrxda .gt_column_spanner_outer {
+#grhixuxsvj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4179,15 +4180,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 4px;
 }
 
-#omoarmrxda .gt_column_spanner_outer:first-child {
+#grhixuxsvj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#omoarmrxda .gt_column_spanner_outer:last-child {
+#grhixuxsvj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#omoarmrxda .gt_column_spanner {
+#grhixuxsvj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -4199,7 +4200,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   width: 100%;
 }
 
-#omoarmrxda .gt_group_heading {
+#grhixuxsvj .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4221,7 +4222,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#omoarmrxda .gt_empty_group_heading {
+#grhixuxsvj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4236,15 +4237,15 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   vertical-align: middle;
 }
 
-#omoarmrxda .gt_from_md > :first-child {
+#grhixuxsvj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#omoarmrxda .gt_from_md > :last-child {
+#grhixuxsvj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#omoarmrxda .gt_row {
+#grhixuxsvj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4263,7 +4264,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   overflow-x: hidden;
 }
 
-#omoarmrxda .gt_stub {
+#grhixuxsvj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4275,7 +4276,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-left: 12px;
 }
 
-#omoarmrxda .gt_summary_row {
+#grhixuxsvj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4285,7 +4286,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#omoarmrxda .gt_first_summary_row {
+#grhixuxsvj .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4295,7 +4296,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_grand_summary_row {
+#grhixuxsvj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4305,7 +4306,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   padding-right: 5px;
 }
 
-#omoarmrxda .gt_first_grand_summary_row {
+#grhixuxsvj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4315,11 +4316,11 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-top-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_striped {
+#grhixuxsvj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#omoarmrxda .gt_table_body {
+#grhixuxsvj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4328,7 +4329,7 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-bottom-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_footnotes {
+#grhixuxsvj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4342,13 +4343,13 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_footnote {
+#grhixuxsvj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#omoarmrxda .gt_sourcenotes {
+#grhixuxsvj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4362,46 +4363,46 @@ Our best estimate of the age of a randomly selected person is 41.1 years if they
   border-right-color: #D3D3D3;
 }
 
-#omoarmrxda .gt_sourcenote {
+#grhixuxsvj .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#omoarmrxda .gt_left {
+#grhixuxsvj .gt_left {
   text-align: left;
 }
 
-#omoarmrxda .gt_center {
+#grhixuxsvj .gt_center {
   text-align: center;
 }
 
-#omoarmrxda .gt_right {
+#grhixuxsvj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#omoarmrxda .gt_font_normal {
+#grhixuxsvj .gt_font_normal {
   font-weight: normal;
 }
 
-#omoarmrxda .gt_font_bold {
+#grhixuxsvj .gt_font_bold {
   font-weight: bold;
 }
 
-#omoarmrxda .gt_font_italic {
+#grhixuxsvj .gt_font_italic {
   font-style: italic;
 }
 
-#omoarmrxda .gt_super {
+#grhixuxsvj .gt_super {
   font-size: 65%;
 }
 
-#omoarmrxda .gt_footnote_marks {
+#grhixuxsvj .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="omoarmrxda" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="grhixuxsvj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Preceptor Table of att_end ~ treatment</th>
@@ -4578,7 +4579,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hzdtczyssa .gt_table {
+#nlxmbmalkx .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -4603,7 +4604,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_heading {
+#nlxmbmalkx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -4615,7 +4616,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_title {
+#nlxmbmalkx .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -4625,7 +4626,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#hzdtczyssa .gt_subtitle {
+#nlxmbmalkx .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -4635,13 +4636,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#hzdtczyssa .gt_bottom_border {
+#nlxmbmalkx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_col_headings {
+#nlxmbmalkx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4656,7 +4657,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_col_heading {
+#nlxmbmalkx .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4676,7 +4677,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#hzdtczyssa .gt_column_spanner_outer {
+#nlxmbmalkx .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4688,15 +4689,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#hzdtczyssa .gt_column_spanner_outer:first-child {
+#nlxmbmalkx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hzdtczyssa .gt_column_spanner_outer:last-child {
+#nlxmbmalkx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hzdtczyssa .gt_column_spanner {
+#nlxmbmalkx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -4708,7 +4709,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#hzdtczyssa .gt_group_heading {
+#nlxmbmalkx .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4730,7 +4731,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#hzdtczyssa .gt_empty_group_heading {
+#nlxmbmalkx .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4745,15 +4746,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#hzdtczyssa .gt_from_md > :first-child {
+#nlxmbmalkx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hzdtczyssa .gt_from_md > :last-child {
+#nlxmbmalkx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hzdtczyssa .gt_row {
+#nlxmbmalkx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4772,7 +4773,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#hzdtczyssa .gt_stub {
+#nlxmbmalkx .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4784,7 +4785,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#hzdtczyssa .gt_summary_row {
+#nlxmbmalkx .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4794,7 +4795,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#hzdtczyssa .gt_first_summary_row {
+#nlxmbmalkx .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4804,7 +4805,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_grand_summary_row {
+#nlxmbmalkx .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4814,7 +4815,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#hzdtczyssa .gt_first_grand_summary_row {
+#nlxmbmalkx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4824,11 +4825,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_striped {
+#nlxmbmalkx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hzdtczyssa .gt_table_body {
+#nlxmbmalkx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4837,7 +4838,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_footnotes {
+#nlxmbmalkx .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4851,13 +4852,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_footnote {
+#nlxmbmalkx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#hzdtczyssa .gt_sourcenotes {
+#nlxmbmalkx .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4871,46 +4872,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#hzdtczyssa .gt_sourcenote {
+#nlxmbmalkx .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#hzdtczyssa .gt_left {
+#nlxmbmalkx .gt_left {
   text-align: left;
 }
 
-#hzdtczyssa .gt_center {
+#nlxmbmalkx .gt_center {
   text-align: center;
 }
 
-#hzdtczyssa .gt_right {
+#nlxmbmalkx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hzdtczyssa .gt_font_normal {
+#nlxmbmalkx .gt_font_normal {
   font-weight: normal;
 }
 
-#hzdtczyssa .gt_font_bold {
+#nlxmbmalkx .gt_font_bold {
   font-weight: bold;
 }
 
-#hzdtczyssa .gt_font_italic {
+#nlxmbmalkx .gt_font_italic {
   font-style: italic;
 }
 
-#hzdtczyssa .gt_super {
+#nlxmbmalkx .gt_super {
   font-size: 65%;
 }
 
-#hzdtczyssa .gt_footnote_marks {
+#nlxmbmalkx .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="hzdtczyssa" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="nlxmbmalkx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -4967,7 +4968,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#nrgkdlhfmr .gt_table {
+#lzqxyjoorb .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -4992,7 +4993,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_heading {
+#lzqxyjoorb .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -5004,7 +5005,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_title {
+#lzqxyjoorb .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -5014,7 +5015,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#nrgkdlhfmr .gt_subtitle {
+#lzqxyjoorb .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -5024,13 +5025,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#nrgkdlhfmr .gt_bottom_border {
+#lzqxyjoorb .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_col_headings {
+#lzqxyjoorb .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5045,7 +5046,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_col_heading {
+#lzqxyjoorb .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5065,7 +5066,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#nrgkdlhfmr .gt_column_spanner_outer {
+#lzqxyjoorb .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5077,15 +5078,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#nrgkdlhfmr .gt_column_spanner_outer:first-child {
+#lzqxyjoorb .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#nrgkdlhfmr .gt_column_spanner_outer:last-child {
+#lzqxyjoorb .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#nrgkdlhfmr .gt_column_spanner {
+#lzqxyjoorb .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -5097,7 +5098,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#nrgkdlhfmr .gt_group_heading {
+#lzqxyjoorb .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5119,7 +5120,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#nrgkdlhfmr .gt_empty_group_heading {
+#lzqxyjoorb .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5134,15 +5135,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#nrgkdlhfmr .gt_from_md > :first-child {
+#lzqxyjoorb .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#nrgkdlhfmr .gt_from_md > :last-child {
+#lzqxyjoorb .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#nrgkdlhfmr .gt_row {
+#lzqxyjoorb .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5161,7 +5162,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#nrgkdlhfmr .gt_stub {
+#lzqxyjoorb .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5173,7 +5174,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#nrgkdlhfmr .gt_summary_row {
+#lzqxyjoorb .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5183,7 +5184,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#nrgkdlhfmr .gt_first_summary_row {
+#lzqxyjoorb .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5193,7 +5194,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_grand_summary_row {
+#lzqxyjoorb .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5203,7 +5204,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#nrgkdlhfmr .gt_first_grand_summary_row {
+#lzqxyjoorb .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5213,11 +5214,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_striped {
+#lzqxyjoorb .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#nrgkdlhfmr .gt_table_body {
+#lzqxyjoorb .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5226,7 +5227,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_footnotes {
+#lzqxyjoorb .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5240,13 +5241,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_footnote {
+#lzqxyjoorb .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#nrgkdlhfmr .gt_sourcenotes {
+#lzqxyjoorb .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5260,46 +5261,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#nrgkdlhfmr .gt_sourcenote {
+#lzqxyjoorb .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#nrgkdlhfmr .gt_left {
+#lzqxyjoorb .gt_left {
   text-align: left;
 }
 
-#nrgkdlhfmr .gt_center {
+#lzqxyjoorb .gt_center {
   text-align: center;
 }
 
-#nrgkdlhfmr .gt_right {
+#lzqxyjoorb .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#nrgkdlhfmr .gt_font_normal {
+#lzqxyjoorb .gt_font_normal {
   font-weight: normal;
 }
 
-#nrgkdlhfmr .gt_font_bold {
+#lzqxyjoorb .gt_font_bold {
   font-weight: bold;
 }
 
-#nrgkdlhfmr .gt_font_italic {
+#lzqxyjoorb .gt_font_italic {
   font-style: italic;
 }
 
-#nrgkdlhfmr .gt_super {
+#lzqxyjoorb .gt_super {
   font-size: 65%;
 }
 
-#nrgkdlhfmr .gt_footnote_marks {
+#lzqxyjoorb .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="nrgkdlhfmr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="lzqxyjoorb" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
@@ -5363,7 +5364,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#vhzkjfttap .gt_table {
+#wxpzbvdpvn .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -5388,7 +5389,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-left-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_heading {
+#wxpzbvdpvn .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -5400,7 +5401,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_title {
+#wxpzbvdpvn .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -5410,7 +5411,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-width: 0;
 }
 
-#vhzkjfttap .gt_subtitle {
+#wxpzbvdpvn .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -5420,13 +5421,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-width: 0;
 }
 
-#vhzkjfttap .gt_bottom_border {
+#wxpzbvdpvn .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_col_headings {
+#wxpzbvdpvn .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5441,7 +5442,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_col_heading {
+#wxpzbvdpvn .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5461,7 +5462,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#vhzkjfttap .gt_column_spanner_outer {
+#wxpzbvdpvn .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5473,15 +5474,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 4px;
 }
 
-#vhzkjfttap .gt_column_spanner_outer:first-child {
+#wxpzbvdpvn .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#vhzkjfttap .gt_column_spanner_outer:last-child {
+#wxpzbvdpvn .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#vhzkjfttap .gt_column_spanner {
+#wxpzbvdpvn .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -5493,7 +5494,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   width: 100%;
 }
 
-#vhzkjfttap .gt_group_heading {
+#wxpzbvdpvn .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5515,7 +5516,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#vhzkjfttap .gt_empty_group_heading {
+#wxpzbvdpvn .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5530,15 +5531,15 @@ Note that the math for both the predictive model we worked on earlier and this m
   vertical-align: middle;
 }
 
-#vhzkjfttap .gt_from_md > :first-child {
+#wxpzbvdpvn .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#vhzkjfttap .gt_from_md > :last-child {
+#wxpzbvdpvn .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#vhzkjfttap .gt_row {
+#wxpzbvdpvn .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5557,7 +5558,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   overflow-x: hidden;
 }
 
-#vhzkjfttap .gt_stub {
+#wxpzbvdpvn .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5569,7 +5570,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-left: 12px;
 }
 
-#vhzkjfttap .gt_summary_row {
+#wxpzbvdpvn .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5579,7 +5580,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#vhzkjfttap .gt_first_summary_row {
+#wxpzbvdpvn .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5589,7 +5590,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_grand_summary_row {
+#wxpzbvdpvn .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5599,7 +5600,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   padding-right: 5px;
 }
 
-#vhzkjfttap .gt_first_grand_summary_row {
+#wxpzbvdpvn .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5609,11 +5610,11 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-top-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_striped {
+#wxpzbvdpvn .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#vhzkjfttap .gt_table_body {
+#wxpzbvdpvn .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5622,7 +5623,7 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-bottom-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_footnotes {
+#wxpzbvdpvn .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5636,13 +5637,13 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_footnote {
+#wxpzbvdpvn .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#vhzkjfttap .gt_sourcenotes {
+#wxpzbvdpvn .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5656,46 +5657,46 @@ Note that the math for both the predictive model we worked on earlier and this m
   border-right-color: #D3D3D3;
 }
 
-#vhzkjfttap .gt_sourcenote {
+#wxpzbvdpvn .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#vhzkjfttap .gt_left {
+#wxpzbvdpvn .gt_left {
   text-align: left;
 }
 
-#vhzkjfttap .gt_center {
+#wxpzbvdpvn .gt_center {
   text-align: center;
 }
 
-#vhzkjfttap .gt_right {
+#wxpzbvdpvn .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#vhzkjfttap .gt_font_normal {
+#wxpzbvdpvn .gt_font_normal {
   font-weight: normal;
 }
 
-#vhzkjfttap .gt_font_bold {
+#wxpzbvdpvn .gt_font_bold {
   font-weight: bold;
 }
 
-#vhzkjfttap .gt_font_italic {
+#wxpzbvdpvn .gt_font_italic {
   font-style: italic;
 }
 
-#vhzkjfttap .gt_super {
+#wxpzbvdpvn .gt_super {
   font-size: 65%;
 }
 
-#vhzkjfttap .gt_footnote_marks {
+#wxpzbvdpvn .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="vhzkjfttap" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="wxpzbvdpvn" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Ending Attitudes on Immigration of 7 Random Respondents</th>
