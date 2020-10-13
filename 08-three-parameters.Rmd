@@ -218,35 +218,44 @@ fit_obj
 ```
 
 
-"partyDemocrat" corresponds to $\beta_1$, the average age of Democrats in the population. "partyRepublican" corresponds to $\beta_2$, the average age of Republicans in the population. Since we don't really care about the posterior distribution for $\sigma$, we won't discuss it here. Graphically,
+"partyDemocrat" corresponds to $\beta_1$, the average age of Democrats in the population. "partyRepublican" corresponds to $\beta_2$, the average age of Republicans in the population. Since we don't really care about the posterior distribution for $\sigma$, we won't discuss it here. Graphically:
+
+<!-- DK: Lots to clean up about this plot! -->
+
+<!-- DK: Should we use different parameter names like beta_r? -->
 
 ```{r}
-
+fit_obj %>% 
+  as_tibble() %>% 
+  select(-sigma) %>% 
+  pivot_longer(cols = partyDemocrat:partyRepublican,
+              names_to = "parameter",
+              values_to = "age") %>% 
+  ggplot(aes(x = age, color = parameter)) +
+    geom_density() +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Average age for Boston commuters in 2012",
+         x = "Age",
+         y = "Probability") +
+    theme_classic()
 ```
 
+The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican) are still unknown. We can never know the true average age of all Democrats in the population. But we can calculate a posterior probability distribution for the parameters. Comments:
+
+* Democrats seem slightly older than Republicans. That was true in our sample and so, almost (but not quite!) by definition, it will be true in our the posterior probability distributions.
+
+* Our estimate for the average age of Democrats in the population is much more precise than that for Republicans because we have five times as many Democrats as Republicans in our sample. A central lesson from Chapter \@ref(one-paramter) is that, the more data you have related to a parameter, the narrower your posterior distribution will be.
+
+* There is a great deal of overlap between the two distributions. Would we be surprised if, in truth, the average age of Republicans in the population was greater than that for Democrats? Not really. We don't have enough data to be sure either way.
 
 
 
-To continue our discussion of these values, we'll bring back our Preceptor table (the actual one). For your reference, it looked like this:
 
 
-
-Recall that when creating a model, our goal is to replace the question marks in that table. To keep it simple, the table will use now displays only a sample of eight people from the `trains` data set instead of all N commuters. We have also added two more columns to show the prediction and the error term for each person. The first one in the table, Age, is the *actual* outcome variable ($y_i$). The second one, called "fitted value", is our *prediction* of the outcome variable ($\hat{y_i}$). The third one, called "residual", is our error term ($\epsilon_i,\ also\ r_i$). The actual age of each person is the addition of the model prediction and the unmodeled variation ($y_i = \hat{y_i} + r_i$).
-
-```{r, include = FALSE}
-margin_note("There are two notations for the error term, one with epsilon and one with an r. Strictly speaking, the epsilon is only used in connection with the real model. This corresponds to the equation where the betas are based on the (unknown) population values. The r is used in connection with the estimated model, like right now. This can be useful to know, but we will not ask you about it in the exam.")
-
-margin_note("To be precise, this is no longer considered a Preceptor Table by our terminology. A Preceptor Table must account for all of the observations in the real-world population that the model is.")
-```
 
 ```{r, echo = FALSE}
 
-tibble(subject = c("4", "9", "32", "41", "74", "90", "100", "106"),
-       age = c(45, 54, 37, 45, 42, 22, 60, 52),
-       fitted = c(41.1, 41.1, 42.6, 41.1, 42.6, 41.1, 41.1, 42.6),
-       party = c("Democrat", "Democrat", "Republican", "Democrat", "Republican", "Democrat", "Democrat", "Republican")) %>%
-  mutate(noise = round(age - fitted, 1)) %>%
-  select(subject, age, fitted, noise, party) %>% 
+
   gt() %>%
   cols_label(subject = md("**ID**"),
              age = md("**Age**"),
