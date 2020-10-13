@@ -8,78 +8,38 @@ output_yaml: output.yml
 *This chapter is still very much a draft.* Come back in a few weeks for a better version.
 
 
-<!-- CHAPTER OUTLINE
 
 
 
-0) Intro
-
-Write something interesting that relates to what we want to find out in the chapter. Should build up, but be different from C7. Tell people that we will draw lines between what we learned so far.
 
 
-1) EDA for trains
+<!--   2.1) Wisdom -->
 
-[Complete]
-
-
-2) age ~ party
-
-This is a predictive model. Make this clear from the beginning, and tell people that we will look at a causal one afterwards. 
+<!--   This section can be rather short. There are two aspects to be discussed: Whether our data is appropriate for answering our research question and whether there are ethical concerns. Stick to the points outlined by Gelman. Begin by discussing possible problems with the data set on hand, in particular the 'age' and 'party' variables. Also consider how other variables might impact the usefulness of these two. Make sure to address both content-related (does this variables tell us what we're looking for?) and methodological problems (is the assignment mechanism problematic, can the scale lead to problems?). This was already discussed on C3, so have a look at this before doing all this from scratch. -->
 
 
-  2.1) Wisdom
-  
-  This section can be rather short. There are two aspects to be discussed: Whether our data is appropriate for answering our research question and whether there are ethical concerns. Stick to the points outlined by Gelman. Begin by discussing possible problems with the data set on hand, in particular the 'age' and 'party' variables. Also consider how other variables might impact the usefulness of these two. Make sure to address both content-related (does this variables tell us what we're looking for?) and methodological problems (is the assignment mechanism problematic, can the scale lead to problems?). This was already discussed on C3, so have a look at this before doing all this from scratch.
+<!--   2.2) Justice -->
 
-  
-  2.2) Justice
-  
-  This section consists of two parts. First, we need to become aware of the purpose of our our model - in this section, it is about making a prediction. Explain why that is, and how this shows in the Preceptor able. Start with and infinite one, then drop any irrelevant rows and columns to arrive at the ideal Preceptor table. Replace unknown rows with question marks to get the actual table. Again, have a look at C3 before doing this.
-  Second, show the mathematical model. Start by repeating the generic regression equation shown in the math section of C3. Then, write the actual regression equation we will use to create our model in this chapter. Instead of just stopping here like in previous chapters, we will now explain what it actually means. Again, no need to talk about the Bayesian-specific stuff like priors. Start with a scatterplot, then add a regression line. Explain how the stuff in the plot corresponds to the equation. Give some examples.
-  
-  
-  2.3) Courage
-  
-  This section consists of two subparts. First, we need to explain the fitted model. Estimate the model shown before using stan_glm().  Then, create a scatterplot with the estimated regression line. Explain the output by referring to the plot. 
-  Second, explain the unmodeled variation. It is, on average, zero - without this assumption, our model would be useless. Explain why this does not hold for (almost) any individual observation, i.e. what residuals are. Give some examples. Finally, create a histogram each for the distribution of y hat, the two regression coefficients, and the residuals. Arrange them in this very order, and possibly put the regression equation below to show how this relates to the model.
-  
-  
-  2.4) Temperance
-  
-  We have three sections here. First, make some predictions using predict(), posterior_predict(), and posterior linpred. Explain what the output means. 
-  Second, give examples for why the representativeness of our model might not be what it seems. Ideally, we should have already checked at the beginning that our data is appropriate for our purposes. Therefore, this point rather refers to representativeness over time. Give examples of what we can and cannot do.
-  Third, explain why null tests are stupid (why are they?).
-  
-  
+<!--   This section consists of two parts. First, we need to become aware of the purpose of our our model - in this section, it is about making a prediction. Explain why that is, and how this shows in the Preceptor able. Start with and infinite one, then drop any irrelevant rows and columns to arrive at the ideal Preceptor table. Replace unknown rows with question marks to get the actual table. Again, have a look at C3 before doing this. -->
+<!--   Second, show the mathematical model. Start by repeating the generic regression equation shown in the math section of C3. Then, write the actual regression equation we will use to create our model in this chapter. Instead of just stopping here like in previous chapters, we will now explain what it actually means. Again, no need to talk about the Bayesian-specific stuff like priors. Start with a scatterplot, then add a regression line. Explain how the stuff in the plot corresponds to the equation. Give some examples. -->
 
-3) att_end ~ treatment
 
-Simply repeat the stuff from above, this time using a causal model. Keep it as simple as possible, there is no need to explain every concept in detail again.
- 
- 
-  3.1) Wisdom
-  
-  
-  3.2) Justice
-  
-  
-  3.3) Courage
-  
-  
-  3.4) Temperance
-  
+<!--   2.3) Courage -->
 
--->
+<!--   This section consists of two subparts. First, we need to explain the fitted model. Estimate the model shown before using stan_glm().  Then, create a scatterplot with the estimated regression line. Explain the output by referring to the plot.  -->
+<!--   Second, explain the unmodeled variation. It is, on average, zero - without this assumption, our model would be useless. Explain why this does not hold for (almost) any individual observation, i.e. what residuals are. Give some examples. Finally, create a histogram each for the distribution of y hat, the two regression coefficients, and the residuals. Arrange them in this very order, and possibly put the regression equation below to show how this relates to the model. -->
+
+
+<!--   2.4) Temperance -->
+
+<!--   We have three sections here. First, make some predictions using predict(), posterior_predict(), and posterior linpred. Explain what the output means.  -->
+<!--   Third, explain why null tests are stupid (why are they?). -->
 
 
 
-<!-- THINGS TO CONSIDER
 
-Don’t use or mention lm(), only use stan_glm(). Also, don’t mention prior distributions/likelihood functions, since technical details are not really important in practice. This will be left to Gov 51. As a result, we will not adjust the prior arguments within stan_glm(), i.e. all our models are based on the (weak) default prior.
 
-Create some memes. Any way to add Batman to Justice section?
 
--->
 
 Models have parameters. In Chapter \@ref(one-parameter) we created models with a single parameter $p$, the proportion of red beads in an urn. In Chapter \@ref(two-parameters) , we used models with two parameters: $\mu$ (the average height in the population, generically known as a model "intercept") and $\sigma$ (the variation in height in the population). Here --- can you guess where this is going? --- we will build models with three parameters: $\sigma$ (which serves the same role throughout the book) and two intercepts: $\beta_1$ and $\beta_2$. All this notation is confusing, not least because different academic fields use inconsistent schemes. The key is to just follow the cardinal virtues and tackle your problem step by step.
 
@@ -168,9 +128,8 @@ On a boxplot, the top and bottom borders of the box denotes the 75th and 25th pe
 
 ## `age` as a function of `party`
 
-<!-- DK: Add a third question with a posterior distribution as the answer. -->
 
-We want to build a predictive model and then use that model to draw conclusions about the world. What are the odds that, if a Democrat shows up at the train station, he will be over 50 years old? In a group of three Democrats and three Republicans, what age difference should we expect the oldest Democrat and the youngest Republican? We can answer these and similar questions by creating a model that uses party affiliation to predict someone's age, again following our four key themes.
+We want to build a model and then use that model to draw conclusions about the world. What is the probability that, if a Democrat shows up at the train station, he will be over 50 years old? In a group of three Democrats and three Republicans, what age difference should we expect betweeb the oldest Democrat and the youngest Republican? We can answer these and similar questions by creating a model that uses party affiliation to predict age
 
 ### Wisdom
 
@@ -178,32 +137,10 @@ We want to build a predictive model and then use that model to draw conclusions 
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-Before we write any line of code, the first thing we should do is make it clear that our approach is correct. As already seen in other chapters, there are two aspects to clarify. First, is the data suitable to answer our question? And second, is our parameter appropriate?
+In data science, there are two main aspects to Wisdom: representativeness and ethics. The data that we have are very limited. There are only 115 observations, all from 2012 and involving train commuters to Boston. How useful will this data be today, or for other populations around Boston, or for other cities in the US? Only your judgment, along with advice from your colleagues, can guide you.
 
-First, let's clarify what we want to know. The goal is to find out what age we can expect to find among people of a certain party affiliation. Let's assume we don't want to limit ourselves to people in a certain place, but we are interested in an estimate for the whole US. As far as party affiliation is concerned, we will probably only want to consider Democrats or Republicans. Returning to the first point, is our data suitable to answer our question? `trains` includes a variable `age` which indicates the age of a person in years, and a variable `party` with values 'Democrat' or 'Republican' which shows their party affiliation. In terms of content this seems to be exactly what we are looking for. Methodologically, however, there could be problems. The data from this study only come from Boston, so the question arises whether we can really draw conclusions for the whole country. In 2018, the median age was 38.8 years in the US, but 39.4 years in Massachusetts. Although the difference is small, we do not know whether this also applies to Democrats and Republicans separately. Another problem could arise from the fact that Massachusetts (and Boston as an urban area) is very Democratic. As noted earlier, the party affiliates in 'trains' are indeed very unequally distributed:
+The ethical issues are, fortunately, not fraught. Estimating someone's age is (universally?) viewed as OK. Estimating someone's health or income or criminal record are far dicier. 
 
-```{r}
-trains %>% 
-  count(party)
-```
-
-With 96 Democrats we could already determine an acceptable estimate of the median age. The sample of 19 Republicans is very small in comparison, and hence more prone to errors. Perhaps Enos happened to catch some Republicans in his study who are significantly younger than the rest? If so, our estimate may not even be representative of Massachusetts. 
-
-Overall, there seem to be potential sources of error in our data, but that doesn't necessarily mean that our estimates will be useless in answering our question. In fact, we will rarely have perfect data sets in which all eventualities have been considered. Our job as data scientists is to apply wisdom to recognize the strengths and weaknesses of our data.
-
-What about the second aspect, the parameter? Before we discuss whether it can answer our question, it is worth thinking again about what a parameter actually is. First of all, remember that an parameter is the size we are looking for. We want to determine the body heights of two different groups, so in our model we are looking for two parameters:
-
-```{r, include = FALSE}
-
-margin_note("You have probably noticed that this chapter covers models with 3 and not 2 parameters. The third parameter, sigma, is usually rather uninteresting and is calculated anyway by R as by-product when we estimate models. For this reason we will concentrate only on the two parameters on the left. However, always keep in mind throughout this chapter that strictly speaking our model also includes sigma as the third parameter.")
-
-```
-
-$$Parameter_{1} = AgeReps$$
-$$Parameter_{2} = AgeDems$$
-Now that we know about the parameter we want to find, are they suitable to answer our question? The two parameters give us exactly what we want to know, namely the body sizes for members of both parties - so yes. However, they are based on our data set, so there are the same possible sources of error as before. For example, if Enos surveyed too many young Republicans, then parameter 1 would be too low. But again, small inaccuracies are usually not a problem as long as we apply Wisdom and become aware of them.
-
-<br/><br/>
 
 ### Justice
 
@@ -211,264 +148,47 @@ Now that we know about the parameter we want to find, are they suitable to answe
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-We have made sure that the data and the parameters are suitable to answer our question. These are the building blocks of our model, and the next step is to investigate whether the model itself is adequate. This involves deciding between prediction and causality, and defining the formal mathematical model.
+Justice, in data science, consists of three topics: predictive versus causal modeling, the Preceptor Table and a mathematical formulation of the model. 
 
 
-#### Prediction vs Causality
+Any model with age as its dependent variable will be predictive, not causal, for the simple reason that nothing, other than time, can change our age. You are X years old. It would not matter if you changed your party registration from Democrat to Republican or vice versa. Your age is your age.
 
-Are we modeling for prediction or causality? Recall that in a predictive model we are only interested in getting an estimate of Y for any X. The focus is on predicting things - how exactly this happens is not so important to us. If you have headaches and are thinking about taking aspirin, you would probably be interested in a predictive model. You are not really interested in the relationship between an aspirin dose and headaches, but rather how strong your headache is once you take it. *Predictive models care nothing about causality.*
+In terms of the Preceptor Table, this fact means that there is only one potential outcome, i.e., one outcome. There is not a potential outcome if you are Democrat and a different potential outcome if you are a Republican.
 
-A causal model, on the other hand, is primarily concerned with the relationship between X and Y themselves. Suppose you work for Pfizer and have discovered a new headache drug that could make billions if approved. However, this requires many studies to get a reliable estimate of which dosage has which effect on humans. Here we are interested in a model for causality, because we (primarily) want to know the effect of the drug. We are less interested in the extent of headache that a random person has after taking the drug. *Causal models often also deal with prediction, even if only as a means of measuring the quality of the model.* 
+When dealing with a non-causal model, the focus is on predicting things. The underlying mechanism which connects age with party is less important than the brute statistical fact that there is a connection.  *Predictive models care little about causality.*
 
-Returning to our model of Democrats' and Republicans' age, it is quite clear that we have a predictive model. What we want is an estimate of the age of a random person whose party affiliation we know. It doesn't make much sense to think about the causal relationship between party affiliation and height, for example, "If Joe were a Republican, he would be 4 years younger". Someone's age is the same regardless of their party affiliation. The whole thing becomes clearer if we present our model in a Preceptor Table. 
-
-Let's start with the **infinite** Preceptor Table, which is the actual representation of our data in the real world. For N commuters this could generally look something like this:
-
-```{r, echo = FALSE}
-
-tibble(subject = c("1 now", "1 in a month", "1 in two months", 
-                   "...", 
-                   "115 now", "115 in a month", "115 in two months", 
-                   "...", 
-                   "517 now", "517 in a month", "517 in two months", 
-                   "...", 
-                   "N in two months"),
-       age = c("34", "34", "34", 
-               "...", 
-               "27", "27", "27", 
-               "...", 
-               "46", "46", "46", 
-               "...",
-               "N's age"),
-       party = c("Democrat", "Democrat", "Democrat", 
-                 "...", 
-                 "Republican", "Republican", "Republican", 
-                 "...", 
-                 "Democrat", "Democrat", "Democrat", 
-                 "...", 
-                 "N's party")) %>%
-  gt() %>%
-  cols_label(subject = md("**ID**"),
-             age = md("**Age**"),
-             party = md("**Party**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header("Preceptor Table of age ~ party") %>%
-  fmt_markdown(columns = TRUE)
-
-```
-
-Remember that this is also a simplification. Since time is continuous, we would actually have to create a new row for every fraction of a second. With so many lines it is not so easy to work with, so we should remove a few. But which ones? If we are not exactly historians, we will probably create a predictive model with the purpose of making statements about the near future (i.e., November 2020). Our **ideal** Preceptor Table would then look like this
-
-```{r, echo = FALSE}
-
-tibble(subject = c("1 in 11/2020", 
-                   "...", 
-                   "115 in 11/2020", 
-                   "...", 
-                   "517 in 11/2020", 
-                   "...",
-                   "N in 11/2020"),
-       age = c("34", 
-               "...",
-               "27", 
-               "...", 
-               "46", 
-               "...",
-               "N's age"),
-       party = c("Democrat", 
-                 "...", 
-                 "Republican", 
-                 "...", 
-                 "Democrat", 
-                 "...",
-                 "N's party")) %>%
-  gt() %>%
-  cols_label(subject = md("**ID**"),
-             age = md("**Age**"),
-             party = md("**Party**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header("Preceptor Table of age ~ party") %>%
-  fmt_markdown(columns = TRUE)
-
-```
-
-Of course, our **actual** Preceptor Table has a lot of question marks, because in reality we have much less information. However, this one will look a bit like the one we have seen so far. What's the same as in the previous chapters is that we only have data for a small group of people - in our case 115 people interviewed by Enos. Another problem is that Enos' paper is from March 2014, which is why we have no data at all for 2020. So, we only have data for 03/2014, and only for a sample of 115 people:
-
-```{r, echo = FALSE}
-
-tibble(subject = c("1 in 03/2014",
-                   "1 in 11/2020", 
-                   "...", 
-                   "115 in 03/2014",
-                   "115 in 11/2020", 
-                   "...", 
-                   "517 in 03/2014",
-                   "517 in 11/2020", 
-                   "...",
-                   "N in 03/2014",
-                   "N in 11/2020"),
-       age = c("28", 
-               "?",
-               "...",
-               "32", 
-               "?",
-               "...", 
-               "?", 
-               "?",
-               "...",
-               "?",
-               "?"),
-       party = c("Democrat", 
-                 "?",
-                 "...", 
-                 "Republican", 
-                 "?",
-                 "...", 
-                 "?", 
-                 "?",
-                 "...",
-                 "?", 
-                 "?")) %>%
-  gt() %>%
-  cols_label(subject = md("**ID**"),
-             age = md("**Age**"),
-             party = md("**Party**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header("Preceptor Table of age ~ party") %>%
-  fmt_markdown(columns = TRUE)
-
-```
-
-Notice two things about this table. First, we always have question marks at the lines 2020 to always, even if we know the age in 2014. Since we do not know the birthday of these people, we don't know whether the age difference is 5 or 6 years. Second, this table works just like the ones we have already seen. For example, we know the age and party of person 1 in 2014, but not in 2020 - that's not much different than if we had two different people, but we lack data for one of them. Our approach will therefore be the same, i.e., obtaining estimates to replace the question marks.
-
-Before we proceed, there is one more thing to clarify. You may have noticed that this table is different from the one in chapter 3. Back then we had two columns for each observation, one with a number and one with a question mark. Now we have either two question marks or none at all. Also, in chapter three there was a column for the parameter, and now there is none. The explanation for this is quite simple, and it has to do with the fact that we now have a predictive and not a causal model. Look at the following (**wrong**) table, which is simply a different representation from the one above:
-
-```{r, echo = FALSE}
-
-tibble(subject = c("1 in 03/2014",
-                   "1 in 11/2020", 
-                   "...", 
-                   "115 in 03/2014",
-                   "115 in 11/2020", 
-                   "...", 
-                   "517 in 03/2014",
-                   "517 in 11/2020", 
-                   "...",
-                   "N in 03/2014",
-                   "N in 11/2020"),
-       age_dem = c("28", 
-               "?",
-               "...",
-               "?", 
-               "?",
-               "...", 
-               "?", 
-               "?",
-               "...",
-               "?",
-               "?"),
-       age_rep = c("?", 
-                 "?",
-                 "...", 
-                 "32", 
-                 "?",
-                 "...", 
-                 "?", 
-                 "?",
-                 "...",
-                 "?", 
-                 "?")) %>%
-  gt() %>%
-  cols_label(subject = md("**ID**"),
-             age_dem = md("**Age_Dem**"),
-             age_rep = md("**Age_Rep**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header("Preceptor Table of age ~ party") %>%
-  fmt_markdown(columns = TRUE)
-
-```
-
-
-This table has the same content as the previous one, but it does not make much sense. Unlike before, we now have two outcome variables, the age if the person is a Democrat and if they are Republican. But as explained earlier, a person does not suddenly get a few years younger or older by voting for another party. We have left the column for the parameter, but it should be clear that this wouldn't make sense either. The point is that these tables are only suitable for causal models as we have seen in chapter 3 and will see again later in this chapter.
-
-Preceptor tables for predictive models like age vs party look like the one we have seen before. In this case there is only **one column for the outcome variable**, and therefore **no column for the parameter**. A column for the parameter would imply that there is a causal effect for each individual person, which is not the case. We can still calculate an parameter here, as we did in chapter 3, but we do not put it in the table for every person. This difference will become clearer in later in this chapter when we estimate the model in R. 
-
+<!-- DK: Really need a Preceptor Table! -->
 
 #### The mathematical model
 
-We now know that we are working with a predictive model, and that the associated Preceptor Table looks slightly different from causal models. Fortunately, the mathematical model looks the same in both cases. Remember chapter 3 where we saw that each outcome is described by 2 parts:
+We now know that we are working with a predictive model. Recall:
 
-$$outcome = in\ the\ model + not\ in\ the\ model$$
+$$outcome = model + not\ in\ the\ model$$
 
-In words, any event depends on our explicitly described model as well as on influences unknown to us.Everything that happens in the world is the result of various factors, and we can only ever consider a part of them in our model (because we do not know about some influences, or because we have no data about them).  The fact that you are reading this chapter today depends not only on your motivation, but also on how much you have to do in other courses, whether you are sick, whether your Internet connection is good enough to access PPBDS, ...
+In words, any event depends on our explicitly described model as well as on influences unknown to us. Everything that happens in the world is the result of various factors, and we can only ever consider a part of them in our model (because we do not know about some influences, or because we have no data about them).  
 
 So far we have only treated the equation above conceptually, but in fact it works just like any other equation. Let's be a bit more concrete. Our model would formally look like this:
 
-```{r, include = FALSE}
+<!-- DK: Should standardize the notation across the book. -->
 
-margin_note("This equation is called population equation. It describes the real world because it is based on all possible values in the data (the \"population\"). In our case this would mean that the age of all Democrats and Republicans in the US is taken into account. However, since we cannot survey all people in the country, the exact values of the population equation are always unknown to us.")
-
-```
-
-$$ \underbrace{y_i}_{outcome} = \underbrace{\beta_1 x_{r,i} + \beta_2 x_{d,i}}_{in\ the\ model} + \underbrace{\epsilon_i}_{not\ in\ the\ model}$$
+$$ \underbrace{y_i}_{outcome} = \underbrace{\beta_1 x_{r,i} + \beta_2 x_{d,i}}_{model} + \underbrace{\epsilon_i}_{not\ in\ the\ model}$$
 
 where \n
-$$x_{r}, x_{d} \in \{0,1\}$$ \n
+$$x_{r,i}, x_{d,i} \in \{0,1\}$$ \n
+$$x_{r,i} +  x_{d,i} = 1$$ \n
 $$\epsilon_i \sim N(0, \sigma^2)$$   
 
 Don't panic dear poets and philosophers, the whole thing is easier than it looks at first sight. 
 
 * On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is the age in years of a person. 
 
-* On the right-hand side we first have the part contained in the model, consisting of two similar looking terms. The two terms stand for Republicans and Democrats and work as follows. Each term consists of a beta and an x. The betas are our two parameters; $\beta_1$ is the age if someone is a Republican and $\beta_2$ is the age if someone is a Democrat. The x's are our explanatory variables and take the values 1 or 0, whichever is applicable. If someone is a Republican we have $x_{ir} = 1$ and $x_{id} = 0$, if someone is a Democrat we have $x_{ir} = 0$ and $x_{id} = 1$. In other words, the x's are binary variables and are mutually exclusive (if you are a Democrat, you cannot also be a Republican).
+* On the right-hand side we first have the part contained in the model, consisting of two similar looking terms. The two terms stand for Republicans and Democrats and work as follows. Each term consists of a parameter and a data point. The betas are our two parameters; $\beta_1$ is the average age of Republicans in the population and $\beta_2$ is the average age of  Democrats in the population. The x's are our explanatory variables and take the values 1 or 0. If someone is a Republican we have $x_{r,i} = 1$ and $x_{d,i} = 0$, if someone is a Democrat we have $x_{r,i} = 0$ and $x_{d,i} = 1$. In other words, the x's are binary variables and are mutually exclusive (if you are a Democrat, you cannot also be a Republican).
 
-* The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's age but are not explained by party affiliation. We assume that this error follows a normal distribution with an expected value of 0, i.e., it is 0 on average.
+* The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's age but are not explained by party affiliation. We assume that this error follows a normal distribution with an expected value of 0, i.e., it is 0 on average.
 
 * The small i's are an index to number observations in our data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person i is explained by the modeled and non-modelled factors for person i. The betas are numbered with 1, 2, 3, etc. The corresponding x's have an "r" or "d" subscript instead, for Republicans or Democrats.
 
-Note that this equation represents the population values, meaning all people in the US. But since we cannot ask all people in the country about their political views and age, the *true* values of $\beta_1$ and $\beta_2$ will always be unknown. For this reason we build models that give us *estimates* for the parameters based on *samples*. And because we do not know the size of the error term, it is not included in the equation (we assume it is zero). The equation we will actually use therefore looks like this:
 
-```{r, include = FALSE}
-margin_note("This equation is called the sample equation. It is based only on a sample and we use it to get an estimate for the values of the population equation. We use \"hats\" to indicate that these are estimates rather than actual values.")
-
-```
-
-$$ \hat{y_i} = \hat\beta_1 x_{r,i} + \hat\beta_2 x_{d,i}$$
-where \n
-$$x_{r}, x_{d} \in \{0,1\}$$
-All these new concepts can be quite confusing, especially what the difference between the sample equation and the population equation is. The best way to understand this is to look at an example. Imagine we have made an estimate in R with the 115 commuters in the 'trains' data set, and obtained the following estimates:
-
-$$\hat\beta_1 = 38.9$$ \n
-$$\hat\beta_2 = 41.2$$
-
-In other words, our best estimate for the age of a random person is 38.9 years if they are a Republican and 41.2 years if they are a Democrat. If we put this into our sample equation for $\hat\beta_1$ and $\hat\beta_2$, it looks like this:
-
-$$ \hat{y_i} = 38.9 x_{ir} + 41.2 x_{id}$$
-This can now be used to make predictions about the age of people. Suppose we are walking around in Boston and meet Pete, a Democrat, and Arnold, a Republican. We get an estimate of their age by using the corresponding values for x. Pete is a Democrat, so we set the variable $x_{ir} = 0$ and $x_{id} = 1$ to get the following estimate for his age:
-
-$$ \hat{y}_{pete} = 38.9*0 + 41.2*1$$
-$$ \hat{y}_{pete} = 41.2\ years$$
-We do the same for Arnold, but here we set the variable for Republicans to 1:
-
-
-$$ \hat{y}_{arnold} = 38.9*1 + 41.2*0$$
-$$ \hat{y}_{arnold} = 38.9\ years$$
-Great, we just produced two estimates! Simple, right? The only thing we need to know is how to get the betas. That's what we'll look at in the next section. But before we do that, let's have a quick look at the connection between the the two equations seen above. Suppose that Pete and Arnold tell us their real ages, 38 and 73, respectively. Obviously we were a bit off with our estimates. This difference between our estimates and the real data, $\epsilon_i$, is the unexplained part we did not take into account in our model:\
-
-$$ y_{pete} = \underbrace{38}_{outcome} = \underbrace{41.2}_{in\ the\ model} - \underbrace{3.2}_{not\ in\ the\ model}$$
-$$ y_{arnold} = \underbrace{73}_{outcome} = \underbrace{38.9}_{in\ the\ model} + \underbrace{34.1}_{not\ in\ the\ model}$$
-
-Almost always when we apply our model to real data, we will at least be a little off. Given that it is unlikely that anyone is *exactly* 41.2 years old, this is not very surprising. But this does not mean that our estimate is useless. As long as our sample is representative of the population, our error will be 0 on average (i.e., we will underestimate ourselves by about as many years as we overestimate ourselves).
-
-<br/><br/>
 
 ### Courage
 
@@ -476,18 +196,19 @@ Almost always when we apply our model to real data, we will at least be a little
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
-Phew, so much dry theory! Don't worry, we are now ready to bring model in R to life. We will need courage to translate the two parts from above into code: The fitted model ("in the model"), and unmodeled variation ("not in the model").
+Courage allows us to translate model to code.
+
 
 
 #### The fitted model
 
-To get estimates for our two parameters, we will again use the `stan_glm()` function from chapter 7. If we take a look at the formula, we can see that it is similar to the equation from before. 
+To get posterior distributions for our three parameters, we will again use the `stan_glm()` function from Chapter \@ref(two-parameters). If we take a look at the formula, we can see that it is similar to the equation from before. 
 
 * The variable before the tilde, `age`, is our outcome. 
-* The tilde is equivalent to “=“. 
-* The only explanatory variable is 'party'. This variable has only two values, 'Democrat' and 'Republican', and R automatically creates an estimate for each of the two groups. We therefore end up with two explanatory variables as seen in the equation.
 
-We have also added "- 1" at the end of the equation, telling R that we do not want an intercept (this is otherwise added by default). We will deal both intercepts and slope parameters in chapter 9, but for now don't worry about this. Running this code in R, we get the following output:
+* The only explanatory variable is `party`. This variable has only two values, 'Democrat' and 'Republican'. 
+
+* We have also added `- 1` at the end of the equation, indicating that we do not want an intercept, which is otherwise added by default. Running this code in R, we get the following output:
 
 ```{r}
 fit_obj <- stan_glm(age ~ party - 1, data = trains, refresh = 0)
@@ -495,72 +216,19 @@ fit_obj <- stan_glm(age ~ party - 1, data = trains, refresh = 0)
 fit_obj
 ```
 
-Compared to chapter 7 we now have two estimates, "partyDemocrat" and "partyRepublican" instead of one. Our two parameters are therefore:
 
-```{r, include = FALSE}
-margin_note("Note that beta hat does not necessarily mean that we have performed an estimate with stan_glm. This notation simply describes an estimated parameter, independent of the estimation method. Although we only use stan_glm in this course, there are in fact several other ways to create estimates. Some of these may lead to slightly different results, but are also denoted by beta hat.")
+"partyDemocrat" corresponds to $\beta_1$, the average age of Democrats in the population. "partyRepublican" corresponds to $\beta_2$, the average age of Republicans in the population. Since we don't really care about the posterior distribution for $\sigma$, we won't discuss it here. Graphically,
+
+```{r}
 
 ```
 
-$$\hat\beta_{1} = 41.1$$ \n
-$$\hat\beta_{2} = 42.6$$
-Our best estimate of the age of a randomly selected person is 41.1 years if they are a Republican and 42.6 years if they are a Democrat. In addition, we get the information from R that the standard deviations for both are $\pm$ 1.3 years and $\pm$ 2.9 years, respectively. Notice how the smaller sample size leads to more uncertainty in the estimate for Republicans. Again inserting it into the equation we used in the previous section, we get:
-
-$$ \hat{y_i} = 42.6 x_{r,i} + 41.1 x_{d,i}$$
-
-Like before, this fitted model allows us to find the predicted outcome, or *fitted value*, for specific individuals. But as we have seen, this only explains part of the actual outcomes. The other part, the error term, represents unmodeled variation and gives us an indication of how accurate our predictions will be.
 
 
-#### Unmodeled variation
 
 To continue our discussion of these values, we'll bring back our Preceptor table (the actual one). For your reference, it looked like this:
 
-```{r, echo = FALSE}
 
-tibble(subject = c("1 in 03/2014",
-                   "1 in 11/2020", 
-                   "...", 
-                   "115 in 03/2014",
-                   "115 in 11/2020", 
-                   "...", 
-                   "517 in 03/2014",
-                   "517 in 11/2020", 
-                   "...",
-                   "N in 03/2014",
-                   "N in 11/2020"),
-       age = c("28", 
-               "?",
-               "...",
-               "32", 
-               "?",
-               "...", 
-               "?", 
-               "?",
-               "...",
-               "?",
-               "?"),
-       party = c("Democrat", 
-                 "?",
-                 "...", 
-                 "Republican", 
-                 "?",
-                 "...", 
-                 "?", 
-                 "?",
-                 "...",
-                 "?", 
-                 "?")) %>%
-  gt() %>%
-  cols_label(subject = md("**ID**"),
-             age = md("**Age**"),
-             party = md("**Party**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header("Preceptor Table of age ~ party") %>%
-  fmt_markdown(columns = TRUE)
-
-```
 
 Recall that when creating a model, our goal is to replace the question marks in that table. To keep it simple, the table will use now displays only a sample of eight people from the `trains` data set instead of all N commuters. We have also added two more columns to show the prediction and the error term for each person. The first one in the table, Age, is the *actual* outcome variable ($y_i$). The second one, called "fitted value", is our *prediction* of the outcome variable ($\hat{y_i}$). The third one, called "residual", is our error term ($\epsilon_i,\ also\ r_i$). The actual age of each person is the addition of the model prediction and the unmodeled variation ($y_i = \hat{y_i} + r_i$).
 
@@ -760,6 +428,12 @@ act_reps + pred_reps + res_reps + plot_annotation("Results for Republicans")
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Temperance"}
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
+
+Recall the two questions with which we began this section:
+
+* What is the probability that, if a Democrat shows up at the train station, he will be over 50 years old? 
+
+* In a group of three Democrats and three Republicans, what age difference should we expect betweeb the oldest Democrat and the youngest Republican?
 
 So far we have only tried our model on people from our data set whose real age we already knew. This is helpful to understand the model, but our ultimate goal is to understand more about the real world, about people we don't yet know much about. Temperance guides us to make meaningful predictions and to become aware of their (unknown) limitations.
 
