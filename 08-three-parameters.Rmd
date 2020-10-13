@@ -130,7 +130,7 @@ On a boxplot, the top and bottom borders of the box denotes the 75th and 25th pe
 ## `age` as a function of `party`
 
 
-We want to build a model and then use that model to draw conclusions about the world. What is the probability that, if a Democrat shows up at the train station, he will be over 50 years old? In a group of three Democrats and three Republicans, what age difference should we expect betweeb the oldest Democrat and the youngest Republican? We can answer these and similar questions by creating a model that uses party affiliation to predict age
+We want to build a model and then use that model to draw conclusions about the world. What is the probability that, if a Democrat shows up at the train station, he will be over 50 years old? In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican? We can answer these and similar questions by creating a model that uses party affiliation to predict age
 
 ### Wisdom
 
@@ -248,31 +248,32 @@ The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican)
 
 * There is a great deal of overlap between the two distributions. Would we be surprised if, in truth, the average age of Republicans in the population was greater than that for Democrats? Not really. We don't have enough data to be sure either way.
 
-
-
-
+* The phrase "in the population" is doing a great deal of work because we have not what, precisely, we mean by the population. Is it the set of people on those commuter platforms on those days in 2012 when the experiment was done? Is it the set of people on all platforms, including ones never visited? Is it the set of all Boston commuter? All Massachusetts residents? All US residents? Does it include people today, or can we only draw inferences for 2012? We will explore these questions in every model we create.
 
 
 ```{r, echo = FALSE}
-
-
+trains %>% 
+  select(age, party) %>% 
+  mutate(fitted = fitted(fit_obj)) %>% 
+  mutate(residual = residuals(fit_obj)) %>% 
+  slice(1:8) %>% 
   gt() %>%
-  cols_label(subject = md("**ID**"),
-             age = md("**Age**"),
+  cols_label(age = md("**Age**"),
+             party = md("**Party**"),
              fitted = md("**Fitted**"),
-             noise = md("**Residual**"),
-             party = md("**Party**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
+             residual = md("**Residual**")) %>%
+  fmt_number(columns = vars(fitted), decimals = 2) %>% 
   tab_header("8 Observations from Trains Dataset") %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  fmt_markdown(columns = TRUE)
+  cols_align(align = "center", columns = TRUE) 
+
 
 ```
 
-The fitted values are the same for all Republicans and for all Democrats, as the fitted value is one of the two estimates output by our model. However, almost all of the residuals are different due to each observation's own variation from the fitted value estimate. The only observations with the same residual are 4 and 41. This is because they are both Democrats that are the same age: with the same $y_i$ and $\hat{y_i}$, the calculation of their residuals is identical. This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual who walks in the room even using our model. 
+The fitted values are the same for all Republicans and for all Democrats, as the fitted value is one of the two estimates output by our model. However, almost all of the residuals are different due to each observation's own variation from the fitted value estimate.  This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual who walks in the room even using our model. 
 
 We can get a better picture of the unmodeled variation in our sample if we plot these three values for all individuals in our data set. The following three histograms show the actual outcomes, fitted values and residuals of all people in `trains`:
+
+<!-- DK: Clean up these plots to be similar across chapters! -->
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
 
@@ -322,116 +323,10 @@ act_both + pred_both + res_both +
 
 ```
 
-The three plots are structured like our equation and table above, i.e. a value in the left plot is the addition of one value in the middle and one in the right plot. The actual age distribution looks like a normal distribution, centered around 43 and with a standard deviation of about 12 years (the distribution could be random, but the exact reasons are not important here). The plot for the fitted values shows only two adjacent spikes, which represent the estimates for Democrats and Republicans. Since the residuals represent the difference between the two plots, their distribution looks like a mirror image of the first plot around the value 43. Indeed, our model seems to be quite inaccurate.
+The three plots are structured like our equation and table above, i.e. a value in the left plot is the addition of one value in the middle and one in the right plot. The actual age distribution looks like a normal distribution, centered around 43 and with a standard deviation of about 12 years. The plot for the fitted values shows only two adjacent spikes, which represent the estimates for Democrats and Republicans. Since the residuals represent the difference between the two plots, their distribution looks like the first plot. 
 
-We already learned about another method to reveal the distribution of the residuals. When we estimate a model with stan_glm() we automatically get the standard deviation of the residuals, or *sigma*. Recall that sigma is the third parameter of our model, but we have ignored it so far since it was not useful for any of the analysis above. A look at the output from before shows a sigma of 12.3, indicating that the actual age within $\pm$ is 12.3 years around our predicted value for about 68% of the people in `trains`, and $\pm$ 2*12.3 = 24.6 years around our prediction for about 95% of the people.
+<!-- DK: All unclear and would benefit from clean up. -->
 
-The main reason and the solution for this strong deviation can be seen by looking at the histograms again. A bar on the left is always the result of the bars in the middle and right. The better our prediction is, i.e. the more the fitted values match the real ones, the more the middle histogram looks like the one on the left. Only the part that does not coincide is "moved" to the right plot. Apparently we need more bars in the middle, that is, we need a model that can predict more than just two values. We can achieve this by adding more (meaningful) variables to our model. An example would be a variable that shows whether the person has ever used Windows 95; if so, we would probably add a few more years to our estimate. But don't worry about that now, we will learn in the next chapter how to create models with more variables.
-
-<!-- Are separate plots for Democrats and Republicans useful?
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-
-trains_dems <- trains %>% 
-                select(party, age) %>% 
-                filter(party == "Democrat") %>% 
-                mutate("fitted" = 41.1,
-                     "residual" = age - fitted)
-
-
-
-# Actual outcomes (Dems)
-
-act_dems <- ggplot(trains_dems, aes(x = age)) +
-  geom_histogram(color = "white", fill = "dodgerblue2", binwidth = 2, boundary = 20) +
-  scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 10), breaks = c(2, 4, 6, 8, 10)) +
-  labs(
-    x = "Age",
-    y = "Count") +
-  theme_linedraw()
-
-
-# Predicted outcomes (Dems)
-
-pred_dems <- ggplot(trains_dems, aes(x = fitted)) +
-  geom_histogram(color = "white", fill = "dodgerblue2", binwidth = 1.5) +
-  scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
-  labs(
-    x = "Predicted Age",
-    y = "") +
-  theme_linedraw()
-
-
-# Residuals (Dems)
-
-res_dems <- ggplot(trains_dems, aes(x = residual)) +
-  geom_histogram(color = "white", fill = "dodgerblue2", binwidth = 2) +
-  xlim(-30, 30) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 10), breaks = c(2, 4, 6, 8, 10)) +
-  labs(
-    x = "Residuals",
-    y = "") +
-  theme_linedraw()
-
-act_dems + pred_dems + res_dems + plot_annotation("Results for Democrats")
-
-```
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE,}
-
-trains_reps <- trains %>% 
-                select(party, age) %>% 
-                filter(party == "Republican") %>% 
-                mutate("fitted" = 42.6,
-                     "residual" = age - fitted)
-
-
-
-# Actual outcomes (Reps)
-
-act_reps <- ggplot(trains_reps, aes(x = age)) +
-  geom_histogram(color = "white", fill = "red2", binwidth = 2, boundary = 20) +
-  scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 10), breaks = c(2, 4, 6, 8, 10)) +
-  labs(
-    x = "Age",
-    y = "Count") +
-  theme_linedraw()
-
-
-# Predicted outcomes (Reps)
-
-pred_reps <- ggplot(trains_reps, aes(x = fitted)) +
-  geom_histogram(color = "white", fill = "red2", binwidth = 1.5) +
-  scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
-  labs(
-    x = "Predicted Age",
-    y = "") +
-  theme_linedraw()
-
-
-# Residuals (Reps)
-
-res_reps <- ggplot(trains_reps, aes(x = residual)) +
-  geom_histogram(color = "white", fill = "red2", binwidth = 2) +
-  xlim(-30, 30) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 10), breaks = c(2, 4, 6, 8, 10)) +
-  labs(
-    x = "Residuals",
-    y = "") +
-  theme_linedraw()
-
-act_reps + pred_reps + res_reps + plot_annotation("Results for Republicans")
-
-```
-
--->
-
-
-<br/><br/>
 
 ### Temperance
 
@@ -443,30 +338,27 @@ Recall the two questions with which we began this section:
 
 * What is the probability that, if a Democrat shows up at the train station, he will be over 50 years old? 
 
-* In a group of three Democrats and three Republicans, what age difference should we expect betweeb the oldest Democrat and the youngest Republican?
+* In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?
 
-So far we have only tried our model on people from our data set whose real age we already knew. This is helpful to understand the model, but our ultimate goal is to understand more about the real world, about people we don't yet know much about. Temperance guides us to make meaningful predictions and to become aware of their (unknown) limitations.
+So far we have only tried our model on people from our data set whose real age we already knew. This is helpful to understand the model, but our ultimate goal is to understand more about the real world, about people we don't yet know much about. Temperance guides us to make meaningful predictions and to become aware of their known and unknown limitations.
 
 
 #### Making Predictions
 
-Some questions can be answered with the simple equation we have learned before However, instead of using the two pre-calculated values for Democrats and Republicans returned by `stan_glm`, it can be helpful to directly use simulation results. Recall from chapter 7 that when running `stan_glm`, an algorithm creates thousands of simulations, each of which contains an estimate. The median of these thousands of parameters estimates is then returned as single estimate. This means that behind each of our two estimates for Democrats' and Republicans' age, there are actually thousand of values. The long series of simulation results are especially helpful when we want to make predictions involving probabilities. 
+We learned in Chapter \@ref(two-parameters) that, when running `stan_glm`, an algorithm creates thousands of simulations, each of which contains a draw from the posterior distribution of each parameter. . 
 
-What sounds complicated is actually just a matter of a few extra lines of code. To start with a simple question, what are the chances that a random Democrat is over 50 years old? First, we create a tibble with the desired input for our model. In our case the tibble has a column named "party" which contains a single observation named "Democrat". This is a bit different than before, when we only specified the input to be 0 or 1. Next, we'll use the `posterior_predict` function from chapter 7 to get some simulation results. `posterior_predict` takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from 'Courage' and the tibble is the one we just created in the previous step.
+What sounds complicated is actually just a matter of a few extra lines of code. To start with a simple question, what are the chances that a random Democrat is over 50 years old? First, we create a tibble with the desired input for our model. In our case the tibble has a column named "party" which contains a single observation named "Democrat". This is a bit different than before, when we only specified the input to be 0 or 1. Next, we'll use the `posterior_predict()` function to get some simulation results. `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from 'Courage' and the tibble is the one we just created.
 
 ```{r}
-
-# Creating a tibble with a column named "party" and
-# a single observation, "Democrat". We will use this to 
-# tell R that we want simulation results for a single 
-# Democrat.
+# Creating a tibble with a column named "party" and a single observation,
+# "Democrat". We will use this to tell posterior_predict() that we want
+# simulation results for a single Democrat.
 
 new <- tibble(party = "Democrat")
 
-# Generating simulation results. The first argument 
-# specifies the fitted model to be used, which in our
-# case is the one we generated in "Courage". The second
-# argument specifies the input, and takes tibbles only.
+# Generating simulation results. The first argument specifies the fitted model
+# to be used, which in our case is the one we generated in "Courage". The second
+# argument specifies the input.
 
 pp <- posterior_predict(fit_obj, newdata = new)
 
@@ -474,49 +366,33 @@ head(pp, 10)
 
 ```
 
-A look at the first few observations shows that we simply get ten different estimates for the age of a person. Since we have defined in our tibble that the value of "party" for this person is "Democrat", these are estimates for a random Democrat. It is important to understand that this is not a concrete person from the `trains` dataset - the algorithm in `posterior_predict` simply uses the existing data of all democrats in `trains` to predict how old a random additional democrat could be in 4000 different scenarios (that's how many rows the tibble has). When the values from all 4000 scenarios are plotted in a histogram, you can see that they are centered around the single estimate of 42.6 that we calculated in "Courage." So, instead of this single like before estimate, we now use the thousands of simulations that lie behind it.
+A look at the first few observations shows that we simply get ten draws from the model's posterior distribution of the age of a Democrat. It is important to understand that this is not a concrete person from the `trains` dataset - the algorithm in `posterior_predict()` simply uses the existing data from  `trains` to estimate this posterior distribution. 
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+Note that we have a new posterior distribution under consideration here. The unknown parameter, call it $D_{age}$ is the age of a Democrat. This could be the age of a randomly selected Democrat from the population or of the next Democrat we meet or of the next Democrat we interview on the train platform. The definition of "population" determines the appropriate interpretation. Yet, regardless, $D_{age}$ is an unknown parameter, not one, like $\beta_1$,  $\beta_2$, or $\sigma$ that we have already estimated. That is why we need `posterior_predict()`.
 
-as_tibble(pp) %>% 
-  rename(age = "1") %>% 
-  ggplot(., aes(x = age)) +
-    geom_histogram(color = "white", fill = "blueviolet", binwidth = 2) +
-   scale_x_continuous(expand = c(0, 0), limits = c(0, 85)) + 
-    scale_y_continuous(expand = c(0, 0), limits = c(0, 280)) +
-    labs(
-      title = "Age of a Random Democrat (4000 Simulations)",
-      x = "Age",
-      y = "Count") +
-    theme_linedraw()
-
-
-```
-
-Once we have the simulation results for our random democrat, we just have to use our wrangling skills. For this, we proceed in a similar way as in chapter 7:
 
 ```{r}
-
-as_tibble(pp) %>% 
-  
-  # Renaming the column containing
-  # the simulation results.
-  
-  rename(age = "1") %>% 
-  
-  # Creating a new column that is TRUE if someone 
-  # is over 50 years old, and FALSE otherwise.
-  
-  mutate(ot_50 = ifelse(age > 50, TRUE, FALSE)) %>% 
-  
-  # Calculating the percentage of TRUEs.
-  
-  summarize(perc = sum(ot_50)/n() * 100)
-
+tibble(age = pp[, 1]) %>% 
+  ggplot(aes(x = age)) +
+    geom_density() +
+    labs(title = "Posterior Probability Distribution for a Democrat's Age",
+         x = "Age",
+         y = "Probability") +
+    theme_linedraw()
 
 ```
 
-Therefore we can assume with 27.8% probability that a random democrat is over 50 years old. We can also use simulation results to answer questions involving several persons or groups. Suppose three democrats and three republicans show up. What age difference should we expect between the youngest Republican and the oldest Democrat?
+Once we have the posterior distribution, we can answer (almost) any reasonable question. In this case, the probability that the next Democrat will be over 50 is around 28%.
+
+```{r}
+tibble(age = pp[, 1]) %>% 
+  mutate(ot_50 = ifelse(age > 50, TRUE, FALSE)) %>% 
+  summarize(perc = sum(ot_50)/n())
+```
+
+
+
+Suppose three democrats and three republicans show up. What age difference should we expect between the youngest Republican and the oldest Democrat?
 
 As before we start by creating a tibble with the desired input. Note that the name of the column ("party") and the observations ("Democrat", "Republican") must always be named *exactly* as in the data set. This tibble as well as our model can then be used as arguments for `posterior_predict`:
 
