@@ -334,11 +334,9 @@ The three plots are structured like our equation and table above, i.e. a value i
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
-Recall the two questions with which we began this section:
+Recall the first questions with which we began this section:
 
 * What is the probability that, if a Democrat shows up at the train station, he will be over 50 years old? 
-
-* In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?
 
 So far we have only tried our model on people from our data set whose real age we already knew. This is helpful to understand the model, but our ultimate goal is to understand more about the real world, about people we don't yet know much about. Temperance guides us to make meaningful predictions and to become aware of their known and unknown limitations.
 
@@ -390,11 +388,11 @@ tibble(age = pp[, 1]) %>%
   summarize(perc = sum(ot_50)/n())
 ```
 
+Recall the second question:
 
+* In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?
 
-Suppose three democrats and three republicans show up. What age difference should we expect between the youngest Republican and the oldest Democrat?
-
-As before we start by creating a tibble with the desired input. Note that the name of the column ("party") and the observations ("Democrat", "Republican") must always be named *exactly* as in the data set. This tibble as well as our model can then be used as arguments for `posterior_predict`:
+As before we start by creating a tibble with the desired input. Note that the name of the column ("party") and the observations ("Democrat", "Republican") must always be *exactly* as they the data set. This tibble as well as our model can then be used as arguments for `posterior_predict()`:
 
 ```{r}
 
@@ -414,14 +412,8 @@ To determine the expected age difference, we can then proceed as follows:
 ```{r}
 
 as_tibble(pp) %>% 
-  
-  # Using more meaningful names.
-  
-  rename(dem_1 = "1", dem_2 = "2", dem_3 = "3",
-         rep_1 = "4", rep_2 = "5", rep_3 = "6") %>% 
-
-  # Grouping the data by rows.
-  
+  set_names(c("dem_1", "dem_2", "dem_3", 
+              "rep_1", "rep_2", "rep_3")) %>% 
   rowwise() %>% 
   
   # Creating three new columns. The first two are the 
@@ -438,28 +430,21 @@ as_tibble(pp) %>%
   
   ungroup() %>% 
   
-  # Calculate the average age difference.
+  # Create posterior probability distribution
   
-  summarize(avg_diff = mean(age_diff))
+  ggplot(aes(x = age_diff)) +
+    geom_density() +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Age difference between the oldest/youngest of three Democrats/Republicans",
+         x = "Age",
+         y = "Probability")
   
 ```
 
-In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican.
-
-
-#### Unknown unknowns
-
-Yet another area of uncertainty that might not be immediately obvious is the possibility of unknown unknowns — that is, all the things that might change with time. How do we know that our model — which relies heavily on figures like income and party affiliation — will still be able to draw conclusions about America 50 years from now? Mass migrations, political revolutions, and world wars are just a few of the things that could render all the conclusions we draw from the `trains` dataset moot. And, other than expanding our confidence intervals to the point of uselessness, there's no way to account for the unknown unknowns. 
-
-In short, *while we can accept the model as representative of the United States at or around 2012 (the year in which Enos conducted his study), we cannot reasonably extrapolate that to the far future*.
-
-It is always important to keep the problem of validity in the back of our minds as we investigate data sets and how the data within these sets are collected. Given the many factors — those we are aware of and those we are not aware of — that go into any kind of data collection, there is no way to guarantee 100 percent validity.
+In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican, but we would not be surprised if the oldest Democrat were actually younger than the youngest Republican.
 
 
 
-
-<br/><br/>
-<br/><br/>
 
 ## `att_end` as a function of `treatment`
 
