@@ -574,7 +574,7 @@ Recall the first question with which we began this section:
 
 * What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration? 
 
-Recall from Chapter \@ref(rubin-causal-model) the discussion of the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration of the population for those exposed to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of their posterior distributions.
+Recall from Chapter \@ref(rubin-causal-model) the discussion of the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration of the population for those exposed to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of $\beta_1$ and $\beta_2$. With that information, the problem is simple:
 
 ```{r}
 fit_obj %>% 
@@ -599,13 +599,13 @@ Our second question was: What is the posterior probability distribution for the 
 
 
 ```{r}
-ate_data <- tibble(treatment =
-                     factor(c("Treated", "Control"),
-                            levels = c("Treated", "Control")))
-
-posterior_predict(fit_obj, newdata = ate_data) %>%
-  as_tibble() %>%
-  setNames(c("Treated", "Control")) 
+# ate_data <- tibble(treatment =
+#                      factor(c("Treated", "Control"),
+#                             levels = c("Treated", "Control")))
+# 
+# posterior_predict(fit_obj, newdata = ate_data) %>%
+#   as_tibble() %>%
+#   setNames(c("Treated", "Control")) 
 
 
 
