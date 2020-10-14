@@ -127,7 +127,7 @@ On a boxplot, the top and bottom borders of the box denotes the 75th and 25th pe
 
 
 
-## `age` as a function of `party`
+## age ~ party
 
 
 We want to build a model and then use that model to draw conclusions about the world. What is the probability that, if a Democrat shows up at the train station, he will be over 50 years old? In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican? We can answer these and similar questions by creating a model that uses party affiliation to predict age
@@ -160,7 +160,6 @@ When dealing with a non-causal model, the focus is on predicting things. The und
 
 <!-- DK: Really need a Preceptor Table! -->
 
-#### The mathematical model
 
 We now know that we are working with a predictive model. Recall:
 
@@ -338,8 +337,6 @@ Recall the first questions with which we began this section:
 So far we have only tried our model on people from our data set whose real age we already knew. This is helpful to understand the model, but our ultimate goal is to understand more about the real world, about people we don't yet know much about. Temperance guides us to make meaningful predictions and to become aware of their known and unknown limitations.
 
 
-#### Making Predictions
-
 We learned in Chapter \@ref(two-parameters) that, when running `stan_glm`, an algorithm creates thousands of simulations, each of which contains a draw from the posterior distribution of each parameter. . 
 
 What sounds complicated is actually just a matter of a few extra lines of code. To start with a simple question, what are the chances that a random Democrat is over 50 years old? First, we create a tibble with the desired input for our model. In our case the tibble has a column named "party" which contains a single observation named "Democrat". This is a bit different than before, when we only specified the input to be 0 or 1. Next, we'll use the `posterior_predict()` function to get some simulation results. `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from 'Courage' and the tibble is the one we just created.
@@ -406,6 +403,8 @@ A look at the output shows that we now have 6 columns: one for each person. R do
 
 To determine the expected age difference, we can then proceed as follows:
 
+<!-- DK: I am unsure about this code. Would c() in place of c_across() work as well? -->
+
 ```{r}
 
 as_tibble(pp) %>% 
@@ -418,8 +417,8 @@ as_tibble(pp) %>%
   # among Republicans, respectively. The third one is
   # the difference between the first two.
   
-  mutate(dems_oldest = max(c(dem_1, dem_2, dem_3)),
-         reps_youngest = min(c(rep_1, rep_2, rep_3)),
+  mutate(dems_oldest = max(c_across(dem_1:dem_3)),
+         reps_youngest = min(c_across(rep_1:rep_3)),
          age_diff = dems_oldest - reps_youngest) %>% 
   
   # Ungroup to tell R not to perform rowwise operations
@@ -443,9 +442,9 @@ In words, we would expect the oldest Democrat to be about 22 years older than th
 
 
 
-## `att_end` as a function of `treatment`
+## att_end ~ treatment
 
-Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is then what we could have in the absence of information about their age. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration? What is the posterior probability distribution for the largest such effect when 3 people are exposed?
+Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is then what we could have in the absence of information about their age. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration? What is the largest causal effect which still has a 1 in 10 chance of occurring?
 
 
 ### Wisdom
@@ -577,6 +576,7 @@ Recall the first question with which we began this section:
 Recall from Chapter \@ref(rubin-causal-model) the discussion of the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration of the population for those exposed to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of $\beta_1$ and $\beta_2$. With that information, the problem is simple:
 
 ```{r}
+set.seed(14)
 fit_obj %>% 
   as_tibble() %>% 
   mutate(ate = treatmentTreated - treatmentControl) %>% 
@@ -593,29 +593,41 @@ Could the true value of the average treatment effect be as much as 2 or as littl
 
 <!-- DK: Much more discussion. Explain what a test might be used for in this situation and why we should reject testing. -->
 
-Our second question was: What is the posterior probability distribution for the largest such effect when 3 people are exposed to the treatment?
-
-
+Our second question: What is the largest effect size which still has a 1 in 10 chance of occurring? Consider the result of posterior_predict() for someone treated and someone in the control group.
 
 
 ```{r}
-# ate_data <- tibble(treatment =
-#                      factor(c("Treated", "Control"),
-#                             levels = c("Treated", "Control")))
-# 
-# posterior_predict(fit_obj, newdata = ate_data) %>%
-#   as_tibble() %>%
-#   setNames(c("Treated", "Control")) 
+# newdata variables must be exactly the same as their counterparts in the
+# original data. treatment must be a factor, with the same levels as it has in
+# `trains`.
+
+ate_data <- tibble(treatment =
+                     factor(c("Treated", "Control"),
+                            levels = c("Treated", "Control")))
+
+pp <- posterior_predict(fit_obj, newdata = ate_data)
 
 
+te <- tibble(Treated = pp[, 1], Control = pp[, 2])  %>% 
+  mutate(te = Treated - Control) 
 
-
+te %>% 
+  ggplot(aes(x = te)) +
+    geom_density() +
+    labs(title = "Posterior Probability Distribution for Treatment Effect",
+         subtitle = "Causal effects are more variable for indivduals",
+         x = "Attitude",
+         y = "Probability") +
+    theme_classic()
+  
 ```
 
 
+In this case, we are looking at the distribution of the treatment effect for a single individual. This is very different than the *average* treatment effect. In particular, it is much more variable. We are looking at one row in the Preceptor Table. For a single individual, the `att_end` value can be anywhere from 3 to 15, both under treatment and under control. So, the causual effect --- the difference between the two potential outcomes can, in theory, be anywhere from -12 to +12. Such extreme values are rare, but not impossible.
 
+The question, however, was interested in the value at the 90th percentile. For this model, that is `r quantile(te$te, prob = 0.9)`. We would not expect a treatment effect of this magnitude to be common, but, at the same time, effects this big and bigger will occur about 10% of the time.
  
 
-
+<!-- DK: Conclusion -->
 
 
