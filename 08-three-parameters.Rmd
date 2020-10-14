@@ -187,7 +187,7 @@ Don't panic dear poets and philosophers, the whole thing is easier than it looks
 
 * The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's age but are not explained by party affiliation. We assume that this error follows a normal distribution with an expected value of 0, i.e., it is 0 on average.
 
-* The small i's are an index to number observations in our data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person i is explained by the modeled and non-modelled factors for person i. The betas are numbered with 1, 2, 3, etc. The corresponding x's have an "r" or "d" subscript instead, for Republicans or Democrats.
+* The small i's are an index to number observations in our data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person i is explained by the modeled and non-modeled factors for person i. The corresponding x's have an $r$ or $d$ subscript, for Republican or Democrat.
 
 
 
@@ -448,7 +448,7 @@ In words, we would expect the oldest Democrat to be about 22 years older than th
 
 ## `att_end` as a function of `treatment`
 
-Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. What is the effect of exposing someone on a train platform to Spanish-speakers  on their attitudes toward immigration? 
+Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is then what we could have in the absence of information about their age. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. What is the effect of exposing someone to Spanish-speakers on their attitudes toward immigration? What is the posterior probability distribution for the largest such effect when 3 people are exposed?
 
 
 ### Wisdom
@@ -457,12 +457,37 @@ Above, we created a predictive model: with someone's party affiliation, we can m
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
+We are still using the data from Enos (2014). Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant to understanding the world today? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious the answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. Math won't save us.
+
+Ethical issues are tricky, or at least trickier than they were in the context of models in which the dependent variable was height or age. (And then ethical issues in conducting the experiment in the first place are non-trivial.) Assume we make a good model. What is to prevent someone from using that information to, say, influence voting and donations? Imagine a Republican Senate candidate who hires Spanish-speakers to ride commuter trains in order to shift voters' attitudes toward immigration in a conservative direction. She believes (correctly?) that doing so will increase her odds of winning the election. Is that the sort of knowledge we seek to create? We can make such models. Indeed, the purpose of this chapter is to show you how to do so! But should you make those models?
 
 ### Justice
 
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Justice"}
 knitr::include_graphics("other/images/Justice.jpg")
 ```
+
+The three elements of Justice in data science remain the same: predictive/causal models, Preceptor Table, and mathematical formula.
+
+
+The math for this model is exactly the same as the math for the predictive model in the first half of the chapter, although we change the notation a bit for clarity.
+
+$$ \underbrace{y_i}_{outcome} = \underbrace{\beta_1 x_{t,i} + \beta_2 x_{c,i}}_{model} + \underbrace{\epsilon_i}_{not\ in\ the\ model}$$
+
+where \n
+$$x_{t,i}, x_{c,i} \in \{0,1\}$$ \n
+$$x_{t,i} +  x_{c,i} = 1$$ \n
+$$\epsilon_i \sim N(0, \sigma^2)$$  
+
+Nothing has changed, except for the meaning of the data items and the interpretations of the parameters. 
+
+* On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is a person's attitude toward immigration after the experiment is complete.  $y_i$ takes on integer values between 3 and 15 inclusive.
+
+* On the right-hand side we first have the part contained in the model, consisting of two similar looking terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point. The betas are our two parameters. $\beta_1$ is the average attitude toward immigration for treated individuals --- those exposed to Spanish-speakers ---   in the population. $\beta_2$ is the average attitude toward immigration for control individuals --- those not exposed to Spanish-speakers ---  in the population. The x's are our explanatory variables and take the values 1 or 0. If someone is a Treated we have $x_{t,i} = 1$ and $x_{c,i} = 0$, if someone is a Control we have $x_{t,i} = 0$ and $x_{c,i} = 1$. In other words, the x's are binary variables and are mutually exclusive (if you are a Treated, you cannot also be a Control).
+
+* The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's attitude toward immigration but are not explained by treatment status. We assume that this error follows a normal distribution with an expected value of 0, i.e., it is 0 on average.
+
+* The small i's are an index to number observations in our data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person i is explained by the modeled and non-modelled factors for person i. The corresponding x's have a $t$ or $c$ subscript, for Treated or Control.
 
 
 ### Courage
@@ -471,38 +496,13 @@ knitr::include_graphics("other/images/Justice.jpg")
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
+With Justice satisfied, we gather our Courage and fit the model. Note that, except for the change in variable names, the code is exactly the same as it was above, in our predictive model. In general, *predictive models and causal models use the same math and the same code.* The differences, and they are very important, lie in the interpretation of the results, not in their creation. 
+
 ```{r}
-obj <- stan_glm(att_end ~ treatment - 1, data = trains, refresh = 0)
+fit_obj <- stan_glm(att_end ~ treatment - 1, data = trains, refresh = 0)
 
 obj
 ```
-
-Note that for both Democrats and Republicans, the prediction interval is significantly wider than the confidence interval. This discrepancy illustrates the *unmodeled variation* of the dataset: while the mean values, as indicated by the "fit" column, are still the best guess you can make for any given subject, we are less confident in the value range of that individual subject than we are of the value range of the mean. *The unmodeled variation widens the prediction intervals relative to the confidence intervals.*
-
-Recall our discussion regarding the wider confidence intervals for Republican subjects than Democrat subjects. Although the Republican and Democrat average incomes had vastly different confidence intervals — the Republican confidence intervals were much wider — they have very similar prediction intervals. Although the *parameter uncertainty* of these two parameters were very different, the *unmodeled variation* for both parameters was roughly the same. Even though the data points were equally spread out for both Democrat and Republican income, were were able to more confidently pinpoint a true value for democrat income because we had more data to work with.
-
-In many cases, the most important use of a model is for prediction. We use them to make predictions about data which we have not yet seen.
-
-
-
-And we can reconstruct the table by filling in the unknowns with the predictions (note that these are unchanged) and their associated levels of uncertainty (which HAVE changed to accommodate for individual variation within the data):
-
-```{r, echo = FALSE}
-
-tibble(subject = c("7", "6,041", "67", "40,080", "758", "32", "8,809"),
-       Control = c("8.45 (2.9-14.0)", "8.45 (2.9-14.0)", "8.45 (2.9-14.0)", "8.45 (2.9-14.0)", "5", "8.45 (2.9-14.0)", "13"),
-       Treated = c("11", "10", "5", "11", "10 (4.4-15.6)", "13", "10 (4.4-15.6)")) %>% 
-  
-  gt() %>%
-  cols_label(subject = md("**Subject**"),
-                Control = md("**$$Y_c(u)$$**"),
-                Treated = md("**$$Y_t(u)$$**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header(title = "Ending Attitudes on Immigration of 7 Random Respondents")
-```
-
 
 
 
@@ -513,21 +513,9 @@ tibble(subject = c("7", "6,041", "67", "40,080", "758", "32", "8,809"),
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
-There are various sources of uncertainties and problems that have addressed in previous chapters and again in this chapter. It's important that you always have these in the back of your mind when working with data:
-
-1) *Validity*. At the surface level, parameter names might not invoke too much thought — but once you really sit down and think about the story the numbers are trying to tell, it's not always the case that the numbers deserve to tell that story. In our earlier discussion regarding `income` and `att_end`, the conclusions we draw from these data might be misleading just because the way they were collected or computed inevitably change these conclusions. Even when there's nothing WRONG with a setup, we need to keep in mind that the smallest differences 
-
-2) When we dive deeper into the data, we run into the issue of *parameter uncertainty*, which is the uncertainty associated with our analysis of summary parameters, such as mean, median, and range. In our above analysis with the `trains` dataset, we account for parameter uncertainty using confidence intervals.
-
-3) As great as confidence intervals are, they don't capture the uncertainty of using summary statistics to predict parameter values of random individuals. We are more sure, for example, about the range of possible incomes for the mean income of American democrats than we are about the range of possible incomes for a single American democrat, whose income could stray far from the mean democrat income. This *unmodeled variation*, or variation between data points that is not fully captured by bootstrapping, deserves much consideration when dealing with data.
-
-4) *Unknown unknowns* are an especially unavoidable source of uncertainty. The world is changing, and people 50 years from now might act differently and have vastly different lifestyles and characteristics; in the case of the `trains` dataset, it wouldn't be unreasonable to expect completely different combinations of income and party affiliation. That would render our mean income, median ratio, and prediction intervals for both those measures useless.
 
 
 
-
-
-The *fitted value* of att_end is 8.45 for the control group and 10 for the treated group. Because a higher att_end means more conservative towards stances on immigration, it seems that treated individuals had more conservative stances on this issue than the control group by the end of the study. 
 
 ### Model Structure
 
@@ -584,120 +572,6 @@ $$\epsilon_i = y_i - \hat{y_i}$$
 ...And you can now complete your equation.
 $$ y_i = \hat{b_1}x_r + \hat{b_2} x_d + \epsilon_i $$
 Note that the math for both the predictive model we worked on earlier and this model is *identical*. It is not the calculations for the residual, fitted value, or parameter estimates that differ between these two model types; rather, it is how one uses and interprets these numbers. While predictive models are simply used for predicting another variable's value (in the previous case, age), we can use these numbers to calculate the effect of one variable (treatment) on another (att_end) for each individual observation. 
-
-Now, we'll create a Rubin Causal Model table of possible outcomes, as we did back in ch3. We'll do this using 7 random observations from the trains dataset. 
-
-```{r}
-
-#Adding question marks where necessary
-
-trains_RCM <- trains %>% 
-  pivot_wider(names_from = treatment, values_from = att_end) %>%
-  slice(1:7) %>%
-  mutate(subject = 1:7) %>%
-  replace_na(list(Treated = "?", Control = "?")) %>% 
-  select(subject, Control, Treated)
-
-trains_RCM$subject <- c("7", "6,041", "67", "40,080", "758", "32", "8,809")
-
-#Mathematical notation
-
-trains_RCM %>%
-  gt() %>%
-  cols_label(subject = md("**Subject**"),
-                Control = md("**$$Y_c(u)$$**"),
-                Treated = md("**$$Y_t(u)$$**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header(title = "Ending Attitudes on Immigration of 7 Random Respondents")
-
-
-```
-
-Recall that the Rubin Causal Model centers on filling in the unknowns, which are indicated by the "?"s in the table. There's one way we could fill in the missing values — we could use our approximations we generated with our `lm()` model: that is, for each unknown Treated value, we use 10, and for each unknown Control value, we use 8.45. 
-
-```{r, echo = FALSE}
-
-tibble(subject = c("7", "6,041", "67", "40,080", "758", "32", "8,809"),
-       Control = c("8.45", "8.45", "8.45", "8.45", "5", "8.45", "13"),
-       Treated = c("11", "10", "5", "11", "10", "13", "10")) %>% 
-  
-  gt() %>%
-  cols_label(subject = md("**Subject**"),
-                Control = md("**$$Y_c(u)$$**"),
-                Treated = md("**$$Y_t(u)$$**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header(title = "Ending Attitudes on Immigration of 7 Random Respondents")
-
-```
-
-```{r, include = FALSE}
-
-library(tufte)
-
-margin_note("The minimum att_end is 3 and maximum att_end is 15.")
-
-```
-
-This table looks a bit funky: take a look at subject 67. According to this model, subject 67's attitude under control would be HIGHER than his/her attitude under treatment, which corresponds to a negative treatment effect. This would mean that he/she would become more LIBERAL after undergoing treatment, which flies in the face of the ATE we calculated earlier. Another example of this can be seen with subject 32, whose predicted `att_end` under treatment is lower than his/her `att_end` under control (also signifying a shift towards liberal attitudes regarding immigration). 
-
-Clearly, using the same control and treatment values to fill in the unknowns doesn't capture the entire picture as it does with a predictive model. While using `lm()` to fill in the `att_end` unknowns towards the center of the distribution, it makes less sense for values towards the outskirts of the dataset. So, how can we predict outcomes in a way that equally addresses data towards the center of the distribution, and data that isn't?
-
-One such way is by attaching the ATE, which we previously calculated to be `r ATE`, in the appropriate direction to fill in the unknowns:
-
-```{r, echo = FALSE}
-
-#This is necessary so we can see the offset as caused by treatmentTreated, not treatmentControl.
-
-trains$treatment <- fct_relevel(trains$treatment, "Control", "Treated")
-
-lm(data = trains, att_end ~ treatment) %>% 
-  tidy(conf.int = TRUE) %>%
-  select(term, estimate, conf.low, conf.high)
-
-
-tibble(subject = c("7", "6,041", "67", "40,080", "758", "32", "8,809"),
-       Control = c("9.45", "8.45", "3.45", "9.45", "5", "11.45", "13"),
-       Treated = c("11", "10", "5", "11", "6.55", "13", "14.55")) %>%
-  gt() %>%
-  cols_label(subject = md("**Subject**"),
-                Control = md("**$$Y_c(u)$$**"),
-                Treated = md("**$$Y_t(u)$$**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header(title = "Ending Attitudes on Immigration of 7 Random Respondents")
-
-```
-
-The usage of this table shows how a causal model is used differently than a predictive model. Unlike before, it wasn't enough to fill in our unknowns with the parameter estimates. This is because we aren't merely predicting their att_end, a variable that, unlike age, could be changed by exposure to a treatment variable. By using the ATE, we were able to make a more informed prediction on any individual's att_end had they been placed in the other group. 
-
-### Parameter Uncertainty
-
-Here, we see that the average treatment effect is `r ATE`; this is the average change in att_end caused by treatment (if this statistic looks unfamiliar, refer back to chapter 3 for a refresher on ATE). But how confident are we in this ATE? We can use `lm()` again to generate confidence intervals for our parameters and for this value:
-
-```{r}
-#This is necessary so we can see the offset as caused by treatmentTreated, not treatmentControl.
-
-trains$treatment <-fct_relevel(trains$treatment, "Control", "Treated")
-
-lm(data = trains, att_end ~ treatment - 1) %>% 
-  tidy(conf.int = TRUE) %>%
-  select(term, estimate, conf.low, conf.high)
-
-summary(lm(data = trains, att_end ~ treatment - 1))
-
-```
-
-<!-- MB: Is this true  -->
-
-Our measure of confidence for the ATE is known as the residual standard error, which in this case is 2.78. The residual standard error show our confidence in the average treatment effect of the `trains` dataset being representative of the true average treatment effect on Boston commuters.
-
-### Uncertainties
-
 
 
 
