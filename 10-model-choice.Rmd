@@ -19,7 +19,6 @@ output_yaml:
 
 <!-- 4) I am concerned about the ames_snippets.R code used in the original but, maybe, not needed here. -->
 
-<!-- 5) I totally skipped the workflow chapter (8) in the original. Is that OK? -->
 
 <!-- 6) Many sections begun with a weird code chunk. These should be cleaned up and organized. -->
 
@@ -63,7 +62,7 @@ The Ames housing data set is an excellent resource for learning about models. It
 
 It makes sense to start with the outcome we want to predict: the last sale price of the house (in USD): 
 
-<!-- DK: Clean up these plots? -->
+<!-- DK: Clean up these plots? Why not? -->
 
 ```{r}
 ggplot(ames, aes(x = Sale_Price)) + 
@@ -71,6 +70,8 @@ ggplot(ames, aes(x = Sale_Price)) +
 ```
 
 The data are right-skewed; there are more inexpensive houses than expensive ones. The median sale price was \$`r format(median(ames$Sale_Price), big.mark = ",")` and the most expensive house was \$`r format(max(ames$Sale_Price), big.mark = ",")`. When modeling this outcome, a strong argument can be made that the price should be log-transformed. The advantages of doing this are that no houses would be predicted with negative sale prices and that errors in predicting expensive houses will not have an undue influence on the model. Also, from a statistical perspective, a logarithmic transform may also _stabilize the variance_ in a way that makes inference more legitimate. Let's visualize the transformed data:
+
+<!-- DK: Do we need to discuss logs, either here or earlier in the book? -->
 
 ```{r}
 ggplot(ames, aes(x = Sale_Price)) + 
@@ -128,7 +129,7 @@ Also notable is the "Iowa Department of Transportation (DOT) and Rail Road" neig
 knitr::include_graphics("10-model-choice/images/dot_rr.png")
 ```
 
-It is critical to conduct _exploratory data analysis_ prior to beginning any modeling. These housing data have characteristics that present interesting challenges about how the data should be processed and modeled. We describe many of these in later sections. Some basic questions that could be examined include: 
+It is _critical_ to conduct _exploratory data analysis_ prior to beginning any modeling. These housing data have characteristics that present interesting challenges about how the data should be processed and modeled. We describe many of these in later sections. Some basic questions that could be examined include: 
 
  * Are there any odd or noticeable things about the distributions of the individual predictors? Is there much skewness or any pathological distributions? 
 
@@ -136,15 +137,7 @@ It is critical to conduct _exploratory data analysis_ prior to beginning any mod
 
  * Are there associations between predictors and the outcomes? 
 
-Many of these questions will be revisited as these data are used in upcoming examples.The important code that we will carry forward is:
- 
- 
-```{r, eval = FALSE}
-library(tidymodels)
-data(ames)
-ames <- ames %>% 
-  mutate(Sale_Price = log10(Sale_Price))
-``` 
+Many of these questions will be revisited as these data are used in upcoming examples. 
 
 ## Spending our data {#splitting}
 
@@ -188,17 +181,7 @@ dim(ames_train)
 
 These objects are data frames with the same _columns_ as the original data but only the appropriate _rows_ for each set. 
 
-Simple random sampling is appropriate in many cases but there are exceptions. When there is a dramatic _class imbalance_ in classification problems, one class occurs much less frequently than another. Using a simple random sample may haphazardly allocate these infrequent samples disproportionately into the training or test set. To avoid this, _stratified sampling_ can be used. Another difficult case is when the data have a significant _time_ component, such as time series data. Here, it is more common to use the most recent data as the test set. The **rsample** package contains a function called `initial_time_split()` that is very similar to `initial_split()`. Instead of using random sampling, the `prop` argument denotes what proportion of the first part of the data should be used as the training set; the function assumes that the data have been pre-sorted in an appropriate order. 
-
-### What proportion should be used? 
-
 The amount of data that should be allocated when splitting the data is highly dependent on the context of the problem at hand. Too much data in the training set lowers the quality of the performance estimates. Conversely, too much data in the test set handicaps the model's ability to find appropriate parameter estimates. There are parts of the statistics community that eschew test sets in general because they believe all of the data should be used for parameter estimation. While there is merit to this argument, it is good modeling practice to have an unbiased set of observations as the final arbiter of model quality. A test set should be avoided only when the data are pathologically small.
-
-### What about a validation set? 
-
-Previously, when describing the goals of data splitting, we singled out the test set as the data that should be used to conduct a proper evaluation of model performance on the final model(s). This begs the question of, "How can we tell what is best if we don't measure performance until the test set?" 
-
-It is common to hear about _validation sets_ as an answer to this question, especially in the neural network and deep learning literature. The validation set was originally defined in the early days of neural networks when researchers realized that measuring performance by re-predicting the training set samples led to results that were overly optimistic (significantly, unrealistically so). This led to models that overfit, meaning that they performed very well on the training set but poorly on the test set. To combat this issue, a small validation set of data were held back and used to measure performance as the network was trained. Once the validation set error rate began to rise, the training would be halted. In other words, the validation set was a means to get a rough sense of how well the model performed prior to the test set. It is largely semantics as to whether validation sets are a subset of the training set or a third allocation in the initial split of the data.
 
 
 ## Feature engineering with recipes {#recipes}
@@ -231,6 +214,8 @@ In this section, we will focus on a small subset of the predictors available in 
  * The year built (`Year_Built`)
 
  * The type of building (`Bldg_Type` with values `r val_list(ames_train$Bldg_Type)`)
+
+<!-- DK: Introduce lm here? Or earlier? -->
 
 Suppose that an initial ordinary linear regression model were fit to these data. A  standard call to `lm()`, a function similar to `stan_glm()`, might look like:
 
@@ -270,7 +255,7 @@ Let's break this down:
 
 1. `step_dummy()` is used to specify which variables should be converted from a qualitative format to a quantitative format, in this case, using dummy or indicator variables. An indicator or dummy variable is a binary numeric variable (a column of ones and zeroes) that encodes qualitative information; we will dig deeper into these kinds of variables in Section \@ref(dummies). 
 
-The function `all_nominal()` captures the names of any columns that are currently factor or character (i.e., nominal) in nature. This is a **dplyr** selector function similar to `starts_with()` or `matches()` but can only be used inside of a recipe. 
+The function `all_nominal()` captures the names of any columns that are currently factor or character (i.e., nominal) in nature. This is a **dplyr** selector function similar to `starts_with()` or `matches()` but which can only be used inside of a recipe. 
 
 
 What is the advantage to using a recipe? There are a few, including:
@@ -291,7 +276,8 @@ Remember that when invoking the `recipe()` function, the steps are not estimated
 For our example recipe, we can now `prep()`: 
 
 ```{r}
-simple_ames <- prep(simple_ames, training = ames_train)
+simple_ames <- prep(simple_ames, 
+                    training = ames_train)
 simple_ames
 ``` 
 
@@ -309,8 +295,12 @@ names(test_ex) %>%
 
 Note the dummy variable columns starting with `Neighborhood_`. The `bake()` function can also take selectors so that, if we only wanted the neighborhood results, we could use:
 
+<!-- DK: When do we explain starts_with() and friends? Maybe there is a preliminaries section for each chapter which teaches some more cool stuff? -->
+
 ```{r, eval = FALSE}
-bake(simple_ames, ames_test, starts_with("Neighborhood_"))
+bake(simple_ames, 
+     ames_test, 
+     starts_with("Neighborhood_"))
 ```
 
 To get the processed version of the training set, we use `bake()` and pass in the argument `ames_train`.
@@ -383,9 +373,6 @@ Why not all five? The most basic reason is simplicity; if you know the value for
 
 The full set of encodings can be used for some models. This is traditionally called the "one-hot" encoding and can be achieved using the `one_hot` argument of `step_dummy()`. 
 
-One helpful feature of `step_dummy()` is that there is more control over how the resulting dummy variables are named. In base R, dummy variable names mash the variable name with the level, resulting in names like `NeighborhoodVeenker`. Recipes, by default, use an underscore as the separator between the name and level (e.g., `Neighborhood_Veenker`) and there is an option to use custom formatting for the names. The default naming convention in recipes makes it easier to capture those new columns in future steps using a selector, such as `starts_with("Neighborhood_")`. 
-
-
 Different recipe steps can have different effects on columns of the data. For example, `step_log()` modifies a column in-place without changing the name. Other steps, such as `step_dummy()` eliminate the original data column and replace it with one or more columns with different names. This behavior depends on the type of operation being done. 
 
 
@@ -420,12 +407,15 @@ simple_ames <-
 
 Additional interactions can be specified in this formula by separating them by `+`. Also note that the recipe will only utilize interactions between different variables; if the formula uses `var_1:var_1`, this term will be ignored. 
 
+<!-- DK: Delete spline discussion and usage? I am torn! -->
 
 ### Spline functions
 
 When a predictor has a nonlinear relationship with the outcome, some types of predictive models can adaptively approximate this relationship during training. However, simpler is usually better and it is not uncommon to try to use a simple model, such as a linear fit, and add in specific non-linear features for predictors that may need them. One common method for doing this is to use _spline_ functions to represent the data. Splines replace the existing numeric predictor with a set of columns that allow a model to emulate a flexible, non-linear relationship. As more spline terms are added to the data, the capacity to non-linearly represent the relationship increases. Unfortunately, it may also increase the likelihood of picking up on data trends that occur by chance (i.e., over-fitting). 
 
 If you have ever used `geom_smooth()` within a `ggplot`, you have probably used a spline representation of the data. For example, each panel below uses a different number of smooth splines for the latitude predictor:
+
+<!-- DK: This is a nice plot! Why not show students how to make it? Perhaps the preiminaries for this chapter could explain patchwork? And logs? And splines? -->
 
 ```{r}
 library(patchwork)
@@ -487,9 +477,6 @@ ames_rec %>%
   update_role(address, new_role = "street address")
 ```
 
-
-You have learned about using recipes for flexible feature engineering and data preprocessing, from creating dummy variables to handling class imbalance and more. Feature engineering is an important part of the modeling process where information leakage can easily occur and good practices must be adopted. Between the **recipes** package and other packages that extend recipes, there are over 100 available steps. All possible recipe steps are enumerated at [`tidymodels.org/find`](https://www.tidymodels.org/find/). The recipes framework provides a rich data manipulation environment for preprocessing and transforming data prior to modeling. 
-Additionally, [`tidymodels.org/learn/develop/recipes/`](https://www.tidymodels.org/learn/develop/recipes/) shows how custom steps can be created.
 
 Our code so far:
 
