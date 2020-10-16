@@ -393,17 +393,23 @@ As before we start by creating a tibble with the desired input. Note that the na
 new <- tibble(party = c("Democrat", "Democrat", "Democrat", 
                         "Republican", "Republican","Republican"))
 
+set.seed(27)
 pp <- posterior_predict(fit_obj, newdata = new)
 
 head(pp, 10)
 
 ```
 
+<!-- DK: These pp objects are fundamentally flawed because some of the predicted values are absurdly low, even negative! This is not the fault of the model or the code. It is simply that the sigma is large enough, then the model things a negative age is plausible. We should at least mention this, ideally as part of a posterior predictive check, perhaps in a problem set. -->
+
 A look at the output shows that we now have 6 columns: one for each person. R does not name the columns, but they are arranged in the same order in which we specified the persons in the tibble (D, D, R, R, R). Notice that all values in a row belong to the same scenario, i.e. each row represents a scenario where the 6 people meet. 
 
 To determine the expected age difference, we can then proceed as follows:
 
 <!-- DK: I am unsure about this code. Would c() in place of c_across() work as well? -->
+
+<!-- DK: This works, but it takes much more time than it should because the the pp object still has every column as a ppd object, even after as_tibble(). The rest of the code still works, but takes a 100x longer than it should. Maybe this is the best approach for handling the ppd problem? Just ignore it and take the time hit? -->
+
 
 ```{r}
 
