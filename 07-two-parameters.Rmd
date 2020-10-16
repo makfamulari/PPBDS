@@ -366,7 +366,7 @@ We can see the the most probable heights for both genders and that men are gener
 
 ## Bootstrap to estimate average height
 
-We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let's use a similar approach to estimate the value of a different unknown parameter: the average height of an adult American male in 2009. Let's also name this parameter $\mu$. Is it confusing that we are using the same parameter? Yes! But, sadly, there are only so many Greek letters. We have no choice but to reuse them. By convention, $\mu$ is often used as the parameter name for an unknown mean. But we could have used a different letter, Greek or otherwise. And, symbols besides $\mu$ are often used for unknown means. It is up to you, in general, but following the conventions in your field is wise. 
+We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let's use a similar approach to estimate the value of a different unknown parameter: the average height of an adult American male in 2009. Let's also name this parameter $\mu$. Is it confusing that we are using the same parameter? Yes! But, sadly, there are only so many Greek letters. We have no choice but to reuse them. By convention, $\mu$ is often used as the parameter name for an unknown mean. But we could have used a different letter, Greek or otherwise. And, symbols besides $\mu$ are often used for unknown means. It is up to you, but, in general, following the conventions in your field is wise. 
 
 First, filter the data set:
 
@@ -394,6 +394,7 @@ virtual_resamples
 
 Plot the results:
 
+<!-- DK: No decimals show up on the x-axis when this is knit, just 176, 176, 176.  -->
 
 ```{r}
 virtual_resamples %>% 
@@ -422,9 +423,9 @@ The posterior distribution includes all the information we have about the unknow
 
 Most textbooks would, at this stage, provide a more mathematical explanation of the transition we are making from Chapter \@ref(probability) to this chapter. In both Chapters \@ref(probability) and \@ref(one-parameter) we dealt with a discrete set of possible models. We began with examples in which there were only two or three possible "true" states of the world. You were either infected or not infected. There were either zero, one or two white marbles in the bag. These examples grew more and more complex, both by increasing the number of models under consideration and by increasing the number of possible outcomes of the experiment. In the case of the urn, there were 2,401 possible models: either zero or one or two or . . . 2,400 red beans in the urn. 
 
-The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values. Yet, almost miraculously, the same intuition applies. 
+The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values since height is continuous. Yet, almost miraculously, the same intuition applies. 
 
-Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which $\mu$ might take. We restricted $p$ to only 2,401 possible values: $0, 1/2400, 2/2400, 3/2400, ..., 2398/2400, 2399/2400, 1$
+Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which $\mu$ might take. We restricted $p$ to only 2,401 possible values: $0$, $1/2400$, $2/2400$, ..., $2399/2400$, $1$. 
 
 Although a bootstrap can create a posterior distribution, as above, there are much simpler ways to do so. The most common involves the function `stan_glm()` from the **rstanarm** library. Halfway through the book, we are now ready for our first full scale data science project. Let us be guided by the cardinal virtues.
 
@@ -447,7 +448,7 @@ In any textbook, it will be tough to avoid the "toy problem" trap. The real worl
 
 * What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
 
-* What is our posterior probability of the height of the 3rd tallest man out of the next 100 we meet?
+* What is our posterior probability distribution for the height of the 3rd tallest man out of the next 100 we meet?
 
 The first two questions have a single number, a single probability, as their answer. The third question requires a full scale posterior probability distribution.
 
@@ -470,22 +471,22 @@ knitr::include_graphics("other/images/Justice.jpg")
 
 Mathematical knowledge is the least important skill for a data scientist. 
 
-However, a little mathematical notation will make our modeling assumptions clear, will bring some clarity and precision to our approach. In this case:
+However, a little mathematical notation will make our modeling assumptions clear, will bring some precision to our approach. In this case:
 
 $$ y_i =  \mu + \epsilon_i $$
 with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the height of male $i$. $\mu$ is the average height of all males in the population. $\epsilon_i$ is the "error term," the difference between the height of male $i$ and the average height of all males.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
 
-This is almost the simplest model we can construct. Note: 
+This is the simplest model we can construct. Note: 
 
-* The model has two unknown parameters: $\mu$ and $\sigma$. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create *posterior distributions* for each parameter.
+* The model has two unknown parameters: $\mu$ and $\sigma$. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, by using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create *posterior probability distributions* for each parameter.
 
 <!-- DK: Box quote. -->
 
 * The model is wrong, as are all models. 
 
-* The parameter we most care about is $\mu$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about its value. Parameters like $\sigma$ in this context are *nuisance* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
+* The parameter we most care about is $\mu$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about its value. Parameters like $\sigma$ in this context are *nuisance* or *auxiliary* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
 
-* $\mu$ is not the average height of the men in the sample. We can calculate that directly. It is `r mean(ch7_male$height)`. No estimation required! Instead, $\mu$ is the average height of men in the *population*. Recall from the discussions in Chapter \@ref(one-parameter) that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, the the population we really care about, in order to answer our three questions, is the set of adult men into which we might run today. This is not the same as the population of adult men in the US in 2009. But is it close enough? Is it better than nothing? Each case is a different and the details matter.
+* $\mu$ is not the average height of the men in the sample. We can calculate that directly. It is `r mean(ch7_male$height)`. No estimation required! Instead, $\mu$ is the average height of men in the *population*. Recall from the discussions in Chapter \@ref(one-parameter) that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, then the population we really care about, in order to answer our three questions, is the set of adult men into which we might run today. This is not the same as the population of adult men in the US in 2009. But is it close enough? Is it better than nothing? Each case is a different and the details matter.
 
 <!-- DK: Should we discuss what a superpopulation is? -->
 
@@ -629,7 +630,7 @@ fit_obj %>%
     theme_classic()
 ```
 
-Although it is possible to have variables names like "(Intercept)", it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Better, rename them, as we do above.
+Although it is possible to have variable names like "(Intercept)", it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Better, rename them, as we do above.
 
 ```{r}
 fit_obj %>% 
@@ -663,7 +664,7 @@ ch7_male %>%
   sample_n(5)
 ```
 
-The fitted value represents the model's best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, we already know what the actual value is. The residual is the difference between the outcome of the fitted value. These definitions lead to a natural decomposition of the outcome data:
+The fitted value represents the model's best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, we already know what the actual value is. The residual is the difference between the outcome and the fitted value. These definitions lead to a natural decomposition of the outcome data:
 
 
 ```{r, echo = FALSE}
@@ -699,7 +700,7 @@ outcome + fitted + res +
 
 
 
-<!-- DK: More details. And don't forget to compare this confidence interval to the bootstrapped one. -->
+<!-- DK: More details. And don't forget to compare this confidence interval to the bootstrapped one. And do a posterior predictive check! -->
 
 
 
@@ -774,7 +775,9 @@ tibble(pred = pp[, 1]) %>%
 
 Somewhere around 29% or so. 
 
-Again, the key difficulty is the population. The problem we actually have involves walking around London, or wherever, today. The data we have involve America in 2009. Those are not the same things! But they are not totally different. Knowing whether the data we have is "close enough" to the problem we want to solve is at the heart of Wisdom.
+Again, the key difficulty is the population. The problem we actually have involves walking around London, or wherever, today. The data we have involve America in 2009. Those are not the same things! But they are not totally different. Knowing whether the data we have is "close enough" to the problem we want to solve is at the heart of Wisdom. Yet that was the decision we made at the start of the process, the decision to create a model in the first place. Now that we have created a model, we look to the virtue of Temperance for guidance in using that model. The data we have is never a perfect match for the world we face. We need to temper our confidence and act with humility. Our forecasts will never be as good as a naive use of the model might suggest. Reality will surprise us. We need to take the model's claims with a family-sized portion of salt.
+
+<!-- DK: More on temperance and the many ways that we should be less confident. -->
 
 * What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
 
@@ -794,7 +797,7 @@ tibble(pred_1 = pp[, 1],
   summarize(answer = sum(gt_10) / n())
 ```
 
-There is about a 75% chance that, when meeting 4 random men, the tallest with be at least 10 cm taller than the shortest.
+There is about a 75% chance that, when meeting 4 random men, the tallest will be at least 10 cm taller than the shortest.
 
 <!-- DK: Discuss all the reasons why this might not be true. -->
 
