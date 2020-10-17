@@ -740,14 +740,20 @@ We have a model of American male height from 2009, `fit_obj`, which we can use f
 
 ```{r}
 set.seed(11)
-pp <- posterior_predict(fit_obj)[] %>% 
-  as_tibble()
+pp <- posterior_predict(fit_obj)
 
 ```
 
-Note the subset operator --- the `[]` --- at the end of `posterior_predict()`. This is an absurd hack, made necessary by the fact that `posterior_predict()` returns a weird object with class "ppd", which stands for posterior probability distribution. There are some advanced use cases in which this is a useful class of object to work with. But, for the purposes of this book, the "ppd" class is too complex. So, we quickly turn it into a tibble. Doing so requires two steps. First, using the `[]` operator to turn the object into a matrix and then using `as_tibble()` to transform the matrix into a tibble.
+Unfortunately, `posterior_predict()` returns a weird object with class "ppd", which stands for posterior probability distribution. There are some advanced use cases in which this is a useful class of object to work with. But, for the purposes of this book, the "ppd" class is too complex. So, whenever we call `posterior_predict()`, we will always transform it into a tibble like so:
 
-The resulting object, `pp`, is not easy to work with. But because the variable names are all numbers and because how big it is.
+```{r}
+set.seed(11)
+pp <- posterior_predict(fit_obj) %>%
+  `[` %>% 
+  as_tibble()
+```
+
+Doing so requires two steps. First, using the `[` operator to turn the object into a simple matrix and then using `as_tibble()` to transform the matrix into a tibble. The resulting object, `pp`, is not easy to work with, both because the variable names are all numbers and because of how big it is.
 
 ```{r}
 dim(pp)

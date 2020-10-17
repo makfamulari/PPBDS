@@ -352,7 +352,8 @@ new <- tibble(party = "Democrat")
 # to be used, which in our case is the one we generated in "Courage". The second
 # argument specifies the input.
 
-pp <- posterior_predict(fit_obj, newdata = new)[] %>% 
+pp <- posterior_predict(fit_obj, newdata = new) %>%
+  `[` %>% 
   as_tibble()
 
 head(pp, 10)
@@ -395,7 +396,8 @@ new <- tibble(party = c("Democrat", "Democrat", "Democrat",
                         "Republican", "Republican","Republican"))
 
 set.seed(27)
-pp <- posterior_predict(fit_obj, newdata = new)[] %>% 
+pp <- posterior_predict(fit_obj, newdata = new) %>%
+  `[` %>% 
   as_tibble()
 
 head(pp, 10)
@@ -613,7 +615,8 @@ ate_data <- tibble(treatment =
                      factor(c("Treated", "Control"),
                             levels = c("Treated", "Control")))
 
-pp <- posterior_predict(fit_obj, newdata = ate_data)[] %>% 
+pp <- posterior_predict(fit_obj, newdata = ate_data) %>%
+  `[` %>% 
   as_tibble()
 
 
