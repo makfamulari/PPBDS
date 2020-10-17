@@ -353,8 +353,8 @@ new <- tibble(party = "Democrat")
 # argument specifies the input.
 
 pp <- posterior_predict(fit_obj, newdata = new) %>%
-  `[` %>% 
-  as_tibble()
+    as_tibble() %>%
+    mutate(across(everything(), as.numeric))
 
 head(pp, 10)
 
@@ -397,8 +397,8 @@ new <- tibble(party = c("Democrat", "Democrat", "Democrat",
 
 set.seed(27)
 pp <- posterior_predict(fit_obj, newdata = new) %>%
-  `[` %>% 
-  as_tibble()
+    as_tibble() %>%
+    mutate(across(everything(), as.numeric))
 
 head(pp, 10)
 
@@ -616,8 +616,8 @@ ate_data <- tibble(treatment =
                             levels = c("Treated", "Control")))
 
 pp <- posterior_predict(fit_obj, newdata = ate_data) %>%
-  `[` %>% 
-  as_tibble()
+    as_tibble() %>%
+    mutate(across(everything(), as.numeric))
 
 
 te <- tibble(Treated = pp$`1`, Control = pp$`2`)  %>% 

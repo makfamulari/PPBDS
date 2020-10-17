@@ -749,11 +749,11 @@ Unfortunately, `posterior_predict()` returns a weird object with class "ppd", wh
 ```{r}
 set.seed(11)
 pp <- posterior_predict(fit_obj) %>%
-  `[` %>% 
-  as_tibble()
+    as_tibble() %>%
+    mutate(across(everything(), as.numeric))
 ```
 
-Doing so requires two steps. First, using the `[` operator to turn the object into a simple matrix and then using `as_tibble()` to transform the matrix into a tibble. The resulting object, `pp`, is not easy to work with, both because the variable names are all numbers and because of how big it is.
+Doing so requires two steps. First, use `as_tibble()`, just as you might expect. In R, we often transform one thing into another thing with functions which begin with `as_`. Unfortunately, that does not solve our problem because each column is still of class `ppd`. So, second, we use an `across` incantation to transform each column. The resulting object, `pp`, is still not easy to work with, both because the variable names are all numbers and because of how big it is.
 
 ```{r}
 dim(pp)
