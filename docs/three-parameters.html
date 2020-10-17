@@ -938,8 +938,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb914-9"><a href="three-parameters.html#cb914-9"></a><span class="co"># argument specifies the input.</span></span>
 <span id="cb914-10"><a href="three-parameters.html#cb914-10"></a></span>
 <span id="cb914-11"><a href="three-parameters.html#cb914-11"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">newdata =</span> new) <span class="op">%&gt;%</span></span>
-<span id="cb914-12"><a href="three-parameters.html#cb914-12"></a><span class="st">  `</span><span class="dt">[</span><span class="st">`</span> <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb914-13"><a href="three-parameters.html#cb914-13"></a><span class="st">  </span><span class="kw">as_tibble</span>()</span>
+<span id="cb914-12"><a href="three-parameters.html#cb914-12"></a><span class="st">    </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span></span>
+<span id="cb914-13"><a href="three-parameters.html#cb914-13"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
 <span id="cb914-14"><a href="three-parameters.html#cb914-14"></a></span>
 <span id="cb914-15"><a href="three-parameters.html#cb914-15"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 1
@@ -983,8 +983,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb919-3"><a href="three-parameters.html#cb919-3"></a></span>
 <span id="cb919-4"><a href="three-parameters.html#cb919-4"></a><span class="kw">set.seed</span>(<span class="dv">27</span>)</span>
 <span id="cb919-5"><a href="three-parameters.html#cb919-5"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">newdata =</span> new) <span class="op">%&gt;%</span></span>
-<span id="cb919-6"><a href="three-parameters.html#cb919-6"></a><span class="st">  `</span><span class="dt">[</span><span class="st">`</span> <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb919-7"><a href="three-parameters.html#cb919-7"></a><span class="st">  </span><span class="kw">as_tibble</span>()</span>
+<span id="cb919-6"><a href="three-parameters.html#cb919-6"></a><span class="st">    </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span></span>
+<span id="cb919-7"><a href="three-parameters.html#cb919-7"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
 <span id="cb919-8"><a href="three-parameters.html#cb919-8"></a></span>
 <span id="cb919-9"><a href="three-parameters.html#cb919-9"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 6
@@ -1179,8 +1179,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb926-7"><a href="three-parameters.html#cb926-7"></a>                            <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">"Treated"</span>, <span class="st">"Control"</span>)))</span>
 <span id="cb926-8"><a href="three-parameters.html#cb926-8"></a></span>
 <span id="cb926-9"><a href="three-parameters.html#cb926-9"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">newdata =</span> ate_data) <span class="op">%&gt;%</span></span>
-<span id="cb926-10"><a href="three-parameters.html#cb926-10"></a><span class="st">  `</span><span class="dt">[</span><span class="st">`</span> <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb926-11"><a href="three-parameters.html#cb926-11"></a><span class="st">  </span><span class="kw">as_tibble</span>()</span>
+<span id="cb926-10"><a href="three-parameters.html#cb926-10"></a><span class="st">    </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span></span>
+<span id="cb926-11"><a href="three-parameters.html#cb926-11"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
 <span id="cb926-12"><a href="three-parameters.html#cb926-12"></a></span>
 <span id="cb926-13"><a href="three-parameters.html#cb926-13"></a></span>
 <span id="cb926-14"><a href="three-parameters.html#cb926-14"></a>te &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">Treated =</span> pp<span class="op">$</span><span class="st">`</span><span class="dt">1</span><span class="st">`</span>, <span class="dt">Control =</span> pp<span class="op">$</span><span class="st">`</span><span class="dt">2</span><span class="st">`</span>)  <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -1208,7 +1208,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a href="n-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-16
+2020-10-17
 </p>
 </div>
 </div>

@@ -532,9 +532,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Note that these interfaces are heterogeneous in either how the data are passed to the model function or in terms of their arguments. The first issue is that, to fit models across different packages, the data must be formatted in different ways. <code>lm()</code> and <code>stan_glm()</code> only have formula interfaces while <code>glmnet()</code> does not. For other types of models, the interfaces may be even more disparate. For a person trying to do data analysis, these differences require the memorization of each package’s syntax and can be very frustrating.</p>
 <p>For tidymodels, the approach to specifying a model is intended to be more unified:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Specify the <em>type</em> of model based on its mathematical structure</strong> (e.g., linear regression, random forest, <em>K</em>-nearest neighbors, etc).</p></li>
+<li><p><strong>Specify the <em>type</em> of model based on its mathematical structure</strong>.</p></li>
 <li><p><strong>Specify the <em>engine</em> for fitting the model.</strong> Most often this reflects the software package that should be used.</p></li>
-<li><p><strong>When required, declare the <em>mode</em> of the model.</strong> The mode reflects the type of prediction outcome. For numeric outcomes, the mode is <em>regression</em>; for qualitative outcomes, it is <em>classification</em><label for="tufte-sn-12" class="margin-toggle sidenote-number">12</label><input type="checkbox" id="tufte-sn-12" class="margin-toggle"><span class="sidenote"><span class="sidenote-number">12</span> Note that <strong>parsnip</strong> constrains the outcome column of a classification models to be encoded as a <em>factor</em>; using binary numeric values will result in an error.</span>. If a model can only create one type of model, such as linear regression, the mode is already set.</p></li>
+<li><p><strong>When required, declare the <em>mode</em> of the model.</strong> The mode reflects the type of prediction outcome. For numeric outcomes, the mode is <em>regression</em>; for qualitative outcomes, it is <em>classification</em>. Note that <strong>parsnip</strong> constrains the outcome column of a classification models to be encoded as a <em>factor</em>; using binary numeric values will result in an error. If a model can only create one type of model, such as linear regression, the mode is already set.</p></li>
 </ol>
 <p>These specifications are built <em>without referencing the data</em>. For example, for the three cases above:</p>
 <div class="sourceCode" id="cb999"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb999-1"><a href="model-choice.html#cb999-1"></a><span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -552,7 +552,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>## Linear Regression Model Specification (regression)
 ## 
 ## Computational engine: stan</code></pre>
-<p>Once the details of the model have been specified, the model estimation can be done with either the <code>fit()</code> function (to use a formula) or the <code>fit_xy()</code> function (when your data are already pre-processed). The <strong>parsnip</strong> package allows the user to be indifferent to the interface of the underlying model; you can always use a formula even if the modeling package’s function only has the <code>x</code>/<code>y</code> interface.</p>
+<p>Once the details of the model have been specified, the model estimation can be done using a formula with the <code>fit()</code> function. The <strong>parsnip</strong> package allows the user to be indifferent to the interface of the underlying model.</p>
 <p>Let’s walk through how to predict the sale price of houses in the Ames data as a function of only longitude and latitude.</p>
 <div class="sourceCode" id="cb1005"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1005-1"><a href="model-choice.html#cb1005-1"></a>lm_model &lt;-<span class="st"> </span></span>
 <span id="cb1005-2"><a href="model-choice.html#cb1005-2"></a><span class="st">  </span><span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -563,30 +563,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1005-7"><a href="model-choice.html#cb1005-7"></a>lm_form_fit &lt;-<span class="st"> </span></span>
 <span id="cb1005-8"><a href="model-choice.html#cb1005-8"></a><span class="st">  </span>lm_model <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1005-9"><a href="model-choice.html#cb1005-9"></a><span class="st">  </span><span class="kw">fit</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, <span class="dt">data =</span> ames_train)</span>
-<span id="cb1005-10"><a href="model-choice.html#cb1005-10"></a></span>
-<span id="cb1005-11"><a href="model-choice.html#cb1005-11"></a>lm_xy_fit &lt;-<span class="st"> </span></span>
-<span id="cb1005-12"><a href="model-choice.html#cb1005-12"></a><span class="st">  </span>lm_model <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1005-13"><a href="model-choice.html#cb1005-13"></a><span class="st">  </span><span class="kw">fit_xy</span>(<span class="dt">x =</span> ames_train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Longitude, Latitude),</span>
-<span id="cb1005-14"><a href="model-choice.html#cb1005-14"></a>         <span class="dt">y =</span> ames_train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>(Sale_Price))</span>
-<span id="cb1005-15"><a href="model-choice.html#cb1005-15"></a>    </span>
-<span id="cb1005-16"><a href="model-choice.html#cb1005-16"></a>lm_form_fit</span></code></pre></div>
-<pre><code>## parsnip model object
-## 
-## Fit time:  5ms 
-## 
-## Call:
-## stats::lm(formula = Sale_Price ~ Longitude + Latitude, data = data)
-## 
-## Coefficients:
-## (Intercept)    Longitude     Latitude  
-##     -316.37        -2.08         3.01</code></pre>
-<div class="sourceCode" id="cb1007"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1007-1"><a href="model-choice.html#cb1007-1"></a>lm_xy_fit</span></code></pre></div>
+<span id="cb1005-10"><a href="model-choice.html#cb1005-10"></a>    </span>
+<span id="cb1005-11"><a href="model-choice.html#cb1005-11"></a>lm_form_fit</span></code></pre></div>
 <pre><code>## parsnip model object
 ## 
 ## Fit time:  3ms 
 ## 
 ## Call:
-## stats::lm(formula = ..y ~ ., data = data)
+## stats::lm(formula = Sale_Price ~ Longitude + Latitude, data = data)
 ## 
 ## Coefficients:
 ## (Intercept)    Longitude     Latitude  
@@ -602,8 +586,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">10.4.2</span> Use the model results</h3>
 <p>Once the model is created and fit, we can use the results in a variety of ways; we might want to plot, print, or otherwise examine the model output. Several quantities are stored in a <strong>parsnip</strong> model object, including the fitted model. This can be found in an element called <code>fit</code>, which can be returned using the <code>purrr::pluck()</code> function:</p>
 <!-- DK: Investigate pluck nonsense. -->
-<div class="sourceCode" id="cb1009"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1009-1"><a href="model-choice.html#cb1009-1"></a>lm_form_fit <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1009-2"><a href="model-choice.html#cb1009-2"></a><span class="st">  </span>purrr<span class="op">::</span><span class="kw">pluck</span>(<span class="st">"fit"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1007"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1007-1"><a href="model-choice.html#cb1007-1"></a>lm_form_fit <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1007-2"><a href="model-choice.html#cb1007-2"></a><span class="st">  </span>purrr<span class="op">::</span><span class="kw">pluck</span>(<span class="st">"fit"</span>)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## stats::lm(formula = Sale_Price ~ Longitude + Latitude, data = data)
@@ -613,7 +597,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##     -316.37        -2.08         3.01</code></pre>
 <p>Normal methods can be applied to this object, such as printing, plotting, and so on.</p>
 <p>One issue with some existing methods in base R is that the results are stored in a manner that may not be the most useful. As a solution, the <strong>broom</strong> package has methods to convert many types of model objects to a tidy structure. For example, using the <code>tidy()</code> method on the linear model produces:</p>
-<div class="sourceCode" id="cb1011"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1011-1"><a href="model-choice.html#cb1011-1"></a><span class="kw">tidy</span>(lm_form_fit)</span></code></pre></div>
+<div class="sourceCode" id="cb1009"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1009-1"><a href="model-choice.html#cb1009-1"></a><span class="kw">tidy</span>(lm_form_fit)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
@@ -632,8 +616,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>There are always as many rows in the tibble as there are in the input data set.</li>
 </ol>
 <p>For example, when numeric data are predicted:</p>
-<div class="sourceCode" id="cb1013"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1013-1"><a href="model-choice.html#cb1013-1"></a>ames_test_small &lt;-<span class="st"> </span>ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</span>
-<span id="cb1013-2"><a href="model-choice.html#cb1013-2"></a><span class="kw">predict</span>(lm_form_fit, <span class="dt">new_data =</span> ames_test_small)</span></code></pre></div>
+<div class="sourceCode" id="cb1011"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1011-1"><a href="model-choice.html#cb1011-1"></a>ames_test_small &lt;-<span class="st"> </span>ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</span>
+<span id="cb1011-2"><a href="model-choice.html#cb1011-2"></a><span class="kw">predict</span>(lm_form_fit, <span class="dt">new_data =</span> ames_test_small)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 1
 ##   .pred
 ##   &lt;dbl&gt;
@@ -642,15 +626,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 3  5.28
 ## 4  5.26
 ## 5  5.24</code></pre>
-<p>The row order of the predictions are always the same as the original data. Why are there leading dot in some of the column names? Some tidyverse and tidymodels arguments and return values contain periods. This is to protect against merging data with duplicate names. There are some data sets that contain predictors names <code>pred</code>!</p>
+<p>The row order of the predictions are always the same as the original data. Why is there a leading dot in some of the column names? Some tidyverse and tidymodels arguments and return values contain periods. This is to protect against merging data with duplicate names. There are some data sets that contain predictors named <code>pred</code>!</p>
 <p>These three rules make it easier to merge predictions with the original data:</p>
-<div class="sourceCode" id="cb1015"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1015-1"><a href="model-choice.html#cb1015-1"></a>ames_test_small <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1015-2"><a href="model-choice.html#cb1015-2"></a><span class="st">  </span><span class="kw">select</span>(Sale_Price) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1015-3"><a href="model-choice.html#cb1015-3"></a><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">predict</span>(lm_form_fit, ames_test_small)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1015-4"><a href="model-choice.html#cb1015-4"></a><span class="st">  </span></span>
-<span id="cb1015-5"><a href="model-choice.html#cb1015-5"></a><span class="st">  </span><span class="co"># Add 95% prediction intervals to the results:</span></span>
-<span id="cb1015-6"><a href="model-choice.html#cb1015-6"></a><span class="st">  </span></span>
-<span id="cb1015-7"><a href="model-choice.html#cb1015-7"></a><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">predict</span>(lm_form_fit, ames_test_small, <span class="dt">type =</span> <span class="st">"pred_int"</span>)) </span></code></pre></div>
+<div class="sourceCode" id="cb1013"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1013-1"><a href="model-choice.html#cb1013-1"></a>ames_test_small <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1013-2"><a href="model-choice.html#cb1013-2"></a><span class="st">  </span><span class="kw">select</span>(Sale_Price) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1013-3"><a href="model-choice.html#cb1013-3"></a><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">predict</span>(lm_form_fit, ames_test_small)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1013-4"><a href="model-choice.html#cb1013-4"></a><span class="st">  </span></span>
+<span id="cb1013-5"><a href="model-choice.html#cb1013-5"></a><span class="st">  </span><span class="co"># Add 95% prediction intervals to the results:</span></span>
+<span id="cb1013-6"><a href="model-choice.html#cb1013-6"></a><span class="st">  </span></span>
+<span id="cb1013-7"><a href="model-choice.html#cb1013-7"></a><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">predict</span>(lm_form_fit, ames_test_small, <span class="dt">type =</span> <span class="st">"pred_int"</span>)) </span></code></pre></div>
 <pre><code>## # A tibble: 5 x 4
 ##   Sale_Price .pred .pred_lower .pred_upper
 ##        &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
@@ -697,18 +681,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 5 `pred_int`   `.pred_lower`, `.pred_upper`</code></pre>
 <p>The third rule regarding the number of rows in the output is critical. For example, if any rows of the new data contain missing values, the output will be padded with missing results for those rows.</p>
 <p>A main advantage of standardizing the model interface and prediction types in <strong>parsnip</strong> is that, when different models are used, the syntax is identical. Suppose that we used a decision tree to model the Ames data. Outside of the model specification, there are no significant differences in the code pipeline:</p>
-<div class="sourceCode" id="cb1018"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1018-1"><a href="model-choice.html#cb1018-1"></a>tree_model &lt;-<span class="st"> </span></span>
-<span id="cb1018-2"><a href="model-choice.html#cb1018-2"></a><span class="st">  </span><span class="kw">decision_tree</span>(<span class="dt">min_n =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1018-3"><a href="model-choice.html#cb1018-3"></a><span class="st">  </span><span class="kw">set_engine</span>(<span class="st">"rpart"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1018-4"><a href="model-choice.html#cb1018-4"></a><span class="st">  </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)</span>
-<span id="cb1018-5"><a href="model-choice.html#cb1018-5"></a></span>
-<span id="cb1018-6"><a href="model-choice.html#cb1018-6"></a>tree_fit &lt;-<span class="st"> </span></span>
-<span id="cb1018-7"><a href="model-choice.html#cb1018-7"></a><span class="st">  </span>tree_model <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1018-8"><a href="model-choice.html#cb1018-8"></a><span class="st">  </span><span class="kw">fit</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, <span class="dt">data =</span> ames_train)</span>
-<span id="cb1018-9"><a href="model-choice.html#cb1018-9"></a></span>
-<span id="cb1018-10"><a href="model-choice.html#cb1018-10"></a>ames_test_small <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1018-11"><a href="model-choice.html#cb1018-11"></a><span class="st">  </span><span class="kw">select</span>(Sale_Price) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1018-12"><a href="model-choice.html#cb1018-12"></a><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">predict</span>(tree_fit, ames_test_small))</span></code></pre></div>
+<div class="sourceCode" id="cb1016"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1016-1"><a href="model-choice.html#cb1016-1"></a>tree_model &lt;-<span class="st"> </span></span>
+<span id="cb1016-2"><a href="model-choice.html#cb1016-2"></a><span class="st">  </span><span class="kw">decision_tree</span>(<span class="dt">min_n =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1016-3"><a href="model-choice.html#cb1016-3"></a><span class="st">  </span><span class="kw">set_engine</span>(<span class="st">"rpart"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1016-4"><a href="model-choice.html#cb1016-4"></a><span class="st">  </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb1016-5"><a href="model-choice.html#cb1016-5"></a></span>
+<span id="cb1016-6"><a href="model-choice.html#cb1016-6"></a>tree_fit &lt;-<span class="st"> </span></span>
+<span id="cb1016-7"><a href="model-choice.html#cb1016-7"></a><span class="st">  </span>tree_model <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1016-8"><a href="model-choice.html#cb1016-8"></a><span class="st">  </span><span class="kw">fit</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, <span class="dt">data =</span> ames_train)</span>
+<span id="cb1016-9"><a href="model-choice.html#cb1016-9"></a></span>
+<span id="cb1016-10"><a href="model-choice.html#cb1016-10"></a>ames_test_small <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1016-11"><a href="model-choice.html#cb1016-11"></a><span class="st">  </span><span class="kw">select</span>(Sale_Price) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1016-12"><a href="model-choice.html#cb1016-12"></a><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">predict</span>(tree_fit, ames_test_small))</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 2
 ##   Sale_Price .pred
 ##        &lt;dbl&gt; &lt;dbl&gt;
@@ -718,7 +702,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 4       5.60  5.31
 ## 5       5.02  5.16</code></pre>
 <p>This demonstrates the benefit of homogenizing the data analysis process and syntax across different models. It enables the user to spend their time on the results and interpretation rather than having to focus on the syntactical differences between R packages.</p>
-<p>We have introduced the <strong>parsnip</strong> package, which provides a common interface for models across R packages using a standard syntax. The interface and resulting objects have a predictable structure.</p>
 </div>
 </div>
 <div id="workflows" class="section level2">
@@ -730,7 +713,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">10.5.1</span> Where does the model begin and end?</h3>
 <p>So far, when we have used the term “the model”, we have meant a structural equation that relates some predictors to one or more outcomes. Let’s consider again linear regression as an example. The outcome data are denoted as <span class="math inline">\(y_i\)</span>, where there are <span class="math inline">\(i = 1 \ldots n\)</span> samples in the training set. Suppose that there are <span class="math inline">\(p\)</span> predictors <span class="math inline">\(x_{i1}, \ldots, x_{ip}\)</span> that are used in the model. Linear regression produces a model equation of</p>
 <p><span class="math display">\[ \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1x_{i1} + \ldots + \hat{\beta}_px_{ip} \]</span></p>
-<p>While this is a <em>linear</em> model, it is only linear in the parameters. The predictors could be nonlinear terms (such as the <span class="math inline">\(log(x_i)\)</span>).</p>
+<p>While this is a <em>linear</em> model, it is only linear in the parameters. The predictors could be nonlinear terms like <span class="math inline">\(log(x_i)\)</span>.</p>
 <p>For some data sets that are straightforward in nature, fitting the model itself may be the entire process. However, there are a variety of choices and additional steps that often occur <em>before</em> the model is fit:</p>
 <ul>
 <li><p>While our example model has <span class="math inline">\(p\)</span> predictors, it is common to start with more than <span class="math inline">\(p\)</span> candidate predictors. Through exploratory data analysis or using domain knowledge, some of the predictors may be excluded from the analysis. In other cases, a feature selection algorithm may be used to make a data-driven choice for the minimum predictor set for the model.</p></li>
@@ -740,7 +723,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>While the examples above are related to steps that occur before the model fit, there may also be operations that occur <em>after</em> the model is created. When a classification model is created where the outcome is binary (e.g., <code>event</code> and <code>non-event</code>), it is customary to use a 50% probability cutoff to create a discrete class prediction, also known as a “hard prediction”. For example, a classification model might estimate that the probability of an event was 62%. Using the typical default, the hard prediction would be <code>event</code>. However, the model may need to be more focused on reducing false positive results (i.e., where true non-events are classified as events). One way to do this is to raise the cutoff from 50% to some greater value. This increases the level of evidence required to call a new sample an event. While this reduces the true positive rate (which is bad), it may have a more dramatic effect on reducing false positives. The choice of the cutoff value should be optimized using data. This is an example of a <em>post-processing</em> step that has a significant effect on how well the model works, even though it is not contained in the model fitting step.</p>
 <p>It is important to focus on the broader <em>modeling process</em>, instead of only fitting the specific model used to estimate parameters. This broader process includes any preprocessing steps, the model fit itself, as well as potential post-processing activities. In this book, we will refer to this broader process as the <strong>model workflow</strong> and include in it any data-driven activities that are used to produce a final model equation.</p>
 <p>In other software, such as Python or Spark, similar collections of steps are called <em>pipelines</em>. In tidymodels, the term “pipeline” already connotes a sequence of operations chained together with a pipe operator (such as <code>%&gt;%</code>). Rather than using ambiguous terminology in this context, we call the sequence of computational operations related to modeling <strong>workflows</strong>.</p>
-<p>Binding together the analytical components of a data analysis is important for another reason. Future chapters will demonstrate how to accurately measure performance, as well as how to optimize structural parameters (i.e. model tuning). To correctly quantify model performance on the training set, we recommend using <em>resampling</em> methods. To do this properly, no data-driven parts of the analysis should be excluded from validation. To this end, the workflow must include all significant estimation steps.</p>
+<p>Binding together the analytical components of a data analysis is important for another reason. We will learn how to accurately measure performance, as well as how to optimize structural parameters (i.e. model tuning). To correctly quantify model performance on the training set, we recommend using <em>resampling</em> methods. To do this properly, no data-driven parts of the analysis should be excluded from validation. To this end, the workflow must include all significant estimation steps.</p>
 <p>To illustrate, consider PCA signal extraction. This is a way to replace correlated predictors with new artificial features that are uncorrelated and capture most of the information in the original set. The new features would be used as the predictors and least squares regression could be used to estimate the model parameters.</p>
 <p>There are two ways of thinking about the model workflow. The <em>incorrect</em> method would be to think of the PCA preprocessing step as <em>not being part of the modeling process</em>:</p>
 <p><img src="10-model-choice/images/bad-workflow.svg"></p>
@@ -753,17 +736,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3>
 <span class="header-section-number">10.5.2</span> Workflow basics</h3>
 <p>The <strong>workflows</strong> package allows the user to bind modeling and preprocessing objects together. Let’s start again with the Ames data and a simple linear model:</p>
-<div class="sourceCode" id="cb1020"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1020-1"><a href="model-choice.html#cb1020-1"></a><span class="kw">library</span>(tidymodels)  <span class="co"># Includes the workflows package</span></span>
-<span id="cb1020-2"><a href="model-choice.html#cb1020-2"></a></span>
-<span id="cb1020-3"><a href="model-choice.html#cb1020-3"></a>lm_model &lt;-<span class="st"> </span></span>
-<span id="cb1020-4"><a href="model-choice.html#cb1020-4"></a><span class="st">  </span><span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1020-5"><a href="model-choice.html#cb1020-5"></a><span class="st">  </span><span class="kw">set_engine</span>(<span class="st">"lm"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1018"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1018-1"><a href="model-choice.html#cb1018-1"></a><span class="kw">library</span>(tidymodels)  <span class="co"># Includes the workflows package</span></span>
+<span id="cb1018-2"><a href="model-choice.html#cb1018-2"></a></span>
+<span id="cb1018-3"><a href="model-choice.html#cb1018-3"></a>lm_model &lt;-<span class="st"> </span></span>
+<span id="cb1018-4"><a href="model-choice.html#cb1018-4"></a><span class="st">  </span><span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1018-5"><a href="model-choice.html#cb1018-5"></a><span class="st">  </span><span class="kw">set_engine</span>(<span class="st">"lm"</span>)</span></code></pre></div>
 <p>A workflow always requires a <strong>parsnip</strong> model object:</p>
-<div class="sourceCode" id="cb1021"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1021-1"><a href="model-choice.html#cb1021-1"></a>lm_wflow &lt;-<span class="st"> </span></span>
-<span id="cb1021-2"><a href="model-choice.html#cb1021-2"></a><span class="st">  </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1021-3"><a href="model-choice.html#cb1021-3"></a><span class="st">  </span><span class="kw">add_model</span>(lm_model)</span>
-<span id="cb1021-4"><a href="model-choice.html#cb1021-4"></a></span>
-<span id="cb1021-5"><a href="model-choice.html#cb1021-5"></a>lm_wflow</span></code></pre></div>
+<div class="sourceCode" id="cb1019"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1019-1"><a href="model-choice.html#cb1019-1"></a>lm_wflow &lt;-<span class="st"> </span></span>
+<span id="cb1019-2"><a href="model-choice.html#cb1019-2"></a><span class="st">  </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1019-3"><a href="model-choice.html#cb1019-3"></a><span class="st">  </span><span class="kw">add_model</span>(lm_model)</span>
+<span id="cb1019-4"><a href="model-choice.html#cb1019-4"></a></span>
+<span id="cb1019-5"><a href="model-choice.html#cb1019-5"></a>lm_wflow</span></code></pre></div>
 <pre><code>## ══ Workflow ════════════════════════════════════════════════════════════════
 ## Preprocessor: None
 ## Model: linear_reg()
@@ -774,11 +757,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Computational engine: lm</code></pre>
 <p>Notice that we have not yet specified how this workflow should preprocess the data: <code>Preprocessor: None</code>.</p>
 <p>If our model were very simple, a standard R formula can be used as a preprocessor:</p>
-<div class="sourceCode" id="cb1023"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1023-1"><a href="model-choice.html#cb1023-1"></a>lm_wflow &lt;-<span class="st"> </span></span>
-<span id="cb1023-2"><a href="model-choice.html#cb1023-2"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1023-3"><a href="model-choice.html#cb1023-3"></a><span class="st">  </span><span class="kw">add_formula</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude)</span>
-<span id="cb1023-4"><a href="model-choice.html#cb1023-4"></a></span>
-<span id="cb1023-5"><a href="model-choice.html#cb1023-5"></a>lm_wflow</span></code></pre></div>
+<div class="sourceCode" id="cb1021"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1021-1"><a href="model-choice.html#cb1021-1"></a>lm_wflow &lt;-<span class="st"> </span></span>
+<span id="cb1021-2"><a href="model-choice.html#cb1021-2"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1021-3"><a href="model-choice.html#cb1021-3"></a><span class="st">  </span><span class="kw">add_formula</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude)</span>
+<span id="cb1021-4"><a href="model-choice.html#cb1021-4"></a></span>
+<span id="cb1021-5"><a href="model-choice.html#cb1021-5"></a>lm_wflow</span></code></pre></div>
 <pre><code>## ══ Workflow ════════════════════════════════════════════════════════════════
 ## Preprocessor: Formula
 ## Model: linear_reg()
@@ -791,8 +774,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 
 ## Computational engine: lm</code></pre>
 <p>Workflows have a <code>fit()</code> method that can be used to create the model. Using the objects created previously:</p>
-<div class="sourceCode" id="cb1025"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1025-1"><a href="model-choice.html#cb1025-1"></a>lm_fit &lt;-<span class="st"> </span><span class="kw">fit</span>(lm_wflow, ames_train)</span>
-<span id="cb1025-2"><a href="model-choice.html#cb1025-2"></a>lm_fit</span></code></pre></div>
+<div class="sourceCode" id="cb1023"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1023-1"><a href="model-choice.html#cb1023-1"></a>lm_fit &lt;-<span class="st"> </span><span class="kw">fit</span>(lm_wflow, ames_train)</span>
+<span id="cb1023-2"><a href="model-choice.html#cb1023-2"></a>lm_fit</span></code></pre></div>
 <pre><code>## ══ Workflow [trained] ══════════════════════════════════════════════════════
 ## Preprocessor: Formula
 ## Model: linear_reg()
@@ -809,7 +792,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## (Intercept)    Longitude     Latitude  
 ##     -316.37        -2.08         3.01</code></pre>
 <p>We can also <code>predict()</code> on the fitted workflow:</p>
-<div class="sourceCode" id="cb1027"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1027-1"><a href="model-choice.html#cb1027-1"></a><span class="kw">predict</span>(lm_fit, ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb1025"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1025-1"><a href="model-choice.html#cb1025-1"></a><span class="kw">predict</span>(lm_fit, ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>))</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 1
 ##   .pred
 ##   &lt;dbl&gt;
@@ -823,15 +806,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">10.5.3</span> Workflows and recipes</h3>
 <!-- DK: Simplify this. No need to teach update() stuff trickery. -->
 <p>Instead of using model formulas, recipe objects can also be used to preprocess data for modeling. Previously, we summarized a recipe that specified several preprocessing and feature engineering steps. These are encapsulated inside the object <code>ames_rec</code> and are attached to the workflow:</p>
-<div class="sourceCode" id="cb1029"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1029-1"><a href="model-choice.html#cb1029-1"></a>lm_wflow <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1029-2"><a href="model-choice.html#cb1029-2"></a><span class="st">  </span><span class="kw">add_recipe</span>(ames_rec)</span></code></pre></div>
+<div class="sourceCode" id="cb1027"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1027-1"><a href="model-choice.html#cb1027-1"></a>lm_wflow <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1027-2"><a href="model-choice.html#cb1027-2"></a><span class="st">  </span><span class="kw">add_recipe</span>(ames_rec)</span></code></pre></div>
 <pre><code>## Error: A recipe cannot be added when a formula already exists.</code></pre>
 <p>That did not work! We can only have one preprocessing method at a time, so we need to remove the formula before adding the recipe.</p>
-<div class="sourceCode" id="cb1031"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1031-1"><a href="model-choice.html#cb1031-1"></a>lm_wflow &lt;-<span class="st"> </span></span>
-<span id="cb1031-2"><a href="model-choice.html#cb1031-2"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1031-3"><a href="model-choice.html#cb1031-3"></a><span class="st">  </span><span class="kw">remove_formula</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1031-4"><a href="model-choice.html#cb1031-4"></a><span class="st">  </span><span class="kw">add_recipe</span>(ames_rec)</span>
-<span id="cb1031-5"><a href="model-choice.html#cb1031-5"></a>lm_wflow</span></code></pre></div>
+<div class="sourceCode" id="cb1029"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1029-1"><a href="model-choice.html#cb1029-1"></a>lm_wflow &lt;-<span class="st"> </span></span>
+<span id="cb1029-2"><a href="model-choice.html#cb1029-2"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1029-3"><a href="model-choice.html#cb1029-3"></a><span class="st">  </span><span class="kw">remove_formula</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1029-4"><a href="model-choice.html#cb1029-4"></a><span class="st">  </span><span class="kw">add_recipe</span>(ames_rec)</span>
+<span id="cb1029-5"><a href="model-choice.html#cb1029-5"></a>lm_wflow</span></code></pre></div>
 <pre><code>## ══ Workflow ════════════════════════════════════════════════════════════════
 ## Preprocessor: Recipe
 ## Model: linear_reg()
@@ -849,105 +832,61 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Linear Regression Model Specification (regression)
 ## 
 ## Computational engine: lm</code></pre>
-<p>We described the <code>prep()</code>, <code>bake()</code>, and <code>juice()</code> functions for using the recipe with a modeling function. This can be onerous, so the <code>fit()</code> method for workflow objects automates this process:</p>
-<!-- DK: Drop the prep/juice/fit discussions? We should shorten this. -->
-<div class="sourceCode" id="cb1033"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1033-1"><a href="model-choice.html#cb1033-1"></a><span class="co"># Does `prep()`, `juice()`, and `fit()` in one step:</span></span>
-<span id="cb1033-2"><a href="model-choice.html#cb1033-2"></a></span>
-<span id="cb1033-3"><a href="model-choice.html#cb1033-3"></a>lm_fit &lt;-<span class="st"> </span><span class="kw">fit</span>(lm_wflow, ames_train)</span>
-<span id="cb1033-4"><a href="model-choice.html#cb1033-4"></a></span>
-<span id="cb1033-5"><a href="model-choice.html#cb1033-5"></a><span class="co"># Does `bake()` and `predict()` automatically:</span></span>
-<span id="cb1033-6"><a href="model-choice.html#cb1033-6"></a></span>
-<span id="cb1033-7"><a href="model-choice.html#cb1033-7"></a><span class="kw">predict</span>(lm_fit, ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>))</span></code></pre></div>
+<p>Use <code>fit()</code> to complete the model and <code>predict()</code> to create predictions from the fitted model.</p>
+<div class="sourceCode" id="cb1031"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1031-1"><a href="model-choice.html#cb1031-1"></a>lm_fit &lt;-<span class="st"> </span><span class="kw">fit</span>(lm_wflow, ames_train)</span>
+<span id="cb1031-2"><a href="model-choice.html#cb1031-2"></a></span>
+<span id="cb1031-3"><a href="model-choice.html#cb1031-3"></a><span class="kw">predict</span>(lm_fit, ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>))</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 1
 ##   .pred
 ##   &lt;dbl&gt;
 ## 1  5.31
 ## 2  5.30
 ## 3  5.17</code></pre>
-<p>If we need the bare model object or recipe, there are <code>pull_*</code> functions that can retrieve them:</p>
-<div class="sourceCode" id="cb1035"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1035-1"><a href="model-choice.html#cb1035-1"></a><span class="co"># Get the recipe and run `tidy()` method: </span></span>
-<span id="cb1035-2"><a href="model-choice.html#cb1035-2"></a></span>
-<span id="cb1035-3"><a href="model-choice.html#cb1035-3"></a>lm_fit <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1035-4"><a href="model-choice.html#cb1035-4"></a><span class="st">  </span><span class="kw">pull_workflow_prepped_recipe</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1035-5"><a href="model-choice.html#cb1035-5"></a><span class="st">  </span><span class="kw">tidy</span>()</span></code></pre></div>
-<pre><code>## # A tibble: 5 x 6
-##   number operation type     trained skip  id            
-##    &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;    &lt;lgl&gt;   &lt;lgl&gt; &lt;chr&gt;         
-## 1      1 step      log      TRUE    FALSE log_vqtIn     
-## 2      2 step      other    TRUE    FALSE other_K2XxD   
-## 3      3 step      dummy    TRUE    FALSE dummy_ht3jv   
-## 4      4 step      interact TRUE    FALSE interact_XqiIK
-## 5      5 step      ns       TRUE    FALSE ns_u4pZz</code></pre>
-<div class="sourceCode" id="cb1037"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1037-1"><a href="model-choice.html#cb1037-1"></a><span class="co"># To tidy the model fit: </span></span>
-<span id="cb1037-2"><a href="model-choice.html#cb1037-2"></a></span>
-<span id="cb1037-3"><a href="model-choice.html#cb1037-3"></a>lm_fit <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1037-4"><a href="model-choice.html#cb1037-4"></a></span>
-<span id="cb1037-5"><a href="model-choice.html#cb1037-5"></a><span class="st">  </span><span class="co"># This returns the parsnip object:</span></span>
-<span id="cb1037-6"><a href="model-choice.html#cb1037-6"></a><span class="st">  </span></span>
-<span id="cb1037-7"><a href="model-choice.html#cb1037-7"></a><span class="st">  </span><span class="kw">pull_workflow_fit</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1037-8"><a href="model-choice.html#cb1037-8"></a><span class="st">  </span></span>
-<span id="cb1037-9"><a href="model-choice.html#cb1037-9"></a><span class="st">  </span><span class="co"># Now tidy the linear model object:</span></span>
-<span id="cb1037-10"><a href="model-choice.html#cb1037-10"></a><span class="st">  </span></span>
-<span id="cb1037-11"><a href="model-choice.html#cb1037-11"></a><span class="st">  </span><span class="kw">tidy</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1037-12"><a href="model-choice.html#cb1037-12"></a><span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 5 x 5
-##   term                       estimate std.error statistic   p.value
-##   &lt;chr&gt;                         &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-## 1 (Intercept)                -0.531    0.296        -1.79 7.32e-  2
-## 2 Gr_Liv_Area                 0.648    0.0161       40.3  1.46e-264
-## 3 Year_Built                  0.00194  0.000139     13.9  2.69e- 42
-## 4 Neighborhood_College_Creek -0.0898   0.0332       -2.71 6.83e-  3
-## 5 Neighborhood_Old_Town      -0.0516   0.0129       -4.01 6.20e-  5</code></pre>
-<div id="tree-based-models" class="section level4 unnumbered">
-<h4>Tree-based models</h4>
-<p>When we fit a tree to the data, the <strong>parsnip</strong> package understands what the modeling function would do. For example, if a random forest model is fit using the <strong>ranger</strong> or <strong>randomForest</strong> packages, the workflow knows predictors columns that are factors should be left as-is.</p>
-<p>As a counter example, a boosted tree created with the <strong>xgboost</strong> package requires the user to create dummy variables from factor predictors (since <code>xgboost::xgb.train()</code> will not). This requirement is embedded into the model specification object and a workflow using <strong>xgboost</strong> <em>will</em> create the indicator columns for this engine. Also note that a different engine for boosted trees, C5.0, does not require dummy variables so none are made by the workflow.</p>
-<p>This determination is made for <em>each model and engine combination</em>.</p>
 <p>We have learned that the modeling process encompasses more than just estimating the parameters of an algorithm that connects predictors to an outcome. This process also includes preprocessing steps and operations taken after a model is fit. We introduced a concept called a <strong>model workflow</strong> that can capture the important components of the modeling process.</p>
 <p>For the Ames data, the updated code:</p>
-<div class="sourceCode" id="cb1039"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1039-1"><a href="model-choice.html#cb1039-1"></a><span class="kw">library</span>(tidymodels)</span>
-<span id="cb1039-2"><a href="model-choice.html#cb1039-2"></a><span class="kw">data</span>(ames)</span>
-<span id="cb1039-3"><a href="model-choice.html#cb1039-3"></a></span>
-<span id="cb1039-4"><a href="model-choice.html#cb1039-4"></a>ames &lt;-<span class="st"> </span><span class="kw">mutate</span>(ames, <span class="dt">Sale_Price =</span> <span class="kw">log10</span>(Sale_Price))</span>
-<span id="cb1039-5"><a href="model-choice.html#cb1039-5"></a></span>
-<span id="cb1039-6"><a href="model-choice.html#cb1039-6"></a><span class="kw">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb1039-7"><a href="model-choice.html#cb1039-7"></a>ames_split &lt;-<span class="st"> </span><span class="kw">initial_split</span>(ames, <span class="dt">prob =</span> <span class="fl">0.80</span>, <span class="dt">strata =</span> Sale_Price)</span>
-<span id="cb1039-8"><a href="model-choice.html#cb1039-8"></a>ames_train &lt;-<span class="st"> </span><span class="kw">training</span>(ames_split)</span>
-<span id="cb1039-9"><a href="model-choice.html#cb1039-9"></a>ames_test  &lt;-<span class="st">  </span><span class="kw">testing</span>(ames_split)</span>
-<span id="cb1039-10"><a href="model-choice.html#cb1039-10"></a></span>
-<span id="cb1039-11"><a href="model-choice.html#cb1039-11"></a>ames_rec &lt;-<span class="st"> </span></span>
-<span id="cb1039-12"><a href="model-choice.html#cb1039-12"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1039-13"><a href="model-choice.html#cb1039-13"></a><span class="st">           </span>Latitude <span class="op">+</span><span class="st"> </span>Longitude, <span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span></span>
-<span id="cb1039-14"><a href="model-choice.html#cb1039-14"></a><span class="st">  </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1039-15"><a href="model-choice.html#cb1039-15"></a><span class="st">  </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1039-16"><a href="model-choice.html#cb1039-16"></a><span class="st">  </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1039-17"><a href="model-choice.html#cb1039-17"></a><span class="st">  </span><span class="kw">step_interact</span>( <span class="op">~</span><span class="st"> </span>Gr_Liv_Area<span class="op">:</span><span class="kw">starts_with</span>(<span class="st">"Bldg_Type_"</span>) ) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1039-18"><a href="model-choice.html#cb1039-18"></a><span class="st">  </span><span class="kw">step_ns</span>(Latitude, Longitude, <span class="dt">deg_free =</span> <span class="dv">20</span>)</span>
-<span id="cb1039-19"><a href="model-choice.html#cb1039-19"></a></span>
-<span id="cb1039-20"><a href="model-choice.html#cb1039-20"></a>lm_model &lt;-<span class="st"> </span><span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">set_engine</span>(<span class="st">"lm"</span>)</span>
-<span id="cb1039-21"><a href="model-choice.html#cb1039-21"></a></span>
-<span id="cb1039-22"><a href="model-choice.html#cb1039-22"></a>lm_wflow &lt;-<span class="st"> </span></span>
-<span id="cb1039-23"><a href="model-choice.html#cb1039-23"></a><span class="st">  </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1039-24"><a href="model-choice.html#cb1039-24"></a><span class="st">  </span><span class="kw">add_model</span>(lm_model) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1039-25"><a href="model-choice.html#cb1039-25"></a><span class="st">  </span><span class="kw">add_recipe</span>(ames_rec)</span>
-<span id="cb1039-26"><a href="model-choice.html#cb1039-26"></a></span>
-<span id="cb1039-27"><a href="model-choice.html#cb1039-27"></a>lm_fit &lt;-<span class="st"> </span><span class="kw">fit</span>(lm_wflow, ames_train)</span></code></pre></div>
-</div>
+<div class="sourceCode" id="cb1033"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1033-1"><a href="model-choice.html#cb1033-1"></a><span class="kw">library</span>(tidymodels)</span>
+<span id="cb1033-2"><a href="model-choice.html#cb1033-2"></a><span class="kw">data</span>(ames)</span>
+<span id="cb1033-3"><a href="model-choice.html#cb1033-3"></a></span>
+<span id="cb1033-4"><a href="model-choice.html#cb1033-4"></a>ames &lt;-<span class="st"> </span><span class="kw">mutate</span>(ames, <span class="dt">Sale_Price =</span> <span class="kw">log10</span>(Sale_Price))</span>
+<span id="cb1033-5"><a href="model-choice.html#cb1033-5"></a></span>
+<span id="cb1033-6"><a href="model-choice.html#cb1033-6"></a><span class="kw">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1033-7"><a href="model-choice.html#cb1033-7"></a>ames_split &lt;-<span class="st"> </span><span class="kw">initial_split</span>(ames, <span class="dt">prob =</span> <span class="fl">0.80</span>, <span class="dt">strata =</span> Sale_Price)</span>
+<span id="cb1033-8"><a href="model-choice.html#cb1033-8"></a>ames_train &lt;-<span class="st"> </span><span class="kw">training</span>(ames_split)</span>
+<span id="cb1033-9"><a href="model-choice.html#cb1033-9"></a>ames_test  &lt;-<span class="st">  </span><span class="kw">testing</span>(ames_split)</span>
+<span id="cb1033-10"><a href="model-choice.html#cb1033-10"></a></span>
+<span id="cb1033-11"><a href="model-choice.html#cb1033-11"></a>ames_rec &lt;-<span class="st"> </span></span>
+<span id="cb1033-12"><a href="model-choice.html#cb1033-12"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1033-13"><a href="model-choice.html#cb1033-13"></a><span class="st">           </span>Latitude <span class="op">+</span><span class="st"> </span>Longitude, <span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span></span>
+<span id="cb1033-14"><a href="model-choice.html#cb1033-14"></a><span class="st">  </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1033-15"><a href="model-choice.html#cb1033-15"></a><span class="st">  </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1033-16"><a href="model-choice.html#cb1033-16"></a><span class="st">  </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1033-17"><a href="model-choice.html#cb1033-17"></a><span class="st">  </span><span class="kw">step_interact</span>( <span class="op">~</span><span class="st"> </span>Gr_Liv_Area<span class="op">:</span><span class="kw">starts_with</span>(<span class="st">"Bldg_Type_"</span>) ) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1033-18"><a href="model-choice.html#cb1033-18"></a><span class="st">  </span><span class="kw">step_ns</span>(Latitude, Longitude, <span class="dt">deg_free =</span> <span class="dv">20</span>)</span>
+<span id="cb1033-19"><a href="model-choice.html#cb1033-19"></a></span>
+<span id="cb1033-20"><a href="model-choice.html#cb1033-20"></a>lm_model &lt;-<span class="st"> </span><span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb1033-21"><a href="model-choice.html#cb1033-21"></a></span>
+<span id="cb1033-22"><a href="model-choice.html#cb1033-22"></a>lm_wflow &lt;-<span class="st"> </span></span>
+<span id="cb1033-23"><a href="model-choice.html#cb1033-23"></a><span class="st">  </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1033-24"><a href="model-choice.html#cb1033-24"></a><span class="st">  </span><span class="kw">add_model</span>(lm_model) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1033-25"><a href="model-choice.html#cb1033-25"></a><span class="st">  </span><span class="kw">add_recipe</span>(ames_rec)</span>
+<span id="cb1033-26"><a href="model-choice.html#cb1033-26"></a></span>
+<span id="cb1033-27"><a href="model-choice.html#cb1033-27"></a>lm_fit &lt;-<span class="st"> </span><span class="kw">fit</span>(lm_wflow, ames_train)</span></code></pre></div>
 </div>
 </div>
 <div id="performance" class="section level2">
 <h2>
 <span class="header-section-number">10.6</span> Judging model effectiveness</h2>
-<p>Once we have a model, we need to know how well it works. A quantitative approach for estimating effectiveness allows us to understand the model, to compare different models, or to tweak the model to improve performance. Our focus in tidymodels is on <em>empirical validation</em>; this usually means using data that were not used to create the model as the substrate to measure effectiveness.</p>
+<p>Once we have a model, we need to know how well it works. A quantitative approach for estimating effectiveness allows us to understand the model, to compare different models, or to tweak the model to improve performance. Our focus in tidymodels is on <em>empirical validation</em>; this usually means using data that were not used to create the model as the substrate on which we measure effectiveness.</p>
 <p>The choice of which metrics to examine can be critical. For example, two common metrics for regression models are the root mean squared error (RMSE) and the coefficient of determination (a.k.a. <span class="math inline">\(R^2\)</span>). The former measures <em>accuracy</em> while the latter measures <em>correlation</em>. These are not necessarily the same thing. This figure demonstrates the difference between the two:</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-819-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-818-1.png" width="672"></p>
 <p>A model optimized for RMSE has more variability but has relatively uniform accuracy across the range of the outcome. The right panel shows that there is a tighter correlation between the observed and predicted values but this model performs poorly in the tails.</p>
 <p>This section will largely focus on the <strong>yardstick</strong> package. Before illustrating syntax, let’s explore whether empirical validation using performance metrics is worthwhile when a model is focused on inference rather than prediction.</p>
 <div id="performance-metrics-and-inference" class="section level3">
 <h3>
 <span class="header-section-number">10.6.1</span> Performance metrics and inference</h3>
+<!-- DK: We could put these sections at the start of their respective chapters. -->
 <p>The effectiveness of any given model depends on how the model will be used. An inferential model is used primarily to understand relationships, and typically is discussed with a strong focus on the choice (and validity) of probabilistic distributions and other generative qualities that define the model. For a model used primarily for prediction, by contrast, predictive strength is primary and concerns about underlying statistical qualities may be less important. Predictive strength is usually focused on how close our predictions come to the observed data, i.e., fidelity of the model predictions to the actual results. This section focuses on functions that can be used to measure predictive strength. However, our advice for those developing inferential models is to use these techniques <em>even when the model will not be used with the primary goal of prediction</em>.</p>
-<p>A longstanding issue with the practice of inferential statistics is that, with a focus purely on inference, it is difficult to assess the credibility of a model. For example, consider the Alzheimer’s disease data where patients were studied to determine the factors that influence cognitive impairment. Assume that we build a model, using the standard statistical approach. We would, normally, not even be required to calculate how closely this model fits the actual data.</p>
+<p>A longstanding issue with the practice of inferential statistics is that, with a focus purely on inference, it is difficult to assess the credibility of a model. For example, consider Alzheimer’s disease data used to study the factors that influence cognitive impairment. Assume that we build a model, using the standard statistical approach. We would, normally, not even be required to calculate how closely this model fits the actual data.</p>
 <p>Using resampling methods, we can estimate the accuracy of this model to be about 73.3%. Accuracy is often a poor measure of model performance; we use it here because it is commonly understood. If the model has 73.3% fidelity to the data, should we trust the conclusions produced by the model? We might think so until we realize that the baseline rate of non-impaired patients in the data is 72.7%. This means that, despite our statistical analysis, a fancy model appears to be <em>only 0.6% better than a simple heuristic that always predicts patients to be unimpaired</em>, irregardless of the observed data.</p>
 <!-- DK: Never seen this sort of object before. -->
 <div class="rmdnote">
@@ -955,19 +894,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 The point of this analysis is to demonstrate the idea that <strong>optimization of statistical characteristics of the model does not imply that the model fits the data well.</strong> Even for purely inferential models, some measure of fidelity to the data should accompany the inferential results. Using this, the consumers of the analyses can calibrate their expectations of the results of the statistical analysis.
 </p>
 </div>
-<p>In the remainder of this section, general approaches for evaluating models via empirical validation are discussed. These approaches are grouped by the nature of the outcome data: purely numeric, binary classes, and three or more class levels.</p>
+<!-- DK: Next edition: Bring back multi-classification -->
+<p>In the remainder of this section, general approaches for evaluating models via empirical validation are discussed. These approaches are grouped by the nature of the outcome data: purely numeric (Chapter <a href="continuous-response.html#continuous-response">11</a>) and binary classes (Chapter <a href="discrete-response.html#discrete-response">12</a>).</p>
 </div>
 <div id="regression-metrics" class="section level3">
 <h3>
 <span class="header-section-number">10.6.2</span> Regression metrics</h3>
 <p>Recall from Section <a href="model-choice.html#parsnip-predictions">10.4.3</a> that tidymodels prediction functions produce tibbles with columns for the predicted values. These columns have consistent names, and the functions in the <strong>yardstick</strong> package that produce performance metrics have consistent interfaces. The functions are data frame-based, as opposed to vector-based, with the general syntax of:</p>
-<div class="sourceCode" id="cb1040"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1040-1"><a href="model-choice.html#cb1040-1"></a><span class="cf">function</span>(data, truth, ...)</span></code></pre></div>
+<div class="sourceCode" id="cb1034"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1034-1"><a href="model-choice.html#cb1034-1"></a><span class="cf">function</span>(data, truth, ...)</span></code></pre></div>
 <p>where <code>data</code> is a data frame or tibble and <code>truth</code> is the column with the observed outcome values. The ellipses or other arguments are used to specify the column(s) containing the predictions.</p>
 <p>To illustrate, let’s evaluate the model we have constructed for the Ames house price data. Recall that the <code>lm_fit</code> object was a linear regression model whose predictor set was supplemented with an interaction and spline functions for longitude and latitude. It was created from a training set (named <code>ames_train</code>). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame <code>ames_test</code> consists of 731 properties. To start, let’s produce predictions:</p>
 <!-- DK: Is this correct? The pipe within new_data? -->
-<div class="sourceCode" id="cb1041"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1041-1"><a href="model-choice.html#cb1041-1"></a>ames_test_res &lt;-<span class="st"> </span><span class="kw">predict</span>(lm_fit, <span class="dt">new_data =</span> ames_test <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1041-2"><a href="model-choice.html#cb1041-2"></a><span class="st">                           </span><span class="kw">select</span>(<span class="op">-</span>Sale_Price))</span>
-<span id="cb1041-3"><a href="model-choice.html#cb1041-3"></a>ames_test_res</span></code></pre></div>
+<div class="sourceCode" id="cb1035"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1035-1"><a href="model-choice.html#cb1035-1"></a>ames_test_res &lt;-<span class="st"> </span><span class="kw">predict</span>(lm_fit, <span class="dt">new_data =</span> ames_test <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1035-2"><a href="model-choice.html#cb1035-2"></a><span class="st">                           </span><span class="kw">select</span>(<span class="op">-</span>Sale_Price))</span>
+<span id="cb1035-3"><a href="model-choice.html#cb1035-3"></a>ames_test_res</span></code></pre></div>
 <pre><code>## # A tibble: 731 x 1
 ##    .pred
 ##    &lt;dbl&gt;
@@ -983,8 +923,8 @@ The point of this analysis is to demonstrate the idea that <strong>optimization 
 ## 10  5.24
 ## # … with 721 more rows</code></pre>
 <p>The predicted numeric outcome from the regression model is named <code>.pred</code>. Let’s match the predicted values with their corresponding observed outcome values:</p>
-<div class="sourceCode" id="cb1043"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1043-1"><a href="model-choice.html#cb1043-1"></a>ames_test_res &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(ames_test_res, ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Sale_Price))</span>
-<span id="cb1043-2"><a href="model-choice.html#cb1043-2"></a>ames_test_res</span></code></pre></div>
+<div class="sourceCode" id="cb1037"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1037-1"><a href="model-choice.html#cb1037-1"></a>ames_test_res &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(ames_test_res, ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Sale_Price))</span>
+<span id="cb1037-2"><a href="model-choice.html#cb1037-2"></a>ames_test_res</span></code></pre></div>
 <pre><code>## # A tibble: 731 x 2
 ##    .pred Sale_Price
 ##    &lt;dbl&gt;      &lt;dbl&gt;
@@ -1001,25 +941,25 @@ The point of this analysis is to demonstrate the idea that <strong>optimization 
 ## # … with 721 more rows</code></pre>
 <p>Note that both the predicted and observed outcomes are in log10 units. It is best practice to analyze the predictions on the transformed scale (if one were used) even if the predictions are reported using the original units.</p>
 <p>Let’s plot the data before computing metrics:</p>
-<div class="sourceCode" id="cb1045"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1045-1"><a href="model-choice.html#cb1045-1"></a><span class="kw">ggplot</span>(ames_test_res, <span class="kw">aes</span>(<span class="dt">x =</span> Sale_Price, <span class="dt">y =</span> .pred)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1045-2"><a href="model-choice.html#cb1045-2"></a><span class="st">  </span><span class="co"># Create a diagonal line:</span></span>
-<span id="cb1045-3"><a href="model-choice.html#cb1045-3"></a><span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1045-4"><a href="model-choice.html#cb1045-4"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1045-5"><a href="model-choice.html#cb1045-5"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">"Predicted Sale Price (log10)"</span>, <span class="dt">x =</span> <span class="st">"Sale Price (log10)"</span>) <span class="op">+</span></span>
-<span id="cb1045-6"><a href="model-choice.html#cb1045-6"></a><span class="st">  </span><span class="co"># Scale and size the x- and y-axis uniformly:</span></span>
-<span id="cb1045-7"><a href="model-choice.html#cb1045-7"></a><span class="st">  </span><span class="kw">coord_obs_pred</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-823-1.png" width="672"></p>
+<div class="sourceCode" id="cb1039"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1039-1"><a href="model-choice.html#cb1039-1"></a><span class="kw">ggplot</span>(ames_test_res, <span class="kw">aes</span>(<span class="dt">x =</span> Sale_Price, <span class="dt">y =</span> .pred)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1039-2"><a href="model-choice.html#cb1039-2"></a><span class="st">  </span><span class="co"># Create a diagonal line:</span></span>
+<span id="cb1039-3"><a href="model-choice.html#cb1039-3"></a><span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1039-4"><a href="model-choice.html#cb1039-4"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1039-5"><a href="model-choice.html#cb1039-5"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">"Predicted Sale Price (log10)"</span>, <span class="dt">x =</span> <span class="st">"Sale Price (log10)"</span>) <span class="op">+</span></span>
+<span id="cb1039-6"><a href="model-choice.html#cb1039-6"></a><span class="st">  </span><span class="co"># Scale and size the x- and y-axis uniformly:</span></span>
+<span id="cb1039-7"><a href="model-choice.html#cb1039-7"></a><span class="st">  </span><span class="kw">coord_obs_pred</span>()</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-822-1.png" width="672"></p>
 <p>There is one property that is substantially over-predicted.</p>
 <p>Let’s compute the root mean squared error for this model using the <code>rmse()</code> function:</p>
-<div class="sourceCode" id="cb1046"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1046-1"><a href="model-choice.html#cb1046-1"></a><span class="kw">rmse</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
+<div class="sourceCode" id="cb1040"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1040-1"><a href="model-choice.html#cb1040-1"></a><span class="kw">rmse</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 ## 1 rmse    standard      0.0808</code></pre>
 <p>The output above shows the standard format of the output of <strong>yardstick</strong> functions. Metrics for numeric outcomes usually have a value of “standard” for the <code>.estimator</code> column. Examples with different values for this column are shown below.</p>
 <p>To compute multiple metrics at once, we can create a <em>metric set</em>. Let’s add <span class="math inline">\(R^2\)</span> and the mean absolute error:</p>
-<div class="sourceCode" id="cb1048"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1048-1"><a href="model-choice.html#cb1048-1"></a>ames_metrics &lt;-<span class="st"> </span><span class="kw">metric_set</span>(rmse, rsq, mae)</span>
-<span id="cb1048-2"><a href="model-choice.html#cb1048-2"></a><span class="kw">ames_metrics</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
+<div class="sourceCode" id="cb1042"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1042-1"><a href="model-choice.html#cb1042-1"></a>ames_metrics &lt;-<span class="st"> </span><span class="kw">metric_set</span>(rmse, rsq, mae)</span>
+<span id="cb1042-2"><a href="model-choice.html#cb1042-2"></a><span class="kw">ames_metrics</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -1032,8 +972,8 @@ The point of this analysis is to demonstrate the idea that <strong>optimization 
 <h3>
 <span class="header-section-number">10.6.3</span> Binary classification metrics</h3>
 <p>To illustrate other ways to measure model performance, we will switch to a different example. The <strong>modeldata</strong> package contains example predictions from a test data set with two classes (“Class1” and “Class2”):</p>
-<div class="sourceCode" id="cb1050"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1050-1"><a href="model-choice.html#cb1050-1"></a><span class="kw">data</span>(two_class_example)</span>
-<span id="cb1050-2"><a href="model-choice.html#cb1050-2"></a><span class="kw">str</span>(two_class_example)</span></code></pre></div>
+<div class="sourceCode" id="cb1044"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1044-1"><a href="model-choice.html#cb1044-1"></a><span class="kw">data</span>(two_class_example)</span>
+<span id="cb1044-2"><a href="model-choice.html#cb1044-2"></a><span class="kw">str</span>(two_class_example)</span></code></pre></div>
 <pre><code>## 'data.frame':	500 obs. of  4 variables:
 ##  $ truth    : Factor w/ 2 levels "Class1","Class2": 2 1 2 1 2 1 1 1 2 2 ...
 ##  $ Class1   : num  0.00359 0.67862 0.11089 0.73516 0.01624 ...
@@ -1041,25 +981,25 @@ The point of this analysis is to demonstrate the idea that <strong>optimization 
 ##  $ predicted: Factor w/ 2 levels "Class1","Class2": 2 1 2 1 2 1 1 1 2 2 ...</code></pre>
 <p>The second and third columns are the predicted class probabilities for the test set while <code>predicted</code> are the discrete predictions.</p>
 <p>For the hard class predictions, there are a variety of <strong>yardstick</strong> functions that are helpful:</p>
-<div class="sourceCode" id="cb1052"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1052-1"><a href="model-choice.html#cb1052-1"></a><span class="co"># A confusion matrix: </span></span>
-<span id="cb1052-2"><a href="model-choice.html#cb1052-2"></a><span class="kw">conf_mat</span>(two_class_example, <span class="dt">truth =</span> truth, <span class="dt">estimate =</span> predicted)</span></code></pre></div>
+<div class="sourceCode" id="cb1046"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1046-1"><a href="model-choice.html#cb1046-1"></a><span class="co"># A confusion matrix: </span></span>
+<span id="cb1046-2"><a href="model-choice.html#cb1046-2"></a><span class="kw">conf_mat</span>(two_class_example, <span class="dt">truth =</span> truth, <span class="dt">estimate =</span> predicted)</span></code></pre></div>
 <pre><code>##           Truth
 ## Prediction Class1 Class2
 ##     Class1    227     50
 ##     Class2     31    192</code></pre>
-<div class="sourceCode" id="cb1054"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1054-1"><a href="model-choice.html#cb1054-1"></a><span class="kw">accuracy</span>(two_class_example, <span class="dt">truth =</span> truth, <span class="dt">estimate =</span> predicted)</span></code></pre></div>
+<div class="sourceCode" id="cb1048"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1048-1"><a href="model-choice.html#cb1048-1"></a><span class="kw">accuracy</span>(two_class_example, <span class="dt">truth =</span> truth, <span class="dt">estimate =</span> predicted)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##   .metric  .estimator .estimate
 ##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 ## 1 accuracy binary         0.838</code></pre>
-<div class="sourceCode" id="cb1056"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1056-1"><a href="model-choice.html#cb1056-1"></a><span class="co"># Matthews correlation coefficient:</span></span>
-<span id="cb1056-2"><a href="model-choice.html#cb1056-2"></a><span class="kw">mcc</span>(two_class_example, truth, predicted)</span></code></pre></div>
+<div class="sourceCode" id="cb1050"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1050-1"><a href="model-choice.html#cb1050-1"></a><span class="co"># Matthews correlation coefficient:</span></span>
+<span id="cb1050-2"><a href="model-choice.html#cb1050-2"></a><span class="kw">mcc</span>(two_class_example, truth, predicted)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 ## 1 mcc     binary         0.677</code></pre>
-<div class="sourceCode" id="cb1058"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1058-1"><a href="model-choice.html#cb1058-1"></a><span class="co"># F1 metric:</span></span>
-<span id="cb1058-2"><a href="model-choice.html#cb1058-2"></a><span class="kw">f_meas</span>(two_class_example, truth, predicted)</span></code></pre></div>
+<div class="sourceCode" id="cb1052"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1052-1"><a href="model-choice.html#cb1052-1"></a><span class="co"># F1 metric:</span></span>
+<span id="cb1052-2"><a href="model-choice.html#cb1052-2"></a><span class="kw">f_meas</span>(two_class_example, truth, predicted)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -1071,7 +1011,7 @@ There is some heterogeneity in R functions in this regard; some use the first le
 </p>
 </div>
 <p>As an example where the second class is the event:</p>
-<div class="sourceCode" id="cb1060"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1060-1"><a href="model-choice.html#cb1060-1"></a><span class="kw">f_meas</span>(two_class_example, truth, predicted, <span class="dt">event_level =</span> <span class="st">"second"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1054"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1054-1"><a href="model-choice.html#cb1054-1"></a><span class="kw">f_meas</span>(two_class_example, truth, predicted, <span class="dt">event_level =</span> <span class="st">"second"</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -1079,8 +1019,8 @@ There is some heterogeneity in R functions in this regard; some use the first le
 <p>In the output above, the <code>.estimator</code> value of “binary” indicates that the standard formula for binary classes will be used.</p>
 <p>There are numerous classification metrics that use the predicted probabilities as inputs rather than the hard class predictions. For example, the receiver operating characteristic (ROC) curve computes the sensitivity and specificity over a continuum of different event thresholds. The predicted class column is not used. There are two <strong>yardstick</strong> functions for this method: <code>roc_curve()</code> computes the data points that make up the ROC curve and <code>roc_auc()</code> computes the area under the curve.</p>
 <p>The interfaces to these types of metric functions use the <code>...</code> argument placeholder to pass in the appropriate class probability column. For two-class problems, the probability column for the event of interest is passed into the function:</p>
-<div class="sourceCode" id="cb1062"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1062-1"><a href="model-choice.html#cb1062-1"></a>two_class_curve &lt;-<span class="st"> </span><span class="kw">roc_curve</span>(two_class_example, truth, Class1)</span>
-<span id="cb1062-2"><a href="model-choice.html#cb1062-2"></a>two_class_curve</span></code></pre></div>
+<div class="sourceCode" id="cb1056"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1056-1"><a href="model-choice.html#cb1056-1"></a>two_class_curve &lt;-<span class="st"> </span><span class="kw">roc_curve</span>(two_class_example, truth, Class1)</span>
+<span id="cb1056-2"><a href="model-choice.html#cb1056-2"></a>two_class_curve</span></code></pre></div>
 <pre><code>## # A tibble: 502 x 3
 ##    .threshold specificity sensitivity
 ##         &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
@@ -1095,146 +1035,15 @@ There is some heterogeneity in R functions in this regard; some use the first le
 ##  9    2.38e-5     0.0289            1
 ## 10    3.30e-5     0.0331            1
 ## # … with 492 more rows</code></pre>
-<div class="sourceCode" id="cb1064"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1064-1"><a href="model-choice.html#cb1064-1"></a><span class="kw">roc_auc</span>(two_class_example, truth, Class1)</span></code></pre></div>
+<div class="sourceCode" id="cb1058"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1058-1"><a href="model-choice.html#cb1058-1"></a><span class="kw">roc_auc</span>(two_class_example, truth, Class1)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 ## 1 roc_auc binary         0.939</code></pre>
 <p>The <code>two_class_curve</code> object can be used in a <code>ggplot</code> call to visualize the curve. There is an <code>autoplot()</code> method that will take care of the details:</p>
-<div class="sourceCode" id="cb1066"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1066-1"><a href="model-choice.html#cb1066-1"></a><span class="kw">autoplot</span>(two_class_curve)</span></code></pre></div>
+<div class="sourceCode" id="cb1060"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1060-1"><a href="model-choice.html#cb1060-1"></a><span class="kw">autoplot</span>(two_class_curve)</span></code></pre></div>
 <p><img src="book_temp_files/figure-html/performance-2class-roc-curve-1.png" width="672"></p>
 <p>There are a number of other functions that use probability estimates, including <code>gain_curve()</code>, <code>lift_curve()</code>, and <code>pr_curve()</code>.</p>
-</div>
-<div id="multi-class-classification-metrics" class="section level3">
-<h3>
-<span class="header-section-number">10.6.4</span> Multi-class classification metrics</h3>
-<p>What about data with three or more classes? To demonstrate, let’s explore a different example data set that has four classes:</p>
-<div class="sourceCode" id="cb1067"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1067-1"><a href="model-choice.html#cb1067-1"></a><span class="kw">data</span>(hpc_cv)</span>
-<span id="cb1067-2"><a href="model-choice.html#cb1067-2"></a><span class="kw">str</span>(hpc_cv)</span></code></pre></div>
-<pre><code>## 'data.frame':	3467 obs. of  7 variables:
-##  $ obs     : Factor w/ 4 levels "VF","F","M","L": 1 1 1 1 1 1 1 1 1 1 ...
-##  $ pred    : Factor w/ 4 levels "VF","F","M","L": 1 1 1 1 1 1 1 1 1 1 ...
-##  $ VF      : num  0.914 0.938 0.947 0.929 0.942 ...
-##  $ F       : num  0.0779 0.0571 0.0495 0.0653 0.0543 ...
-##  $ M       : num  0.00848 0.00482 0.00316 0.00579 0.00381 ...
-##  $ L       : num  1.99e-05 1.01e-05 5.00e-06 1.56e-05 7.29e-06 ...
-##  $ Resample: chr  "Fold01" "Fold01" "Fold01" "Fold01" ...</code></pre>
-<p>As before, there are factors for the observed and predicted outcomes along with four other columns of predicted probabilities for each class. These data also include a <code>Resample</code> column. These results are for out-of-sample predictions associated with 10-fold cross-validation. For the time being, this column will be ignored.</p>
-<p>The functions for metrics that use the discrete class probabilities are identical:</p>
-<div class="sourceCode" id="cb1069"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1069-1"><a href="model-choice.html#cb1069-1"></a><span class="kw">accuracy</span>(hpc_cv, obs, pred)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##   .metric  .estimator .estimate
-##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-## 1 accuracy multiclass     0.709</code></pre>
-<div class="sourceCode" id="cb1071"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1071-1"><a href="model-choice.html#cb1071-1"></a><span class="kw">mcc</span>(hpc_cv, obs, pred)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##   .metric .estimator .estimate
-##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 mcc     multiclass     0.515</code></pre>
-<p>Note that, in these results, a “multiclass” <code>.estimator</code> is listed. Like “binary”, this indicates that the formulas for outcomes with three or more class levels was used. The Matthews correlation coefficient was originally designed for two classes but has been extended to cases with more class levels.</p>
-<p>There are methods for using metrics that are specific to outcomes with two classes for data sets with more than two classes. For example, a metric such as sensitivity measures the true positive rate which, by definition, is specific to two classes (i.e., “event” and “non-event”). How can this metric be used in our example data?</p>
-<p>There are wrapper methods that can be used to apply sensitivity to our four-class outcome. These options are macro-, macro-weighted, and micro-averaging:</p>
-<ul>
-<li><p>Macro-averaging computes a set of one-versus-all metrics using the standard two-class statistics. These are averaged.</p></li>
-<li><p>Macro-weighted averaging does the same but the average is weighted by the number of samples in each class.</p></li>
-<li><p>Micro-averaging computes the contribution for each class, aggregates them, then computes a single metric from the aggregates.</p></li>
-</ul>
-<p>Using sensitivity as an example, the usual two-class calculation is the ratio of the number of correctly predicted events divided by the number of true events. The “manual” calculations for these averaging methods are:</p>
-<div class="sourceCode" id="cb1073"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1073-1"><a href="model-choice.html#cb1073-1"></a>class_totals &lt;-<span class="st"> </span></span>
-<span id="cb1073-2"><a href="model-choice.html#cb1073-2"></a><span class="st">  </span><span class="kw">count</span>(hpc_cv, obs, <span class="dt">name =</span> <span class="st">"totals"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1073-3"><a href="model-choice.html#cb1073-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">class_wts =</span> totals <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(totals))</span>
-<span id="cb1073-4"><a href="model-choice.html#cb1073-4"></a>class_totals</span></code></pre></div>
-<pre><code>##   obs totals class_wts
-## 1  VF   1769      0.51
-## 2   F   1078      0.31
-## 3   M    412      0.12
-## 4   L    208      0.06</code></pre>
-<div class="sourceCode" id="cb1075"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1075-1"><a href="model-choice.html#cb1075-1"></a>cell_counts &lt;-<span class="st"> </span></span>
-<span id="cb1075-2"><a href="model-choice.html#cb1075-2"></a><span class="st">  </span>hpc_cv <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-3"><a href="model-choice.html#cb1075-3"></a><span class="st">  </span><span class="kw">group_by</span>(obs, pred) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-4"><a href="model-choice.html#cb1075-4"></a><span class="st">  </span><span class="kw">count</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-5"><a href="model-choice.html#cb1075-5"></a><span class="st">  </span><span class="kw">ungroup</span>()</span>
-<span id="cb1075-6"><a href="model-choice.html#cb1075-6"></a></span>
-<span id="cb1075-7"><a href="model-choice.html#cb1075-7"></a><span class="co"># Compute the four sensitivities using 1-vs-all</span></span>
-<span id="cb1075-8"><a href="model-choice.html#cb1075-8"></a>one_versus_all &lt;-<span class="st"> </span></span>
-<span id="cb1075-9"><a href="model-choice.html#cb1075-9"></a><span class="st">  </span>cell_counts <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-10"><a href="model-choice.html#cb1075-10"></a><span class="st">  </span><span class="kw">filter</span>(obs <span class="op">==</span><span class="st"> </span>pred) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-11"><a href="model-choice.html#cb1075-11"></a><span class="st">  </span><span class="kw">full_join</span>(class_totals, <span class="dt">by =</span> <span class="st">"obs"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-12"><a href="model-choice.html#cb1075-12"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sens =</span> n <span class="op">/</span><span class="st"> </span>totals)</span>
-<span id="cb1075-13"><a href="model-choice.html#cb1075-13"></a>one_versus_all</span></code></pre></div>
-<pre><code>## # A tibble: 4 x 6
-##   obs   pred      n totals class_wts  sens
-##   &lt;fct&gt; &lt;fct&gt; &lt;int&gt;  &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;
-## 1 VF    VF     1620   1769    0.510  0.916
-## 2 F     F       647   1078    0.311  0.600
-## 3 M     M        79    412    0.119  0.192
-## 4 L     L       111    208    0.0600 0.534</code></pre>
-<div class="sourceCode" id="cb1077"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1077-1"><a href="model-choice.html#cb1077-1"></a><span class="co"># Three different estimates:</span></span>
-<span id="cb1077-2"><a href="model-choice.html#cb1077-2"></a>one_versus_all <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1077-3"><a href="model-choice.html#cb1077-3"></a><span class="st">  </span><span class="kw">summarize</span>(</span>
-<span id="cb1077-4"><a href="model-choice.html#cb1077-4"></a>    <span class="dt">macro =</span> <span class="kw">mean</span>(sens), </span>
-<span id="cb1077-5"><a href="model-choice.html#cb1077-5"></a>    <span class="dt">macro_wts =</span> <span class="kw">weighted.mean</span>(sens, class_wts),</span>
-<span id="cb1077-6"><a href="model-choice.html#cb1077-6"></a>    <span class="dt">micro =</span> <span class="kw">sum</span>(n) <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(totals)</span>
-<span id="cb1077-7"><a href="model-choice.html#cb1077-7"></a>  )</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##   macro macro_wts micro
-##   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
-## 1 0.560     0.709 0.709</code></pre>
-<p>Thankfully, there are easier methods for obtaining these results:</p>
-<div class="sourceCode" id="cb1079"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1079-1"><a href="model-choice.html#cb1079-1"></a><span class="kw">sensitivity</span>(hpc_cv, obs, pred, <span class="dt">estimator =</span> <span class="st">"macro"</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##   .metric .estimator .estimate
-##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 sens    macro          0.560</code></pre>
-<div class="sourceCode" id="cb1081"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1081-1"><a href="model-choice.html#cb1081-1"></a><span class="kw">sensitivity</span>(hpc_cv, obs, pred, <span class="dt">estimator =</span> <span class="st">"macro_weighted"</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##   .metric .estimator     .estimate
-##   &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;
-## 1 sens    macro_weighted     0.709</code></pre>
-<div class="sourceCode" id="cb1083"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1083-1"><a href="model-choice.html#cb1083-1"></a><span class="kw">sensitivity</span>(hpc_cv, obs, pred, <span class="dt">estimator =</span> <span class="st">"micro"</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##   .metric .estimator .estimate
-##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 sens    micro          0.709</code></pre>
-<p>For metrics using probability estimates, there are some metrics with multi-class analogs. In this case, <em>all</em> of the class probability columns must be given to the function:</p>
-<div class="sourceCode" id="cb1085"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1085-1"><a href="model-choice.html#cb1085-1"></a><span class="kw">roc_auc</span>(hpc_cv, obs, VF, F, M, L)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##   .metric .estimator .estimate
-##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 roc_auc hand_till      0.829</code></pre>
-<p>Macro-averaging is also available:</p>
-<div class="sourceCode" id="cb1087"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1087-1"><a href="model-choice.html#cb1087-1"></a><span class="kw">roc_auc</span>(hpc_cv, obs, VF, F, M, L, <span class="dt">estimator =</span> <span class="st">"macro_weighted"</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##   .metric .estimator     .estimate
-##   &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;
-## 1 roc_auc macro_weighted     0.868</code></pre>
-<p>Finally, all of these performance metrics can be computed using <strong>dplyr</strong> groupings. Recall that these data have a column for the resampling groups. Passing a grouped data frame to the metric function will compute the metrics for each group:</p>
-<div class="sourceCode" id="cb1089"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1089-1"><a href="model-choice.html#cb1089-1"></a>hpc_cv <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1089-2"><a href="model-choice.html#cb1089-2"></a><span class="st">  </span><span class="kw">group_by</span>(Resample) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1089-3"><a href="model-choice.html#cb1089-3"></a><span class="st">  </span><span class="kw">accuracy</span>(obs, pred)</span></code></pre></div>
-<pre><code>## # A tibble: 10 x 4
-##    Resample .metric  .estimator .estimate
-##    &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-##  1 Fold01   accuracy multiclass     0.726
-##  2 Fold02   accuracy multiclass     0.712
-##  3 Fold03   accuracy multiclass     0.758
-##  4 Fold04   accuracy multiclass     0.712
-##  5 Fold05   accuracy multiclass     0.712
-##  6 Fold06   accuracy multiclass     0.697
-##  7 Fold07   accuracy multiclass     0.675
-##  8 Fold08   accuracy multiclass     0.721
-##  9 Fold09   accuracy multiclass     0.673
-## 10 Fold10   accuracy multiclass     0.699</code></pre>
-<p>The groupings also translate to the <code>autoplot()</code> methods:</p>
-<div class="sourceCode" id="cb1091"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1091-1"><a href="model-choice.html#cb1091-1"></a><span class="co"># Four 1-vs-all ROC curves for each fold</span></span>
-<span id="cb1091-2"><a href="model-choice.html#cb1091-2"></a></span>
-<span id="cb1091-3"><a href="model-choice.html#cb1091-3"></a>hpc_cv <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1091-4"><a href="model-choice.html#cb1091-4"></a><span class="st">  </span><span class="kw">group_by</span>(Resample) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1091-5"><a href="model-choice.html#cb1091-5"></a><span class="st">  </span><span class="kw">roc_curve</span>(obs, VF, F, M, L) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1091-6"><a href="model-choice.html#cb1091-6"></a><span class="st">  </span><span class="kw">autoplot</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-836-1.png" width="672"></p>
-<p>This can be a quick visualization method for model effectiveness.</p>
-<p>Functions from the <strong>yardstick</strong> package measure the effectiveness of a model using data. The primary interface is based on data frames (as opposed to having vector arguments). There are a variety of regression and classification metrics and, within these, there are sometimes different estimators for the statistics.</p>
 </div>
 </div>
 <div id="conclusion" class="section level2">
@@ -1250,7 +1059,7 @@ There is some heterogeneity in R functions in this regard; some use the first le
 <a href="continuous-response.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-16
+2020-10-17
 </p>
 </div>
 </div>
