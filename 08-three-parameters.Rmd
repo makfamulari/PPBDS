@@ -352,7 +352,8 @@ new <- tibble(party = "Democrat")
 # to be used, which in our case is the one we generated in "Courage". The second
 # argument specifies the input.
 
-pp <- posterior_predict(fit_obj, newdata = new)
+pp <- posterior_predict(fit_obj, newdata = new)[] %>% 
+  as_tibble()
 
 head(pp, 10)
 
@@ -364,7 +365,7 @@ Note that we have a new posterior distribution under consideration here. The unk
 
 
 ```{r}
-tibble(age = pp[, 1]) %>% 
+tibble(age = pp$`1`) %>% 
   ggplot(aes(x = age)) +
     geom_density() +
     labs(title = "Posterior Probability Distribution for a Democrat's Age",
@@ -377,7 +378,7 @@ tibble(age = pp[, 1]) %>%
 Once we have the posterior distribution, we can answer (almost) any reasonable question. In this case, the probability that the next Democrat will be over 50 is around 28%.
 
 ```{r}
-tibble(age = pp[, 1]) %>% 
+tibble(age = pp$`1`) %>% 
   mutate(ot_50 = ifelse(age > 50, TRUE, FALSE)) %>% 
   summarize(perc = sum(ot_50)/n())
 ```
@@ -394,7 +395,8 @@ new <- tibble(party = c("Democrat", "Democrat", "Democrat",
                         "Republican", "Republican","Republican"))
 
 set.seed(27)
-pp <- posterior_predict(fit_obj, newdata = new)
+pp <- posterior_predict(fit_obj, newdata = new)[] %>% 
+  as_tibble()
 
 head(pp, 10)
 
@@ -413,7 +415,7 @@ To determine the expected age difference, we can then proceed as follows:
 
 ```{r}
 
-as_tibble(pp) %>% 
+pp %>% 
   set_names(c("dem_1", "dem_2", "dem_3", 
               "rep_1", "rep_2", "rep_3")) %>% 
   rowwise() %>% 
@@ -611,10 +613,11 @@ ate_data <- tibble(treatment =
                      factor(c("Treated", "Control"),
                             levels = c("Treated", "Control")))
 
-pp <- posterior_predict(fit_obj, newdata = ate_data)
+pp <- posterior_predict(fit_obj, newdata = ate_data)[] %>% 
+  as_tibble()
 
 
-te <- tibble(Treated = pp[, 1], Control = pp[, 2])  %>% 
+te <- tibble(Treated = pp$`1`, Control = pp$`2`)  %>% 
   mutate(te = Treated - Control) 
 
 te %>% 

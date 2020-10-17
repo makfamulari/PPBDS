@@ -740,17 +740,21 @@ We have a model of American male height from 2009, `fit_obj`, which we can use f
 
 ```{r}
 set.seed(11)
-pp <- posterior_predict(fit_obj)
+pp <- posterior_predict(fit_obj)[] %>% 
+  as_tibble()
+
 ```
 
-That is a simple enough command, but the resulting object `pp`, a matrix, is not easy to work with. Note how big it is!
+Note the subset operator --- the `[]` --- at the end of `posterior_predict()`. This is an absurd hack, made necessary by the fact that `posterior_predict()` returns a weird object with class "ppd", which stands for posterior probability distribution. There are some advanced use cases in which this is a useful class of object to work with. But, for the purposes of this book, the "ppd" class is too complex. So, we quickly turn it into a tibble. Doing so requires two steps. First, using the `[]` operator to turn the object into a matrix and then using `as_tibble()` to transform the matrix into a tibble.
+
+The resulting object, `pp`, is not easy to work with. But because the variable names are all numbers and because how big it is.
 
 ```{r}
 dim(pp)
 ```
 
 There are `r nrow(pp)` rows because, by default, `stan_glm()` gives us `r nrow(pp)` draws from the posterior distributions, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There 
-are `r ncol(pp)` because the matrix provides a (potentially) different posterior prediction for each of the input data rows. (In this case, they are all the same because the model does not use any covariates. In more complex models, the columns in the `pp` matrix can be very different.) 
+are `r ncol(pp)` because the matrix provides a (potentially) different posterior prediction for each of the input data rows. (In this case, they are all the same because the model does not use any covariates. In more complex models, the columns in the `pp` tibble can be very different.) 
 
 Why do we want a posterior prediction for each observation? After all, we already know the value for each observation! We know everyone's height in our data set. No prediction is necessary.
 
@@ -761,14 +765,14 @@ The reason is that, in order to confirm that our model is consistent with the da
 In the meantime, we can still use any column in `pp` to answer our question. (We will use the first column for convenience.) Consider:
 
 ```{r}
-tibble(pred = pp[, 1]) %>% 
+tibble(pred = pp$`1`) %>% 
   mutate(gt_180 = ifelse(pred > 180, TRUE, FALSE))
 ```
 
 We don't have to put the posterior predictions in a tibble, but doing so makes everything easier. What are the odds that the next adult male will be taller than 180 centimeters?
 
 ```{r}
-tibble(pred = pp[, 1]) %>% 
+tibble(pred = pp$`1`) %>% 
   mutate(gt_180 = ifelse(pred > 180, TRUE, FALSE)) %>% 
   summarize(answer = sum(gt_180) / n())
 ```
@@ -784,10 +788,10 @@ Again, the key difficulty is the population. The problem we actually have involv
 Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. With simulation, we just need to answer this step by step.
 
 ```{r}
-tibble(pred_1 = pp[, 1],
-       pred_2 = pp[, 2],
-       pred_3 = pp[, 3],
-       pred_4 = pp[, 4]) %>% 
+tibble(pred_1 = pp$`1`,
+       pred_2 = pp$`2`,
+       pred_3 = pp$`3`,
+       pred_4 = pp$`4`) %>% 
   rowwise() %>% 
   mutate(tallest = max(c_across(pred_1:pred_4))) %>% 
   mutate(shortest = min(c_across(pred_1:pred_4))) %>% 
@@ -807,7 +811,6 @@ The same approach will work for almost any question.
 
 ```{r}
 pp[, 1:100] %>% 
-  as_tibble() %>% 
   rowwise() %>% 
   mutate(third_tallest = sort(c_across(`1`:`100`), decreasing = TRUE)[3]) %>% 
   ungroup() %>% 
