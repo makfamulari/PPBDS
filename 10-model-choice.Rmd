@@ -548,11 +548,11 @@ Note that these interfaces are heterogeneous in either how the data are passed t
 
 For tidymodels, the approach to specifying a model is intended to be more unified: 
 
-1. **Specify the _type_ of model based on its mathematical structure** (e.g., linear regression, random forest, _K_-nearest neighbors, etc). 
+1. **Specify the _type_ of model based on its mathematical structure**. 
 
 2. **Specify the _engine_ for fitting the model.** Most often this reflects the software package that should be used. 
 
-3. **When required, declare the _mode_ of the model.** The mode reflects the type of prediction outcome. For numeric outcomes, the mode is _regression_; for qualitative outcomes, it is _classification_^[Note that **parsnip** constrains the outcome column of a classification models to be encoded as a _factor_; using binary numeric values will result in an error.]. If a model can only create one type of model, such as linear regression, the mode is already set. 
+3. **When required, declare the _mode_ of the model.** The mode reflects the type of prediction outcome. For numeric outcomes, the mode is _regression_; for qualitative outcomes, it is _classification_. Note that **parsnip** constrains the outcome column of a classification models to be encoded as a _factor_; using binary numeric values will result in an error. If a model can only create one type of model, such as linear regression, the mode is already set. 
 
 These specifications are built _without referencing the data_. For example, for the three cases above: 
 
@@ -568,8 +568,7 @@ linear_reg() %>%
 ```
 
 
-Once the details of the model have been specified, the model estimation can be done with either the `fit()` function (to use a formula) or the `fit_xy()` function (when your data are already pre-processed). The **parsnip** package allows the user to be indifferent to the interface of the underlying model; you can always use a formula even if the modeling package's function only has the `x`/`y` interface. 
-
+Once the details of the model have been specified, the model estimation can be done using a formula with the `fit()` function. The **parsnip** package allows the user to be indifferent to the interface of the underlying model. 
 
 
 Let's walk through how to predict the sale price of houses in the Ames data as a function of only longitude and latitude. 
@@ -585,14 +584,8 @@ lm_model <-
 lm_form_fit <- 
   lm_model %>% 
   fit(Sale_Price ~ Longitude + Latitude, data = ames_train)
-
-lm_xy_fit <- 
-  lm_model %>% 
-  fit_xy(x = ames_train %>% select(Longitude, Latitude),
-         y = ames_train %>% pull(Sale_Price))
     
 lm_form_fit
-lm_xy_fit
 ```
 
 
@@ -641,7 +634,7 @@ ames_test_small <- ames_test %>% slice(1:5)
 predict(lm_form_fit, new_data = ames_test_small)
 ```
 
-The row order of the predictions are always the same as the original data. Why are there leading dot in some of the column names? Some tidyverse and tidymodels arguments and return values contain periods. This is to protect against merging data with duplicate names. There are some data sets that contain predictors names `pred`! 
+The row order of the predictions are always the same as the original data. Why is there a leading dot in some of the column names? Some tidyverse and tidymodels arguments and return values contain periods. This is to protect against merging data with duplicate names. There are some data sets that contain predictors named `pred`! 
 
 
 These three rules make it easier to merge predictions with the original data: 
@@ -702,9 +695,6 @@ ames_test_small %>%
 This demonstrates the benefit of homogenizing the data analysis process and syntax across different models. It enables the user to spend their time on the results and interpretation rather than having to focus on the syntactical differences between R packages. 
 
 
-We have introduced the **parsnip** package, which provides a common interface for models across R packages using a standard syntax. The interface and resulting objects have a predictable structure. 
-
-
 ## A model workflow {#workflows}
 
 In the previous two sections, we discussed the **recipes** and **parsnip** packages. These packages can be used to prepare the data for analysis and fitting the model. This chapter introduces a new object called a _model workflow_. The purpose of this object is to encapsulate the major pieces of the modeling _process_. The workflow is important in two ways. First, using a workflow object encourages good methodology since it is a single point of entry to the estimation components of a data analysis. Second, it enables the user to better organize their projects.  
@@ -716,7 +706,7 @@ So far, when we have used the term "the model", we have meant a structural equat
 
 $$ \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1x_{i1} + \ldots + \hat{\beta}_px_{ip} $$
 
-While this is a _linear_ model, it is only linear in the parameters. The predictors could be nonlinear terms (such as the $log(x_i)$). 
+While this is a _linear_ model, it is only linear in the parameters. The predictors could be nonlinear terms like $log(x_i)$. 
 
 For some data sets that are straightforward in nature, fitting the model itself may be the entire process. However, there are a variety of choices and additional steps that often occur _before_ the model is fit:
 
@@ -734,7 +724,7 @@ It is important to focus on the broader _modeling process_, instead of only fitt
 In other software, such as Python or Spark, similar collections of steps are called  _pipelines_. In tidymodels, the term "pipeline" already connotes a sequence of operations chained together with a pipe operator (such as `%>%`). Rather than using ambiguous terminology in this context, we call the sequence of computational operations related to modeling **workflows**. 
 
 
-Binding together the analytical components of a data analysis is important for another reason. Future chapters will demonstrate how to accurately measure performance, as well as how to optimize structural parameters (i.e. model tuning). To correctly quantify model performance on the training set, we recommend using _resampling_ methods. To do this properly, no data-driven parts of the analysis should be excluded from validation. To this end, the workflow must include all significant estimation steps.
+Binding together the analytical components of a data analysis is important for another reason. We will learn how to accurately measure performance, as well as how to optimize structural parameters (i.e. model tuning). To correctly quantify model performance on the training set, we recommend using _resampling_ methods. To do this properly, no data-driven parts of the analysis should be excluded from validation. To this end, the workflow must include all significant estimation steps.
 
 To illustrate, consider PCA signal extraction. This is a way to replace correlated predictors with new artificial features that are uncorrelated and capture most of the information in the original set. The new features would be used as the predictors and least squares regression could be used to estimate the model parameters. 
 
@@ -825,53 +815,15 @@ lm_wflow <-
 lm_wflow
 ```
 
-We described the `prep()`, `bake()`, and `juice()` functions for using the recipe with a modeling function. This can be onerous, so the `fit()` method for workflow objects automates this process: 
+Use `fit()` to complete the model and `predict()` to create predictions from the fitted model.
 
-<!-- DK: Drop the prep/juice/fit discussions? We should shorten this. -->
 
 ```{r}
-# Does `prep()`, `juice()`, and `fit()` in one step:
-
 lm_fit <- fit(lm_wflow, ames_train)
-
-# Does `bake()` and `predict()` automatically:
 
 predict(lm_fit, ames_test %>% slice(1:3))
 ```
 
-If we need the bare model object or recipe, there are `pull_*` functions that can retrieve them: 
-
-```{r}
-# Get the recipe and run `tidy()` method: 
-
-lm_fit %>% 
-  pull_workflow_prepped_recipe() %>% 
-  tidy()
-
-# To tidy the model fit: 
-
-lm_fit %>% 
-
-  # This returns the parsnip object:
-  
-  pull_workflow_fit() %>% 
-  
-  # Now tidy the linear model object:
-  
-  tidy() %>% 
-  slice(1:5)
-```
-
-
-#### Tree-based models {-}
-
-When we fit a tree to the data, the **parsnip** package understands what the modeling function would do. For example, if a random forest model is fit using the **ranger** or **randomForest** packages, the workflow knows predictors columns that are factors should be left as-is. 
-
-As a counter example, a boosted tree created with the **xgboost** package requires the user to create dummy variables from factor predictors (since `xgboost::xgb.train()` will not). This requirement is embedded into the model specification object and a workflow using **xgboost** _will_ create the indicator columns for this engine. Also note that a different engine for boosted trees, C5.0, does not require dummy variables so none are made by the workflow. 
-
-This determination is made for _each model and engine combination_. 
-
-  
 We have learned that the modeling process encompasses more than just estimating the parameters of an algorithm that connects predictors to an outcome. This process also includes preprocessing steps and operations taken after a model is fit. We introduced a concept called a **model workflow** that can capture the important components of the modeling process. 
 
 For the Ames data, the updated code:
@@ -905,9 +857,6 @@ lm_wflow <-
 
 lm_fit <- fit(lm_wflow, ames_train)
 ```
-
-
-
 
 ## Judging model effectiveness {#performance}
 
