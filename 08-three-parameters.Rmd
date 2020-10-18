@@ -149,7 +149,7 @@ The ethical issues are, fortunately, not fraught. Estimating someone's age is (u
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-Justice, in data science, consists of three topics: predictive versus causal modeling, the Preceptor Table and a mathematical formulation of the model. 
+Justice, in data science, consists of three topics: predictive versus causal modeling, the Preceptor Table, and a mathematical formulation of the model. 
 
 
 Any model with age as its dependent variable will be predictive, not causal, for the simple reason that nothing, other than time, can change our age. You are X years old. It would not matter if you changed your party registration from Democrat to Republican or vice versa. Your age is your age.
@@ -205,7 +205,9 @@ To get posterior distributions for our three parameters, we will again use the `
 
 * The only explanatory variable is `party`. This variable has only two values, 'Democrat' and 'Republican'. 
 
-* We have also added `- 1` at the end of the equation, indicating that we do not want an intercept, which is otherwise added by default. Running this code in R, we get the following output:
+* We have also added `- 1` at the end of the equation, indicating that we do not want an intercept, which is otherwise added by default. 
+
+Running this code in R, we get the following output:
 
 ```{r}
 fit_obj <- stan_glm(age ~ party - 1, data = trains, refresh = 0)
@@ -233,19 +235,21 @@ fit_obj %>%
          subtitle = "Average age for Boston commuters in 2012",
          x = "Age",
          y = "Probability") +
-    theme_classic()
+    theme_classic() + scale_y_continuous(labels=scales::percent_format())
 ```
 
 The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican) are still unknown. We can never know the true average age of all Democrats in the population. But we can calculate a posterior probability distribution for the parameters. Comments:
 
 * Democrats seem slightly older than Republicans. That was true in our sample and so, almost (but not quite!) by definition, it will be true in our the posterior probability distributions.
 
-* Our estimate for the average age of Democrats in the population is much more precise than that for Republicans because we have five times as many Democrats as Republicans in our sample. A central lesson from Chapter \@ref(one-paramter) is that, the more data you have related to a parameter, the narrower your posterior distribution will be.
+* Our estimate for the average age of Democrats in the population is much more precise than that for Republicans because we have five times as many Democrats as Republicans in our sample. A central lesson from Chapter \@ref(one-parameter) is that, the more data you have related to a parameter, the narrower your posterior distribution will be.
 
 * There is a great deal of overlap between the two distributions. Would we be surprised if, in truth, the average age of Republicans in the population was greater than that for Democrats? Not really. We don't have enough data to be sure either way.
 
 * The phrase "in the population" is doing a great deal of work because we have not what, precisely, we mean by the population. Is it the set of people on those commuter platforms on those days in 2012 when the experiment was done? Is it the set of people on all platforms, including ones never visited? Is it the set of all Boston commuter? All Massachusetts residents? All US residents? Does it include people today, or can we only draw inferences for 2012? We will explore these questions in every model we create.
 
+
+Look at the following table that shows a sample of 8 individuals.
 
 ```{r, echo = FALSE}
 trains %>% 
@@ -265,9 +269,9 @@ trains %>%
 
 ```
 
-The fitted values are the same for all Republicans and for all Democrats, as the fitted value is one of the two estimates output by our model. However, almost all of the residuals are different due to each observation's own variation from the fitted value estimate.  This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual who walks in the room even using our model. 
+The fitted values are the same for all Republicans and for all Democrats, as the fitted value is one of the two estimates output by our model. However, almost all of the residuals are different due to each observation's own variation from the fitted value estimate.  This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual who walks in the room even using our model. We can get a better picture of the unmodeled variation in our sample if we plot these three values for all individuals in our data set. 
 
-We can get a better picture of the unmodeled variation in our sample if we plot these three values for all individuals in our data set. The following three histograms show the actual outcomes, fitted values and residuals of all people in `trains`:
+The following three histograms show the actual outcomes, fitted values, and residuals of all people in `trains`:
 
 <!-- DK: Clean up these plots to be similar across chapters! -->
 
@@ -283,43 +287,46 @@ trains_both <- trains %>%
 # Actual outcomes (both)
 
 act_both <- ggplot(trains_both, aes(x = age)) +
-  geom_histogram(color = "white", fill = "blueviolet", binwidth = 2, boundary = 20) +
+  geom_histogram(bins = 100, binwidth = 1.5, boundary = 20) +
   scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
   scale_y_continuous(expand = c(0, 0), limits = c(0, 10), breaks = c(2, 4, 6, 8, 10)) +
   labs(
     x = "Age",
-    y = "Count") +
-  theme_linedraw()
+    y = "Count") 
 
 
 # Predicted outcomes (both)
 
 pred_both <- ggplot(trains_both, aes(x = fitted)) +
-  geom_histogram(color = "white", fill = "blueviolet", binwidth = 1.5) +
+  geom_histogram( binwidth = 1.5) +
   scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
   labs(
     x = "Fitted Values",
-    y = "") +
-  theme_linedraw()
+    y = "") 
 
 
 # Residuals (both)
 
 res_both <- ggplot(trains_both, aes(x = residual)) +
-  geom_histogram(color = "white", fill = "blueviolet", binwidth = 2) +
+  geom_histogram (bins = 100, binwidth = 1.5) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 10), breaks = c(2, 4, 6, 8, 10)) +
   labs(
     x = "Residuals",
-    y = "") +
-  theme_linedraw()
+    y = "") 
 
 act_both + pred_both + res_both + 
-  plot_annotation(title = "Results for Democrats and Republicans")
+  plot_annotation(title = "Decomposition of Age into Fitted Values and Residuals")
 
 ```
 
-The three plots are structured like our equation and table above, i.e. a value in the left plot is the addition of one value in the middle and one in the right plot. The actual age distribution looks like a normal distribution, centered around 43 and with a standard deviation of about 12 years. The plot for the fitted values shows only two adjacent spikes, which represent the estimates for Democrats and Republicans. Since the residuals represent the difference between the two plots, their distribution looks like the first plot. 
+The three plots are structured like our equation and table above. A value in the left plot is the addition of one value in the middle plot and one in the right plot. 
+
+* The actual age distribution looks like a normal distribution. It is centered around 43, and it has a standard deviation of about 12 years. 
+
+* The middle plot for the fitted values shows only two adjacent spikes, which represent the estimates for Democrats and Republicans. 
+
+* Since the residuals plot represents the difference between the other two plots, its distribution looks like the first plot. 
 
 <!-- DK: All unclear and would benefit from clean up. -->
 
@@ -450,8 +457,6 @@ pp %>%
 In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican, but we would not be surprised if the oldest Democrat were actually younger than the youngest Republican.
 
 
-
-
 ## att_end ~ treatment
 
 Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is then what we could have in the absence of information about their age. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration? What is the largest causal effect which still has a 1 in 10 chance of occurring?
@@ -463,7 +468,7 @@ Above, we created a predictive model: with someone's party affiliation, we can m
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-We are still using the data from Enos (2014). Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant to understanding the world today? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious the answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. Math won't save us.
+We are still using the data from Enos (2014). Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant to understanding the world today? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. Math won't save us.
 
 Ethical issues are tricky, or at least trickier than they were in the context of models in which the dependent variable was height or age. (And then ethical issues in conducting the experiment in the first place are non-trivial.) Assume we make a good model. What is to prevent someone from using that information to, say, influence voting and donations? Imagine a Republican Senate candidate who hires Spanish-speakers to ride commuter trains in order to shift voters' attitudes toward immigration in a conservative direction. She believes (correctly?) that doing so will increase her odds of winning the election. Is that the sort of knowledge we seek to create? We can make such models. Indeed, the purpose of this chapter is to show you how to do so! But should you make those models?
 
@@ -536,7 +541,7 @@ fit_obj %>%
          subtitle = "Average attitude toward immigration",
          x = "Attitude",
          y = "Probability") +
-    theme_classic()
+    theme_classic() + scale_y_continuous(labels=scales::percent_format())
 ```
 
 It appears that the affect of the treatment is to change people's attitudes to be more conservative about immigration issues. Which is somewhat surprising!
@@ -635,11 +640,21 @@ te %>%
 ```
 
 
-In this case, we are looking at the distribution of the treatment effect for a single individual. This is very different than the *average* treatment effect. In particular, it is much more variable. We are looking at one row in the Preceptor Table. For a single individual, the `att_end` value can be anywhere from 3 to 15, both under treatment and under control. So, the causual effect --- the difference between the two potential outcomes can, in theory, be anywhere from -12 to +12. Such extreme values are rare, but not impossible.
+In this case, we are looking at the distribution of the treatment effect for a single individual. This is very different than the *average* treatment effect. In particular, it is much more variable. We are looking at one row in the Preceptor Table. For a single individual, the `att_end` value can be anywhere from 3 to 15, both under treatment and under control. So, the causal effect --- the difference between the two potential outcomes can, in theory, be anywhere from -12 to +12. Such extreme values are rare, but not impossible.
 
 The question, however, was interested in the value at the 90th percentile. For this model, that is `r quantile(te$te, prob = 0.9)`. We would not expect a treatment effect of this magnitude to be common, but, at the same time, effects this big and bigger will occur about 10% of the time.
  
 
 <!-- DK: Conclusion -->
+
+## Conclusion
+
+<!-- BG: This is not great, but I wanted to get some initial ideas down  -->
+
+In this chapter, we explored relationships between different variables in the trains data set. We built a predictive model and a causal model using the following three parameters: $\beta_1$,$\beta_2$,and $\sigma$.
+
+Similar to previous chapters, our first task is to use _Wisdom_ . We judge how relevant our data is to the questions we ask, using ethics to guide our decision. Could income data in 2012 really be suitable for making predictions in the modern day (2020)? Probably not and this answer will often be the case.  _Justice_ is necessary to decide the best way to represent the models we make. We use  _Courage_ to change translate our models into code. Our goal is to understand, generate posterior distributions, and interpret their meanings. Temperance leads us to the final stage. We remind ourselves that there are so many unknown factors that affect our data. Our models are never as good as we hope them to be. Therefore, we always use caution in applying our model to the real world. 
+
+
 
 
