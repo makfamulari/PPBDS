@@ -3,7 +3,9 @@ output_yaml:
   - _output.yml
 ---
 
-# Probability
+# Probability {#probability}
+
+<!-- DK: Instead of after_stat(count/sum(count)), it looks like we could use after_stat(density), if we divide by the number of outcomes. Would that be an improvement? -->
 
 <!-- We need to draw a tighter connection between the probability section and the 2/3/N models sections. Each of these features the creation, by hand, of a joint unnormalized distribution. In each case, we then take a slice of that joint distribution p(models, data) in order to get the conditional distribution p(models | data). Explain this more clearly each time, using this language.  Example:
 
@@ -97,13 +99,15 @@ mydata <- tibble(results = c(rep(0, 50),
                              rep(1, 50)))
 
 ggplot(mydata, aes(x = results)) +
-  geom_histogram(aes(y = ..count../sum(..count..)), 
-                 binwidth = 0.5, color = "white") +
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 binwidth = 0.5, 
+                 color = "white") +
   labs(title = "Mathematical Probability Distribution",
        subtitle = "Flipping One Coin",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails")) +
+  scale_x_continuous(breaks = c(0, 1), 
+                     labels = c("Heads", "Tails")) +
   theme_classic()
 
 ```
@@ -127,13 +131,15 @@ results <- sample(coin, sims, replace=TRUE)
 mydata <- tibble(results)
 
 ggplot(mydata, aes(x = results)) +
-  geom_histogram(aes(y=..count../sum(..count..)), binwidth = 0.5, 
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 binwidth = 0.5, 
                  color = "white") +
   labs(title = "Empirical Probability Distribution",
        subtitle = "Flipping One Coin A Hundred Times",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails")) +
+  scale_x_continuous(breaks = c(0, 1), 
+                     labels = c("Heads", "Tails")) +
   theme_classic()
 
 ```
@@ -152,20 +158,22 @@ mydata <- tibble(results = c(rep(0, 95),
     rep(1, 5)))
 
 ggplot(mydata, aes(x = results)) +
-  geom_histogram(aes(y=..count../sum(..count..)), binwidth = 0.5, 
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 binwidth = 0.5, 
                  color = "white") +
   labs(title = "Posterior Probability Distribution",
        subtitle = "Your Beliefs About Flipping One Coin to Bet Your Friend",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,1,1), labels = c("Heads", "Tails")) +
+  scale_x_continuous(breaks = c(0, 1), 
+                     labels = c("Heads", "Tails")) +
   theme_classic()
 
 ```
 
 ### Rolling two dice
 
-Our *mathematical distribution* tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two dice at the same time and sum the values, the numbers closes to the middle (ex. 6, 7, 8) are more common sums than numbers at the very edge (ex. 2, 12) because there are more combinations of numbers that add up to the middle values.
+Our *mathematical distribution* tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two dice at the same time and sum the values, the numbers closest to the middle (ex. 6, 7, 8) are more common sums than numbers at the very edge (ex. 2, 12) because there are more combinations of numbers that add up to the middle values.
 
 ```{r, echo=FALSE}
 
@@ -182,13 +190,14 @@ mydata <- mydata %>%
   mutate(sum = (dice_1 + dice_2))
 
 ggplot(mydata, aes(x = sum)) +
-  geom_histogram(aes(y=..count../sum(..count..)), binwidth = 1, 
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 binwidth = 1, 
                  color = "white") +
   labs(title = "Mathematical Probability Distribution",
        subtitle = "Sum from Rolling Two Dice",
        x = "Outcome\nSum of Two Dice",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,12,1), labels = 0:12) +
+  scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
   theme_classic()
 
 ```
@@ -212,13 +221,14 @@ mydata <- mydata %>%
   mutate(sum = (dice_1 + dice_2))
 
 ggplot(mydata, aes(x = sum)) +
-  geom_histogram(aes(y=..count../sum(..count..)), binwidth = 1, 
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 binwidth = 1, 
                  color = "white") +
   labs(title = "Empirical Probability Distribution",
        subtitle = "Sum from Rolling Two Dice A Hundred Times",
        x = "Outcome\nSum of Two Dice",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,12,1), labels = 0:12) +
+  scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
   theme_classic()
 
 ```
@@ -229,18 +239,20 @@ The *posterior distribution* for rolling one dice a hundred depends on your expe
 
 # Flipping a dice 100 times
 
-mydata <- tibble(results = c(rep(2, 17),rep(3, 17),rep(4, 7),rep(5, 7),
-                             rep(6, 7),rep(7, 5),rep(8, 7),rep(9, 7),
-                             rep(10, 7),rep(11,5),rep(12,7)))
+mydata <- tibble(results = c(rep(2, 17), rep(3, 17), rep(4, 7), 
+                             rep(5, 7), rep(6, 7), rep(7, 5),
+                             rep(8, 7), rep(9, 7), rep(10, 7), rep(11, 5),
+                             rep(12, 7)))
 
 ggplot(mydata, aes(x = results)) +
-  geom_histogram(aes(y=..count../sum(..count..)), binwidth = 1, 
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 binwidth = 1, 
                  color = "white") +
   labs(title = "Posterior Probability Distribution",
        subtitle = "Your Belief About Rolling Two Dice at a Crooked Casino",
        x = "Outcome\nSum of Two Dice",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,12,1), labels = 0:12) +
+  scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
   theme_classic()
 
 ```
@@ -265,7 +277,8 @@ result <- tibble(total = (matrix(rbinom(sims*length(ev),
                  ncol = length(ev)) %*% ev)[,1])
 
 ggplot(data = result, aes(total)) +
-  geom_histogram(aes(y=..count../sum(..count..)), binwidth = 1) +
+  geom_histogram(aes(y= after_stat(count/sum(count))), 
+                 binwidth = 1) +
   labs(title = "Mathematical Probability Distribution",
        subtitle = "Presidential Elections",
        y = "Probability",
@@ -286,7 +299,9 @@ mydata <- tibble(electoral_votes = c(486,191,17,297,49,13,111,370,379,
                       271,286,365,332,304))
 
 ggplot(mydata, aes(x = electoral_votes)) +
-  geom_histogram(aes(y=..count../sum(..count..)), bins = 100, color = "white") +
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 bins = 100, 
+                 color = "white") +
   labs(title = "Empirical Probability Distribution",
        subtitle = "Electoral Votes from Previous Elections",
        x = "Outcome\nElectoral Vote Total for Democratic Candidate",
@@ -298,13 +313,14 @@ ggplot(mydata, aes(x = electoral_votes)) +
 The *posterior distribution* in the election case is something data scientists devote a lot of time to. The analysts develop algorithms that consider their expectations for each outcome. Consider this generated using data from *FiveThirtyEight*.
 
 ```{r, echo=FALSE}
-# Some comments about this. Where did you get this data from? Why those columns?
+# DK: Some comments about this. Where did you get this data from? Why those
+# columns? Don't use read.csv!
 
 
 posterior_prez <- read.csv("./05-probability/data/election-forecasts-2020/prez_1.csv") %>%
   select(c(9,11))
 
-ggplot(posterior_prez, aes(total_ev,evprob_chal)) +
+ggplot(posterior_prez, aes(total_ev, evprob_chal)) +
   geom_bar(stat = 'identity') +
   labs(title = "Posterior Probability Distribution Based on FiveThirtyEight Forecast",
        subtitle = "Presidential Elections",
@@ -373,7 +389,7 @@ ggplot(mydata, aes(x = sum)) +
        subtitle = "Sum from Rolling Two Dice A Hundred Times",
        x = "Outcome\nSum of Two Dice",
        y = "Count") +
-  scale_x_continuous(breaks = seq(0,12,1), labels = 0:12) +
+  scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
   theme_classic()
 
 ```
@@ -763,8 +779,10 @@ ggplot(pop, aes(x = as.factor(positive_test), y = as.factor(have_disease))) +
   labs(title = "Joint Unnormalized Empirical Distribution \n of Test Results and Disease Status",
     x = "Test Result",
     y = "Disease Status") +
-  scale_x_discrete(breaks = seq(0,1,1), labels = c("Negative", "Positive")) +
-  scale_y_discrete(breaks = seq(0,1,1), labels = c("Negative", "Positive"))
+  scale_x_discrete(breaks = c(0, 1), 
+                   labels = c("Negative", "Positive")) +
+  scale_y_discrete(breaks = c(0, 1), 
+                   labels = c("Negative", "Positive"))
 
 ```
 
@@ -796,13 +814,15 @@ mydata <- tibble(results = c(rep(0, 5),
                              rep(1, 5)))
 
 ggplot(mydata, aes(x = results)) +
-  geom_histogram(aes(y = ..count../sum(..count..)), 
-                 binwidth = 0.5, color = "white") +
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 binwidth = 0.5, 
+                 color = "white") +
   labs(title = "Conditional Probability Distribution",
        subtitle = "Probability of Having the Disease Given a Positive Test Result",
        x = "Disease Status",
        y = "Probability") +
-  scale_x_continuous(breaks = seq(0,1,1), labels = c("Positive", "Negative")) +
+  scale_x_continuous(breaks = c(0, 1), 
+                     labels = c("Positive", "Negative")) +
   theme_classic()
 
 ```
@@ -884,13 +904,15 @@ Next, let's normalize the distribution.
 ```{r, echo=FALSE}
 
 ggplot(x, aes(results)) +
-  geom_histogram(aes(y = ..count../sum(..count..)), 
-                 binwidth = 0.25, color = "white") +
+  geom_histogram(aes(y = after_stat(count/sum(count))), 
+                 binwidth = 0.25, 
+                 color = "white") +
   labs(title = "Conditional Probability Distribution",
        subtitle = "Number of White Marbles Given a Three White Marbles Selected in the Sample",
        x = "Number of White Marbles in the Bag",
        y = "Count") +
-  scale_x_continuous(breaks = seq(0,1,0.5), labels = c("0", "1", "2")) +
+  scale_x_continuous(breaks = seq(0,1,0.5), 
+                     labels = c("0", "1", "2")) +
   theme_classic()
 
 ```
@@ -1100,7 +1122,7 @@ odds
 
 ```
 
-As you may have noticed, if you calculated the value using the first method, you would believe that getting 10 or more heads is less likely than it really is. If you were to run a crooked casino based on these assumptions, you might end up losing money. It is very important to be careful about the assumptions you are making. We tossed a coin 20 times and got 8 heads. However, you would be worng to assume that $p_h$ = 0.4 just based on this result.
+As you may have noticed, if you calculated the value using the first method, you would believe that getting 10 or more heads is less likely than it really is. If you were to run a casino based on these assumptions, you will lose all your money. It is very important to be careful about the assumptions you are making. We tossed a coin 20 times and got 8 heads. However, you would be wrong to assume that $p_h$ = 0.4 just based on this result.
 
 <!-- ## Testing is evil -->
 
@@ -1129,6 +1151,62 @@ Parameter uncertainty is a reason to exercise Wisdom. Suppose your friend sets u
 You have a sneaking suspicion that the coin isn't fair and you ask your friend to flip it 10 times to test your theory. However, you must not be overconfident. 10 observations might be too few to judge the fairness of the coin. Perhaps your friend secretly switches coins when it comes time for the actual betting and your sample in the initial simulation is not representative. You might be nervous about losing your money and even miscount the number of heads and tails. These are all examples of *parameter uncertainty*. Sometimes, a model has the correct form, but it's not practical to run the simulation millions of times to be certain of the outcome. It's not possible to be absolutely certain that your friend isn't switching coins. A perfect world does not exist, so we must have reservations when drawing likely conclusions.
 
 We need to be aware that sometimes it is not possible to capture all the variables we care about. However, as long as we are prudent, we can still interpret the data.
+
+## Justice
+
+```{r, echo=FALSE, fig.margin=TRUE, fig.cap="Justice."}
+
+knitr::include_graphics("other/images/Justice.jpg")
+
+```
+
+Justice in data science is all about making sure that are models are as "fair" and unbiased as possible. Model structure is one of the most important ideas under the theme of Justice.
+
+In the section about N models, we talked about the number of heads we would get from flipping a coin 20 times. One of the important parts of model structure is compressing ideas like the coin toss experiment into mathematical expressions.
+
+For instance, a Bernouli distribution is where $n = 1$. In the following expression, we are assuming the default value of n = 1, where we flip a coin one time. H represents the observation (i.e. is the result heads of tails). The tilda tells us we are making observations from an experiment. The B() represents a binomial distribution because the result of the experiment is either 0 or 1, tails or heads. $p$ in the expression represents the probability of heads.
+
+$$ H \sim B(p) $$
+The following is a slightly more comprehensive expression, which takes different values of n into account. We might flip the coin 1 time, 2 times, etc.
+
+$$ H \sim B(p, n)$$
+
+This is the experiment we simulated in the section about N models. We flipped a coin 20 times and observed the number of heads we got. We worked with different values of $p$ to create the scatterplot and 3D visualization earlier in this chapter.
+
+$$ H \sim B(p, n = 20)$$
+Another question to consider is whether the models we generate while calculating probabilities are predictive or causal. Knowing the difference helps us fairly interpret the data. Every model is predictive in the sense that, if you give me new data drawn from a stable distribution, I can give you a predictive forecast. But only a subset of those models are causal, meaning that, for a given individual, you can change the value of one input and figure out what the new output would be and then, from that, calculate the causal effect.
+
+For the purposes of this chapter, everything we worked with was predictive. We did not attempt to make causal claims. If we wanted to make a causal claim, we would need to feature at least two different ways of doing an experiment. For instance, we could look at how the way in which you flip a coin affects the outcome. We could compare the number of heads we get from catching a coin in the air versus letting it fall to the ground. An important part of Justice is understanding the distinction between predictive and causal models.
+
+## Courage
+
+```{r, echo=FALSE, fig.margin=TRUE, fig.cap="Courage."}
+
+knitr::include_graphics("other/images/Courage.jpg")
+
+```
+Data science involves words, math, and code. Code is the most important element. Turning an idea into code requires *Courage*.
+
+Courage helps us account for unmodeled variation. Recall the following equation.
+
+$$outcome = model + what is not in the model$$
+```{r, echo=FALSE, fig.margin=TRUE, fig.cap="De Finetti."}
+
+knitr::include_graphics("05-probability/images/de_finetti.jpg")
+
+```
+
+```{marginfigure}
+
+Bruno de Finetti was an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.
+
+```
+
+A residual is the variation that is not contained in the model. This is explains why the result is equal to the fitted (also known as expected) value plus the residual (what is not in the model). However, no matter how nuanced our model becomes, we will not be able to make perfect predictions. Some randomness is intrinsic. For instance, the behavior of one individual can change and can't be perfectly predicted even if a model accounts for what a group does on average.
+
+*Prediction uncertainty* highlights our ability, or lack thereof, to predict the future. This can be conceptualized as either an attempt to forecast the literal future or as an attempt to model data points which have been left out of the original analysis in some way. Prediction uncertainty has two primary sources that we previously discussed: *parameter uncertainty* and *unmodeled variation*.
+
+
 
 ## Temperance
 
@@ -1159,60 +1237,6 @@ knitr::include_graphics("05-probability/images/Three_Card_Monte.jpg")
 What does this mean? Well imagine a crowd playing Three Card Monte in the streets of New York. The guy running the game runs a demo and shows you all the cards to make you confident. They earn money by making you overconfident and persuading you to bet. Your odds may seem good during the demo round, but that doesn't actually say anything about what will likely happen when the real, high stakes game begins. The person running the game does many simulations, making the "victim" forget that they cannot actually make any conclusions about the odds of winning. There are some variables that we simply do not know even if we put a lot of effort into making posterior probability distributions. People can be using slight of hand, for instance.
 
 We need patience in order to study and understand the unknown unknowns in our data. Patience is also important when we analyze the "realism" of our models. When we created the mathematical probability distribution for presidential elections, for instance, we assumed that the Democratic candidate would have a 50% chance of winning each vote in the electoral college. By comparing the mathematical model to our empirical cases, however, we recognize that the mathematical model is unlikely to be true. The mathematical model suggested that getting fewer than 100 votes is next to impossible, but many past Democratic candidates in the empirical distribution received less than 100 electoral votes.
-
-## Courage
-
-```{r, echo=FALSE, fig.margin=TRUE, fig.cap="Courage."}
-
-knitr::include_graphics("other/images/Courage.jpg")
-
-```
-Data science involves words, math, and code. Code is the most important element. Turning an idea into code requires *Courage*.
-
-Courage helps us account for unmodeled variation. Recall the following equation.
-
-$$outcome = model + what is not in the model$$
-```{r, echo=FALSE, fig.margin=TRUE, fig.cap="De Finetti."}
-
-knitr::include_graphics("05-probability/images/de_finetti.jpg")
-
-```
-
-```{marginfigure}
-
-Bruno de Finetti was an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.
-
-```
-
-A residual is the variation that is not contained in the model. This is explains why the result is equal to the fitted (also known as expected) value plus the residual (what is not in the model). However, no matter how nuanced our model becomes, we will not be able to make perfect predictions. Some randomness is intrinsic. For instance, the behavior of one individual can change and can't be perfectly predicted even if a model accounts for what a group does on average.
-
-*Prediction uncertainty* highlights our ability, or lack thereof, to predict the future. This can be conceptualized as either an attempt to forecast the literal future or as an attempt to model data points which have been left out of the original analysis in some way. Prediction uncertainty has two primary sources that we previously discussed: *parameter uncertainty* and *unmodeled variation*.
-
-## Justice
-
-```{r, echo=FALSE, fig.margin=TRUE, fig.cap="Justice."}
-
-knitr::include_graphics("other/images/Justice.jpg")
-
-```
-
-Justice in data science is all about making sure that are models are as "fair" and unbiased as possible. Model structure is one of the most important ideas under the theme of Justice.
-
-In the section about N models, we talked about the number of heads we would get from flipping a coin 20 times. One of the important parts of model structure is compressing ideas like the coin toss experiment into mathematical expressions.
-
-For instance, a Bernouli distribution is where $n = 1$. In the following expression, we are assuming the default value of n = 1, where we flip a coin one time. H represents the observation (i.e. is the result heads of tails). The tilda tells us we are making observations from an experiment. The B() represents a binomial distribution because the result of the experiment is either 0 or 1, tails or heads. $p$ in the expression represents the probability of heads.
-
-$$ H \sim B(p) $$
-The following is a slightly more comprehensive expression, which takes different values of n into account. We might flip the coin 1 time, 2 times, etc.
-
-$$ H \sim B(p, n)$$
-
-This is the experiment we simulated in the section about N models. We flipped a coin 20 times and observed the number of heads we got. We worked with different values of $p$ to create the scatterplot and 3D visualization earlier in this chapter.
-
-$$ H \sim B(p, n = 20)$$
-Another question to consider is whether the models we generate while calculating probabilities are predictive or causal. Knowing the difference helps us fairly interpret the data. Every model is predictive in the sense that, if you give me new data drawn from a stable distribution, I can give you a predictive forecast. But only a subset of those models are causal, meaning that, for a given individual, you can change the value of one input and figure out what the new output would be and then, from that, calculate the causal effect.
-
-For the purposes of this chapter, everything we worked with was predictive. We did not attempt to make causal claims. If we wanted to make a causal claim, we would need to feature at least two different ways of doing an experiment. For instance, we could look at how the way in which you flip a coin affects the outcome. We could compare the number of heads we get from catching a coin in the air versus letting it fall to the ground. An important part of Justice is understanding the distinction between predictive and causal models.
 
 ## Conclusion
 
