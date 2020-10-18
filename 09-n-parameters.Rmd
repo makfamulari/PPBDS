@@ -27,7 +27,6 @@ output_yaml:
 <!-- 2) `primary_06` as a function of `treatment`, `gender`, `solo`, `age` and (some of) their interactions. We will build up this model step-by-step, very similar to how we explored the effect of treatment in chapter 8. But we go deeper because  we are learning about interactions. Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 5 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
 
 
-
 Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters) and three parameters in Chapter \@ref(three-parameters), you are now ready to make the jump to $N$ parameters. 
 
 In this chapter, we will consider models with multiple parameters and the complexities that arise from these additions. 
@@ -47,8 +46,6 @@ library(tidyverse)
 
 <!-- Talk about the data, as we usual do. Lots of interesting things. Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Make sure to mention all the variables we end up keeping below. Finish with some graphics which show how various things are related to our lefthand side variable: alive_post. -->
 
-
-
 We will start off by using a subset of the `governors` data set from the **PPBDS.data** package. This data set looks at the lifespans of U.S. politicians from 1945 to 2012. It comes from the paper "Longevity Returns to Political Office" by Barfort, Klemmensen & Larsen (2019), and aims to find out whether winning an election influences the lifespan of candidates for governor.
 
 Let's explore the variables and observations contained within this data set by performing an exploratory data analysis. 
@@ -65,7 +62,7 @@ ch9_gov <- governors %>%
   select(last_name, year, state, sex, status, won, alive_post, alive_pre)
 ```
 
-There are a few things to note when looking at this data. First, the data set includes the variables `alive_pre` and `alive_post`, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. Furthermore, candidates with unknown dates of death were not included. This means that there are only a handful of observations from elections in the last 20 years. Most candidates are still alive.
+There are a few things to note when looking at this data. First, the data set includes the variables `alive_pre` and `alive_post`, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. Furthermore, candidates with unknown dates of death were not included. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time are still alive and are excluded due to an unknown/yet-to-be-determined value for the column `alive_post`.
 
 Another caveat is that for a given election, only the top two candidates are included in the data set. If a politician did not receive the highest or second-highest number of votes, they are excluded. 
 
