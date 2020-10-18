@@ -216,7 +216,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb930"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb930-1"><a href="n-parameters.html#cb930-1"></a>ch9_gov &lt;-<span class="st"> </span>governors <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb930-2"><a href="n-parameters.html#cb930-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">won =</span> <span class="kw">ifelse</span>(win_margin <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb930-3"><a href="n-parameters.html#cb930-3"></a><span class="st">  </span><span class="kw">select</span>(last_name, year, state, sex, status, won, alive_post, alive_pre)</span></code></pre></div>
-<p>There are a few things to note when looking at this data. First, the data set includes the variables <code>alive_pre</code> and <code>alive_post</code>, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. Furthermore, candidates with unknown dates of death were not included. This means that there are only a handful of observations from elections in the last 20 years. Most candidates are still alive.</p>
+<p>There are a few things to note when looking at this data. First, the data set includes the variables <code>alive_pre</code> and <code>alive_post</code>, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. Furthermore, candidates with unknown dates of death were not included. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time are still alive and are excluded due to an unknown/yet-to-be-determined value for the column <code>alive_post</code>.</p>
 <p>Another caveat is that for a given election, only the top two candidates are included in the data set. If a politician did not receive the highest or second-highest number of votes, they are excluded.</p>
 <p>Finally, it is noted that for some observations, only the birth or death year of a candidate could be determined, in which case the date was taken as July 1st of that year.</p>
 <p>Let’s run <code>sample_n()</code>:</p>
@@ -2390,12 +2390,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p class="caption marginnote">-->FIGURE 9.4: Temperance<!--</p>-->
 <!--</div>--></span>
 </p>
-<!-- Use posterior_predict -->
 </div>
 <div id="eda-of-shaming" class="section level2">
 <h2>
 <span class="header-section-number">9.5</span> EDA of <code>shaming</code>
 </h2>
+<!-- Use print(fit_obj, digits = 4) if you need to see more digits. -->
+<!-- Models to use-->
+<!-- primary_06 ~ sex - 1 -->
+<!-- primary_06 ~ age -->
+<!-- primary_06 ~ treatment - 1 (plot all five posteriors together) -->
+<!-- primary_06 ~ sex + solo + treatment -->
+<!-- primary_06 ~ sex + solo + treatment + solo * treatment -->
 <p>Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that “shames” citizens who do not vote. You are considering sending out a “shaming” voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?</p>
 <p>Consider a new data set, <code>shaming</code>, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled “Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment”. This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout.</p>
 <p>Let’s now do another EDA, starting off by running <code>glimpse()</code>.</p>
@@ -2838,6 +2844,7 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <!-- We must have left bootstrapping behind by now. No more bootstraps, at least for the purpose of calculating uncertainty. (We will use it later for the purpose of out-of-sample testing and avoiding overfitting.) Key lesson is that overfitting is easy. You can't just estimate a value for each cell. You need to smooth and borrow strength. Of course, the only way to do that is with a Bayesian approach. Right? We don't want to get into hacked likelihood approaches. -->
 <!-- cces looks perfect for this project. There are 400,000 rows, so it seems like you ought to have plenty of data for anything you want, but once you realize there are 51 states and 10 years, things get sparse fast. We only have 15 observations, for example, for Wyoming in 2007. Once you start subsetting by race and education, you have no choice but to start borrowing strength.  -->
 <!-- So, just what will we use? rstanarm(). If so (and if we have not introduced it earlier), we can begin with seeing how it is similar to lm() and then expand. This means that, in one paramter chapter, we should be doing lm( ~ 1). In two parameter, lm( ~ treatment) --- if treatment is zero one --- or, perhaps better, lm( ~ -1 + treatment) if treatment is a factor/character with two levels. We might also have introduced  -->
+<!-- MF: Is basic structure for this chapter meant to be [1] life span section, [2] shame section, and [3] interactions? -->
 
 <!-- Add a couple more of the chapters? Or maybe put them in chapter 11? -->
 <!-- Cut the recipe, bake, stuff? Not really needed for chapters 11 and 12. -->
@@ -2859,7 +2866,7 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-17
+2020-10-18
 </p>
 </div>
 </div>
