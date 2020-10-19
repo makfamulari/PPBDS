@@ -116,7 +116,7 @@ Let's explore descriptive, not causal, models which seek to explain longevity po
 
 To begin, let's model candidate lifespan after the election as a function of candidate lifespan prior to the election. The math is fairly simple:
 
-$$ alive.post_i =  \beta_0 + \beta_1 alive.pre_i + \epsilon_i $$
+$$ alive\_post_i =  \beta_0 + \beta_1 alive\_pre_i + \epsilon_i $$
 
 <!-- DK: I need to think harder about exactly what these cofficients mean in the Bayesian context. We can't just rely on the "average value for the population" verbiage which we used in chapters 7 and 8. -->
 
@@ -133,6 +133,18 @@ fit_gov_1 <- stan_glm(data = ch9_gov,
                       formula = alive_post ~ alive_pre,
                       refresh = 0)
 ```
+
+
+```{r}
+# ch9_gov %>% 
+#   mutate(fitted_values = fitted(fit_gov_1)) %>% 
+#   ggplot() +
+#     geom_point(aes(alive_pre, alive_post)) +
+#     geom_line(aes(fitted_values, alive_post))
+```
+
+
+
 
 Most of the time, we are only interested in the parameter values.
 
