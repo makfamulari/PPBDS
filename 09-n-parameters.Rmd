@@ -3,6 +3,13 @@ output_yaml:
   - _output.yml
 ---
 
+
+<!-- Becca: -->
+
+<!-- * Wisdom section -->
+
+<!-- * Everything starting with fit_gov_3. Math, preceptor table, mention its predictive. Courage: meaning fit model, show posteriors, interpret posteriors. Show split into outcome, fitted, residuals. -->
+
 # N Parameters {#n-parameters}
 
 
@@ -58,6 +65,7 @@ sample_n(ch9_gov, 10)
 
 From this sample, we can see some trends start to appear. For example, we see that `sex` is most often "Male", and status is most often "Challenger" rather than "Incumbent".
 
+<!-- DK: Weird that this automagically creates a "TABLE 9.1: Data summary" side margin note. -->
 
 ```{r}
 skim(ch9_gov)
@@ -125,7 +133,7 @@ $$ alive\_post_i =  \beta_0 + \beta_1 alive\_pre_i + \epsilon_i $$
 
 <!-- DK: I need to think harder about exactly what these cofficients mean in the Bayesian context. We can't just rely on the "average value for the population" verbiage which we used in chapters 7 and 8. -->
 
-with $\epsilon_i \sim N(0, \sigma^2)$. $alive\_post_i$ is the number of days lived after the election for candidate $i$. $\beta_0$ is the "intercept" of the regression, the average value for the population of $alive\_post_i$ if $alive\_pre_i = 0$. $\beta_1$ is the "coefficient" of  $alive\_pre$. Each one day increase in $alive\_pre$ is associated with a $\beta_1$ change in $alive\_post$. Again, this is the value for the population. $\epsilon_i$ is the "error term," the difference between the days-lived of candidate $i$ and the average days-lived of all candidates.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. There are three unknown parameters, similar to the situation we faced in Chapter \@ref{three-parameters}.
+with $\epsilon_i \sim N(0, \sigma^2)$. $alive\_post_i$ is the number of days lived after the election for candidate $i$. $\beta_0$ is the "intercept" of the regression, the average value for the population of $alive\_post_i$ if $alive\_pre_i = 0$. $\beta_1$ is the "coefficient" of  $alive\_pre$. Each one day increase in $alive\_pre$ is associated with a $\beta_1$ change in $alive\_post$. Again, this is the value for the population. $\epsilon_i$ is the "error term," the difference between the days-lived of candidate $i$ and the average days-lived of all candidates.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. There are three unknown parameters, similar to the situation we faced in Chapter \@ref(three-parameters).
 
 <!-- Make a single Preceptor Table which we will use for this who section. It will have a single outcome, alive_post, and a bunch of covariates, including all the ones we have saved. It will also have a bunch of rows with missing data, indicating all the people for whom we don't have data, since we are probably interested in applying this more broadly than just US governor candidates who are dead. -->
 
@@ -186,15 +194,15 @@ fit_gov_1 %>%
 
 Centering is a tool that is used when the model's intercept does not make substantive sense. To center a model, we pick a constant value, usually the mean of the independent variable, and subtract that constant from every value of the independent variable. This changes the zero point for the variable and shifts the model over.
 
-In this example, we want to center the value for `alive_pre`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `alive_pre`. Once we find this value, we will subtract it from every `alive_pre` value, creating a new variable called `alive_pre_centered`. We then use `alive_pre_centered` as the independent variable to model `alive_post`.
+In this example, we want to center the value for `alive_pre`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `alive_pre`. Once we find this value, we will subtract it from every `alive_pre` value. We have changed the meaning of `alive_pre`. It now means the number of days a candidate has been alive, as of Election Day, relative to the average days alive of all candidates.
 
 ```{r}
-ch9_gov$alive_pre_centered <- ch9_gov$alive_pre - mean(ch9_gov$alive_pre)
+ch9_gov$alive_pre <- ch9_gov$alive_pre - mean(ch9_gov$alive_pre)
 ```
 
 ```{r, cache = TRUE}
 fit_gov_1.centered <- stan_glm(data = ch9_gov,
-                      formula = alive_post ~ alive_pre_centered,
+                      formula = alive_post ~ alive_pre,
                       refresh = 0)
 
 print(fit_gov_1.centered, detail = FALSE)
@@ -294,6 +302,9 @@ fit_gov_3 <- stan_glm(data = ch9_gov,
 print(fit_gov_3, detail = FALSE)
 ```
 
+<!-- DK: Show three posterior plots: one for beta_2, one for beta_0 (intercept) and one for beta_0 + beta_1.  Interpret them. This is a parallel slopes model. Can we show a parallel slopes graph by hand? Skip this for now. -->
+
+
 <!-- DK: Cool, eh? It is (mostly?) an age effect! Controlling for age at the election, women live about as long as men, but they are much more likely be candidates as an older age. Again, what we are doing is slowly building more complex models, understanding what they mean. -->
 
 <!-- Also, note that this is a "parallel slopes" model. Explain slowly what that means.  Create a plot. -->
@@ -324,6 +335,13 @@ fit_gov_5 <- stan_glm(data = ch9_gov,
                       iter = 10000)
 ```
 
+Notes:
+
+* takes awhile to run. Got 55 parameters.
+
+* Shrink parameter values.
+
+* Pick two unique posterior parameters to interpret.
 
 
 ```{r}
