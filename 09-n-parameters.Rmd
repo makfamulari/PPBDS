@@ -11,12 +11,14 @@ output_yaml:
 
 Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters) and three parameters in Chapter \@ref(three-parameters), you are now ready to make the jump to $N$ parameters. 
 
-In this chapter, we will consider models with multiple parameters and the complexities that arise from these additions. 
+In this chapter, we will consider models with multiple parameters and the complexities that arise therefrom. 
+
+<!-- DK: Add some more. What are the key lessons? What do we carry over from previous chapters? What is new? -->
 
 
 ## EDA of `governors`
 
-Begin by loading the packages which we need.
+Load packages:
 
 ```{r, message=FALSE}
 library(PPBDS.data)
@@ -25,17 +27,16 @@ library(rstanarm)
 library(tidyverse)
 ```
 
-<!-- Talk about the data, as we usual do. Lots of interesting things. Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Make sure to mention all the variables we end up keeping below. Finish with some graphics which show how various things are related to our lefthand side variable: alive_post. -->
+<!-- DK: Was all this covered? --- Talk about the data, as we usual do. Lots of interesting things. Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Make sure to mention all the variables we end up keeping below. Finish with some graphics which show how various things are related to our lefthand side variable: alive_post. -->
 
-We will start off by using a subset of the `governors` data set from the **PPBDS.data** package. This data set looks at the lifespans of U.S. politicians from 1945 to 2012. It comes from the paper "Longevity Returns to Political Office" by Barfort, Klemmensen & Larsen (2019), and aims to find out whether winning an election influences the lifespan of candidates for governor.
+We will start off by using a subset of the `governors` data set from the **PPBDS.data** package. This data set looks at the lifespans of candidates for governor in the US. It comes from the paper "Longevity Returns to Political Office" by Barfort, Klemmensen & Larsen (2019), which concludes that winning a gubernatorial election increases a candidate's lifespan.
 
-Let's explore the variables and observations contained within this data set by performing an exploratory data analysis. 
 
 ```{r}
 glimpse(governors)
 ```
 
-There are 11 variables and 1,092 observations. In this chapter, we will only be looking at the variables `last_name`, `year`, `state`, `sex`, `status`, `alive_post`, and `alive_pre`. We will also create a new variable called `won` that is `TRUE` when the win margin is greater than 0, and `FALSE` if not.
+There are 11 variables and 1,092 observations. In this Chapter, we will only be looking at the variables `last_name`, `year`, `state`, `sex`, `status`, `alive_post`, and `alive_pre`. We will also create a new variable called `won` that is `TRUE` if the candidate won the election, and `FALSE` if not.
 
 ```{r}
 ch9_gov <- governors %>% 
@@ -43,11 +44,11 @@ ch9_gov <- governors %>%
   select(last_name, year, state, sex, status, won, alive_post, alive_pre)
 ```
 
-There are a few things to note when looking at this data. First, the data set includes the variables `alive_pre` and `alive_post`, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. Furthermore, candidates with unknown dates of death were not included. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time are still alive and are excluded due to an unknown/yet-to-be-determined value for the column `alive_post`.
+There are a few things to note when looking at this data. First, the data set includes the variables `alive_pre` and `alive_post`, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time are still alive and are excluded.
 
-Another caveat is that for a given election, only the top two candidates are included in the data set. If a politician did not receive the highest or second-highest number of votes, they are excluded. 
+Another caveat is that for a given election, only the top two candidates are included in the data. If a politician did not receive the highest or second-highest number of votes, they are excluded. 
 
-Finally, it is noted that for some observations, only the birth or death year of a candidate could be determined, in which case the date was taken as July 1st of that year.
+Finally, for some observations, only the birth or death year of a candidate could be determined and not the exact date. In those cases, the date was set as July 1st of that year.
 
 Let's run `sample_n()`:
 
@@ -57,7 +58,6 @@ sample_n(ch9_gov, 10)
 
 From this sample, we can see some trends start to appear. For example, we see that `sex` is most often "Male", and status is most often "Challenger" rather than "Incumbent".
 
-Let's summarize the data with `skim()`:
 
 ```{r}
 skim(ch9_gov)
@@ -65,7 +65,11 @@ skim(ch9_gov)
 
 This output groups the variables together by type (character, logical, numeric, etc.). From this, we can see things like the number of unique last names, how many of the observations in our subset won versus how many lost their elections, and the mean number of days before and after a gubernatorial election that a candidate lived. We are also given histograms of the numerical data. In looking at the histogram for `year`, we see that it is skewed right, with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.
 
-In using this data set, our left-side variable will be `alive_post`. We want to know how the election affected the lifespan of these gubernatorial candidates. Let's look at some graphs and plots showing the relationships between `alive_post` and some of the other variables in our subset.
+<!-- DK: Would using years rather than days as the unit be helpful? -->
+
+In using this data set, our left-side variable will be `alive_post`. We are trying to understand/predict how many days a candidate will live after the election. Let's look at some graphs and plots showing the relationships between `alive_post` and some of the other variables in our subset.
+
+<!-- DK: Clean up the plot. -->
 
 ```{r}
 ch9_gov %>%
@@ -73,18 +77,19 @@ ch9_gov %>%
   geom_point()
 ```
 
-Starting with the relationship between `alive_post` and `year`, we can see that the data is skewed right and that there is a defined line that data points do not exist above. There are no data points in the top right portion of the graph because it is not possible to have run in 2011, lived 20,000 days after the election took place, and still have died before the data set was created. This line represents the most a candidate could have possibly lived - and still have died - to be included the data set. The reason this line is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a longer time after the election and still have died prior to the data set creation, giving them higher `alive_post` values than those who ran for office in later years. 
+Starting with the relationship between `alive_post` and `year`, we can see that the data is skewed right and that there is a defined line that data points do not exist above. There are no data points in the top right portion of the graph because it is not possible to have run in 2011, lived 20,000 days after the election took place, and still have died before the data set was created. This line represents, approximately, the most a candidate could have possibly lived --- and still have died --- to be included the data set. The reason this line is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a longer time after the election and still have died prior to the data set creation, giving them higher `alive_post` values than those who ran for office in more recent years. 
 
-There are fewer observations in later years because fewer candidates have died. The vast maajority of candidates who ran for office in the 21st century are still alive today and therefore excluded from this data set. 
+There are fewer observations in later years because fewer candidates have died. The vast majority of candidates who ran for office in the 21st century are still alive today and therefore excluded. 
 
+<!-- DK: Clean up plot. -->
 
 ```{r}
 ch9_gov %>%
-  ggplot(aes(x = won, y = alive_post)) +
+  ggplot(aes(x = sex, y = alive_post)) +
   geom_boxplot()
 ```
 
-This box plot is interesting in that it takes a direct look at the relationship we are trying to learn more about: whether winning an election influences the lifespan of politicians. 
+This plot shows that men live much longer, on average, than women after the election. Does that make sense to you?
 
 <!-- Clean up and add more discussion here -->
 
@@ -94,6 +99,8 @@ This box plot is interesting in that it takes a direct look at the relationship 
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Wisdom"}
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
+
+<!-- DK: Two paragraphs is plenty. Note this is a change. Topic is: If we want to predict how long someone will live, how relevant is this data set? (We are not interested in the question which the authors explore which is the causal effect of victory on lifespan.) We are making a predictive model, not a causal one. Can we use this model for any new person we meet? Only for people who are candidates? For people who are about as rich/successful/educated as the typical candidate? -->
 
 
 ## Justice and Courage
@@ -110,9 +117,7 @@ Because we will be going through a series of models in this chapter, it is usefu
 
 
 
-<!-- DK: Maybe instead of tables, we should just be showing graphics, using ggdist/tidybayes. -->
-
-Let's explore descriptive, not causal, models which seek to explain longevity post-election.
+Let's explore descriptive, not causal, models which seek to predict longevity post-election.
 
 To begin, let's model candidate lifespan after the election as a function of candidate lifespan prior to the election. The math is fairly simple:
 
@@ -120,9 +125,9 @@ $$ alive\_post_i =  \beta_0 + \beta_1 alive\_pre_i + \epsilon_i $$
 
 <!-- DK: I need to think harder about exactly what these cofficients mean in the Bayesian context. We can't just rely on the "average value for the population" verbiage which we used in chapters 7 and 8. -->
 
-with $\epsilon_i \sim N(0, \sigma^2)$. $alive.post_i$ is the number of days lived after the election for candidate $i$. $\beta_0$ is the "intercept" of the regression, the average value for the population of $alive.post_i$ if $alive.pre_i = 0$. $\beta_1$ is the "coefficient" of  $alive.pre$. Each one day increase in $alive.pre$ is associated with a $\beta_1$ change in $alive.post$. Again, this is the value for the population. $\epsilon_i$ is the "error term," the difference between the days-lived of candidate $i$ and the average days-lived of all candidates.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. There are three unknown parameters, similar to the situation we faced in Chapter \@ref{three-parameters}.
+with $\epsilon_i \sim N(0, \sigma^2)$. $alive\_post_i$ is the number of days lived after the election for candidate $i$. $\beta_0$ is the "intercept" of the regression, the average value for the population of $alive\_post_i$ if $alive\_pre_i = 0$. $\beta_1$ is the "coefficient" of  $alive\_pre$. Each one day increase in $alive\_pre$ is associated with a $\beta_1$ change in $alive\_post$. Again, this is the value for the population. $\epsilon_i$ is the "error term," the difference between the days-lived of candidate $i$ and the average days-lived of all candidates.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. There are three unknown parameters, similar to the situation we faced in Chapter \@ref{three-parameters}.
 
-<!-- DK: More discussion. Perhaps a Preceptor Table. -->
+<!-- Make a single Preceptor Table which we will use for this who section. It will have a single outcome, alive_post, and a bunch of covariates, including all the ones we have saved. It will also have a bunch of rows with missing data, indicating all the people for whom we don't have data, since we are probably interested in applying this more broadly than just US governor candidates who are dead. -->
 
 We can implement this model with `stan_glm()`. 
 
