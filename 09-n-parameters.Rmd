@@ -147,7 +147,7 @@ Most of the time, we are only interested in the parameter values.
 print(fit_gov_1, detail = FALSE)
 ```
 
-As is almost always the case, $\sigma$ is a nuisance parameter, somethings whose value we are not interested in. This is why `stan_glm()` refers to it as an "auxiliary" parameter.
+As is almost always the case, $\sigma$ is a nuisance parameter, somethings whose value we are not interested in. This is why `stan_glm()` refers to it as an "Auxiliary" parameter.
 
 The posterior distributions of $\beta_0$ (the intercept) and $\beta_1$ (the coefficient of `alive_pre`), on the other hand, are very important. Before looking at the posteriors themselves, let's see what happens when we place the medians into the model:
 
@@ -161,10 +161,11 @@ This is, of course, substantively nonsense. No one runs for office on the day th
 
 Let's continue by discussing the coefficient for `alive_pre`, $\beta_1$. The median of the posterior, -0.9, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. Putting this slope definition in terms of our model, this means that for every additional day a candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. If we are given the number of days a candidate lived before the election and want to estimate how long they will live for after, we will multiply the days they were alive prior by this beta of -0.9, then subtract that from the intercept. 
 
-This is a descriptive model, not a causal model. Remember our motto from Chapter \@ref(rubin-causal-model): No causation without manipulation. There is no way, for person $i$, to change the days that she has been alive on Election Day. On the day of this election, she is X days old. There is no way to change that. So, there are not two (or more) potential outcomes. Without more than one potential outcome, there can not be a causal effect.
+This is a descriptive model, not a causal model. Remember our motto from Chapter \@ref(rubin-causal-model): *No causation without manipulation.* There is no way, for person $i$, to change the days that she has been alive on Election Day. On the day of this election, she is X days old. There is no way to change that. So, there are not two (or more) potential outcomes. Without more than one potential outcome, there can not be a causal effect.
 
-Given that, it is important to monitor our language. We do not believe that that changes in `alive_pre` "cause" changes in `alive_post`. That is obvious. But there are some words and phrases, like "associated with," which are too close to causal. Be wary of their use. *Always think in terms of comparisons* when using a predictive model. We can't change `alive_pre` from X to Y for an individual candidate. We can only compare two candidates (or two groups of candidates), one with `alive_pre` equal to X and the other with `alive_pre` equal to Y. If our model is correct, such candidates will, on average, differ in `alive_post` by $\beta_1$ times the difference between X and Y.
+Given that, it is important to monitor our language. We do not believe that that changes in `alive_pre` "cause" changes in `alive_post`. That is obvious. But there are some words and phrases --- like "associated with" --- which are too close to causal. (And which we are guilty of using just a few paragraphs ago!) Be wary of their use. *Always think in terms of comparisons* when using a predictive model. We can't change `alive_pre` from X to Y for an individual candidate. We can only compare two candidates (or two groups of candidates), one with `alive_pre` equal to X and the other with `alive_pre` equal to Y. If our model is correct, such candidates will, on average, differ in `alive_post` by $\beta_1$ times the difference between X and Y.
 
+<!-- DK: THis is a critical point. Maybe give a precise example? Go through the math slowly, like ModernDive does? -->
 
 Let's look at the posterior of $\beta_1$, the coefficient of `alive_pre`:
 
@@ -220,27 +221,34 @@ print(fit_gov_2, detail = FALSE)
 ```
 
 
-In this regression, we use the -1 in the formula to make the output more straightforward, with no intercept to interpret. 
+In this regression, we use the -1 in the formula to make the output more straightforward, with no intercept to interpret. The math of this model is the same as those we saw in Chapter \@ref(three-parameters):
 
-You may recall from algebra that the equation of a line is $ y = a + b*x $. It is defined by two coefficients *a* and *b*. The intercept coefficient *a* is the value of *y* when $ x = 0 $. The slope coefficient *b* for *x* is the increase in *y* for every increase of one in *x*.
+$$ \underbrace{y_i}_{outcome} = \underbrace{\beta_1 x_{f,i} + \beta_2 x_{m,i}}_{model} + \underbrace{\epsilon_i}_{not\ in\ the\ model}$$
 
-However, when defining a regression line, we use slightly different notation: the equation of the regression line is $ \hat{y} = {b_0} + {b_1} x  $. The intercept coefficient is $ {b_0} $, so $ {b_0} $ is the value of $ \hat{y} $ when $ x = 0 $. The slope coefficient for *x* is $ {b_1} $, i.e., the increase in $ \hat{y} $ for every increase of one in *x*. Why do we put a "hat" on top of the *y*? It's a form of notation commonly used in regression to indicate that we have a "fitted value," or the value of *y* on the regression line for a given *x* value. This fitted value that falls on the regression line may differ from the observed value of *y* given that particular *x* value. The difference between the observed y-value and the predicted, or fitted, y-value is called the *residual*. 
+where \n
+$$x_{f,i}, x_{m,i} \in \{0,1\}$$ \n
+$$x_{f,i} +  x_{m,i} = 1$$ \n
+$$\epsilon_i \sim N(0, \sigma^2)$$  
+
+<!-- DK: Provide more details on what each of the items in the formula means, even though this is a repeat of what we did in chapter 8. -->
+
+<!-- DK: This next section belongs above somewhere, I think. -->
+
+You may recall from algebra that the equation of a line is $y = a + b x$. It is defined by two coefficients $a$ and $b$. The intercept coefficient $a$ is the value of $y$ when $x = 0$. The slope coefficient $b$ for $x$ is the increase in $y$ for every increase of one in $x$.
+
+However, when defining a regression line, we use slightly different notation: the equation of the regression line is $ \hat{y} = b_0 + b_1 x  $. The intercept coefficient is $b_0$, so $b_0$ is the value of $ \hat{y} $ when $x = 0$. The slope coefficient for $x$ is $b_1$, i.e., the increase in $ \hat{y} $ for every increase of one in $x$. Why do we put a "hat" on top of the $y$? It's a form of notation commonly used in regression to indicate that we have a "fitted value," or the value of $y$ on the regression line for a given $x$ value. This fitted value that falls on the regression line may differ from the observed value of $y$ given that particular $x$ value. The difference between the observed y-value ($y$) and the predicted, or fitted, y-value ($ \hat{y}$) is called the *residual*. 
 
 
 
-In many of the examples we will be discussing in this chapter, our regression equations will contain multiple beta values for all the different parameters we are interpreting. 
+Looking back to the regression model we just created, we see that there is no intercept. Instead of having a $ {b_0} $ value, we have $b_1$ and $b_2$ for female and male. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that on average, women are expected to live about 6,000 days after running for governor, and men are expected to live 10,000 days.
 
-Now looking back to the regression model we just created, we see that there is no intercept. Instead of having a $ {b_0} $ value, we have $ {b_m} $ and $ {b_f} $ for male and female. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that on average, women are expected to live 5840 days after running for governor, and men are expected to live 10395 days after running for governor.
-
-This is a strange result, as men are expected to live twice as long as women. One explanation for this might be that women don't run for governor until later in life, and therefore are not expected to live as long.
-
-<!-- HV: Should probably add more discussion of this result. -->
+This is a strange result. Why would men live twice as long as women after the election. One explanation for this might be that women don't run for governor until later in life, and therefore are not expected to live as long.
 
 <!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case. -->
 
 <!-- Perhaps of next is to understand what the intercept is. That is, this model is identical to the previous. -->
 
-Now that we have interpreted the model using a -1 in the formula to get both a $ {b_m} $ value and a $ {b_f} $ value, let's take away the -1 and regress `sex` on `alive_post` to see how our equation changes.
+Now that we have interpreted the model using a -1 in the formula to get both a $b_1$ value and a $b_2$ value, let's take away the -1 and regress `alive_post` on `sex` to see how our equation changes.
 
 ```{r, cache = TRUE}
 fit_gov_2a <- stan_glm(data = ch9_gov,
@@ -252,13 +260,15 @@ fit_gov_2a <- stan_glm(data = ch9_gov,
 print(fit_gov_2a, detail = FALSE)
 ```
 
-From this result, we can see that we no longer have a value for female, however we do have an intercept. In this regression our mathematical regression formula is $ \hat{alivepost} = {b_0} + {b_m}* male  $. $ {b_0} $ is our intercept value which here would be 5875. You may notice that this is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $ {b_m} $ value is for when the candidate is male. Therefore, we can infer that the intercept value represents those who are not male: females.
+From this result, we can see that we no longer have a value for female, however we do have an intercept. In this regression our mathematical regression formula is $\hat{alive\_post_i} = b_0 + b_1 x_{m, i}$. $ b_0 $ is our intercept value which here would be 5875. You may notice that this is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $ b_1 $ value is for when the candidate is male. Therefore, we can infer that the intercept value represents those who are not male: females.
 
-When the candidate is a male, we add the beta for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding ${b_m}$ and ${b_0}$, this value is the same as what we got for males in the previous model.
+When the candidate is a male, we add the beta for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding $b_0$ and $b_1$, this value is the same as what we got for males in the previous model.
 
+<!-- DK: Be careful with notation! b_1 in the no-intercept model is different from b_1 in the last model! Explain this here. -->
 
+<!-- DK: Clean up and explain this plot. It is relevant. -->
 
-```{r}
+```{r, echo=FALSE}
 sex_means <- 
   governors %>% 
   group_by(sex) %>% 
@@ -271,7 +281,8 @@ governors %>%
 ```
 
 
-<!-- DK: All the above happens before this -->
+
+For our next mode, let's include both `sex` and `alive_pre` in the regression.
 
 ```{r, cache = TRUE}
 fit_gov_3 <- stan_glm(data = ch9_gov,
@@ -444,7 +455,7 @@ By running the `skim()` command, we get a summary of the data set as a whole, as
 
 
 
-Having created models with one parameter in Chapter \@ref(#one-parameter) and two parameters in Chapter \@ref(#two-parameters), you are now ready to make the jump to $N$ parameters.  The more parameters we include in our models, the more flexible they can become. But we must be careful of *overfitting*, of making models which are inaccurate because they don't use enough data to accurately estimate those parameters. The tension between overfitting and underfitting is central to the practice of data science.
+Having created models with one parameter in Chapter \@ref(one-parameter) and two parameters in Chapter \@ref(two-parameters), you are now ready to make the jump to $N$ parameters.  The more parameters we include in our models, the more flexible they can become. But we must be careful of *overfitting*, of making models which are inaccurate because they don't have enough data to accurately estimate those parameters. The tension between overfitting and underfitting is central to the practice of data science.
 
 
 <!-- DK: Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 5 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
