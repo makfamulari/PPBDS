@@ -425,21 +425,33 @@ Let’s look at some posteriors.
 
 <!-- BG: why isn't this working? It works, but when I try to use pivotlonger(), it fails.  -->
 
-```{r fit_gov3-p1, exercise = TRUE}
-z <- fit_gov_3 %>% as_tibble() %>% mutate(days = `(Intercept)` + sexMale) 
-ggplot(z, color = parameter) + geom_density(aes(days)) + geom_density(aes(`(Intercept)`)) +
-labs(title = "Posterior Probability Distribution",
-         subtitle = "Avg. Days to live After Election for Candidates ",
-         x = "Days",
-         y = "Probability") + #pivot_longer(cols = sexMale:sexFemale, names_to = "parameter", values_to = "days") 
-  theme_classic() + scale_y_continuous(labels=scales::percent_format())
-
+```{r}
+fit_gov_3 %>% 
+  as_tibble() %>% 
+  mutate(male_days = `(Intercept)` + sexMale) %>% 
+  rename(female_days = `(Intercept)`) %>% 
+  select(female_days, male_days) %>% 
+  pivot_longer(cols = female_days:male_days, 
+               names_to = "parameters",
+               values_to = "days") %>% 
+  ggplot(aes(days, color = parameters)) +
+    geom_density() +
+     labs(title = "Posterior Probability Distribution",
+         subtitle = "Men live longer",
+         x = "Average Days Lived Post Election",
+         y = "Probability") + 
+    theme_classic() + 
+    scale_y_continuous(labels=scales::percent_format())
 ```
+
+
+
+
 
 <!-- BG: This code chunk will show posterior for Beta 2 -->
 
 ```{r fit_gov3-p1, exercise = TRUE}
-fit_gov_3 %>% as_tibble() %>% mutate( slope = -.8 * alive_pre ) %>%  ggplot(aes(slope)) + geom_density()
+# fit_gov_3 %>% as_tibble() %>% mutate( slope = -.8 * alive_pre ) %>%  ggplot(aes(slope)) + geom_density()
 
 ```
 
@@ -467,7 +479,7 @@ Here is the math we will be using:
 <!-- BG: is this right for the model? model look different now its as a function of?-->
 
 
-$$ y_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i+ \beta_3 alive\_pre_\epsilon_i$$
+$$ y_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i+ \beta_3 male_i *  alive\_pre_i + \epsilon_i$$
 
 Ok, great! Now that we have our model, let's break it down to explain what each part means. Note that a few of our meanings will be the same as our previous model above.
 
@@ -538,7 +550,7 @@ fit_gov_5 <- stan_glm(data = ch9_gov,
 ```
 
 
-
+$$ y_i =  \beta_0 +   \beta_{50} male_i + \beta_{51} alive\_pre_i+ \beta_{52} male_i *  alive\_pre_i + \epsilon_i$$
 
 
 
