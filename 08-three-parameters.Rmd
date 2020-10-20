@@ -122,6 +122,29 @@ When dealing with a non-causal model, the focus is on predicting things. The und
 
 <!-- DK: Really need a Preceptor Table! -->
 
+A good way at looking at this is with a Preceptor table, as seenbelow. Unlike the previous table in chapter 7, we now have two columns in addition to the ID one. To the left, we have the predictor of the model, which is political party, and to the right we have what that variable will be predictiing, which is age. Since our data is not fully representative of all republicans and democrats in the world, not every row is filled in. To really get a good idea of how predictive political party really is, we are going to need to create a model.
+
+```{r echo = FALSE}
+tibble(ID = c("1", "2", "...", "473", "474",
+              "...", "3,258", "3,259", "...", "N"),
+       Party = c("D", "?", "...", "D", "?", "...", "?", "R", "...", "?"),
+      Age = c("31", "?", "...", "58", "?", "...", "?", "49", "...", "?")) %>%
+  
+  # Then, we use the gt function to make it pretty
+  
+  gt() %>%
+  cols_label(ID = md("ID"),Party = "Political Party", Age = "Age") %>%
+  tab_style(cell_borders(sides = "right"),
+            location = cells_body(columns = vars(ID))) %>%
+  tab_style(style = cell_text(align = "left", v_align = "middle"), 
+            locations = cells_column_labels(columns = vars(ID))) %>%
+  cols_align(align = "center", columns = TRUE) %>%
+  cols_align(align = "left", columns = vars(ID)) %>%
+  tab_spanner(label = "Outcome", columns = vars(Age)) %>%
+  tab_spanner(label = "Predictor", columns = vars(Party))
+```
+
+
 
 We now know that we are working with a predictive model. Recall:
 
@@ -144,17 +167,17 @@ Don't panic dear poets and philosophers, the whole thing is easier than it looks
 
 <!-- DK: This whole section is very awkward. -->
 
-* On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is the age in years of a person. 
+* On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is the age of participant in the study
 
 * On the right-hand side we first have the part contained in the model, consisting of two similar looking terms. The two terms stand for Republicans and Democrats and work as follows. Each term consists of a parameter and a data point. The betas are our two parameters: $\beta_1$ is the average age of Republicans in the population and $\beta_2$ is the average age of  Democrats in the population. The $x$'s are our explanatory variables and take the values 1 or 0. If someone is a Republican we have $x_{r,i} = 1$ and $x_{d,i} = 0$, if someone is a Democrat we have $x_{r,i} = 0$ and $x_{d,i} = 1$. In other words, the $x$'s are binary variables and are mutually exclusive (if you are a Democrat, you cannot also be a Republican).
 
 <!-- DK: "Connected to" is awkward here. -->
 
-* The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0, i.e., it is 0 on average.
+* The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0 (meaning it is 0 on average).
 
 * The small $i$'s are an index to number observations in our data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the modeled and non-modeled factors for person $i$. The corresponding $x$'s have an $r$ or $d$ subscript, for Republican or Democrat.
 
-* Although terminology differs across academic fields, the most common term to describe a model like this is "regression." We are "regressing" `age` on `party` in order to see if they are associated with each other. The formula above is a "regression formula." The model is a "regression model." This terminology would also apply to our model of `height` in Chapter \@ref(two-parameters). 
+* Although terminology differs across academic fields, the most common term to describe a model like this is a "regression." We are "regressing" `age` on `party` in order to see if they are associated with each other. The formula above is a "regression formula", and the model is a "regression model." This terminology would also apply to our model of `height` in Chapter \@ref(two-parameters). 
 
 
 
@@ -196,7 +219,8 @@ fit_obj
 fit_obj %>% 
   as_tibble() %>% 
   select(-sigma) %>% 
-  pivot_longer(cols = partyDemocrat:partyRepublican,
+  mutate(Democrat = partyDemocrat, Republican = partyRepublican) %>%
+ pivot_longer(cols = Democrat:Republican,
               names_to = "parameter",
               values_to = "age") %>% 
   ggplot(aes(x = age, color = parameter)) +
@@ -241,7 +265,7 @@ trains %>%
 
 <!-- DK: More extreme awkwardness. -->
 
-The fitted values are the same for all Republicans and for all Democrats, as the fitted value is one of the two estimates output by our model. However, almost all of the residuals are different due to each observation's own variation from the fitted value estimate.  This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual. We can get a better picture of the unmodeled variation in our sample if we plot these three variables for all the individuals in our data. 
+The fitted values are the same for all Republicans and for all Democrats, as the model outputs one fitted value for each condition. Thus, almost all of the obeservation's residuals are different - depending on how much they vary from the fitted value estimate. This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual. We can get a better picture of the unmodeled variation in our sample if we plot these three variables for all the individuals in our data. 
 
 The following three histograms show the actual outcomes, fitted values, and residuals of all people in `trains`:
 
@@ -449,8 +473,29 @@ knitr::include_graphics("other/images/Justice.jpg")
 
 The three elements of Justice in data science remain the same: predictive/causal models, Preceptor Table, and mathematical formula.
 
+A preceptor table for this model would look very similar to the one in the first half of this chapter, except now we have an explanatory instead of predictibe variable due to the nature of our model. Additionally, it now reflects how we are looking to explain participant's end attitudes depending on their condtion: treatment or control
 
 <!-- DK: We need to add Preceptor Tables here and elsewhere. -->
+
+```{r echo = FALSE}
+tibble(ID = c("1", "2", "...", "473", "474",
+              "...", "3,258", "3,259", "...", "N"),
+       Treatment = c("Treatment", "?", "...", "Control", "?", "...", "?", "Control", "...", "?"),
+      Attitude_End = c("10", "?", "...", "8", "?", "...", "?", "11", "...", "?")) %>%
+  
+  # Then, we use the gt function to make it pretty
+  
+  gt() %>%
+  cols_label(ID = md("ID"),Treatment= "Condition", Attitude_End = "Attitude at End") %>%
+  tab_style(cell_borders(sides = "right"),
+            location = cells_body(columns = vars(ID))) %>%
+  tab_style(style = cell_text(align = "left", v_align = "middle"), 
+            locations = cells_column_labels(columns = vars(ID))) %>%
+  cols_align(align = "center", columns = TRUE) %>%
+  cols_align(align = "left", columns = vars(ID)) %>%
+  tab_spanner(label = "Outcome", columns = vars(Attitude_End)) %>%
+  tab_spanner(label = "Explanitory Variable", columns = vars(Treatment))
+```
 
 The math for this model is exactly the same as the math for the predictive model in the first half of the chapter, although we change the notation a bit for clarity.
 
