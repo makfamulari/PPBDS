@@ -4,6 +4,7 @@ output_yaml:
 ---
 
 
+
 <!-- Becca: -->
 
 <!-- * Wisdom section -->
@@ -36,7 +37,7 @@ library(tidyverse)
 
 <!-- DK: Was all this covered? --- Talk about the data, as we usual do. Lots of interesting things. Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Make sure to mention all the variables we end up keeping below. Finish with some graphics which show how various things are related to our lefthand side variable: alive_post. -->
 
-We will start off by using a subset of the `governors` data set from the **PPBDS.data** package. This data set looks at the lifespans of candidates for governor in the US. It comes from the paper "Longevity Returns to Political Office" by Barfort, Klemmensen & Larsen (2019), which concludes that winning a gubernatorial election increases a candidate's lifespan.
+We will start off by using a subset of the `governors` data set from the **PPBDS.data** package. This data set looks at the lifespans of candidates for governor in the US. It comes from the paper "Longevity Returns to Political Office" by Barfort, Klemmensen and Larsen (2019), which concludes that winning a gubernatorial election increases a candidate's lifespan.
 
 
 ```{r}
@@ -121,13 +122,24 @@ knitr::include_graphics("other/images/Justice.jpg")
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
-Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage.
+Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let's model candidate lifespan after the election as a function of candidate lifespan prior to the election. The data:
+
+<!-- DK: Change axis labels to years? -->
+
+```{r, echo=FALSE}
+ch9_gov %>% 
+  ggplot(aes(x = alive_pre, y = alive_post)) +
+    geom_point() +
+    labs(title = "Longevity of Gubernatorial Candidates",
+         subtitle = "Younger candidates live longer", 
+         caption = "Data Source: Barfort, Klemmensen and Larsen (2019)",
+         x = "Age in Days (relative to average)",
+         y = "Days Lived After Election")
+
+```
 
 
-
-Let's explore descriptive, not causal, models which seek to predict longevity post-election.
-
-To begin, let's model candidate lifespan after the election as a function of candidate lifespan prior to the election. The math is fairly simple:
+The math is fairly simple:
 
 $$ alive\_post_i =  \beta_0 + \beta_1 alive\_pre_i + \epsilon_i $$
 
@@ -135,7 +147,31 @@ $$ alive\_post_i =  \beta_0 + \beta_1 alive\_pre_i + \epsilon_i $$
 
 with $\epsilon_i \sim N(0, \sigma^2)$. $alive\_post_i$ is the number of days lived after the election for candidate $i$. $\beta_0$ is the "intercept" of the regression, the average value for the population of $alive\_post_i$ if $alive\_pre_i = 0$. $\beta_1$ is the "coefficient" of  $alive\_pre$. Each one day increase in $alive\_pre$ is associated with a $\beta_1$ change in $alive\_post$. Again, this is the value for the population. $\epsilon_i$ is the "error term," the difference between the days-lived of candidate $i$ and the average days-lived of all candidates.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. There are three unknown parameters, similar to the situation we faced in Chapter \@ref(three-parameters).
 
-<!-- Make a single Preceptor Table which we will use for this who section. It will have a single outcome, alive_post, and a bunch of covariates, including all the ones we have saved. It will also have a bunch of rows with missing data, indicating all the people for whom we don't have data, since we are probably interested in applying this more broadly than just US governor candidates who are dead. -->
+You may recall from middle school algebra that the equation of a line is $y = a + b x$. It is defined by two coefficients $a$ and $b$. The intercept coefficient $a$ is the value of $y$ when $x = 0$. The slope coefficient $b$ for $x$ is the increase in $y$ for every increase of one in $x$.
+
+However, when defining a regression line, we use slightly different notation: the equation of the regression line is $ \hat{y} = b_0 + b_1 x  $. The intercept coefficient is $b_0$, so $b_0$ is the value of $ \hat{y} $ when $x = 0$. The slope coefficient for $x$ is $b_1$, i.e., the increase in $ \hat{y} $ for every increase of one in $x$. Why do we put a "hat" on top of the $y$? It's a form of notation commonly used in regression to indicate that we have a "fitted value," or the value of $y$ on the regression line for a given $x$ value. This fitted value will generally differ from the observed value of $y$. The difference between the observed y-value ($y$) and the predicted, or fitted, y-value ($ \hat{y}$) is called the *residual*. 
+
+We can use `geom_smooth()` to create the fitted regression line:
+
+```{r}
+ch9_gov %>% 
+  ggplot(aes(x = alive_pre, y = alive_post)) +
+    geom_point() +
+    geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+    labs(title = "Longevity of Gubernatorial Candidates",
+         subtitle = "Younger candidates live longer", 
+         caption = "Data Source: Barfort, Klemmensen and Larsen (2019)",
+         x = "Age in Days (relative to average)",
+         y = "Days Lived After Election")
+```
+
+Consider someone who is about 5,000 says younger than the average candidate. We have a score or more data points for candidates around that age. Some of then only lived for about 5,000 days after the election. Others lived for more than 20,000 days. The world is filled with variation. But the fitted line tells us that, on average, we would expect a candidate that age to live for about 15,000 days after the election. 
+
+<!-- DK: Add a red circle to the graphic to show how we figured that out? -->
+
+This model, with a continuous independent (or "predictor") variable has an infinite number of fitted values, one for each possible value of `alive_pre`. This is very different from the models we saw in Chapter \@ref(three-parameters). Those models only had two possible fitted because the predictor variable only took two possible values.
+
+<!-- DK: I am nervous that alive_pre, as used here, is a different variable that alive_pre when, later, we transform it.  -->
 
 We can implement this model with `stan_glm()`. 
 
@@ -148,8 +184,7 @@ fit_gov_1 <- stan_glm(data = ch9_gov,
 
 As we discussed in Chapter \@ref(three-parameters), the most common term for a model like this is a "regression." We have "regressed" `alive_post`, our dependent variable on `alive_pre`, our one independent variable.
 
-
-Most of the time, we are only interested in the parameter values.
+The parameter values:
 
 ```{r}
 print(fit_gov_1, detail = FALSE)
@@ -167,11 +202,11 @@ Consider the intercept. Since our independent variable is `alive_pre`, the inter
 
 This is, of course, substantively nonsense. No one runs for office on the day they are born. In the next model, we will explore ways of making the intercept more interpretable. In the meantime, the math is the math. 
 
-Let's continue by discussing the coefficient for `alive_pre`, $\beta_1$. The median of the posterior, -0.9, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. Putting this slope definition in terms of our model, this means that for every additional day a candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. If we are given the number of days a candidate lived before the election and want to estimate how long they will live for after, we will multiply the days they were alive prior by this beta of -0.9, then subtract that from the intercept. 
+Consider the coefficient for `alive_pre`, $\beta_1$. The median of the posterior, -0.9, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. Putting this slope definition in terms of our model, this means that for every additional day a candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. If we are given the number of days a candidate lived before the election and want to estimate how long they will live for after, we will multiply the days they were alive prior by this beta of -0.9, then subtract that from the intercept. 
 
 This is a descriptive model, not a causal model. Remember our motto from Chapter \@ref(rubin-causal-model): *No causation without manipulation.* There is no way, for person $i$, to change the days that she has been alive on Election Day. On the day of this election, she is X days old. There is no way to change that. So, there are not two (or more) potential outcomes. Without more than one potential outcome, there can not be a causal effect.
 
-Given that, it is important to monitor our language. We do not believe that that changes in `alive_pre` "cause" changes in `alive_post`. That is obvious. But there are some words and phrases --- like "associated with" --- which are too close to causal. (And which we are guilty of using just a few paragraphs ago!) Be wary of their use. *Always think in terms of comparisons* when using a predictive model. We can't change `alive_pre` from X to Y for an individual candidate. We can only compare two candidates (or two groups of candidates), one with `alive_pre` equal to X and the other with `alive_pre` equal to Y. If our model is correct, such candidates will, on average, differ in `alive_post` by $\beta_1$ times the difference between X and Y.
+Given that, it is important to monitor our language. We do not believe that that changes in `alive_pre` "cause" changes in `alive_post`. That is obvious. But there are some words and phrases --- like "associated with" and "change by" --- which are too close to causal. (And which we are guilty of using just a few paragraphs ago!) Be wary of their use. *Always think in terms of comparisons* when using a predictive model. We can't change `alive_pre` from X to Y for an individual candidate. We can only compare two candidates (or two groups of candidates), one with `alive_pre` equal to X and the other with `alive_pre` equal to Y. If our model is correct, such candidates will, on average, differ in `alive_post` by $\beta_1$ times the difference between X and Y.
 
 <!-- DK: THis is a critical point. Maybe give a precise example? Go through the math slowly, like ModernDive does? -->
 
@@ -183,7 +218,8 @@ Let's look at the posterior of $\beta_1$, the coefficient of `alive_pre`:
 fit_gov_1 %>% 
   as_tibble() %>% 
   ggplot(aes(alive_pre)) + 
-    geom_histogram(bins = 100) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100, ) +
     labs(title = "Posterior Distribution of the Coefficient of `alive_pre`",
          y = "Probability",
          x = "Coefficient of `alive_pre`")
@@ -194,11 +230,13 @@ fit_gov_1 %>%
 
 Centering is a tool that is used when the model's intercept does not make substantive sense. To center a model, we pick a constant value, usually the mean of the independent variable, and subtract that constant from every value of the independent variable. This changes the zero point for the variable and shifts the model over.
 
-In this example, we want to center the value for `alive_pre`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `alive_pre`. Once we find this value, we will subtract it from every `alive_pre` value. We have changed the meaning of `alive_pre`. It now means the number of days a candidate has been alive, as of Election Day, relative to the average days alive of all candidates.
+In this example, we want to center the value for `alive_pre`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `alive_pre`. Once we find this value, we will subtract it from every `alive_pre` value. We have, thereby, changed the meaning of `alive_pre`. It now means the number of days a candidate has been alive, as of Election Day, relative to the average days alive of all candidates at their respective election days.
 
 ```{r}
 ch9_gov$alive_pre <- ch9_gov$alive_pre - mean(ch9_gov$alive_pre)
 ```
+
+
 
 ```{r, cache = TRUE}
 fit_gov_1.centered <- stan_glm(data = ch9_gov,
@@ -208,7 +246,7 @@ fit_gov_1.centered <- stan_glm(data = ch9_gov,
 print(fit_gov_1.centered, detail = FALSE)
 ```
 
-In this model, we can see that the intercept has increased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the lifespan of a candidate who was alive for zero days before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of days before running. In this instance, our center value is approximately 18,892, so we will use this value in our interpretation. If a candidate was alive for 18,892 days before running for governor (the mean value in this data set), they are expected to live for 10,309 days after the election, on average. 
+In this model, we can see that the intercept has increased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the lifespan of a candidate who was alive for zero days before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of days before running. In this instance, our center value is approximately 18,892, so we will use this value in our interpretation. If a candidate was alive for 18,892 days before running for governor (the mean value in this data set), they are expected to live about 10,300 days after the election, on average. 
 
 Since all values of the predictor variable decreased by the same amount, the model shifted over but the slope of the linear model did not change. In fact, any linear change in the predictor variables has no effect on other aspects of the model, which is one reason why linear models are so commonly used.
 
@@ -220,8 +258,7 @@ fit_gov_2 <- stan_glm(data = ch9_gov,
                       refresh = 0)
 ```
 
-Note that this workflow is similar to professional work. Try one model. Interpret it. Try another model. And then another. There is no one "true" model. There is an infinite space of possible models. Good data science involves an intelligent tour of that space.
-
+Note that this workflow. Try one model. Interpret it. Try another model. And then another. There is no one "true" model. There is an infinite space of possible models. Good data science involves an intelligent tour of that space.
 
 
 ```{r}
@@ -240,21 +277,14 @@ $$\epsilon_i \sim N(0, \sigma^2)$$
 
 <!-- DK: Provide more details on what each of the items in the formula means, even though this is a repeat of what we did in chapter 8. -->
 
-<!-- DK: This next section belongs above somewhere, I think. -->
 
-You may recall from algebra that the equation of a line is $y = a + b x$. It is defined by two coefficients $a$ and $b$. The intercept coefficient $a$ is the value of $y$ when $x = 0$. The slope coefficient $b$ for $x$ is the increase in $y$ for every increase of one in $x$.
-
-However, when defining a regression line, we use slightly different notation: the equation of the regression line is $ \hat{y} = b_0 + b_1 x  $. The intercept coefficient is $b_0$, so $b_0$ is the value of $ \hat{y} $ when $x = 0$. The slope coefficient for $x$ is $b_1$, i.e., the increase in $ \hat{y} $ for every increase of one in $x$. Why do we put a "hat" on top of the $y$? It's a form of notation commonly used in regression to indicate that we have a "fitted value," or the value of $y$ on the regression line for a given $x$ value. This fitted value that falls on the regression line may differ from the observed value of $y$ given that particular $x$ value. The difference between the observed y-value ($y$) and the predicted, or fitted, y-value ($ \hat{y}$) is called the *residual*. 
-
-
-
-Looking back to the regression model we just created, we see that there is no intercept. Instead of having a $ {b_0} $ value, we have $b_1$ and $b_2$ for female and male. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that on average, women are expected to live about 6,000 days after running for governor, and men are expected to live 10,000 days.
+Looking back to the regression model we just created, we see that there is no intercept. Instead of having a $b_0$ value, we have $b_1$ and $b_2$ for female and male. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that on average, women are expected to live about 6,000 days after running for governor, and men are expected to live 10,000 days.
 
 This is a strange result. Why would men live twice as long as women after the election. One explanation for this might be that women don't run for governor until later in life, and therefore are not expected to live as long.
 
-<!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case. -->
+<!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case in more detail. -->
 
-<!-- Perhaps of next is to understand what the intercept is. That is, this model is identical to the previous. -->
+<!-- DK: Add a discussion of what the intercept is? -->
 
 Now that we have interpreted the model using a -1 in the formula to get both a $b_1$ value and a $b_2$ value, let's take away the -1 and regress `alive_post` on `sex` to see how our equation changes.
 
@@ -268,25 +298,44 @@ fit_gov_2a <- stan_glm(data = ch9_gov,
 print(fit_gov_2a, detail = FALSE)
 ```
 
-From this result, we can see that we no longer have a value for female, however we do have an intercept. In this regression our mathematical regression formula is $\hat{alive\_post_i} = b_0 + b_1 x_{m, i}$. $ b_0 $ is our intercept value which here would be 5875. You may notice that this is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $ b_1 $ value is for when the candidate is male. Therefore, we can infer that the intercept value represents those who are not male: females.
+From this result, we can see that we no longer have a value for female, however we do have an intercept. In this regression our mathematical regression formula is $\hat{alive\_post_i} = b_0 + b_1 x_{m, i}$. $ b_0 $ is our intercept value which here would be around 5850. You may notice that this is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $ b_1 $ value is for when the candidate is male. Therefore, we can infer that the intercept value represents those who are not male: females.
 
-When the candidate is a male, we add the beta for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding $b_0$ and $b_1$, this value is the same as what we got for males in the previous model.
+When the candidate is a male, we add the coefficient for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding $b_0$ and $b_1$, this value is the same as what we got for males in the previous model.
 
-<!-- DK: Be careful with notation! b_1 in the no-intercept model is different from b_1 in the last model! Explain this here. -->
+Be careful with notation! $\beta_1$ in the no-intercept model is different from $\beta_1$  in the model with an intercept! Notation varies. We must pay attention each time we make a model.
 
-<!-- DK: Clean up and explain this plot. It is relevant. -->
+<!-- DK: Clean up and explain this plot. It is relevant. But I am not exactly sure what to do with it. Maybe it really belongs in the last chapter? Or maybe we need to show how to make it correctly by using fitted(). Either way, I think it is always (?) useful to how the raw data and the fitted values in the same graphic. -->
 
-```{r, echo=FALSE}
-sex_means <- 
-  governors %>% 
-  group_by(sex) %>% 
-  summarize(avg = mean(alive_post), .groups = "drop")
+<!-- ```{r, echo=FALSE} -->
+<!-- sex_means <-  -->
+<!--   governors %>%  -->
+<!--   group_by(sex) %>%  -->
+<!--   summarize(avg = mean(alive_post), .groups = "drop") -->
 
-governors %>% 
-  ggplot(aes(sex, alive_post)) + 
-    geom_jitter(width = 0.1, alpha = 0.2) + 
-    geom_point(data = sex_means, aes(y = avg), color = "red")
+<!-- governors %>%  -->
+<!--   ggplot(aes(sex, alive_post)) +  -->
+<!--     geom_jitter(width = 0.1, alpha = 0.2) +  -->
+<!--     geom_point(data = sex_means, aes(y = avg), color = "red") -->
+<!-- ``` -->
+
+The posterior distribution for $\beta_0 + \beta_1$ can be constructed via simple addition.
+
+
+```{r}
+fit_gov_2a %>% 
+  as_tibble() %>% 
+  mutate(male_intercept = `(Intercept)` + sexMale) %>% 
+  ggplot(aes(male_intercept)) + 
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100, ) +
+    labs(title = "Posterior Distribution of Average Male Candidate Days Left`",
+         y = "Probability",
+         x = "Male Days To Live After the Election")
 ```
+
+<!-- DK: Maybe graph the posteriors from both versions of the model and show they are the same? -->
+
+The interpretation of this model is the same as we have seen before. There is a true average, across the entire population, of the number of days that male candidates live after the election. We can never know what that true average is. But, it seems highly likely that the true average is somewhere between 10,000 and 10,750 days.
 
 
 
