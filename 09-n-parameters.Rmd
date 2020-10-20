@@ -21,7 +21,7 @@ Having created models with one parameter in Chapter \@ref(one-parameter), two pa
 
 In this chapter, we will consider models with multiple parameters and the complexities that arise therefrom. 
 
-<!-- DK: Add some more. What are the key lessons? What do we carry over from previous chapters? What is new? -->
+<!-- DK: Add some more. What are the key lessons? What do we carry over from previous chapters? What is new? Hit the data science research cycle. -->
 
 
 ## EDA of `governors`
@@ -35,7 +35,13 @@ library(rstanarm)
 library(tidyverse)
 ```
 
-<!-- DK: Was all this covered? --- Talk about the data, as we usual do. Lots of interesting things. Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Make sure to mention all the variables we end up keeping below. Finish with some graphics which show how various things are related to our lefthand side variable: alive_post. -->
+<!-- DK: Perhaps we need more detail in this EDA?  Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Or is such a discussion too advanced? -->
+
+<!-- DK: Don't keep around variables other than the ones we end up using. -->
+
+<!-- DK: Provide proper citation to Barfort et al. -->
+
+<!-- DK: Go and change governors data to use better variable names than the ones we have here. Maybe switch to years. Or maybe just clean them up here. -->
 
 We will start off by using a subset of the `governors` data set from the **PPBDS.data** package. This data set looks at the lifespans of candidates for governor in the US. It comes from the paper "Longevity Returns to Political Office" by Barfort, Klemmensen and Larsen (2019), which concludes that winning a gubernatorial election increases a candidate's lifespan.
 
@@ -44,27 +50,26 @@ We will start off by using a subset of the `governors` data set from the **PPBDS
 glimpse(governors)
 ```
 
-There are 11 variables and 1,092 observations. In this Chapter, we will only be looking at the variables `last_name`, `year`, `state`, `sex`, `status`, `alive_post`, and `alive_pre`. We will also create a new variable called `won` that is `TRUE` if the candidate won the election, and `FALSE` if not.
+There are `r ncol(governors)` variables and `r nrow(governors)` observations. In this Chapter, we will only be looking at the variables `last_name`, `year`, `state`, `sex`, `alive_post`, and `alive_pre`. 
 
 ```{r}
 ch9_gov <- governors %>% 
-  mutate(won = ifelse(win_margin > 0, TRUE, FALSE)) %>% 
-  select(last_name, year, state, sex, status, won, alive_post, alive_pre)
+  select(last_name, year, state, sex, alive_post, alive_pre)
 ```
 
-There are a few things to note when looking at this data. First, the data set includes the variables `alive_pre` and `alive_post`, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time are still alive and are excluded.
+There are a few things to note when looking at this data. First, the data set includes the variables `alive_pre` and `alive_post`, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time period are still alive and are, therefore, excluded.
+
+<!-- DK: Too much information? Not enough? -->
 
 Another caveat is that for a given election, only the top two candidates are included in the data. If a politician did not receive the highest or second-highest number of votes, they are excluded. 
 
 Finally, for some observations, only the birth or death year of a candidate could be determined and not the exact date. In those cases, the date was set as July 1st of that year.
 
-Let's run `sample_n()`:
-
 ```{r}
 sample_n(ch9_gov, 10)
 ```
 
-From this sample, we can see some trends start to appear. For example, we see that `sex` is most often "Male", and status is most often "Challenger" rather than "Incumbent".
+`sex` is most often "Male", as we might expect.
 
 <!-- DK: Weird that this automagically creates a "TABLE 9.1: Data summary" side margin note. -->
 
@@ -72,18 +77,22 @@ From this sample, we can see some trends start to appear. For example, we see th
 skim(ch9_gov)
 ```
 
-This output groups the variables together by type (character, logical, numeric, etc.). From this, we can see things like the number of unique last names, how many of the observations in our subset won versus how many lost their elections, and the mean number of days before and after a gubernatorial election that a candidate lived. We are also given histograms of the numerical data. In looking at the histogram for `year`, we see that it is skewed right, with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.
-
-<!-- DK: Would using years rather than days as the unit be helpful? -->
+This output groups the variables together by type (character, logical, numeric, etc.).  We are given histograms of the numerical data. In looking at the histogram for `year`, we see that it is skewed right, with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.
 
 In using this data set, our left-side variable will be `alive_post`. We are trying to understand/predict how many days a candidate will live after the election. Let's look at some graphs and plots showing the relationships between `alive_post` and some of the other variables in our subset.
 
 <!-- DK: Clean up the plot. -->
 
-```{r}
+```{r, echo=FALSE}
 ch9_gov %>%
   ggplot(aes(x = year, y = alive_post)) +
-  geom_point()
+  geom_point() +
+  labs(title = "US Gubernatorial Candidate Lifespans",
+       subtitle = "",
+       caption = "Data: Barfort, Klemmensen and Larsen (2019)",
+       x = "Days Lived Before Election",
+       y = "Days Lived After Election") +
+  scale_x_continuous()
 ```
 
 Starting with the relationship between `alive_post` and `year`, we can see that the data is skewed right and that there is a defined line that data points do not exist above. There are no data points in the top right portion of the graph because it is not possible to have run in 2011, lived 20,000 days after the election took place, and still have died before the data set was created. This line represents, approximately, the most a candidate could have possibly lived --- and still have died --- to be included the data set. The reason this line is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a longer time after the election and still have died prior to the data set creation, giving them higher `alive_post` values than those who ran for office in more recent years. 
