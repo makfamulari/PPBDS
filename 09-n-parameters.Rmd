@@ -668,9 +668,12 @@ ch9 %>%
 ```
 
 
+Let's focus on a few observations that may be relevant to our analysis. First, note that each treatment has approximately 38,000 respondents. The control group, denoted by Con, has approximately 190 thousand respondents. For the logical variable `solo`, we see that approximately 47 thousand of the total respondents live alone (TRUE), while approximately 296 thousand live in households greater than 1 (FALSE). It may also be important to note that the average age of the respondents is 49.8 years with a standard deviation of 14.4 years.
+
 <!-- DK: Add discussion of what you see here. No need to drop missing values since there aren't any. I think this next discussion can be dropped. -->
 
-While some summarizing commands such as `glimpse()` gives us a good look at the possible values for the variables, it is difficult to read it in terms of individual observations. Recall that the *observational unit* is what is being measured. With the `shaming` data set, the observational unit would be the voter respondent. To get a better sense of some respondents' information, let's use `sample_n()` to gather a random sample of *n* observations from the data set.
+To get a better sense of some respondents' information, let's use `sample_n()` to gather a random sample of *n* observations from the data set.
+
 <!-- HV: Does this belong here? -->
 
 ```{r}
@@ -712,6 +715,16 @@ Having created models with one parameter in Chapter \@ref(one-parameter) and two
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Wisdom"}
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
+
+Let's consider one of the most important virtues of data science: wisdom. The map from our data to our question. Recall that our mission here is to increase our voter turnout while we are running for Governor. 
+
+To investigate this, we are given a dataset in which respondents were encouraged to vote under four treatments. This was accomplished by sending a letter to citizens that voted in the previous primary election with varying degrees of social pressure. The remainder of the respondents fall under a control group, which received no such mailings. The dataset offers a number of details about each respondent, including their age, sex, treatment type, and voting outcome. 
+
+What we truly want to know is *how to make citizens vote*. One immediate problem with our dataset is that, due to our study population, we are only studying people that voted in the previous primary election. In other words, if someone *did not* vote in the previous primary election, they were not included. This would be a large problem, since that means we can only figure out how to make citizens *that have already voted* vote. Though we can't be sure, it is reasonable to assume that it is easier to encourage citizens to vote in the next primary election if they have a history of recently voting in primary elections. 
+
+Does this mean our data is unhelpful? Of course not! With four treatments (and therefore four different methods of encouraging voting), we can gain quite a bit of knowledge. Mostly, we will know the most effective way to incentivize people with a history of voting to vote again. We will also know if no method of persuasion (the control) is the best option. We will further be able to tell if certain methods of persuasion work better for certain groups of people, according to factors such as age, sex, or household size. This can help tremendously in our election. 
+
+That being said, the map from our question to our data is almost never perfect. In data science, we often have to look at our data, understand its limitations, and try our best to make inferences that help our cause.
 
 
 ### Justice and Courage
