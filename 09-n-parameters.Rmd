@@ -324,16 +324,16 @@ $$\epsilon_i \sim N(0, \sigma^2)$$
 
 The meanings of $y_i$ and $\epsilon_i$ are the same as in the first models. Indeed, they are the same throughout these exercises.  $x_{f,i}$ and $x_{m,i}$ are 0/1 variables, just like last chapter. They are *variables* whose value varies across individuals.
 
-The important parameters are $\beta_1$ and $\beta_2$. They are the average days-lived post-election for, respectively, women and men. Again, this is not the "average" for the data we have. That is easy to calculate! No estimation required. $\beta_1$ and $\beta_2$ are averages for the entire "population," however we have chosen to define it. Those averages can not be calculated directly. They can only be estimated, by creating a posterior probability distribution.
+The important parameters are $\beta_1$ and $\beta_2$. They are the average days-lived post-election for, respectively, women and men. Again, this is not the "average" for the data we have. That is easy to calculate! No estimation required. $\beta_1$ and $\beta_2$ are averages for the entire "population," however we have chosen to define that term. Those averages can not be calculated directly. They can only be estimated, by creating a posterior probability distribution.
 
 
 Looking back to the regression model we just created, we see that there is no intercept. Instead of having a $b_0$ value, we have $b_1$ and $b_2$ for female and male. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that on average, women are expected to live about 6,000 days after running for governor, and men are expected to live 10,000 days.
 
-This is a strange result. Why would men live twice as long as women after the election. One explanation for this might be that women don't run for governor until later in life, and therefore are not expected to live as long.
+This is a strange result. Why would men live twice as long as women after the election? One explanation for this might be that women don't run for governor until later in life, and therefore are not expected to live as long.
 
 <!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case in more detail. -->
 
-Now that we have interpreted the model using a -1 in the formula to get both a $b_1$ value and a $b_2$ value, let's take away the -1 and regress `alive_post` on `sex` to see how our equation changes.
+Now that we have interpreted the model using a -1 in the formula to get both a $b_1$ value and a $b_2$ value, let's take away the -1 and regress `alive_post` on and intercept and on `sex` to see how our equation changes.
 
 ```{r, cache = TRUE}
 fit_gov_2a <- stan_glm(data = ch9_gov,
@@ -345,14 +345,15 @@ fit_gov_2a <- stan_glm(data = ch9_gov,
 print(fit_gov_2a, detail = FALSE)
 ```
 
-From this result, we can see that we no longer have a value for female, however we do have an intercept. In this regression our mathematical regression formula is $\hat{alive\_post_i} = b_0 + b_1 x_{m, i}$. $ b_0 $ is our intercept value which here would be around 5850. You may notice that this is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $b_1$ value is for when the candidate is male. Therefore, the intercept value represents those who are not male: females.
+From this result, we can see that we no longer have a value for female. However we do have an intercept. In this regression our mathematical regression formula is:
+
+$$ y_i = \beta_0  + \beta_1 x_{m,i} + \epsilon_i$$
+
+$b_0$ is our intercept value which here would be around 5,850. You may notice that this is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $b_1$ value, only shows up when the candidate is male. (If the candidate is female, then $x_{m,i} = 0$. Therefore, the intercept value represents those who are not male: females.
 
 When the candidate is a male, we add the coefficient for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding $b_0$ and $b_1$, this value is the same as what we got for males in the previous model.
 
 Be careful with notation! $\beta_1$ in the no-intercept model is different from $\beta_1$  in the model with an intercept! Notation varies. We must pay attention each time we make a model.
-
-<!-- DK: Clean up and explain this plot. It is relevant. But I am not exactly sure what to do with it. Maybe it really belongs in the last chapter? Or maybe we need to show how to make it correctly by using fitted(). Either way, I think it is always (?) useful to how the raw data and the fitted values in the same graphic. -->
-
 
 
 The posterior distribution for $\beta_0 + \beta_1$ can be constructed via simple addition.
@@ -370,7 +371,6 @@ fit_gov_2a %>%
          x = "Male Days To Live After the Election")
 ```
 
-<!-- DK: Maybe graph the posteriors from both versions of the model and show they are the same? -->
 
 The interpretation of this model is the same as we have seen before. There is a true average, across the entire population, of the number of days that male candidates live after the election. We can never know what that true average is. But, it seems highly likely that the true average is somewhere between 10,000 and 10,750 days.
 
