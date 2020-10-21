@@ -16,7 +16,6 @@ output_yaml:
 
 *This chapter is a draft.* Come back in a few weeks for a better version.
 
-
 Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters) and three parameters in Chapter \@ref(three-parameters), you are now ready to make the jump to $N$ parameters. 
 
 In this chapter, we will consider models with multiple parameters and the complexities that arise therefrom. 
@@ -57,7 +56,8 @@ ch9_gov <- governors %>%
   select(last_name, year, state, sex, alive_post, alive_pre)
 ```
 
-There are a few things to note when looking at this data. First, the data set includes the variables `alive_pre` and `alive_post`, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. Therefore, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time period are still alive and are, therefore, excluded.
+There are a few things to note when looking at this data. First, the data set includes the variables `alive_pre` and `alive_post`, which tell us how many days a candidate lived before the election took place and how many days a candidate lived after the election, respectively. As a consequence, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time period are still alive and are, therefore, excluded.
+
 
 <!-- DK: Too much information? Not enough? -->
 
@@ -515,7 +515,7 @@ print(fit_gov_4, detail = FALSE)
 
 Unlike our last model, we now have two intercepts to consider: one for females and one for males. Our intercept above,  $$\beta_0$$, is 6008.4. This is the intercept for females. This means  the avg. number of days lived after the election for women is 6008.4, The second intercept is for males. This is calculated by adding the value 4332.1 to the intercept for females 6008.4, which is 10340.5. 
 
-The coefficient for alive_pre is  -.1. What does this mean? It is the slope for only females. So for every extra day a feamle candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now take a look below at the coefficient of sexMale:alive_pre, which is -.8, It is the slope for only males. So for every extra day a male candidate is alive before an election, their lifespan after the election will be 0.8 days lower, on average.
+The coefficient for alive_pre is  -.1. What does this mean? It is the slope for only females. So for every extra day a female candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now take a look below at the coefficient of sexMale:alive_pre, which is -.8, It is the slope for only males. So for every extra day a male candidate is alive before an election, their lifespan after the election will be 0.8 days lower, on average.
 
 
 
@@ -622,7 +622,7 @@ Here we see that `glimpse()` gives us a look at the raw data contained within th
 
 <!-- It may be worth mentioning that general_04 is always "yes", unlike all the other voting history variables which have values of "yes" and "no". Why is that? I *think* that this is caused by their sampling plan. They found all the people who voted in the 2004 general election. Then, the authors found their history. As we would expect, those people had sometimes voted in the past and sometime not. Then, the authors sent the mailing. The key dependent variable, primary_06, is coding 0/1, since that makes doing the statistics easier. -->
 
-From this summary, we get an idea about some of the variables we will be dealing with. Some variables that will be of interest to us are `sex`, `hh_size`, and `primary_06`. The variable `hh_size` tells us the size of the respondent's household, and `primary_06` tells us whether or not the respondent voted in the 2006 Primary election. 
+From this summary, we get an idea of some of the variables we will be working with. Variables of particular interest to us are `sex`, `hh_size`, and `primary_06`. The variable `hh_size` tells us the size of the respondent's household, `sex` tells us the sex of the respondent, and `primary_06` tells us whether or not the respondent voted in the 2006 Primary election. 
 
 There are a few things to note while exploring this data set. You may -- or may not -- have noticed that the only response to the `general_04` variable is "Yes". In their published article, the authors note that "Only registered voters who voted in November 2004 were selected for our sample" (Gerber, Green, Larimer, 2008). After this, the authors found their history then sent out the mailings.
 
@@ -641,7 +641,7 @@ shaming %>%
   count(treatment)
 ```
 
-Four types of treatments were used in the experiment, with voters receiving one type of mailing. All of the mailing treatments carried the message, "DO YOUR CIVIC DUTY - VOTE!". 
+Four types of treatments were used in the experiment, with voters receiving one of the four types of mailing. All of the mailing treatments carried the message, "DO YOUR CIVIC DUTY - VOTE!". 
 
 The first treatment, Civic Duty, also read, “Remember your rights and responsibilities as a citizen. Remember to vote." This message acted as a baseline for the other treatments, since it carried a message very similar to the one displayed on all the mailings.
 
@@ -649,7 +649,7 @@ In the second treatment, Hawthorne, households received a mailing which told the
 
 In the third treatment, Self, the mailing includes the recent voting record of each member of the household, placing the word "Voted" next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. In this mailing, the households were also told, “we intend to mail an updated chart" with the voting record of the household members after the 2006 primary. By emphasizing the public nature of voting records, this type of mailing exerts more social pressure on voting than the Hawthorne treatment.
 
-The fourth treatment, Neighbors, provides the household members' voting records, as well as the voting records of those who live nearby. This mailing also told recipients, "we intend to mail an updated chart" of who voted in the 2006 election.
+The fourth treatment, Neighbors, provides the household members' voting records, as well as the voting records of those who live nearby. This mailing also told recipients, "we intend to mail an updated chart" of who voted in the 2006 election to the entire neighborhood.
 
 For now, let's focus on a subset of the data.
 
@@ -668,18 +668,18 @@ ch9 %>%
 ```
 
 
+Let's focus on a few observations that may be relevant to our analysis. First, note that each treatment has approximately 38,000 respondents. The control group, denoted by Con, has approximately 190 thousand respondents. For the logical variable `solo`, we see that approximately 47 thousand of the total respondents live alone (TRUE), while approximately 296 thousand live in households greater than 1 (FALSE). It may also be important to note that the average age of the respondents is 49.8 years with a standard deviation of 14.4 years.
+
 <!-- DK: Add discussion of what you see here. No need to drop missing values since there aren't any. I think this next discussion can be dropped. -->
 
+To get a better sense of some respondents' information, let's use `sample_n()` to gather a random sample of *n* observations from the data set.
 
-While some summarizing commands such as `glimpse()` gives us a good look at the possible values for the variables, it is difficult to read it in terms of individual observations. Recall that the *observational unit* is what is being measured. With the `shaming` data set, the observational unit would be the voter respondent. To get a better sense of some respondents' information, let's use `sample_n()` to gather a random sample of *n* observations from the data set.
 <!-- HV: Does this belong here? -->
 
 ```{r}
 ch9 %>% 
   sample_n(10)
 ```
-
-Now we have a table with 5 random observations and the respondents' information in a regular table output. By taking a few random samples, we may start to see some patterns within the data. 
 
 Now we have a table with 5 random observations and the respondents' information in a regular table output. By taking a few random samples, we may start to see some patterns within the data. Do you notice anything in particular about the variable `treatment`?
 
@@ -716,15 +716,22 @@ Having created models with one parameter in Chapter \@ref(one-parameter) and two
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
+Let's consider one of the most important virtues of data science: wisdom. The map from our data to our question. Recall that our mission here is to increase our voter turnout while we are running for Governor. 
 
-### Justice
+To investigate this, we are given a dataset in which respondents were encouraged to vote under four treatments. This was accomplished by sending a letter to citizens that voted in the previous primary election with varying degrees of social pressure. The remainder of the respondents fall under a control group, which received no such mailings. The dataset offers a number of details about each respondent, including their age, sex, treatment type, and voting outcome. 
+
+What we truly want to know is *how to make citizens vote*. One immediate problem with our dataset is that, due to our study population, we are only studying people that voted in the previous primary election. In other words, if someone *did not* vote in the previous primary election, they were not included. This would be a large problem, since that means we can only figure out how to make citizens *that have already voted* vote. Though we can't be sure, it is reasonable to assume that it is easier to encourage citizens to vote in the next primary election if they have a history of recently voting in primary elections. 
+
+Does this mean our data is unhelpful? Of course not! With four treatments (and therefore four different methods of encouraging voting), we can gain quite a bit of knowledge. Mostly, we will know the most effective way to incentivize people with a history of voting to vote again. We will also know if no method of persuasion (the control) is the best option. We will further be able to tell if certain methods of persuasion work better for certain groups of people, according to factors such as age, sex, or household size. This can help tremendously in our election. 
+
+That being said, the map from our question to our data is almost never perfect. In data science, we often have to look at our data, understand its limitations, and try our best to make inferences that help our cause.
+
+
+### Justice and Courage
 
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Justice"}
 knitr::include_graphics("other/images/Justice.jpg")
 ```
-
-
-### Courage
 
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Courage"}
 knitr::include_graphics("other/images/Courage.jpg")
