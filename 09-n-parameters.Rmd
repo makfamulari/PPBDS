@@ -585,10 +585,10 @@ From this posterior distribution we are able to see that male candidates live lo
 ```{r}
 fit_gov_4 %>% 
   as_tibble() %>% 
-  mutate(slope_men = alive_pre + sexMale: alive_pre) %>% 
+  mutate(slope_men = alive_pre + `sexMale:alive_pre`) %>% 
   rename(slope_women = alive_pre) %>% 
   select(slope_women, slope_men) %>% 
-  pivot_longer(cols = slope_men: slope_women, 
+  pivot_longer(cols = slope_men:slope_women, 
                names_to = "parameters",
                values_to = "slope") %>% 
   ggplot(aes(slope, color = parameters)) +
