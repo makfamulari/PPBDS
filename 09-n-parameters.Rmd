@@ -338,14 +338,14 @@ print(fit_gov_2, detail = FALSE)
 
 In this regression, we use the -1 in the formula to make the output more straightforward, with no intercept to interpret. The math of this model is the same as those we saw in Chapter \@ref(three-parameters):
 
-$$ \underbrace{y_i}_{outcome} = \underbrace{\beta_1 x_{f,i} + \beta_2 x_{m,i}}_{model} + \underbrace{\epsilon_i}_{not\ in\ the\ model}$$
+$$ y_i = \beta_1 x_{f,i} + \beta_2 x_{m,i} + \epsilon_i$$
 
 where \n
 $$x_{f,i}, x_{m,i} \in \{0,1\}$$ \n
 $$x_{f,i} +  x_{m,i} = 1$$ \n
 $$\epsilon_i \sim N(0, \sigma^2)$$  
 
-<!-- DK: Provide more details on what each of the items in the formula means, even though this is a repeat of what we did in chapter 8. -->
+<!-- DK: Provide more details on what each of the items in the formula means, even though this is a repeat of what we did in chapter 8. Don't use "where" with line skips. Just one paragrpah, like elsewhere. -->
 
 The meanings of $y_i$ and $\epsilon_i$ are the same as in the first models. Indeed, they are the same throughout these exercises.  $x_{f,i}$ and $x_{m,i}$ are 0/1 variables, just like last chapter. They are *variables* whose value varies across individuals.
 
@@ -358,7 +358,7 @@ This is a strange result. Why would men live twice as long as women after the el
 
 <!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case in more detail. -->
 
-Now that we have interpreted the model using a -1 in the formula to get both a $\beta_1$ value and a $\beta_2$ value, let's take away the -1 and regress `alive_post` on and intercept and on `sex` to see how our equation changes.
+Now that we have interpreted the model using a -1 in the formula to get both a $\beta_1$ value and a $\beta_2$ value, let's take away the -1 and regress `alive_post` on an intercept and  `sex` to see how our equation changes.
 
 ```{r, cache = TRUE}
 fit_gov_2a <- stan_glm(data = ch9_gov,
@@ -374,7 +374,7 @@ From this result, we can see that we no longer have a value for female. However 
 
 $$ y_i = \beta_0  + \beta_1 x_{m,i} + \epsilon_i$$
 
-$\beta_0$ is our intercept value which here would be around 5,850. You may notice that this is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $\beta_1$ value, only shows up when the candidate is male. (If the candidate is female, then $x_{m,i} = 0$. Therefore, the intercept value represents those who are not male: females.
+$\beta_0$ is our intercept value which here would be around 5,850. This result is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $\beta_1$ value, only shows up when the candidate is male. (If the candidate is female, then $x_{m,i} = 0$. Therefore, the intercept value represents those who are not male, i.e., females.)
 
 When the candidate is a male, we add the coefficient for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding $\beta_0$ and $\beta_1$, this value is the same as what we got for males in the previous model.
 
@@ -403,16 +403,17 @@ The interpretation of this model is the same as we have seen before. There is a 
 ## Multiple Variable Regression
 
 
-We are going to transition to working with a model that has more than one explanatory variable, x. Our outcome variable will be alive_post, but now we will have two different explanatory variables: alive_pre and sex. Note that sex is a continuous explanatory variable and alive_pre is numerical explanatory variable.
+We are going to transition to working with a model that has more than one explanatory variable, x. Our outcome variable will be alive_post, but now we will have two different explanatory variables: `alive_pre` and `sex`. Note that `sex` is a continuous explanatory variable and `alive_pre` is numerical explanatory variable.
 
 
 
 Here is the math we will be using: 
 
-$$ y_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i+ \epsilon_i $$
+$$ y_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \epsilon_i $$
+
 Great! Now that we have our model, let's break it down to explain what each part means. 
 
-* $ y_i$ is our outcome variable. In our case, the outcome variable is alive_post, the number of days a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidate, this value will be 0. $alive_pre$ is our other explanatory variable that represents the number of days a candidate has lived before the election. 
+* $y_i$ is our outcome variable. In our case, the outcome variable is alive_post, the number of days a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidate, this value will be 0. $alive_pre$ is our other explanatory variable that represents the number of days a candidate has lived before the election. 
 
 * $\beta_0$ is the avg. number of days lived after the election for women, who on the day of election, have been alive the avg. number of days of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $ y_i$ if $male_i$ = 0 and $alive_pre$ = 0. However, we can ignore that for our purpose because no one running for governor would have been alive 0 days before the election!
 
