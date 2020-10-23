@@ -663,19 +663,80 @@ fit_gov_5 %>%
     scale_y_continuous(labels=scales::percent_format())
 ```
 
-The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? 
+The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You acn see here Our knowledge of avg. is always more precise than our knowledge of indivuals 
 
 
 <!-- DK: Need to modify this to only show one of the more interesting state coefficients. (Although we might show all the state pdfs in the graphic.) This a good place to discuss shrinkage, which is what is happening here. And that is probably enough models. -->
 
 ## Temperance
 
+
+Temperance is our final guidance tool. In the world, we are constantly adapting to new things being thrown our way. It is impossible to have explanations for everything because there will always be the "unknowns". There is no model that exists that can replicate the world perfectly. We remind ourselves of the "unknowns" so we can be humble with the conclusions we gather from our data.
+
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Temperance"}
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
+Now, let's build a model to answer the following question:
+
+_How do the alive_post values vary for two male individuals, from South Dakota and Washington, who both have the same pre_alive values?_
 
 
+First, we create a tibble with the desired input for our model. In our case the tibble has a variable named “sex” which contains ten observations all with the same value "Male". Next, we’ll use the posterior_predict() function to get some simulation results. posterior_predict() takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, we are using the fit_gov_5 model and the tibble is the one we just created.
+
+```{r}
+new_obs <- tibble(sex = c("Male", "Male"),
+       state = c("South Dakota", "Washington"),alive_pre = 10*365)
+
+pp <- posterior_predict(fit_gov_5, newdata = new_obs) %>%
+  as_tibble() %>% 
+mutate(across(everything(), as.numeric))
+  
+head(pp, 10)
+```
+
+If you look above, you will see that we have 2 columns (one for each person).
+The first column shows the posterior predictions for male from South Dakota, whose age is 10x the avg. of all candidates. The second column shows the posterior predictions for male from Washington, whose age is 10x the avg. of all candidates.
+
+
+Now let's plot the individual posteriors.
+
+```{r}
+fit_gov_5 %>% 
+  as_tibble() %>% 
+  mutate(Washington_male = `(Intercept)` + 2739.1 + sexMale) %>% 
+  mutate (SD_male = `(Intercept)`-1842.9 +sexMale) %>% 
+  select(Washington_male, SD_male) %>% 
+  pivot_longer(cols = Washington_male:SD_male, 
+               names_to = "parameters",
+               values_to = "days") %>% 
+  ggplot(aes(days, color = parameters)) +
+    geom_density() +
+     labs(title = "Posterior Probability Distribution",
+         subtitle = "for men from Washington and South Dakota",
+         x = "Average Days Lived Post Election",
+         y = "Probability") + 
+    theme_classic() + 
+    scale_y_continuous(labels=scales::percent_format())
+```
+
+Looking at our posterior above, we can see that the male candidate from Washington is expected to live longer. Ok great, but how much longer?
+
+
+```{r}
+pp %>% 
+  mutate(diff= `2`-`1`) %>% 
+  ggplot(aes(diff)) +
+    geom_density() +
+    labs(title = "Posterior Probability Distribution", 
+         subtitle = "How much longer?",
+         x = "Days",
+         y = "Probability") +
+    theme_linedraw() + scale_y_continuous(labels = scales::percent_format())
+```
+In words, we would  expect the male candidate from Washington to live longer than the South Dakota male. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 3,000 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. IN fact, there is a 1/3 chance.
+
+Also, notice that in this distribution there are alive_post values that are negative? Does this make sense? Could a candidate be alive negative days after the election/ The answer is no. However, nothing is wrong with the code. The reason for this is because when we assumed epsilon was normally distributed, we allowed numbers to be negative. This is not that important, so let's press on.
 
 
 ## EDA of `shaming`
