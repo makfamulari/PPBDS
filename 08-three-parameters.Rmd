@@ -232,7 +232,7 @@ fit_obj
 ```
 
 
-"partyDemocrat" corresponds to $\beta_1$, the average age of Democrats in the population. "partyRepublican" corresponds to $\beta_2$, the average age of Republicans in the population. Since we don't really care about the posterior distribution for $\sigma$, we won't discuss it here. Graphically:
+`partyDemocrat` corresponds to $\beta_1$, the average age of Democrats in the population. `partyRepublican` corresponds to $\beta_2$, the average age of Republicans in the population. Since we don't really care about the posterior distribution for $\sigma$, we won't discuss it here. Graphically:
 
 <!-- DK: Lots to clean up about this plot! -->
 
@@ -243,9 +243,9 @@ fit_obj %>%
   as_tibble() %>% 
   select(-sigma) %>% 
   mutate(Democrat = partyDemocrat, Republican = partyRepublican) %>%
- pivot_longer(cols = Democrat:Republican,
-              names_to = "parameter",
-              values_to = "age") %>% 
+  pivot_longer(cols = Democrat:Republican,
+               names_to = "parameter",
+               values_to = "age") %>% 
   ggplot(aes(x = age, color = parameter)) +
     geom_density() +
     labs(title = "Posterior Probability Distribution",
@@ -317,7 +317,7 @@ act_both <- ggplot(trains_both, aes(x = age)) +
 # Predicted outcomes (both)
 
 pred_both <- ggplot(trains_both, aes(x = fitted)) +
-  geom_histogram( binwidth = 1.5) +
+  geom_histogram(binwidth = 1.5) +
   scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
   labs(
@@ -328,11 +328,12 @@ pred_both <- ggplot(trains_both, aes(x = fitted)) +
 # Residuals (both)
 
 res_both <- ggplot(trains_both, aes(x = residual)) +
-  geom_histogram (bins = 100, binwidth = 1.5) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 10), breaks = c(2, 4, 6, 8, 10)) +
-  labs(
-    x = "Residuals",
-    y = "") 
+  geom_histogram(bins = 100, binwidth = 1.5) +
+  scale_y_continuous(expand = c(0, 0), 
+                     limits = c(0, 10), 
+                     breaks = c(2, 4, 6, 8, 10)) +
+  labs(x = "Residuals",
+       y = "") 
 
 act_both + pred_both + res_both + 
   plot_annotation(title = "Decomposition of Age into Fitted Values and Residuals")
@@ -393,7 +394,8 @@ A look at the first few observations shows that we simply get ten draws from the
 ```{r}
 pp %>% 
   ggplot(aes(x = `1`)) +
-    geom_density() +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100)  +
     labs(title = "Posterior Probability Distribution for a Democrat's Age",
          x = "Age",
          y = "Probability") +
@@ -461,7 +463,8 @@ pp %>%
   # Create posterior probability distribution
   
   ggplot(aes(x = age_diff)) +
-    geom_density() +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100) +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Age difference between the oldest/youngest of three Democrats/Republicans",
          x = "Age",
@@ -485,6 +488,8 @@ knitr::include_graphics("other/images/Wisdom.jpg")
 
 We are still using the data from Enos (2014). Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. Math won't save us.
 
+The critical issue is always: Which population are we interested in and does our data come from that population? If there is no connection between the two, progress is impossible. But, in this case, if we are willing to consider the population of US residents over the last decade (including today), and if we are willing to assume that our data set of 115 individuals is representative of that population, then we can use our data to create a model to answer our question.
+
 Ethical issues are tricky, or at least trickier than they were in the context of models in which the dependent variable was height or age. (And the ethical issues in conducting the experiment in the first place are non-trivial.) Assume we make a good model. What is to prevent someone from using that information to, say, influence voting and donations? Imagine a Republican Senate candidate who hires Spanish-speakers to ride commuter trains in order to shift voters' attitudes toward immigration in a conservative direction. She believes (correctly?) that doing so will increase her odds of winning the election. Is that the sort of knowledge we seek to create? We can make such models. Indeed, the purpose of this chapter is to show you how to do so! But should you make those models?
 
 ### Justice
@@ -495,44 +500,51 @@ knitr::include_graphics("other/images/Justice.jpg")
 
 The three elements of Justice in data science remain the same: predictive/causal models, Preceptor Table, and mathematical formula.
 
-A Preceptor Table for this model would look very similar to the one in the first half of this chapter, except now we have an explanatory instead of predictibe variable due to the nature of our model. Additionally, it now reflects how we are looking to explain participant's end attitudes depending on their condtion: treatment or control
+A Preceptor Table for this model would look very similar to the one in the first half of this chapter, except that we have now possible outcomes for each individual: `att_end` if they are exposed to treatment and `att_end` they are exposed to control. 
 
-<!-- DK: We need to add Preceptor Tables here and elsewhere. -->
+<!-- DK: We need to add Preceptor Tables here and elsewhere. The below one is wrong because it does not show two potential outcomes. -->
 
-```{r echo = FALSE}
-tibble(ID = c("1", "2", "...", "473", "474",
-              "...", "3,258", "3,259", "...", "N"),
-       Treatment = c("Treatment", "?", "...", "Control", "?", "...", "?", "Control", "...", "?"),
-      Attitude_End = c("10", "?", "...", "8", "?", "...", "?", "11", "...", "?")) %>%
-  
-  # Then, we use the gt function to make it pretty
-  
-  gt() %>%
-  cols_label(ID = md("ID"),Treatment= "Condition", Attitude_End = "Attitude at End") %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(ID))) %>%
-  tab_style(style = cell_text(align = "left", v_align = "middle"), 
-            locations = cells_column_labels(columns = vars(ID))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  cols_align(align = "left", columns = vars(ID)) %>%
-  tab_spanner(label = "Outcome", columns = vars(Attitude_End)) %>%
-  tab_spanner(label = "Explanitory Variable", columns = vars(Treatment))
-```
+<!-- ```{r echo = FALSE} -->
+<!-- tibble(ID = c("1", "2", "...", "473", "474", -->
+<!--               "...", "3,258", "3,259", "...", "N"), -->
+<!--        Treatment = c("Treatment", "?", "...", "Control", "?", "...", "?", "Control", "...", "?"), -->
+<!--       Attitude_End = c("10", "?", "...", "8", "?", "...", "?", "11", "...", "?")) %>% -->
+
+<!--   # Then, we use the gt function to make it pretty -->
+
+<!--   gt() %>% -->
+<!--   cols_label(ID = md("ID"),Treatment= "Condition", Attitude_End = "Attitude at End") %>% -->
+<!--   tab_style(cell_borders(sides = "right"), -->
+<!--             location = cells_body(columns = vars(ID))) %>% -->
+<!--   tab_style(style = cell_text(align = "left", v_align = "middle"),  -->
+<!--             locations = cells_column_labels(columns = vars(ID))) %>% -->
+<!--   cols_align(align = "center", columns = TRUE) %>% -->
+<!--   cols_align(align = "left", columns = vars(ID)) %>% -->
+<!--   tab_spanner(label = "Outcome", columns = vars(Attitude_End)) %>% -->
+<!--   tab_spanner(label = "Explanitory Variable", columns = vars(Treatment)) -->
+<!-- ``` -->
+
 
 The math for this model is exactly the same as the math for the predictive model in the first half of the chapter, although we change the notation a bit for clarity.
 
-$$ \underbrace{y_i}_{outcome} = \underbrace{\beta_1 x_{t,i} + \beta_2 x_{c,i}}_{model} + \underbrace{\epsilon_i}_{not\ in\ the\ model}$$
+$$ y_i = \beta_1 x_{t,i} + \beta_2 x_{c,i} + \epsilon_i$$
 
 where \n
 $$x_{t,i}, x_{c,i} \in \{0,1\}$$ \n
 $$x_{t,i} +  x_{c,i} = 1$$ \n
 $$\epsilon_i \sim N(0, \sigma^2)$$  
 
+<!-- DK: make these sections much more similar across the chapters, always separating out the data and the paramters -->
+
 Nothing has changed, except for the meaning of the data items and the interpretations of the parameters. 
 
 * On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is a person's attitude toward immigration after the experiment is complete.  $y_i$ takes on integer values between 3 and 15 inclusive.
 
-* On the right-hand side we first have the part contained in the model, consisting of two similar terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point. The betas are our two parameters. $\beta_1$ is the average attitude toward immigration for treated individuals --- those exposed to Spanish-speakers ---   in the population. $\beta_2$ is the average attitude toward immigration for control individuals --- those not exposed to Spanish-speakers ---  in the population. The $x$'s are our explanatory variables and take the values 1 or 0. If someone is a Treated we have $x_{t,i} = 1$ and $x_{c,i} = 0$, if someone is a Control we have $x_{t,i} = 0$ and $x_{c,i} = 1$. In other words, the $x$'s are binary variables and are mutually exclusive (if you are a Treated, you cannot also be a Control).
+* On the right-hand side we first have the part contained in the model, consisting of two similar terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point.  $\beta_1$ is the average attitude toward immigration for treated individuals --- those exposed to Spanish-speakers ---   in the population. $\beta_2$ is the average attitude toward immigration for control individuals --- those not exposed to Spanish-speakers ---  in the population. The $x$'s are our explanatory variables and take the values 1 or 0. If someone is a Treated we have $x_{t,i} = 1$ and $x_{c,i} = 0$, if someone is a Control we have $x_{t,i} = 0$ and $x_{c,i} = 1$. In other words, the $x$'s are binary variables and are mutually exclusive -- if you are a Treated, you cannot also be a Control.
+
+* Note that the formula applies to everyone in the population, not just the 115 people for whom we have data. The index $i$ does not just go from 1 through 115. It goes from 1 through $N$, where $N$ is the number of individuals in the population. Conceptually, everyone has an `att_end` under treatment and under control. 
+
+<!-- DK: Above is not overly clear. -->
 
 * The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's attitude toward immigration but are not explained by treatment status. We assume that this error follows a normal distribution with an expected value of 0.
 
@@ -556,9 +568,9 @@ fit_obj <- stan_glm(att_end ~ treatment - 1,
 fit_obj
 ```
 
-treatmentTreated corresponds to $\beta_1$. As always, R has, behind the scenes, estimated the entire posterior probability distribution for $\beta_1$. We will graph that distribution in the next section. But the basic print method for these objects can't show the entire distribution, so it gives us summary numbers: the median and the MAD SD. Speaking roughtly, we would expect about 95% of the values in the posterior to be within two MAD SD's of the median. In other words, we are 95% confident that the true, but unknowable, average attitude toward immigration among the Treated in the population to be between 9.2 and 10.8. 
+`treatmentTreated` corresponds to $\beta_1$. As always, R has, behind the scenes, estimated the entire posterior probability distribution for $\beta_1$. We will graph that distribution in the next section. But the basic print method for these objects can't show the entire distribution, so it gives us summary numbers: the median and the MAD SD. Speaking roughly, we would expect about 95% of the values in the posterior to be within two MAD SD's of the median. In other words, we are 95% confident that the true, but unknowable, average attitude toward immigration among the Treated in the population to be between 9.2 and 10.8. 
 
-treatmentControl corresponds to $\beta_2$. The same analysis applies. We are about 95% confident that the true value for the average attitude toward immigration for Control in the population is between 7.9 and 9.1. 
+`treatmentControl` corresponds to $\beta_2$. The same analysis applies. We are about 95% confident that the true value for the average attitude toward immigration for Control in the population is between 7.9 and 9.1. 
 
 Up until now, we have used the Bayesian interpretation of "confidence interval." This is also the intuitive meaning which, outside of academia, is almost universal. There is a truth out there. We don't know, and sometimes can't know, the truth. A confidence interval, and its associated confidence level, tells us how likely the truth is to lie within a specific range. If your boss asks you for a confidence interval, she almost certainly is using this interpretation.
 
@@ -629,7 +641,9 @@ Recall the first question with which we began this section:
 
 * What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration? 
 
-Recall from Chapter \@ref(rubin-causal-model) the discussion of the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration of the population for those exposed to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of $\beta_1$ and $\beta_2$. With that information, the problem is simple:
+<!-- DK: Below is also not clear. -->
+
+Recall from Chapter \@ref(rubin-causal-model) the discussion of the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration, of the population, for anyone, under exposure to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of $\beta_1$ and $\beta_2$. With that information, the problem is simple:
 
 ```{r}
 set.seed(14)
@@ -637,7 +651,8 @@ fit_obj %>%
   as_tibble() %>% 
   mutate(ate = treatmentTreated - treatmentControl) %>% 
   ggplot(aes(x = ate)) +
-    geom_density() +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100) +
     labs(title = "Posterior Probability Distribution for ATE",
          subtitle = "Exposure to Spanish-speakers shifts immigration attitudes rightward",
          x = "Difference in Attitude",
@@ -649,7 +664,11 @@ Could the true value of the average treatment effect be as much as 2 or as littl
 
 <!-- DK: Much more discussion. Explain what a test might be used for in this situation and why we should reject testing. -->
 
-Our second question: What is the largest effect size which still has a 1 in 10 chance of occurring? To answer this question, we first need to create a tibble which we can pass to `posterior_predict()`. The variables in the tibbles which will be passed in as `newdata` must be exactly the same as their counterparts in the original data. For example, `treatment` must be a factor, with the same levels as it has in `trains`.
+Our second question: 
+
+* What is the largest effect size which still has a 1 in 10 chance of occurring? 
+
+To answer this question, we first need to create a tibble which we can pass to `posterior_predict()`. The variables in the tibbles which will be passed in as `newdata` must be exactly the same as their counterparts in the original data. For example, `treatment` must be a factor, with the same levels as it has in `trains`.
 
 
 ```{r}
@@ -674,7 +693,8 @@ te <- tibble(Treated = pp$`1`, Control = pp$`2`)  %>%
 
 te %>% 
   ggplot(aes(x = te)) +
-    geom_density() +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100)  +
     labs(title = "Posterior Probability Distribution for Treatment Effect",
          subtitle = "Causal effects are more variable for indivduals",
          x = "Difference in Attitude",
@@ -697,7 +717,7 @@ The question, however, was interested in the value at the 90th percentile. For t
 
 In this chapter, we explored relationships between different variables in the trains data set. We built a predictive model and a causal model using the following three parameters: $\beta_1$, $\beta_2$, and $\sigma$.
 
-Similar to previous chapters, our first task is to use _Wisdom_ . We judge how relevant our data is to the questions we ask, using ethics to guide our decision. Could income data from 2012 really be suitable for making predictions today? Probably?  _Justice_ is necessary to decide the best way to represent the models we make. We use  _Courage_ to change translate our models into code. Our goal is to understand, generate posterior distributions, and interpret their meaning. Temperance leads us to the final stage. We remind ourselves that there are so many unknown factors that affect our data. Our models are never as good as we hope them to be. We always use caution in applying our models to the real world. 
+Similar to previous chapters, our first task is to use _Wisdom_ . We judge how relevant our data is to the questions we ask, using ethics to guide our decision. Could income data from 2012 really be suitable for making predictions today? Probably?  _Justice_ is necessary to decide the best way to represent the models we make. We use  _Courage_ to translate our models into code. Our goal is to understand, generate posterior distributions, and interpret their meaning. Temperance leads us to the final stage. We remind ourselves that there are so many unknown factors that affect our data. Our models are never as good as we hope them to be. We always use caution in applying our models to the real world. 
 
 
 
