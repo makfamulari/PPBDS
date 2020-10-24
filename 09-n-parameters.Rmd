@@ -740,7 +740,7 @@ Also, notice that in this distribution there are alive_post values that are nega
 
 Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?    
 
-Consider a new data set, `shaming`, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled "Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment". This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout. 
+Consider a new data set, `shaming`, corresponding to an experiment carried out by   titled "Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment". This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout. 
 
 Let's now do another EDA, starting off by running `glimpse()`.
 
@@ -866,6 +866,8 @@ Because we will be going through a series of models in this chapter, it is usefu
 
 #### Voting and Sex
 
+<!-- MF: I used family = gaussian as I noted it in the lower section drafts, but can't find the purpose online. Also, stan_glm is taking a very long time to run. Is this a concern? -->
+
 Let's start with a simple model: the effect of voting in the 2006 election and sex. First, let's look at the results of `primary_06` after grouping by `sex` to see the number of females and males who did or did not vote. Recall that a value of 1 for `primary_06` means that the citizen *did* vote, while a value of 0 means that they *did not*. 
 
 ```{r}
@@ -891,8 +893,37 @@ Here, the (Intercept) variable represents our "baseline for comparison" female g
 
 #### Voting and Age
 
-Now that we've seen the relationship between sex and voting, let's take a look at age. 
+Now that we've seen the relationship between sex and voting, let's take a look at age. Begin by grouping our observations by `age` and counting by `primary_06`, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category. 
 
+```{r}
+age <- ch9 %>% 
+  group_by(age) %>% 
+  count(primary_06) 
+
+age
+```
+
+To explore this relationship visually, let's create a graph. We are coercing `primary_06` into a character variable as it more closely represents "yes" or "no" as opposed to a numerical value. 
+
+```{r}
+age %>% 
+  mutate(primary_06 = as.character(primary_06)) %>% 
+  ggplot(aes(x = age, y = n, color = primary_06)) +
+  geom_point() +
+  labs(
+    title = "Relationship Between Age and Voting",
+    subtitle = "In the 2006 Primary Elections",
+    x = "Age",
+    y = "Count"
+  )
+```
+
+There are some interesting takeaways here. 
+- First, in almost every age bracket (other than above 90), the majority participants did *not* vote. 
+- The spike between ages 40 and 60 illustrates that most participants exist in this age bracket. 
+- The differences between voters and non-voters narrows greatly after age 60. 
+
+Let's look at the results of our regression. 
 
 ```{r, cache=TRUE}
 model_2 <- stan_glm(data = ch9, 
@@ -948,7 +979,7 @@ model_5 <- stan_glm(data = ch9,
 print(model_5, digits = 3)
 ```
 
-
+<!-- MF: As it stands, I have all five models in this section. Should the interaction model maybe be in a later, separate section? -->
 
 ### Temperance
 
