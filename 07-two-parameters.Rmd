@@ -65,6 +65,7 @@ Then, create a tibble, first column is ID. Second column is height_sample, which
 
 <!-- Workshop Statistics:  Discovery with Data, A Bayesian Approach by James H. Albert and Allan J. Rossman --- Topic 16 has some interesting stuff about how we learn a proportion.  -->
 
+<!-- DK: Add this: "an estimate for the standard deviation of the errors (i.e. variability in height after accounting for the mean)" is pretty intuitive. You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) -->
 
 # Two Parameters {#two-parameters}
 
@@ -409,6 +410,8 @@ The posterior distribution includes all the information we have about the unknow
 
 * 95% confidence interval: `r quantile(virtual_resamples$height_mean, probs = c(0.025, 0.975))`
 
+We use the `quantile()` function to calculate the confidence interval. Note that, in this book, we use the Bayesian interpretation of a confidence interval. There is a truth out there. The average height in our population is a specific number. We don't know what that number is. But we are 95% sure that it lies within the 95% confidence interval.
+
 
 
 ## Probability to bootstrap to Bayesian models
@@ -750,8 +753,8 @@ Doing so requires two steps. First, use `as_tibble()`, just as you might expect.
 dim(pp)
 ```
 
-There are `r nrow(pp)` rows because, by default, `stan_glm()` gives us `r nrow(pp)` draws from the posterior distributions, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There 
-are `r ncol(pp)` because the matrix provides a (potentially) different posterior prediction for each of the input data rows. (In this case, they are all the same because the model does not use any covariates. In more complex models, the columns in the `pp` tibble can be very different.) 
+There are `r nrow(pp)` rows because, by default, `stan_glm()` gives us `r nrow(pp)` draws from the posterior distribution, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There 
+are `r ncol(pp)` because the matrix provides draws from the same posterior predictive distribution for each of the input data rows. (In this case, they are all the same --- all draws from the same posterior predictive distribution --- because the model does not use any covariates. In more complex models, the columns in the `pp` tibble can be draws from very different distributions.) 
 
 Why do we want a posterior prediction for each observation? After all, we already know the value for each observation! We know everyone's height in our data set. No prediction is necessary.
 

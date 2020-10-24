@@ -636,6 +636,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <li><p>Median: 175.97</p></li>
 <li><p>95% confidence interval: 175.66, 176.28</p></li>
 </ul>
+<p>We use the <code>quantile()</code> function to calculate the confidence interval. Note that, in this book, we use the Bayesian interpretation of a confidence interval. There is a truth out there. The average height in our population is a specific number. We don’t know what that number is. But we are 95% sure that it lies within the 95% confidence interval.</p>
 </div>
 <div id="probability-to-bootstrap-to-bayesian-models" class="section level2">
 <h2>
@@ -1281,8 +1282,8 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <p>Doing so requires two steps. First, use <code>as_tibble()</code>, just as you might expect. In R, we often transform one thing into another thing with functions which begin with <code>as_</code>. Unfortunately, that does not solve our problem because each column is still of class <code>ppd</code>. So, second, we use an <code>across</code> incantation to transform each column. The resulting object, <code>pp</code>, is still not easy to work with, both because the variable names are all numbers and because of how big it is.</p>
 <div class="sourceCode" id="cb891"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb891-1"><a href="two-parameters.html#cb891-1"></a><span class="kw">dim</span>(pp)</span></code></pre></div>
 <pre><code>## [1] 4000 1814</code></pre>
-<p>There are 4000 rows because, by default, <code>stan_glm()</code> gives us 4000 draws from the posterior distributions, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There
-are 1814 because the matrix provides a (potentially) different posterior prediction for each of the input data rows. (In this case, they are all the same because the model does not use any covariates. In more complex models, the columns in the <code>pp</code> tibble can be very different.)</p>
+<p>There are 4000 rows because, by default, <code>stan_glm()</code> gives us 4000 draws from the posterior distribution, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There
+are 1814 because the matrix provides draws from the same posterior predictive distribution for each of the input data rows. (In this case, they are all the same — all draws from the same posterior predictive distribution — because the model does not use any covariates. In more complex models, the columns in the <code>pp</code> tibble can be draws from very different distributions.)</p>
 <p>Why do we want a posterior prediction for each observation? After all, we already know the value for each observation! We know everyone’s height in our data set. No prediction is necessary.</p>
 <p>The reason is that, in order to confirm that our model is consistent with the data, <em>we should compare the posterior probability distribution for each observation to the actual value for that observation.</em> They should be consistent. That is, if the model is sensible, about 95% of the true observations should lie within the 95% confidence interval of their respective posterior probability distributions. The process of doing this comparison is a <em>posterior predictive check.</em></p>
 <!-- DK: Do this now or save for later? -->
@@ -1381,7 +1382,7 @@ are 1814 because the matrix provides a (potentially) different posterior predict
 <a href="three-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-20
+2020-10-23
 </p>
 </div>
 </div>
