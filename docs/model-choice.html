@@ -197,13 +197,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- DK: Clean up these plots? Why not? -->
 <div class="sourceCode" id="cb984"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb984-1"><a href="model-choice.html#cb984-1"></a><span class="kw">ggplot</span>(ames, <span class="kw">aes</span>(<span class="dt">x =</span> Sale_Price)) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb984-2"><a href="model-choice.html#cb984-2"></a><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">50</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-786-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-785-1.png" width="672"></p>
 <p>The data are right-skewed; there are more inexpensive houses than expensive ones. The median sale price was $160,000 and the most expensive house was $755,000. When modeling this outcome, a strong argument can be made that the price should be log-transformed. The advantages of doing this are that no houses would be predicted with negative sale prices and that errors in predicting expensive houses will not have an undue influence on the model. Also, from a statistical perspective, a logarithmic transform may also <em>stabilize the variance</em> in a way that makes inference more legitimate. Let’s visualize the transformed data:</p>
 <!-- DK: Do we need to discuss logs, either here or earlier in the book? -->
 <div class="sourceCode" id="cb985"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb985-1"><a href="model-choice.html#cb985-1"></a><span class="kw">ggplot</span>(ames, <span class="kw">aes</span>(<span class="dt">x =</span> Sale_Price)) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb985-2"><a href="model-choice.html#cb985-2"></a><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">50</span>) <span class="op">+</span></span>
 <span id="cb985-3"><a href="model-choice.html#cb985-3"></a><span class="st">  </span><span class="kw">scale_x_log10</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-787-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-786-1.png" width="672"></p>
 <p>While not perfect, this will probably result in better models than using the untransformed data.</p>
 <p>The units of the model coefficients might be more difficult to interpret, as will measures of performance. For example, the root mean squared error (RMSE) is a common performance metric that is used in regression models. It uses the difference between the observed and predicted values in its calculations. If the sale price is on the log scale, these differences (i.e. the residuals) are also in log units. For this reason, it can be difficult to understand the quality of a model whose RMSE is 0.15 log units.</p>
 <p>Despite these drawbacks, we will utilize the log transformation for this outcome. <em>From this point on</em>, the outcome column is pre-logged in the <code>ames</code> data frame:</p>
@@ -385,7 +385,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb1002"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1002-1"><a href="model-choice.html#cb1002-1"></a><span class="kw">ggplot</span>(ames_train, <span class="kw">aes</span>(<span class="dt">y =</span> Neighborhood)) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1002-2"><a href="model-choice.html#cb1002-2"></a><span class="st">  </span><span class="kw">geom_bar</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1002-3"><a href="model-choice.html#cb1002-3"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="ot">NULL</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-804-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-803-1.png" width="672"></p>
 <p>Here there are two neighborhoods that have less than five properties in the training data; in this case, no houses at all in the Landmark neighborhood were included in the training set. For some models, it may be problematic to have dummy variables with a single non-zero entry in the column. At a minimum, it is highly improbable that these features would be important to a model. If we add <code>step_other(Neighborhood, threshold = 0.01)</code> to our recipe, the bottom 1% of the neighborhoods will be lumped into a new level called “other”. In this training set, this will catch 8 neighborhoods.</p>
 <p>For the Ames data, we can amend the recipe to use:</p>
 <div class="sourceCode" id="cb1003"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1003-1"><a href="model-choice.html#cb1003-1"></a>simple_ames &lt;-<span class="st"> </span></span>
@@ -419,7 +419,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1005-5"><a href="model-choice.html#cb1005-5"></a><span class="st">  </span><span class="kw">scale_x_log10</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1005-6"><a href="model-choice.html#cb1005-6"></a><span class="st">  </span><span class="kw">scale_y_log10</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1005-7"><a href="model-choice.html#cb1005-7"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"General Living Area"</span>, <span class="dt">y =</span> <span class="st">"Sale Price (USD)"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-807-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-806-1.png" width="672"></p>
 <p>How are interactions specified? Recipes are explicit and sequential. With the current recipe, <code>step_dummy()</code> has already created dummy variables. How would we combine these for an interaction? The additional step would look like <code>step_interact(~ interaction terms)</code> where the terms on the right-hand side of the tilde are the interactions. These can include selectors, so it would be appropriate to use:</p>
 <div class="sourceCode" id="cb1006"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1006-1"><a href="model-choice.html#cb1006-1"></a>simple_ames &lt;-<span class="st"> </span></span>
 <span id="cb1006-2"><a href="model-choice.html#cb1006-2"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type,</span>
@@ -455,7 +455,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1007-15"><a href="model-choice.html#cb1007-15"></a>}</span>
 <span id="cb1007-16"><a href="model-choice.html#cb1007-16"></a></span>
 <span id="cb1007-17"><a href="model-choice.html#cb1007-17"></a>( <span class="kw">plot_smoother</span>(<span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">plot_smoother</span>(<span class="dv">5</span>) ) <span class="op">/</span><span class="st"> </span>( <span class="kw">plot_smoother</span>(<span class="dv">20</span>) <span class="op">+</span><span class="st"> </span><span class="kw">plot_smoother</span>(<span class="dv">100</span>) )</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-809-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-808-1.png" width="672"></p>
 <p>The <code>ns()</code> function in the <strong>splines</strong> package generates feature columns using functions called <em>natural splines</em>.</p>
 <p>Some panels clearly fit poorly; two terms <em>under-fit</em> the data while 100 terms <em>over-fit</em>. The panels with five and 20 terms seem like reasonably smooth fits that catch the main patterns of the data. This indicates that the proper amount of “non-linear-ness” matters. The number of spline terms could then be considered a <em>tuning parameter</em> for this model.</p>
 <p>In <strong>recipes</strong>, there are multiple steps that can create these types of terms. To add a natural spline representation for this predictor:</p>
@@ -567,7 +567,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1020-11"><a href="model-choice.html#cb1020-11"></a>lm_form_fit</span></code></pre></div>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  5ms 
+## Fit time:  8ms 
 ## 
 ## Call:
 ## stats::lm(formula = Sale_Price ~ Longitude + Latitude, data = data)
@@ -878,7 +878,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">10.6</span> Judging model effectiveness</h2>
 <p>Once we have a model, we need to know how well it works. A quantitative approach for estimating effectiveness allows us to understand the model, to compare different models, or to tweak the model to improve performance. Our focus in tidymodels is on <em>empirical validation</em>; this usually means using data that were not used to create the model as the substrate on which we measure effectiveness.</p>
 <p>The choice of which metrics to examine can be critical. For example, two common metrics for regression models are the root mean squared error (RMSE) and the coefficient of determination (a.k.a. <span class="math inline">\(R^2\)</span>). The former measures <em>accuracy</em> while the latter measures <em>correlation</em>. These are not necessarily the same thing. This figure demonstrates the difference between the two:</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-829-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-828-1.png" width="672"></p>
 <p>A model optimized for RMSE has more variability but has relatively uniform accuracy across the range of the outcome. The right panel shows that there is a tighter correlation between the observed and predicted values but this model performs poorly in the tails.</p>
 <p>This section will largely focus on the <strong>yardstick</strong> package. Before illustrating syntax, let’s explore whether empirical validation using performance metrics is worthwhile when a model is focused on inference rather than prediction.</p>
 <div id="performance-metrics-and-inference" class="section level3">
@@ -948,7 +948,7 @@ The point of this analysis is to demonstrate the idea that <strong>optimization 
 <span id="cb1054-5"><a href="model-choice.html#cb1054-5"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">"Predicted Sale Price (log10)"</span>, <span class="dt">x =</span> <span class="st">"Sale Price (log10)"</span>) <span class="op">+</span></span>
 <span id="cb1054-6"><a href="model-choice.html#cb1054-6"></a><span class="st">  </span><span class="co"># Scale and size the x- and y-axis uniformly:</span></span>
 <span id="cb1054-7"><a href="model-choice.html#cb1054-7"></a><span class="st">  </span><span class="kw">coord_obs_pred</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-833-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-832-1.png" width="672"></p>
 <p>There is one property that is substantially over-predicted.</p>
 <p>Let’s compute the root mean squared error for this model using the <code>rmse()</code> function:</p>
 <div class="sourceCode" id="cb1055"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1055-1"><a href="model-choice.html#cb1055-1"></a><span class="kw">rmse</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>

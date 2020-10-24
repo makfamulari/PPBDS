@@ -233,7 +233,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- DK: Weird that this automagically creates a "TABLE 9.1: Data summary" side margin note. -->
 <div class="sourceCode" id="cb936"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb936-1"><a href="n-parameters.html#cb936-1"></a><span class="kw">skim</span>(ch9_gov)</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-736">TABLE 9.1: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-735">TABLE 9.1: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -376,7 +376,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <p>This output groups the variables together by type. We are given histograms of the numerical data. In looking at the histogram for <code>year</code>, we see that it is skewed right, with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.</p>
 <p>In using this data set, our left-side variable will be <code>alive_post</code>. We are trying to understand/predict how many days a candidate will live after the election. Let’s look at some graphs and plots showing the relationships between <code>alive_post</code> and some of the other variables in our subset.</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-737-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-736-1.png" width="672"></p>
 <p>Starting with the relationship between <code>alive_post</code> and <code>year</code>, we can see that the data is skewed right and that there is a rough line above which there are no observations. There are no data points in the top right portion of the graph because it is not possible to have run in 2011, lived 20,000 days after the election took place, and still have died before the data set was created. This line represents, approximately, the most days a candidate could have possibly lived — and still have died. The reason this line is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a long time after the election and still have died prior to the data set creation, giving them higher <code>alive_post</code> values than those who ran for office in more recent years.</p>
 <p>There are fewer observations in later years because fewer recent candidates have died.</p>
 <div class="sourceCode" id="cb937"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb937-1"><a href="n-parameters.html#cb937-1"></a>ch9_gov <span class="op">%&gt;%</span></span>
@@ -388,7 +388,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb937-7"><a href="n-parameters.html#cb937-7"></a>       <span class="dt">x =</span> <span class="st">"Gender"</span>,</span>
 <span id="cb937-8"><a href="n-parameters.html#cb937-8"></a>       <span class="dt">y =</span> <span class="st">"Days Lived After Election"</span>) <span class="op">+</span></span>
 <span id="cb937-9"><a href="n-parameters.html#cb937-9"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">label_number</span>()) </span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-738-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-737-1.png" width="672"></p>
 <p>This plot shows that men live much longer, on average, than women after the election. Does that make sense to you?</p>
 <!-- DK: Add more discussion here? -->
 </div>
@@ -398,7 +398,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-739"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-738"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 9.1: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -424,7 +424,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-740"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-739"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.2: Justice<!--</p>-->
 <!--</div>--></span>
@@ -432,13 +432,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-741"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-740"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 9.3: Courage<!--</p>-->
 <!--</div>--></span>
 </p>
 <p>Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let’s model candidate lifespan after the election as a function of candidate lifespan prior to the election. The data:</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-742-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-741-1.png" width="672"></p>
 <p>The math is fairly simple:</p>
 <p><span class="math display">\[ alive\_post_i =  \beta_0 + \beta_1 alive\_pre_i + \epsilon_i \]</span></p>
 <p>with <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span>. <span class="math inline">\(alive\_post_i\)</span> is the number of days lived after the election for candidate <span class="math inline">\(i\)</span>. <span class="math inline">\(alive\_pre_i\)</span> is the number of days lived before the election for candidate <span class="math inline">\(i\)</span>. <span class="math inline">\(\epsilon_i\)</span> is the “error term,” the difference between the actual days-lived of candidate <span class="math inline">\(i\)</span> and the modeled days-lived. <span class="math inline">\(\epsilon_i\)</span> is normally distributed with a mean of 0 and a standard deviation of <span class="math inline">\(\sigma\)</span>. The key distinction is between:</p>
@@ -450,7 +450,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Coming back to our model with <span class="math inline">\(alive\_pre\)</span>, there are three unknown parameters, similar to the situation we faced in Chapter <a href="three-parameters.html#three-parameters">8</a>.</p>
 <p>You may recall from middle school algebra that the equation of a line is <span class="math inline">\(y = a + b x\)</span>. It is defined by two coefficients <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>. The intercept coefficient <span class="math inline">\(a\)</span> is the value of <span class="math inline">\(y\)</span> when <span class="math inline">\(x = 0\)</span>. The slope coefficient <span class="math inline">\(b\)</span> for <span class="math inline">\(x\)</span> is the increase in <span class="math inline">\(y\)</span> for every increase of one in <span class="math inline">\(x\)</span>. When defining a regression line, we use slightly different notation but the fundamental relationship is the same.</p>
 <p>We can use <code>geom_smooth()</code> to create the fitted regression line:</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-743-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-742-1.png" width="672"></p>
 <p>Consider someone who is about 15,000 days old on Election Day. We have a score or more data points for candidates around that age. A couple died soon after the election. Some of then lived for about 5,000 days after the election. Others lived for more than 20,000 days. The world is filled with variation. But the fitted line tells us that, on average, we would expect a candidate that age to live for about 15,000 days after the election.</p>
 <!-- DK: Add a red circle to the graphic to show how we figured that out? -->
 <p>This model, with a continuous independent (or “predictor”) variable has an infinite number of fitted values, one for each possible value of <code>alive_pre</code>. This is very different from the models we saw in Chapter <a href="three-parameters.html#three-parameters">8</a>. Those models only had two possible fitted values because the predictor variable only took two possible values.</p>
@@ -483,7 +483,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb941-9"><a href="n-parameters.html#cb941-9"></a>         <span class="dt">y =</span> <span class="st">"Days Lived After Election"</span>) <span class="op">+</span></span>
 <span id="cb941-10"><a href="n-parameters.html#cb941-10"></a><span class="st">    </span><span class="kw">scale_x_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">label_number</span>()) <span class="op">+</span></span>
 <span id="cb941-11"><a href="n-parameters.html#cb941-11"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">label_number</span>()) </span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-746-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-745-1.png" width="672"></p>
 <p>This code is the same as the code we used above, except that we have replaced <code>geom_smooth()</code> with <code>geom_line()</code>. Calling <code>fitted()</code> on a model returns the set of fitted values, which we have plotted by hand.</p>
 <p>We can create a formula for the fitted values by placing the median values of the parameters into the model:</p>
 <p><span class="math display">\[ alive\_post_i =  26,524 - 0.9 alive\_pre_i + \epsilon_i\]</span></p>
@@ -503,7 +503,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb942-6"><a href="n-parameters.html#cb942-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Distribution of the Coefficient of `alive_pre`"</span>,</span>
 <span id="cb942-7"><a href="n-parameters.html#cb942-7"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
 <span id="cb942-8"><a href="n-parameters.html#cb942-8"></a>         <span class="dt">x =</span> <span class="st">"Coefficient of `alive_pre`"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-747-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-746-1.png" width="672"></p>
 <!-- DK: Add some interpretation. Need to explain how the uncertainty in beta_1 is connected to the uncertainty we will see in alive_post, for a given difference (not "change") in alive_pre. -->
 <!-- DK: Priority is to add a graphic which shows the "cloud" of possible regression lines, consistent with the posterior for beta_1.  -->
 <!-- DK: Need a smoother transition back to centering. -->
@@ -577,7 +577,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb952-7"><a href="n-parameters.html#cb952-7"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Distribution of Average Male Candidate Days Left`"</span>,</span>
 <span id="cb952-8"><a href="n-parameters.html#cb952-8"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
 <span id="cb952-9"><a href="n-parameters.html#cb952-9"></a>         <span class="dt">x =</span> <span class="st">"Male Days To Live After the Election"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-754-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-753-1.png" width="672"></p>
 <p>The interpretation of this model is the same as we have seen before. There is a true average, across the entire population, of the number of days that male candidates live after the election. We can never know what that true average is. But, it seems highly likely that the true average is somewhere between 10,000 and 10,750 days.</p>
 </div>
 <div id="multiple-variable-regression" class="section level2">
@@ -628,7 +628,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb956-14"><a href="n-parameters.html#cb956-14"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb956-15"><a href="n-parameters.html#cb956-15"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb956-16"><a href="n-parameters.html#cb956-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span>scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-757-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-756-1.png" width="672"></p>
 <p>The graph above displays the alive_post values for males and females. Take a look at both curves. You can clearly see that the two distributions are pretty different; the distribution for males is more spread out than that for females. What this mean? It means men have more precise values for alive_post. A reason for this difference is because there were a greater number of men than women in this data. The more data we have, the more precise we are.</p>
 <p>Let’s now take a look at a posterior distribution for <span class="math inline">\(\beta_2\)</span>, the coefficient of alive_pre.</p>
 <div class="sourceCode" id="cb957"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb957-1"><a href="n-parameters.html#cb957-1"></a>fit_gov_<span class="dv">3</span> <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -690,7 +690,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb961-14"><a href="n-parameters.html#cb961-14"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb961-15"><a href="n-parameters.html#cb961-15"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb961-16"><a href="n-parameters.html#cb961-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span>scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-760-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-759-1.png" width="672"></p>
 <p>From this posterior for female an male intercepts (i. e. alive_post values), we are able to see that male candidates live longer on average than female candidates.</p>
 <!-- how do I plot b2, and b2+b3 - put on same plot  -->
 <div class="sourceCode" id="cb962"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb962-1"><a href="n-parameters.html#cb962-1"></a>fit_gov_<span class="dv">4</span> <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -709,7 +709,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb962-14"><a href="n-parameters.html#cb962-14"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb962-15"><a href="n-parameters.html#cb962-15"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb962-16"><a href="n-parameters.html#cb962-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span>scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-761-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-760-1.png" width="672"></p>
 <p>This posterior distribution shows the avg. slope values for men and women. You can see that men have a steeper slope, while the slop for women is practically 0!</p>
 <p>Our last model will be very similar to the one we just created. However, we are now adding “state”, which will give us 55 different intercepts!</p>
 <p>Here’s the math we will be using:</p>
@@ -805,7 +805,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb966-14"><a href="n-parameters.html#cb966-14"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb966-15"><a href="n-parameters.html#cb966-15"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb966-16"><a href="n-parameters.html#cb966-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span>scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-764-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-763-1.png" width="672"></p>
 <p>The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You acn see here Our knowledge of avg. is always more precise than our knowledge of indivuals</p>
 <!-- DK: Need to modify this to only show one of the more interesting state coefficients. (Although we might show all the state pdfs in the graphic.) This a good place to discuss shrinkage, which is what is happening here. And that is probably enough models. -->
 </div>
@@ -816,7 +816,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-765"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-764"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.4: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -864,7 +864,7 @@ The first column shows the posterior predictions for male from South Dakota, who
 <span id="cb969-14"><a href="n-parameters.html#cb969-14"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb969-15"><a href="n-parameters.html#cb969-15"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb969-16"><a href="n-parameters.html#cb969-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span>scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-767-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-766-1.png" width="672"></p>
 <p>Looking at our posterior above, we can see that the male candidate from Washington is expected to live longer. Ok great, but how much longer?</p>
 <div class="sourceCode" id="cb970"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb970-1"><a href="n-parameters.html#cb970-1"></a>pp <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb970-2"><a href="n-parameters.html#cb970-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">diff=</span> <span class="st">`</span><span class="dt">2</span><span class="st">`</span><span class="op">-</span><span class="st">`</span><span class="dt">1</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -875,7 +875,7 @@ The first column shows the posterior predictions for male from South Dakota, who
 <span id="cb970-7"><a href="n-parameters.html#cb970-7"></a>         <span class="dt">x =</span> <span class="st">"Days"</span>,</span>
 <span id="cb970-8"><a href="n-parameters.html#cb970-8"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
 <span id="cb970-9"><a href="n-parameters.html#cb970-9"></a><span class="st">    </span><span class="kw">theme_linedraw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-768-1.png" width="672">
+<p><img src="book_temp_files/figure-html/unnamed-chunk-767-1.png" width="672">
 In words, we would expect the male candidate from Washington to live longer than the South Dakota male. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 3,000 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. IN fact, there is a 1/3 chance.</p>
 <p>Also, notice that in this distribution there are alive_post values that are negative? Does this make sense? Could a candidate be alive negative days after the election/ The answer is no. However, nothing is wrong with the code. The reason for this is because when we assumed epsilon was normally distributed, we allowed numbers to be negative. This is not that important, so let’s press on.</p>
 </div>
@@ -940,7 +940,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <div class="sourceCode" id="cb976"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb976-1"><a href="n-parameters.html#cb976-1"></a>ch9 <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb976-2"><a href="n-parameters.html#cb976-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-772">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-771">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -1115,7 +1115,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <span id="cb979-2"><a href="n-parameters.html#cb979-2"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb979-3"><a href="n-parameters.html#cb979-3"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-774">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-773">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -1243,7 +1243,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-775"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-774"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 9.5: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -1260,7 +1260,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-776"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-775"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.6: Justice<!--</p>-->
 <!--</div>--></span>
@@ -1268,7 +1268,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-777"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-776"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 9.7: Courage<!--</p>-->
 <!--</div>--></span>
@@ -1280,7 +1280,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-778"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-777"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.8: Temperance<!--</p>-->
 <!--</div>--></span>
