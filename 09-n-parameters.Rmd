@@ -656,7 +656,7 @@ fit_gov_5 %>%
     scale_y_continuous(labels=scales::percent_format())
 ```
 
-The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You acn see here Our knowledge of avg. is always more precise than our knowledge of indivuals 
+The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You can see here our knowledge of avg. is always more precise than our knowledge of individuals. 
 
 
 <!-- DK: Need to modify this to only show one of the more interesting state coefficients. (Although we might show all the state pdfs in the graphic.) This a good place to discuss shrinkage, which is what is happening here. And that is probably enough models. -->
@@ -862,8 +862,19 @@ knitr::include_graphics("other/images/Justice.jpg")
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
-For the s
-Let's start with a more simple model: the effect of voting in the 2006 election and sex. 
+Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let's model `primary_06`, which represents whether a citizen voted or not, against sex to see if there is a connection. 
+
+#### Voting and Sex
+
+Let's start with a simple model: the effect of voting in the 2006 election and sex. First, let's look at the results of `primary_06` after grouping by `sex` to see the number of females and males who did or did not vote. Recall that a value of 1 for `primary_06` means that the citizen *did* vote, while a value of 0 means that they *did not*. 
+
+```{r}
+ch9 %>% 
+  group_by(sex) %>% 
+  count(primary_06) 
+```
+
+Eyeballing the figures, you may have noticed that slightly more male respondents voted than female respondents. Let's investigate this using `stan_glm`.
 
 ```{r, cache=TRUE}
 model_1 <- stan_glm(data = ch9, 
@@ -876,7 +887,12 @@ model_1 <- stan_glm(data = ch9,
 print(model_1, digits = 3)
 ```
 
-Looking at the relationship between voting in the 2006 primary and age of the respondent. 
+Here, the (Intercept) variable represents our "baseline for comparison" female group of voters. The median value is the percentage of the female group that voted in the 2006 election, as the average of 1 (voted) and 0 (didn't vote) gives us the percentage of the group that *did* vote. That is to say-- about 31% of the female group voted in the primary election. The sexMale term corresponds to the *offset* in intercept for the male respondents relative to the female respondents. In other words, the female respondents had an average intercept of .31 = 31% while the male respondent intercept of .31 + .012 = .322 = 32% voting rate. Therefore, male participants were *slightly more* likely to vote in the 2006 primary election, as compared to the female participants. 
+
+#### Voting and Age
+
+Now that we've seen the relationship between sex and voting, let's take a look at age. 
+
 
 ```{r, cache=TRUE}
 model_2 <- stan_glm(data = ch9, 
@@ -888,6 +904,8 @@ model_2 <- stan_glm(data = ch9,
 ```{r}
 print(model_2, digits = 3)
 ```
+
+#### Voting and Treatment
 
 Looking at the relationship between primary voting and treatment.
 
@@ -902,7 +920,7 @@ model_3 <- stan_glm(data = ch9,
 print(model_3, digits = 3)
 ```
 
-
+#### Voting & (Sex + Solo + Treatment)
 Looking at the relationship between primary voting, sex, living alone, and treatment.
 
 ```{r, cache=TRUE}
