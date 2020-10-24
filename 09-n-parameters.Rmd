@@ -23,8 +23,8 @@ Load packages:
 ```{r, message=FALSE}
 library(PPBDS.data)
 library(skimr)
-library(rstanarm)
 library(tidyverse)
+library(rstanarm)
 ```
 
 <!-- DK: Perhaps we need more detail in this EDA?  Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Or is such a discussion too advanced? -->
@@ -656,7 +656,7 @@ fit_gov_5 %>%
     scale_y_continuous(labels=scales::percent_format())
 ```
 
-The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You acn see here Our knowledge of avg. is always more precise than our knowledge of indivuals 
+The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You can see here our knowledge of avg. is always more precise than our knowledge of individuals. 
 
 
 <!-- DK: Need to modify this to only show one of the more interesting state coefficients. (Although we might show all the state pdfs in the graphic.) This a good place to discuss shrinkage, which is what is happening here. And that is probably enough models. -->
@@ -737,16 +737,6 @@ Also, notice that in this distribution there are alive_post values that are nega
 <!-- Use print(fit_obj, digits = 4) if you need to see more digits. -->
 
 
-<!-- Models to use-->
-
-
-<!-- primary_06 ~ sex - 1 -->
-<!-- primary_06 ~ age -->
-<!-- primary_06 ~ treatment - 1 (plot all five posteriors together) -->
-<!-- primary_06 ~ sex + solo + treatment -->
-<!-- primary_06 ~ sex + solo + treatment + solo * treatment -->
-
-
 
 Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?    
 
@@ -759,8 +749,6 @@ glimpse(shaming)
 ```
 
 Here we see that `glimpse()` gives us a look at the raw data contained within the `shaming` data set. At the very top of the output, we can see the number of rows and columns, or observations and variables respectively. We see that there are 344,084 observations, with each row corresponding to a unique respondent. The "Columns: 10" tells us that there are 10 variables within this data set. Below this, we see a cutoff version of the entire data set that has the variables on the left as rows and the observations as a list separated by commas, as compared to the tibble output that presents with the variables as columns and the observations as rows running horizontally.
-
-<!-- It may be worth mentioning that general_04 is always "yes", unlike all the other voting history variables which have values of "yes" and "no". Why is that? I *think* that this is caused by their sampling plan. They found all the people who voted in the 2004 general election. Then, the authors found their history. As we would expect, those people had sometimes voted in the past and sometime not. Then, the authors sent the mailing. The key dependent variable, primary_06, is coding 0/1, since that makes doing the statistics easier. -->
 
 From this summary, we get an idea of some of the variables we will be working with. Variables of particular interest to us are `sex`, `hh_size`, and `primary_06`. The variable `hh_size` tells us the size of the respondent's household, `sex` tells us the sex of the respondent, and `primary_06` tells us whether or not the respondent voted in the 2006 Primary election. 
 
@@ -831,7 +819,7 @@ shaming %>%
   skim()
 ```
 
-By running the `skim()` command, we get a summary of the data set as a whole, as well as the types of variables and individual variable summaries. At the top we see the number of columns and rows within the selected data set. Below this we are given a list with the different types of variables, or columns, and how often they appear within the data we are skimming. Following this, the variables are then separated by their column type, and we are given individual summaries based on the type. 
+Running the `skim()` command gives us a summary of the data set as a whole, as well as the types of variables and individual variable summaries. At the top, we see the number of columns and rows within the selected data set. Below this we are given a list with the different types of variables, or columns, and how often they appear within the data we are skimming. The variables are then separated by their column type, and we are given individual summaries based on the type. 
 
 <!-- 2) `primary_06` as a function of `treatment` and `solo` and of their interaction. We will build up this model step-by-step, very similar to how we explored the effect of treatment in chapter 8. But we go deeper because  we are learning about interactions. Key thing is to go through all the themes.Rmd issues, at least until prediction. Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 4 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
 
@@ -842,8 +830,6 @@ By running the `skim()` command, we get a summary of the data set as a whole, as
 <!-- 5) I don't think we bother with a scenario which requires a bootstrap. Or should we?  -->
 
 <!-- 6) Prediction. How do we use our model to make predictions? Bring the discussion back to the way that we opened the chapter with a problem. -->
-
-
 
 Having created models with one parameter in Chapter \@ref(one-parameter) and two parameters in Chapter \@ref(two-parameters), you are now ready to make the jump to $N$ parameters.  The more parameters we include in our models, the more flexible they can become. But we must be careful of *overfitting*, of making models which are inaccurate because they don't have enough data to accurately estimate those parameters. The tension between overfitting and underfitting is central to the practice of data science.
 
@@ -866,8 +852,9 @@ Does this mean our data is unhelpful? Of course not! With four treatments (and t
 
 That being said, the map from our question to our data is almost never perfect. In data science, we often have to look at our data, understand its limitations, and try our best to make inferences that help our cause.
 
-
 ### Justice and Courage
+
+<!-- MF: What should the Preceptor tables look like with these models? Should each model have its own Preceptor Table? -->
 
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Justice"}
 knitr::include_graphics("other/images/Justice.jpg")
@@ -877,6 +864,136 @@ knitr::include_graphics("other/images/Justice.jpg")
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
+Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let's model `primary_06`, which represents whether a citizen voted or not, against sex to see if there is a connection. 
+
+#### Voting and Sex
+
+<!-- MF: I used family = gaussian as I noted it in the lower section drafts, but can't find the purpose online. Also, stan_glm is taking a very long time to run. Is this a concern? -->
+
+Let's start with a simple model: the effect of voting in the 2006 election and sex. First, let's look at the results of `primary_06` after grouping by `sex` to see the number of females and males who did or did not vote. Recall that a value of 1 for `primary_06` means that the citizen *did* vote, while a value of 0 means that they *did not*. 
+
+```{r}
+ch9 %>% 
+  group_by(sex) %>% 
+  count(primary_06) 
+```
+
+Eyeballing the figures, you may have noticed that slightly more male respondents voted than female respondents. Let's investigate this using `stan_glm`.
+
+```{r, cache=TRUE}
+model_1 <- stan_glm(data = ch9, 
+                 formula = primary_06 ~ sex, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_1, digits = 3)
+```
+
+Here, the (Intercept) variable represents our "baseline for comparison" female group of voters. The median value is the percentage of the female group that voted in the 2006 election, as the average of 1 (voted) and 0 (didn't vote) gives us the percentage of the group that *did* vote. That is to say-- about 31% of the female group voted in the primary election. The sexMale term corresponds to the *offset* in intercept for the male respondents relative to the female respondents. In other words, the female respondents had an average intercept of .31 = 31% while the male respondent intercept of .31 + .012 = .322 = 32% voting rate. Therefore, male participants were *slightly more* likely to vote in the 2006 primary election, as compared to the female participants. 
+
+#### Voting and Age
+
+Now that we've seen the relationship between sex and voting, let's take a look at age. Begin by grouping our observations by `age` and counting by `primary_06`, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category. 
+
+```{r}
+age <- ch9 %>% 
+  group_by(age) %>% 
+  count(primary_06) 
+
+age
+```
+
+To explore this relationship visually, let's create a graph. We are coercing `primary_06` into a character variable as it more closely represents "yes" or "no" as opposed to a numerical value. 
+
+```{r}
+age %>% 
+  mutate(primary_06 = as.character(primary_06)) %>% 
+  ggplot(aes(x = age, y = n, color = primary_06)) +
+  geom_point() +
+  labs(
+    title = "Relationship Between Age and Voting",
+    subtitle = "In the 2006 Primary Elections",
+    x = "Age",
+    y = "Count"
+  )
+```
+
+There are some interesting takeaways here. 
+- First, in almost every age bracket (other than above 90), the majority participants did *not* vote. 
+- The spike between ages 40 and 60 illustrates that most participants exist in this age bracket. 
+- The differences between voters and non-voters narrows greatly after age 60. 
+
+Let's look at the results of our regression. 
+
+<!-- MF: Age isn't showing unique values (just one intercept and then `age`). Is that a problem? -->
+
+```{r, cache=TRUE}
+model_2 <- stan_glm(data = ch9, 
+                 formula = primary_06 ~ age, 
+                 refresh = 0)
+```
+
+```{r}
+print(model_2, digits = 3)
+```
+
+#### Voting and Treatment
+
+Looking at the relationship between primary voting and treatment.
+
+```{r, cache=TRUE}
+model_3 <- stan_glm(data = ch9, 
+                 formula = primary_06 ~ treatment - 1, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_3, digits = 3)
+```
+
+Recall that the four treatments varied in the amount of social shaming involved. While each sent the message, "DO YOUR CIVIC DUTY - VOTE!", there were differences. Briefly:
+
+- The first treatment, Civic Duty, also read, “Remember your rights and responsibilities as a citizen. Remember to vote." (Least pressure)
+- Hawthorne told the voters that they were being studied and their voting behavior would be examined through public records. (Slighly more pressure)
+- Self included the recent voting record of each member of the household, placing the word "Voted" next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. The households were also told, “we intend to mail an updated chart" with the voting record of the household members after the 2006 primary. (Moderate pressure)
+- Neighbors provides the household members' voting records, as well as the voting records of those who live nearby. This mailing also told recipients, "we intend to mail an updated chart" of who voted in the 2006 election to the entire neighborhood. (Most pressure)
+
+The Control group had the least active voters with a median of .297 = 29.7% of participants voting. The Civic Duty treatment (least pressure) had slighly more at .314 = 31.4% of participants voting. The Hawthorne group (slightly more pressure) increased upon Civic Duty for a total of .322 = 32.2% voting. The Self group (moderate pressure) increased even still, with .345 = 34.5% of the group voting. Finally, the Neighbors group (with the most social pressure) yielded the highest voting rate of .378 = 37.8%. 
+
+This means that, as we hoped, more social pressure = higher voting turnout. That being said, the percent differences were not large. The biggest leap came from the Neighbors group, suggesting that the pressure of your vote being publicized to your community increases turnout more than a simple encouragement. 
+
+#### Voting & (Sex + Solo + Treatment)
+Looking at the relationship between primary voting, sex, living alone, and treatment.
+
+```{r, cache=TRUE}
+model_4 <- stan_glm(data = ch9, 
+                 formula = primary_06 ~ sex + solo + treatment, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_4, digits = 3)
+```
+
+
+INTERACTION MODEL with all of the above plus solo and treatment 
+
+```{r, cache=TRUE}
+model_5 <- stan_glm(data = ch9, 
+                 formula = primary_06 ~ sex + solo + treatment + solo * treatment, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_5, digits = 3)
+```
+
+<!-- MF: As it stands, I have all five models in this section. Should the interaction model maybe be in a later, separate section? -->
 
 ### Temperance
 
@@ -884,6 +1001,15 @@ knitr::include_graphics("other/images/Courage.jpg")
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
+Finally, let's remember the virtue of Temperance. The gist of temperance is: be humble with our inferences, as our inferences are always, certainly, and unfortunately not going to match the real world. How does this apply to our shaming scenario?
+
+Prediction uncertainty is the main culprit. No matter how hard we try, *we cannot predict the future*. Though we now have conclusions about how shaming impacted voters in the 2006 primary elections, we do not have the confidence to say that what worked or didn't work then would work now. 
+
+For instance, perhaps the impact of your neighbors knowing your voting history is greater in the midst of a pandemic, where you may be locked inside with few interactions outside of your immediate proximity. Perhaps the opposite is true. These *unknown unknowns* cannot be accounted for in our models. We cannot predict a pandemic, nor can we predict how this will change the way that people vote or respond to flyers. 
+
+There is also the issue of representitiveness. Do the voters of the 2006 primary election (who have already demonstrated a willingness to vote in the 2004 primary election) truly represent the people voting in **our** gubernatorial election? 
+
+These complications are why we must make inferences with a grain of salt. That is not to say that all data science is unhelpful! On the contrary, acknowledging our deficits will only make our inferences (and the actions we take because of them) stronger. 
 
 ## Causal Effects of `treament`
 
@@ -964,5 +1090,4 @@ What problems do we face? All the things that make modeling difficult. Why is th
 
 <!-- So, just what will we use? rstanarm(). If so (and if we have not introduced it earlier), we can begin with seeing how it is similar to lm() and then expand. This means that, in one paramter chapter, we should be doing lm( ~ 1). In two parameter, lm( ~ treatment) --- if treatment is zero one --- or, perhaps better, lm( ~ -1 + treatment) if treatment is a factor/character with two levels. We might also have introduced  -->
 
-<!-- MF: Is basic structure for this chapter meant to be [1] life span section, [2] shame section, and [3] interactions? -->
 
