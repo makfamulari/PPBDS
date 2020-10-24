@@ -931,7 +931,7 @@ Let's look at the results of our regression.
 
 ```{r, cache=TRUE}
 model_2 <- stan_glm(data = ch9, 
-                 formula = primary_06 ~ age, 
+                 formula = primary_06 ~ age - 1, 
                  refresh = 0)
 ```
 
@@ -953,6 +953,17 @@ model_3 <- stan_glm(data = ch9,
 ```{r}
 print(model_3, digits = 3)
 ```
+
+Recall that the four treatments varied in the amount of social shaming involved. While each sent the message, "DO YOUR CIVIC DUTY - VOTE!", there were differences. Briefly:
+
+- The first treatment, Civic Duty, also read, “Remember your rights and responsibilities as a citizen. Remember to vote." (Least pressure)
+- Hawthorne told the voters that they were being studied and their voting behavior would be examined through public records. (Slighly more pressure)
+- Self included the recent voting record of each member of the household, placing the word "Voted" next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. The households were also told, “we intend to mail an updated chart" with the voting record of the household members after the 2006 primary. (Moderate pressure)
+- Neighbors provides the household members' voting records, as well as the voting records of those who live nearby. This mailing also told recipients, "we intend to mail an updated chart" of who voted in the 2006 election to the entire neighborhood. (Most pressure)
+
+The Control group had the least active voters, with only .297 = 29.7% of participants voting. The Civic Duty treatment (least pressure) had slighly more at .314 = 31.4% of participants voting. The Hawthorne group (slightly more pressure) increased upon Civic Duty for a total of .322 = 32.2% voting. The Self group (moderate pressure) increased even still, with .345 = 34.5% of the group voting. Finally, the Neighbors group (with the most social pressure) yielded the highest voting rate of .378 = 37.8%. 
+
+This means that, as we hoped, more social pressure = higher voting turnout. That being said, the percent differences were not large. The biggest leap came from the Neighbors group, suggesting that the pressure of your vote being publicized to your community increases turnout more than a simple encouragement. 
 
 #### Voting & (Sex + Solo + Treatment)
 Looking at the relationship between primary voting, sex, living alone, and treatment.
