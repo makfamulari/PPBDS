@@ -759,6 +759,7 @@ It is also important to identify the dependent variable and its meaning. In this
 <!-- HV: Should I include discussion of the left-hand variable (treatment?) here? Or wait until we move into the regressions? -->
 
 The voting results from other years, such as 2002 and 2004, are of less interest to us and can be removed from the abbreviated data set. In addition to removing `general_04`, `primary_02`, `general_02`, or `primary_04`, we also will not be taking particular interest in `birth_year`, or `no_of_names` within this chapter.
+
 <!-- HV: should I explain why we are not using any of these variables? why they are not of great use to us? -->
 
 By narrowing down the set of variables we are looking at and investigating, we will find more meaningful relationships among them. However, we have not yet discussed the most important variable of them all: `treatment`. The `treatment` variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let's start off by taking a broad look at the different treatments.
@@ -779,19 +780,21 @@ In the third treatment, Self, the mailing includes the recent voting record of e
 
 The fourth treatment, Neighbors, provides the household members' voting records, as well as the voting records of those who live nearby. This mailing also told recipients, "we intend to mail an updated chart" of who voted in the 2006 election to the entire neighborhood.
 
-For now, let's focus on a subset of the data.
+For now, let's focus on a subset of the data. We will sample just 10,000 rows because otherwise `stan_glm()` takes an annoyingly large amount of time to work. Nothing substantive changes.
 
 ```{r}
-ch9 <- shaming %>% 
+set.seed(9)
+ch9_sham <- shaming %>% 
   mutate(solo = ifelse(hh_size == 1, TRUE, FALSE)) %>% 
   mutate(age = 2006 - birth_year) %>% 
-  select(primary_06, treatment, solo, sex, age)
+  select(primary_06, treatment, solo, sex, age) %>% 
+  sample_n(10000, replace = FALSE)
 ```
 
 We create the variable `solo`, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not.
 
 ```{r}
-ch9 %>% 
+ch9_sham %>% 
   skim()
 ```
 
@@ -805,7 +808,7 @@ To get a better sense of some respondents' information, let's use `sample_n()` t
 <!-- HV: Does this belong here? -->
 
 ```{r}
-ch9 %>% 
+ch9_sham %>% 
   sample_n(10)
 ```
 
@@ -854,7 +857,7 @@ That being said, the map from our question to our data is almost never perfect. 
 
 ### Justice and Courage
 
-<!-- MF: What should the Preceptor tables look like with these models? Should each model have its own Preceptor Table? -->
+<!-- MF: What should the Preceptor tables look like with these models? Like chapter 3. Should each model have its own Preceptor Table? No! Just one preceptor table at the start, with 5 columns under Y, and 4 covariates, where one is treatment assigned. -->
 
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Justice"}
 knitr::include_graphics("other/images/Justice.jpg")
@@ -868,12 +871,12 @@ Because we will be going through a series of models in this chapter, it is usefu
 
 #### Voting and Sex
 
-<!-- MF: I used family = gaussian as I noted it in the lower section drafts, but can't find the purpose online. Also, stan_glm is taking a very long time to run. Is this a concern? -->
+<!-- MF: I used family = gaussian as I noted it in the lower section drafts, but can't find the purpose online. Also, stan_glm is taking a very long time to run. Is this a concern? Never mention gaussian or the family argument. -->
 
 Let's start with a simple model: the effect of voting in the 2006 election and sex. First, let's look at the results of `primary_06` after grouping by `sex` to see the number of females and males who did or did not vote. Recall that a value of 1 for `primary_06` means that the citizen *did* vote, while a value of 0 means that they *did not*. 
 
 ```{r}
-ch9 %>% 
+ch9_sham %>% 
   group_by(sex) %>% 
   count(primary_06) 
 ```
@@ -881,7 +884,7 @@ ch9 %>%
 Eyeballing the figures, you may have noticed that slightly more male respondents voted than female respondents. Let's investigate this using `stan_glm`.
 
 ```{r, cache=TRUE}
-model_1 <- stan_glm(data = ch9, 
+model_1 <- stan_glm(data = ch9_sham, 
                  formula = primary_06 ~ sex, 
                  family = gaussian(), 
                  refresh = 0)
@@ -898,7 +901,7 @@ Here, the (Intercept) variable represents our "baseline for comparison" female g
 Now that we've seen the relationship between sex and voting, let's take a look at age. Begin by grouping our observations by `age` and counting by `primary_06`, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category. 
 
 ```{r}
-age <- ch9 %>% 
+age <- ch9_sham %>% 
   group_by(age) %>% 
   count(primary_06) 
 
@@ -927,10 +930,10 @@ There are some interesting takeaways here.
 
 Let's look at the results of our regression. 
 
-<!-- MF: Age isn't showing unique values (just one intercept and then `age`). Is that a problem? -->
+<!-- MF: Age isn't showing unique values (just one intercept and then `age`). Is that a problem? No. Same explanation as model above. -->
 
 ```{r, cache=TRUE}
-model_2 <- stan_glm(data = ch9, 
+model_2 <- stan_glm(data = ch9_sham, 
                  formula = primary_06 ~ age, 
                  refresh = 0)
 ```
@@ -944,7 +947,7 @@ print(model_2, digits = 3)
 Looking at the relationship between primary voting and treatment.
 
 ```{r, cache=TRUE}
-model_3 <- stan_glm(data = ch9, 
+model_3 <- stan_glm(data = ch9_sham, 
                  formula = primary_06 ~ treatment - 1, 
                  family = gaussian(), 
                  refresh = 0)
@@ -969,7 +972,7 @@ This means that, as we hoped, more social pressure = higher voting turnout. That
 Looking at the relationship between primary voting, sex, living alone, and treatment.
 
 ```{r, cache=TRUE}
-model_4 <- stan_glm(data = ch9, 
+model_4 <- stan_glm(data = ch9_sham, 
                  formula = primary_06 ~ sex + solo + treatment, 
                  family = gaussian(), 
                  refresh = 0)
@@ -983,7 +986,7 @@ print(model_4, digits = 3)
 INTERACTION MODEL with all of the above plus solo and treatment 
 
 ```{r, cache=TRUE}
-model_5 <- stan_glm(data = ch9, 
+model_5 <- stan_glm(data = ch9_sham, 
                  formula = primary_06 ~ sex + solo + treatment + solo * treatment, 
                  family = gaussian(), 
                  refresh = 0)
@@ -993,7 +996,7 @@ model_5 <- stan_glm(data = ch9,
 print(model_5, digits = 3)
 ```
 
-<!-- MF: As it stands, I have all five models in this section. Should the interaction model maybe be in a later, separate section? -->
+<!-- MF: As it stands, I have all five models in this section. Should the interaction model maybe be in a later, separate section? No. -->
 
 ### Temperance
 
