@@ -737,16 +737,6 @@ Also, notice that in this distribution there are alive_post values that are nega
 <!-- Use print(fit_obj, digits = 4) if you need to see more digits. -->
 
 
-<!-- Models to use-->
-
-
-<!-- primary_06 ~ sex - 1 -->
-<!-- primary_06 ~ age -->
-<!-- primary_06 ~ treatment - 1 (plot all five posteriors together) -->
-<!-- primary_06 ~ sex + solo + treatment -->
-<!-- primary_06 ~ sex + solo + treatment + solo * treatment -->
-
-
 
 Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?    
 
@@ -759,8 +749,6 @@ glimpse(shaming)
 ```
 
 Here we see that `glimpse()` gives us a look at the raw data contained within the `shaming` data set. At the very top of the output, we can see the number of rows and columns, or observations and variables respectively. We see that there are 344,084 observations, with each row corresponding to a unique respondent. The "Columns: 10" tells us that there are 10 variables within this data set. Below this, we see a cutoff version of the entire data set that has the variables on the left as rows and the observations as a list separated by commas, as compared to the tibble output that presents with the variables as columns and the observations as rows running horizontally.
-
-<!-- It may be worth mentioning that general_04 is always "yes", unlike all the other voting history variables which have values of "yes" and "no". Why is that? I *think* that this is caused by their sampling plan. They found all the people who voted in the 2004 general election. Then, the authors found their history. As we would expect, those people had sometimes voted in the past and sometime not. Then, the authors sent the mailing. The key dependent variable, primary_06, is coding 0/1, since that makes doing the statistics easier. -->
 
 From this summary, we get an idea of some of the variables we will be working with. Variables of particular interest to us are `sex`, `hh_size`, and `primary_06`. The variable `hh_size` tells us the size of the respondent's household, `sex` tells us the sex of the respondent, and `primary_06` tells us whether or not the respondent voted in the 2006 Primary election. 
 
@@ -831,7 +819,7 @@ shaming %>%
   skim()
 ```
 
-By running the `skim()` command, we get a summary of the data set as a whole, as well as the types of variables and individual variable summaries. At the top we see the number of columns and rows within the selected data set. Below this we are given a list with the different types of variables, or columns, and how often they appear within the data we are skimming. Following this, the variables are then separated by their column type, and we are given individual summaries based on the type. 
+Running the `skim()` command gives us a summary of the data set as a whole, as well as the types of variables and individual variable summaries. At the top, we see the number of columns and rows within the selected data set. Below this we are given a list with the different types of variables, or columns, and how often they appear within the data we are skimming. The variables are then separated by their column type, and we are given individual summaries based on the type. 
 
 <!-- 2) `primary_06` as a function of `treatment` and `solo` and of their interaction. We will build up this model step-by-step, very similar to how we explored the effect of treatment in chapter 8. But we go deeper because  we are learning about interactions. Key thing is to go through all the themes.Rmd issues, at least until prediction. Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 4 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
 
@@ -842,8 +830,6 @@ By running the `skim()` command, we get a summary of the data set as a whole, as
 <!-- 5) I don't think we bother with a scenario which requires a bootstrap. Or should we?  -->
 
 <!-- 6) Prediction. How do we use our model to make predictions? Bring the discussion back to the way that we opened the chapter with a problem. -->
-
-
 
 Having created models with one parameter in Chapter \@ref(one-parameter) and two parameters in Chapter \@ref(two-parameters), you are now ready to make the jump to $N$ parameters.  The more parameters we include in our models, the more flexible they can become. But we must be careful of *overfitting*, of making models which are inaccurate because they don't have enough data to accurately estimate those parameters. The tension between overfitting and underfitting is central to the practice of data science.
 
@@ -875,6 +861,74 @@ knitr::include_graphics("other/images/Justice.jpg")
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Courage"}
 knitr::include_graphics("other/images/Courage.jpg")
 ```
+
+Let's start with a more simple model: the effect of voting in the 2006 election and sex. 
+
+```{r, cache=TRUE}
+model_1 <- stan_glm(data = shaming, 
+                 formula = primary_06 ~ treatment - 1, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_1, digits = 3)
+```
+
+Looking at the relationship between voting in the 2006 primary and age of the respondent. 
+
+```{r, cache=TRUE}
+model_2 <- stan_glm(data = shaming, 
+                 formula = primary_06 ~ age, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_2, digits = 3)
+```
+
+Looking at the relationship between primary voting and treatment.
+
+```{r, cache=TRUE}
+model_3 <- stan_glm(data = shaming, 
+                 formula = primary_06 ~ treatment - 1, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_3, digits = 3)
+```
+
+
+Looking at the relationship between primary voting, sex, living alone, and treatment.
+
+```{r, cache=TRUE}
+model_4 <- stan_glm(data = shaming, 
+                 formula = primary_06 ~ sex + solo + treatment, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_4, digits = 3)
+```
+
+
+INTERACTION MODEL with all of the above plus solo and treatment 
+
+```{r, cache=TRUE}
+model_5 <- stan_glm(data = shaming, 
+                 formula = primary_06 ~ sex + solo + treatment + solo * treatment, 
+                 family = gaussian(), 
+                 refresh = 0)
+```
+
+```{r}
+print(model_5, digits = 3)
+```
+
 
 
 ### Temperance
