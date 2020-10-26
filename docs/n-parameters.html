@@ -176,7 +176,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <html><body><div id="n-parameters" class="section level1">
 <h1>
 <span class="header-section-number">Chapter 9</span> N Parameters</h1>
-<p><em>This chapter is a draft.</em> Come back in a few weeks for a better version.</p>
 <p>Having created models with one parameter in Chapter <a href="one-parameter.html#one-parameter">6</a>, two parameters in Chapter <a href="two-parameters.html#two-parameters">7</a> and three parameters in Chapter <a href="three-parameters.html#three-parameters">8</a>, you are now ready to make the jump to <span class="math inline">\(N\)</span> parameters.</p>
 <p>In this chapter, we will consider models with multiple parameters and the complexities that arise therefrom.</p>
 <!-- DK: Add some more. What are the key lessons? What do we carry over from previous chapters? What is new? Hit the data science research cycle. -->
@@ -187,8 +186,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Load packages:</p>
 <div class="sourceCode" id="cb930"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb930-1"><a href="n-parameters.html#cb930-1"></a><span class="kw">library</span>(PPBDS.data)</span>
 <span id="cb930-2"><a href="n-parameters.html#cb930-2"></a><span class="kw">library</span>(skimr)</span>
-<span id="cb930-3"><a href="n-parameters.html#cb930-3"></a><span class="kw">library</span>(rstanarm)</span>
-<span id="cb930-4"><a href="n-parameters.html#cb930-4"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
+<span id="cb930-3"><a href="n-parameters.html#cb930-3"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb930-4"><a href="n-parameters.html#cb930-4"></a><span class="kw">library</span>(rstanarm)</span></code></pre></div>
 <!-- DK: Perhaps we need more detail in this EDA?  Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Or is such a discussion too advanced? -->
 <!-- DK: Don't keep around variables other than the ones we end up using. -->
 <!-- DK: Provide proper citation to Barfort et al. -->
@@ -806,7 +805,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb966-15"><a href="n-parameters.html#cb966-15"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb966-16"><a href="n-parameters.html#cb966-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span>scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-763-1.png" width="672"></p>
-<p>The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You acn see here Our knowledge of avg. is always more precise than our knowledge of indivuals</p>
+<p>The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You can see here our knowledge of avg. is always more precise than our knowledge of individuals.</p>
 <!-- DK: Need to modify this to only show one of the more interesting state coefficients. (Although we might show all the state pdfs in the graphic.) This a good place to discuss shrinkage, which is what is happening here. And that is probably enough models. -->
 </div>
 <div id="temperance" class="section level2">
@@ -866,6 +865,7 @@ The first column shows the posterior predictions for male from South Dakota, who
 <span id="cb969-16"><a href="n-parameters.html#cb969-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span>scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-766-1.png" width="672"></p>
 <p>Looking at our posterior above, we can see that the male candidate from Washington is expected to live longer. Ok great, but how much longer?</p>
+<p><em>How do the alive_post values vary for two male individuals, from South Dakota and Washington, who both have the same pre_alive values?</em></p>
 <div class="sourceCode" id="cb970"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb970-1"><a href="n-parameters.html#cb970-1"></a>pp <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb970-2"><a href="n-parameters.html#cb970-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">diff=</span> <span class="st">`</span><span class="dt">2</span><span class="st">`</span><span class="op">-</span><span class="st">`</span><span class="dt">1</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb970-3"><a href="n-parameters.html#cb970-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(diff)) <span class="op">+</span></span>
@@ -878,22 +878,74 @@ The first column shows the posterior predictions for male from South Dakota, who
 <p><img src="book_temp_files/figure-html/unnamed-chunk-767-1.png" width="672">
 In words, we would expect the male candidate from Washington to live longer than the South Dakota male. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 3,000 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. IN fact, there is a 1/3 chance.</p>
 <p>Also, notice that in this distribution there are alive_post values that are negative? Does this make sense? Could a candidate be alive negative days after the election/ The answer is no. However, nothing is wrong with the code. The reason for this is because when we assumed epsilon was normally distributed, we allowed numbers to be negative. This is not that important, so let’s press on.</p>
+<p>First, we create a tibble with the desired input for our model. In our case the tibble has a variable named “sex” which contains ten observations all with the same value “Male”. Next, we’ll use the posterior_predict() function to get some simulation results. posterior_predict() takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, we are using the fit_gov_5 model and the tibble is the one we just created.</p>
+<div class="sourceCode" id="cb971"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb971-1"><a href="n-parameters.html#cb971-1"></a>new_obs &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">sex =</span> <span class="kw">c</span>(<span class="st">"Male"</span>, <span class="st">"Male"</span>),</span>
+<span id="cb971-2"><a href="n-parameters.html#cb971-2"></a>       <span class="dt">state =</span> <span class="kw">c</span>(<span class="st">"South Dakota"</span>, <span class="st">"Washington"</span>),<span class="dt">alive_pre =</span> <span class="dv">10</span><span class="op">*</span><span class="dv">365</span>)</span>
+<span id="cb971-3"><a href="n-parameters.html#cb971-3"></a></span>
+<span id="cb971-4"><a href="n-parameters.html#cb971-4"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_gov_<span class="dv">5</span>, <span class="dt">newdata =</span> new_obs) <span class="op">%&gt;%</span></span>
+<span id="cb971-5"><a href="n-parameters.html#cb971-5"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb971-6"><a href="n-parameters.html#cb971-6"></a><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
+<span id="cb971-7"><a href="n-parameters.html#cb971-7"></a>  </span>
+<span id="cb971-8"><a href="n-parameters.html#cb971-8"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 2
+##       `1`    `2`
+##     &lt;dbl&gt;  &lt;dbl&gt;
+##  1  4272. 11804.
+##  2  1252. 13982.
+##  3  5757.  1168.
+##  4  2738.  8946.
+##  5  6923.  4746.
+##  6  5560.  9958.
+##  7  2582. 12381.
+##  8  -346.  7539.
+##  9 -1205.  9820.
+## 10  7350.  2512.</code></pre>
+<p>If you look above, you will see that we have 2 columns (one for each person).
+The first column shows the posterior predictions for male from South Dakota, whose age is 10x the avg. of all candidates. The second column shows the posterior predictions for male from Washington, whose age is 10x the avg. of all candidates.</p>
+<p>Now let’s plot the individual posteriors.</p>
+<div class="sourceCode" id="cb973"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb973-1"><a href="n-parameters.html#cb973-1"></a>fit_gov_<span class="dv">5</span> <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb973-2"><a href="n-parameters.html#cb973-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb973-3"><a href="n-parameters.html#cb973-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Washington_male =</span> <span class="st">`</span><span class="dt">(Intercept)</span><span class="st">`</span> <span class="op">+</span><span class="st"> </span><span class="fl">2739.1</span> <span class="op">+</span><span class="st"> </span>sexMale) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb973-4"><a href="n-parameters.html#cb973-4"></a><span class="st">  </span><span class="kw">mutate</span> (<span class="dt">SD_male =</span> <span class="st">`</span><span class="dt">(Intercept)</span><span class="st">`</span><span class="op">-</span><span class="fl">1842.9</span> <span class="op">+</span>sexMale) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb973-5"><a href="n-parameters.html#cb973-5"></a><span class="st">  </span><span class="kw">select</span>(Washington_male, SD_male) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb973-6"><a href="n-parameters.html#cb973-6"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> Washington_male<span class="op">:</span>SD_male, </span>
+<span id="cb973-7"><a href="n-parameters.html#cb973-7"></a>               <span class="dt">names_to =</span> <span class="st">"parameters"</span>,</span>
+<span id="cb973-8"><a href="n-parameters.html#cb973-8"></a>               <span class="dt">values_to =</span> <span class="st">"days"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb973-9"><a href="n-parameters.html#cb973-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">color =</span> parameters)) <span class="op">+</span></span>
+<span id="cb973-10"><a href="n-parameters.html#cb973-10"></a><span class="st">    </span><span class="kw">geom_density</span>() <span class="op">+</span></span>
+<span id="cb973-11"><a href="n-parameters.html#cb973-11"></a><span class="st">     </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>,</span>
+<span id="cb973-12"><a href="n-parameters.html#cb973-12"></a>         <span class="dt">subtitle =</span> <span class="st">"for men from Washington and South Dakota"</span>,</span>
+<span id="cb973-13"><a href="n-parameters.html#cb973-13"></a>         <span class="dt">x =</span> <span class="st">"Average Days Lived Post Election"</span>,</span>
+<span id="cb973-14"><a href="n-parameters.html#cb973-14"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb973-15"><a href="n-parameters.html#cb973-15"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb973-16"><a href="n-parameters.html#cb973-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span>scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-769-1.png" width="672"></p>
+<p>Looking at our posterior above, we can see that the male candidate from Washington is expected to live longer. Ok great, but how much longer?</p>
+<div class="sourceCode" id="cb974"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb974-1"><a href="n-parameters.html#cb974-1"></a>pp <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb974-2"><a href="n-parameters.html#cb974-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">diff=</span> <span class="st">`</span><span class="dt">2</span><span class="st">`</span><span class="op">-</span><span class="st">`</span><span class="dt">1</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb974-3"><a href="n-parameters.html#cb974-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(diff)) <span class="op">+</span></span>
+<span id="cb974-4"><a href="n-parameters.html#cb974-4"></a><span class="st">    </span><span class="kw">geom_density</span>() <span class="op">+</span></span>
+<span id="cb974-5"><a href="n-parameters.html#cb974-5"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>, </span>
+<span id="cb974-6"><a href="n-parameters.html#cb974-6"></a>         <span class="dt">subtitle =</span> <span class="st">"How much longer?"</span>,</span>
+<span id="cb974-7"><a href="n-parameters.html#cb974-7"></a>         <span class="dt">x =</span> <span class="st">"Days"</span>,</span>
+<span id="cb974-8"><a href="n-parameters.html#cb974-8"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
+<span id="cb974-9"><a href="n-parameters.html#cb974-9"></a><span class="st">    </span><span class="kw">theme_linedraw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-770-1.png" width="672">
+In words, we would expect the male candidate from Washington to live longer than the South Dakota male. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 3,000 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. IN fact, there is a 1/3 chance.</p>
+<p>Also, notice that in this distribution there are alive_post values that are negative? Does this make sense? Could a candidate be alive negative days after the election/ The answer is no. However, nothing is wrong with the code. The reason for this is because when we assumed epsilon was normally distributed, we allowed numbers to be negative. This is not that important, so let’s press on.</p>
 </div>
 <div id="eda-of-shaming" class="section level2">
 <h2>
 <span class="header-section-number">9.6</span> EDA of <code>shaming</code>
 </h2>
+<div id="gov-50-stop-here-rest-of-the-chapter-is-a-draft-which-we-will-go-over-in-class.-tutorial-9-only-covers-material-in-first-part-of-the-chapter." class="section level3">
+<h3>
+<span class="header-section-number">9.6.1</span> GOV 50: STOP HERE! Rest of the chapter is a draft, which we will go over in class. Tutorial 9 only covers material in first part of the chapter.</h3>
 <!-- Use print(fit_obj, digits = 4) if you need to see more digits. -->
-<!-- Models to use-->
-<!-- primary_06 ~ sex - 1 -->
-<!-- primary_06 ~ age -->
-<!-- primary_06 ~ treatment - 1 (plot all five posteriors together) -->
-<!-- primary_06 ~ sex + solo + treatment -->
-<!-- primary_06 ~ sex + solo + treatment + solo * treatment -->
 <p>Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that “shames” citizens who do not vote. You are considering sending out a “shaming” voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?</p>
 <p>Consider a new data set, <code>shaming</code>, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled “Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment”. This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout.</p>
 <p>Let’s now do another EDA, starting off by running <code>glimpse()</code>.</p>
-<div class="sourceCode" id="cb971"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb971-1"><a href="n-parameters.html#cb971-1"></a><span class="kw">glimpse</span>(shaming)</span></code></pre></div>
+<div class="sourceCode" id="cb975"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb975-1"><a href="n-parameters.html#cb975-1"></a><span class="kw">glimpse</span>(shaming)</span></code></pre></div>
 <pre><code>## Rows: 344,084
 ## Columns: 10
 ## $ sex         &lt;chr&gt; "Male", "Female", "Male", "Female", "Female", "Male", "Fe…
@@ -907,17 +959,16 @@ In words, we would expect the male candidate from Washington to live longer than
 ## $ hh_size     &lt;int&gt; 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, …
 ## $ no_of_names &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</code></pre>
 <p>Here we see that <code>glimpse()</code> gives us a look at the raw data contained within the <code>shaming</code> data set. At the very top of the output, we can see the number of rows and columns, or observations and variables respectively. We see that there are 344,084 observations, with each row corresponding to a unique respondent. The “Columns: 10” tells us that there are 10 variables within this data set. Below this, we see a cutoff version of the entire data set that has the variables on the left as rows and the observations as a list separated by commas, as compared to the tibble output that presents with the variables as columns and the observations as rows running horizontally.</p>
-<!-- It may be worth mentioning that general_04 is always "yes", unlike all the other voting history variables which have values of "yes" and "no". Why is that? I *think* that this is caused by their sampling plan. They found all the people who voted in the 2004 general election. Then, the authors found their history. As we would expect, those people had sometimes voted in the past and sometime not. Then, the authors sent the mailing. The key dependent variable, primary_06, is coding 0/1, since that makes doing the statistics easier. -->
 <p>From this summary, we get an idea of some of the variables we will be working with. Variables of particular interest to us are <code>sex</code>, <code>hh_size</code>, and <code>primary_06</code>. The variable <code>hh_size</code> tells us the size of the respondent’s household, <code>sex</code> tells us the sex of the respondent, and <code>primary_06</code> tells us whether or not the respondent voted in the 2006 Primary election.</p>
 <p>There are a few things to note while exploring this data set. You may – or may not – have noticed that the only response to the <code>general_04</code> variable is “Yes”. In their published article, the authors note that “Only registered voters who voted in November 2004 were selected for our sample” (Gerber, Green, Larimer, 2008). After this, the authors found their history then sent out the mailings.</p>
 <p>It is also important to identify the dependent variable and its meaning. In this shaming experiment, the dependent variable is <code>primary_06</code>, which is a variable coded either 0 or 1 for whether or not the respondent voted in the 2006 primary election. This is the dependent variable because the authors are trying to measure the effect that the treatments have on the proportion of people who vote in the 2006 general election.</p>
 <!-- HV: Should I include discussion of the left-hand variable (treatment?) here? Or wait until we move into the regressions? -->
-<p>The voting results from other years, such as 2002 and 2004, are of less interest to us and can be removed from the abbreviated data set. In addition to removing <code>general_04</code>, <code>primary_02</code>, <code>general_02</code>, or <code>primary_04</code>, we also will not be taking particular interest in <code>birth_year</code>, or <code>no_of_names</code> within this chapter.
-<!-- HV: should I explain why we are not using any of these variables? why they are not of great use to us? --></p>
+<p>The voting results from other years, such as 2002 and 2004, are of less interest to us and can be removed from the abbreviated data set. In addition to removing <code>general_04</code>, <code>primary_02</code>, <code>general_02</code>, or <code>primary_04</code>, we also will not be taking particular interest in <code>birth_year</code>, or <code>no_of_names</code> within this chapter.</p>
+<!-- HV: should I explain why we are not using any of these variables? why they are not of great use to us? -->
 <p>By narrowing down the set of variables we are looking at and investigating, we will find more meaningful relationships among them. However, we have not yet discussed the most important variable of them all: <code>treatment</code>. The <code>treatment</code> variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let’s start off by taking a broad look at the different treatments.
 <!-- HV: Is it okay to say the first sentence of this paragraph? --></p>
-<div class="sourceCode" id="cb973"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb973-1"><a href="n-parameters.html#cb973-1"></a>shaming <span class="op">%&gt;%</span></span>
-<span id="cb973-2"><a href="n-parameters.html#cb973-2"></a><span class="st">  </span><span class="kw">count</span>(treatment)</span></code></pre></div>
+<div class="sourceCode" id="cb977"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb977-1"><a href="n-parameters.html#cb977-1"></a>shaming <span class="op">%&gt;%</span></span>
+<span id="cb977-2"><a href="n-parameters.html#cb977-2"></a><span class="st">  </span><span class="kw">count</span>(treatment)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 2
 ##   treatment       n
 ##   &lt;fct&gt;       &lt;int&gt;
@@ -931,16 +982,18 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>In the second treatment, Hawthorne, households received a mailing which told the voters that they were being studied and their voting behavior would be examined through public records. This adds a small amount of social pressure to the households receiving this mailing.</p>
 <p>In the third treatment, Self, the mailing includes the recent voting record of each member of the household, placing the word “Voted” next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. In this mailing, the households were also told, “we intend to mail an updated chart” with the voting record of the household members after the 2006 primary. By emphasizing the public nature of voting records, this type of mailing exerts more social pressure on voting than the Hawthorne treatment.</p>
 <p>The fourth treatment, Neighbors, provides the household members’ voting records, as well as the voting records of those who live nearby. This mailing also told recipients, “we intend to mail an updated chart” of who voted in the 2006 election to the entire neighborhood.</p>
-<p>For now, let’s focus on a subset of the data.</p>
-<div class="sourceCode" id="cb975"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb975-1"><a href="n-parameters.html#cb975-1"></a>ch9 &lt;-<span class="st"> </span>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb975-2"><a href="n-parameters.html#cb975-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">solo =</span> <span class="kw">ifelse</span>(hh_size <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb975-3"><a href="n-parameters.html#cb975-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="dv">2006</span> <span class="op">-</span><span class="st"> </span>birth_year) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb975-4"><a href="n-parameters.html#cb975-4"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, solo, sex, age)</span></code></pre></div>
+<p>For now, let’s focus on a subset of the data. We will sample just 10,000 rows because otherwise <code>stan_glm()</code> takes an annoyingly large amount of time to work. Nothing substantive changes.</p>
+<div class="sourceCode" id="cb979"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb979-1"><a href="n-parameters.html#cb979-1"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
+<span id="cb979-2"><a href="n-parameters.html#cb979-2"></a>ch9_sham &lt;-<span class="st"> </span>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb979-3"><a href="n-parameters.html#cb979-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">solo =</span> <span class="kw">ifelse</span>(hh_size <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb979-4"><a href="n-parameters.html#cb979-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="dv">2006</span> <span class="op">-</span><span class="st"> </span>birth_year) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb979-5"><a href="n-parameters.html#cb979-5"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, solo, sex, age) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb979-6"><a href="n-parameters.html#cb979-6"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10000</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <p>We create the variable <code>solo</code>, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not.</p>
-<div class="sourceCode" id="cb976"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb976-1"><a href="n-parameters.html#cb976-1"></a>ch9 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb976-2"><a href="n-parameters.html#cb976-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb980"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb980-1"><a href="n-parameters.html#cb980-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb980-2"><a href="n-parameters.html#cb980-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-771">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-774">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -948,7 +1001,7 @@ In words, we would expect the male candidate from Washington to live longer than
 </tr>
 <tr class="even">
 <td align="left">Number of rows</td>
-<td align="left">344084</td>
+<td align="left">10000</td>
 </tr>
 <tr class="odd">
 <td align="left">Number of columns</td>
@@ -1026,7 +1079,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <td align="right">1</td>
 <td align="left">FALSE</td>
 <td align="right">5</td>
-<td align="left">Con: 191243, Civ: 38218, Sel: 38218, Haw: 38204</td>
+<td align="left">Con: 5594, Sel: 1135, Haw: 1110, Civ: 1108</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: logical</strong></p>
@@ -1042,8 +1095,8 @@ In words, we would expect the male candidate from Washington to live longer than
 <td align="left">solo</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.14</td>
-<td align="left">FAL: 296250, TRU: 47834</td>
+<td align="right">0.15</td>
+<td align="left">FAL: 8532, TRU: 1468</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: numeric</strong></p>
@@ -1067,7 +1120,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">0.32</td>
-<td align="right">0.46</td>
+<td align="right">0.47</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -1079,14 +1132,14 @@ In words, we would expect the male candidate from Washington to live longer than
 <td align="left">age</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">49.79</td>
-<td align="right">14.45</td>
+<td align="right">49.86</td>
+<td align="right">14.54</td>
 <td align="right">20</td>
 <td align="right">41</td>
 <td align="right">50</td>
 <td align="right">59</td>
-<td align="right">106</td>
-<td align="left">▃▇▅▁▁</td>
+<td align="right">99</td>
+<td align="left">▃▇▇▂▁</td>
 </tr>
 </tbody>
 </table>
@@ -1094,28 +1147,28 @@ In words, we would expect the male candidate from Washington to live longer than
 <!-- DK: Add discussion of what you see here. No need to drop missing values since there aren't any. I think this next discussion can be dropped. -->
 <p>To get a better sense of some respondents’ information, let’s use <code>sample_n()</code> to gather a random sample of <em>n</em> observations from the data set.</p>
 <!-- HV: Does this belong here? -->
-<div class="sourceCode" id="cb977"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb977-1"><a href="n-parameters.html#cb977-1"></a>ch9 <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb977-2"><a href="n-parameters.html#cb977-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb981"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb981-1"><a href="n-parameters.html#cb981-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb981-2"><a href="n-parameters.html#cb981-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 5
 ##    primary_06 treatment solo  sex      age
 ##         &lt;int&gt; &lt;fct&gt;     &lt;lgl&gt; &lt;chr&gt;  &lt;dbl&gt;
-##  1          1 Control   FALSE Female    45
-##  2          1 Control   FALSE Male      75
-##  3          0 Neighbors FALSE Female    77
-##  4          1 Control   FALSE Male      43
-##  5          1 Control   FALSE Male      44
-##  6          0 Control   FALSE Female    62
-##  7          0 Control   TRUE  Male      71
-##  8          1 Control   FALSE Female    61
-##  9          0 Self      FALSE Male      74
-## 10          0 Neighbors FALSE Female    48</code></pre>
+##  1          0 Hawthorne FALSE Male      20
+##  2          0 Neighbors FALSE Male      53
+##  3          0 Control   FALSE Female    45
+##  4          1 Neighbors FALSE Female    44
+##  5          0 Control   FALSE Female    50
+##  6          0 Control   FALSE Female    45
+##  7          0 Neighbors TRUE  Female    41
+##  8          0 Self      FALSE Male      32
+##  9          0 Hawthorne FALSE Female    58
+## 10          1 Control   FALSE Female    75</code></pre>
 <p>Now we have a table with 5 random observations and the respondents’ information in a regular table output. By taking a few random samples, we may start to see some patterns within the data. Do you notice anything in particular about the variable <code>treatment</code>?</p>
 <p>One other helpful summarizing technique we can use is <code>skim()</code>. To make the information it contains simpler, we will only be looking at three variables: <code>primary_06</code>, <code>treatment</code>, and <code>sex</code>.</p>
-<div class="sourceCode" id="cb979"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb979-1"><a href="n-parameters.html#cb979-1"></a>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb979-2"><a href="n-parameters.html#cb979-2"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb979-3"><a href="n-parameters.html#cb979-3"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb983"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb983-1"><a href="n-parameters.html#cb983-1"></a>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb983-2"><a href="n-parameters.html#cb983-2"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb983-3"><a href="n-parameters.html#cb983-3"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-773">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-776">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -1229,21 +1282,18 @@ In words, we would expect the male candidate from Washington to live longer than
 <td align="left">▇▁▁▁▃</td>
 </tr></tbody>
 </table>
-<p>By running the <code>skim()</code> command, we get a summary of the data set as a whole, as well as the types of variables and individual variable summaries. At the top we see the number of columns and rows within the selected data set. Below this we are given a list with the different types of variables, or columns, and how often they appear within the data we are skimming. Following this, the variables are then separated by their column type, and we are given individual summaries based on the type.</p>
+<p>Running the <code>skim()</code> command gives us a summary of the data set as a whole, as well as the types of variables and individual variable summaries. At the top, we see the number of columns and rows within the selected data set. Below this we are given a list with the different types of variables, or columns, and how often they appear within the data we are skimming. The variables are then separated by their column type, and we are given individual summaries based on the type.</p>
 <!-- 2) `primary_06` as a function of `treatment` and `solo` and of their interaction. We will build up this model step-by-step, very similar to how we explored the effect of treatment in chapter 8. But we go deeper because  we are learning about interactions. Key thing is to go through all the themes.Rmd issues, at least until prediction. Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 4 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
-<!-- 3) EDA of `nes`. This can be fairly quick. Again, we won't use all the variables. Only discuss the ones we do use. One of the variables should be year. We want to show off Gelman's trick by plotting things by year. -->
-<!-- 4) We are making a predictive model of what as a function of what other stuff? Want to use a continuous variable and some discrete variables as well. Interactions to.  -->
-<!-- 5) I don't think we bother with a scenario which requires a bootstrap. Or should we?  -->
-<!-- 6) Prediction. How do we use our model to make predictions? Bring the discussion back to the way that we opened the chapter with a problem. -->
 <p>Having created models with one parameter in Chapter <a href="one-parameter.html#one-parameter">6</a> and two parameters in Chapter <a href="two-parameters.html#two-parameters">7</a>, you are now ready to make the jump to <span class="math inline">\(N\)</span> parameters. The more parameters we include in our models, the more flexible they can become. But we must be careful of <em>overfitting</em>, of making models which are inaccurate because they don’t have enough data to accurately estimate those parameters. The tension between overfitting and underfitting is central to the practice of data science.</p>
 <!-- DK: Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 5 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
+</div>
 <div id="wisdom-1" class="section level3">
 <h3>
-<span class="header-section-number">9.6.1</span> Wisdom</h3>
+<span class="header-section-number">9.6.2</span> Wisdom</h3>
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-774"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-777"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 9.5: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -1256,11 +1306,12 @@ In words, we would expect the male candidate from Washington to live longer than
 </div>
 <div id="justice-and-courage-1" class="section level3">
 <h3>
-<span class="header-section-number">9.6.2</span> Justice and Courage</h3>
+<span class="header-section-number">9.6.3</span> Justice and Courage</h3>
+<!-- MF: What should the Preceptor tables look like with these models? Like chapter 3. Should each model have its own Preceptor Table? No! Just one preceptor table at the start, with 5 columns under Y, and 4 covariates, where one is treatment assigned. -->
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-775"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-778"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.6: Justice<!--</p>-->
 <!--</div>--></span>
@@ -1268,23 +1319,238 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-776"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-779"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 9.7: Courage<!--</p>-->
 <!--</div>--></span>
 </p>
+<p>Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let’s model <code>primary_06</code>, which represents whether a citizen voted or not, against sex to see if there is a connection.</p>
+<div id="voting-and-sex" class="section level4">
+<h4>
+<span class="header-section-number">9.6.3.1</span> Voting and Sex</h4>
+<!-- MF: I used family = gaussian as I noted it in the lower section drafts, but can't find the purpose online. Also, stan_glm is taking a very long time to run. Is this a concern? Never mention gaussian or the family argument. -->
+<p>Let’s start with a simple model: the effect of voting in the 2006 election and sex. First, let’s look at the results of <code>primary_06</code> after grouping by <code>sex</code> to see the number of females and males who did or did not vote. Recall that a value of 1 for <code>primary_06</code> means that the citizen <em>did</em> vote, while a value of 0 means that they <em>did not</em>.</p>
+<div class="sourceCode" id="cb984"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb984-1"><a href="n-parameters.html#cb984-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb984-2"><a href="n-parameters.html#cb984-2"></a><span class="st">  </span><span class="kw">group_by</span>(sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb984-3"><a href="n-parameters.html#cb984-3"></a><span class="st">  </span><span class="kw">count</span>(primary_<span class="dv">06</span>) </span></code></pre></div>
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   sex [2]
+##   sex    primary_06     n
+##   &lt;chr&gt;       &lt;int&gt; &lt;int&gt;
+## 1 Female          0  3437
+## 2 Female          1  1563
+## 3 Male            0  3332
+## 4 Male            1  1668</code></pre>
+<p>Eyeballing the figures, you may have noticed that slightly more male respondents voted than female respondents. Let’s investigate this using <code>stan_glm</code>.</p>
+<div class="sourceCode" id="cb986"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb986-1"><a href="n-parameters.html#cb986-1"></a>model_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb986-2"><a href="n-parameters.html#cb986-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex, </span>
+<span id="cb986-3"><a href="n-parameters.html#cb986-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
+<span id="cb986-4"><a href="n-parameters.html#cb986-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb987"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb987-1"><a href="n-parameters.html#cb987-1"></a><span class="kw">print</span>(model_<span class="dv">1</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## stan_glm
+##  family:       gaussian [identity]
+##  formula:      primary_06 ~ sex
+##  observations: 10000
+##  predictors:   2
+## ------
+##             Median MAD_SD
+## (Intercept) 0.313  0.007 
+## sexMale     0.021  0.010 
+## 
+## Auxiliary parameter(s):
+##       Median MAD_SD
+## sigma 0.468  0.003 
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+<p>Here, the (Intercept) variable represents our “baseline for comparison” female group of voters. The median value is the percentage of the female group that voted in the 2006 election, as the average of 1 (voted) and 0 (didn’t vote) gives us the percentage of the group that <em>did</em> vote. That is to say– about 31% of the female group voted in the primary election. The sexMale term corresponds to the <em>offset</em> in intercept for the male respondents relative to the female respondents. In other words, the female respondents had an average intercept of .31 = 31% while the male respondent intercept of .31 + .012 = .322 = 32% voting rate. Therefore, male participants were <em>slightly more</em> likely to vote in the 2006 primary election, as compared to the female participants.</p>
+</div>
+<div id="voting-and-age" class="section level4">
+<h4>
+<span class="header-section-number">9.6.3.2</span> Voting and Age</h4>
+<p>Now that we’ve seen the relationship between sex and voting, let’s take a look at age. Begin by grouping our observations by <code>age</code> and counting by <code>primary_06</code>, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category.</p>
+<div class="sourceCode" id="cb989"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb989-1"><a href="n-parameters.html#cb989-1"></a>age &lt;-<span class="st"> </span>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb989-2"><a href="n-parameters.html#cb989-2"></a><span class="st">  </span><span class="kw">group_by</span>(age) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb989-3"><a href="n-parameters.html#cb989-3"></a><span class="st">  </span><span class="kw">count</span>(primary_<span class="dv">06</span>) </span>
+<span id="cb989-4"><a href="n-parameters.html#cb989-4"></a></span>
+<span id="cb989-5"><a href="n-parameters.html#cb989-5"></a>age</span></code></pre></div>
+<pre><code>## # A tibble: 150 x 3
+## # Groups:   age [78]
+##      age primary_06     n
+##    &lt;dbl&gt;      &lt;int&gt; &lt;int&gt;
+##  1    20          0   122
+##  2    20          1    16
+##  3    21          0   137
+##  4    21          1    24
+##  5    22          0   103
+##  6    22          1    19
+##  7    23          0   124
+##  8    23          1    23
+##  9    24          0   106
+## 10    24          1    16
+## # … with 140 more rows</code></pre>
+<p>To explore this relationship visually, let’s create a graph. We are coercing <code>primary_06</code> into a character variable as it more closely represents “yes” or “no” as opposed to a numerical value.</p>
+<div class="sourceCode" id="cb991"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb991-1"><a href="n-parameters.html#cb991-1"></a>age <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb991-2"><a href="n-parameters.html#cb991-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">primary_06 =</span> <span class="kw">as.character</span>(primary_<span class="dv">06</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb991-3"><a href="n-parameters.html#cb991-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> age, <span class="dt">y =</span> n, <span class="dt">color =</span> primary_<span class="dv">06</span>)) <span class="op">+</span></span>
+<span id="cb991-4"><a href="n-parameters.html#cb991-4"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb991-5"><a href="n-parameters.html#cb991-5"></a><span class="st">  </span><span class="kw">labs</span>(</span>
+<span id="cb991-6"><a href="n-parameters.html#cb991-6"></a>    <span class="dt">title =</span> <span class="st">"Relationship Between Age and Voting"</span>,</span>
+<span id="cb991-7"><a href="n-parameters.html#cb991-7"></a>    <span class="dt">subtitle =</span> <span class="st">"In the 2006 Primary Elections"</span>,</span>
+<span id="cb991-8"><a href="n-parameters.html#cb991-8"></a>    <span class="dt">x =</span> <span class="st">"Age"</span>,</span>
+<span id="cb991-9"><a href="n-parameters.html#cb991-9"></a>    <span class="dt">y =</span> <span class="st">"Count"</span></span>
+<span id="cb991-10"><a href="n-parameters.html#cb991-10"></a>  )</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-784-1.png" width="672"></p>
+<p>There are some interesting takeaways here.
+- First, in almost every age bracket (other than above 90), the majority participants did <em>not</em> vote.
+- The spike between ages 40 and 60 illustrates that most participants exist in this age bracket.
+- The differences between voters and non-voters narrows greatly after age 60.</p>
+<p>Let’s look at the results of our regression.</p>
+<!-- MF: Age isn't showing unique values (just one intercept and then `age`). Is that a problem? No. Same explanation as model above. -->
+<div class="sourceCode" id="cb992"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb992-1"><a href="n-parameters.html#cb992-1"></a>model_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb992-2"><a href="n-parameters.html#cb992-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>age, </span>
+<span id="cb992-3"><a href="n-parameters.html#cb992-3"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb993"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb993-1"><a href="n-parameters.html#cb993-1"></a><span class="kw">print</span>(model_<span class="dv">2</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## stan_glm
+##  family:       gaussian [identity]
+##  formula:      primary_06 ~ age
+##  observations: 10000
+##  predictors:   2
+## ------
+##             Median MAD_SD
+## (Intercept) 0.108  0.016 
+## age         0.004  0.000 
+## 
+## Auxiliary parameter(s):
+##       Median MAD_SD
+## sigma 0.463  0.003 
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+</div>
+<div id="voting-and-treatment" class="section level4">
+<h4>
+<span class="header-section-number">9.6.3.3</span> Voting and Treatment</h4>
+<p>Looking at the relationship between primary voting and treatment.</p>
+<div class="sourceCode" id="cb995"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb995-1"><a href="n-parameters.html#cb995-1"></a>model_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb995-2"><a href="n-parameters.html#cb995-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, </span>
+<span id="cb995-3"><a href="n-parameters.html#cb995-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
+<span id="cb995-4"><a href="n-parameters.html#cb995-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb996"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb996-1"><a href="n-parameters.html#cb996-1"></a><span class="kw">print</span>(model_<span class="dv">3</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## stan_glm
+##  family:       gaussian [identity]
+##  formula:      primary_06 ~ treatment - 1
+##  observations: 10000
+##  predictors:   5
+## ------
+##                     Median MAD_SD
+## treatmentCivic Duty 0.325  0.014 
+## treatmentHawthorne  0.323  0.014 
+## treatmentControl    0.312  0.006 
+## treatmentSelf       0.337  0.014 
+## treatmentNeighbors  0.365  0.015 
+## 
+## Auxiliary parameter(s):
+##       Median MAD_SD
+## sigma 0.467  0.003 
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+<p>Recall that the four treatments varied in the amount of social shaming involved. While each sent the message, “DO YOUR CIVIC DUTY - VOTE!”, there were differences. Briefly:</p>
+<ul>
+<li>The first treatment, Civic Duty, also read, “Remember your rights and responsibilities as a citizen. Remember to vote.” (Least pressure)</li>
+<li>Hawthorne told the voters that they were being studied and their voting behavior would be examined through public records. (Slighly more pressure)</li>
+<li>Self included the recent voting record of each member of the household, placing the word “Voted” next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. The households were also told, “we intend to mail an updated chart” with the voting record of the household members after the 2006 primary. (Moderate pressure)</li>
+<li>Neighbors provides the household members’ voting records, as well as the voting records of those who live nearby. This mailing also told recipients, “we intend to mail an updated chart” of who voted in the 2006 election to the entire neighborhood. (Most pressure)</li>
+</ul>
+<p>The Control group had the least active voters with a median of .297 = 29.7% of participants voting. The Civic Duty treatment (least pressure) had slighly more at .314 = 31.4% of participants voting. The Hawthorne group (slightly more pressure) increased upon Civic Duty for a total of .322 = 32.2% voting. The Self group (moderate pressure) increased even still, with .345 = 34.5% of the group voting. Finally, the Neighbors group (with the most social pressure) yielded the highest voting rate of .378 = 37.8%.</p>
+<p>This means that, as we hoped, more social pressure = higher voting turnout. That being said, the percent differences were not large. The biggest leap came from the Neighbors group, suggesting that the pressure of your vote being publicized to your community increases turnout more than a simple encouragement.</p>
+</div>
+<div id="voting-sex-solo-treatment" class="section level4">
+<h4>
+<span class="header-section-number">9.6.3.4</span> Voting &amp; (Sex + Solo + Treatment)</h4>
+<p>Looking at the relationship between primary voting, sex, living alone, and treatment.</p>
+<div class="sourceCode" id="cb998"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb998-1"><a href="n-parameters.html#cb998-1"></a>model_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb998-2"><a href="n-parameters.html#cb998-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>treatment, </span>
+<span id="cb998-3"><a href="n-parameters.html#cb998-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
+<span id="cb998-4"><a href="n-parameters.html#cb998-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb999"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb999-1"><a href="n-parameters.html#cb999-1"></a><span class="kw">print</span>(model_<span class="dv">4</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## stan_glm
+##  family:       gaussian [identity]
+##  formula:      primary_06 ~ sex + solo + treatment
+##  observations: 10000
+##  predictors:   7
+## ------
+##                    Median MAD_SD
+## (Intercept)         0.308  0.015
+## sexMale             0.021  0.009
+## soloTRUE            0.044  0.014
+## treatmentHawthorne -0.002  0.021
+## treatmentControl   -0.013  0.016
+## treatmentSelf       0.012  0.019
+## treatmentNeighbors  0.039  0.021
+## 
+## Auxiliary parameter(s):
+##       Median MAD_SD
+## sigma 0.467  0.003 
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+<p>INTERACTION MODEL with all of the above plus solo and treatment</p>
+<div class="sourceCode" id="cb1001"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1001-1"><a href="n-parameters.html#cb1001-1"></a>model_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb1001-2"><a href="n-parameters.html#cb1001-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>treatment <span class="op">+</span><span class="st"> </span>solo <span class="op">*</span><span class="st"> </span>treatment, </span>
+<span id="cb1001-3"><a href="n-parameters.html#cb1001-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
+<span id="cb1001-4"><a href="n-parameters.html#cb1001-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1002"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1002-1"><a href="n-parameters.html#cb1002-1"></a><span class="kw">print</span>(model_<span class="dv">5</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## stan_glm
+##  family:       gaussian [identity]
+##  formula:      primary_06 ~ sex + solo + treatment + solo * treatment
+##  observations: 10000
+##  predictors:   11
+## ------
+##                             Median MAD_SD
+## (Intercept)                  0.305  0.016
+## sexMale                      0.021  0.009
+## soloTRUE                     0.069  0.040
+## treatmentHawthorne           0.010  0.022
+## treatmentControl            -0.009  0.017
+## treatmentSelf                0.011  0.021
+## treatmentNeighbors           0.038  0.022
+## soloTRUE:treatmentHawthorne -0.089  0.061
+## soloTRUE:treatmentControl   -0.031  0.045
+## soloTRUE:treatmentSelf       0.003  0.057
+## soloTRUE:treatmentNeighbors  0.007  0.057
+## 
+## Auxiliary parameter(s):
+##       Median MAD_SD
+## sigma 0.467  0.003 
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+<!-- MF: As it stands, I have all five models in this section. Should the interaction model maybe be in a later, separate section? No. -->
+</div>
 </div>
 <div id="temperance-1" class="section level3">
 <h3>
-<span class="header-section-number">9.6.3</span> Temperance</h3>
+<span class="header-section-number">9.6.4</span> Temperance</h3>
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-777"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-793"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.8: Temperance<!--</p>-->
 <!--</div>--></span>
 </p>
+<p>Finally, let’s remember the virtue of Temperance. The gist of temperance is: be humble with our inferences, as our inferences are always, certainly, and unfortunately not going to match the real world. How does this apply to our shaming scenario?</p>
+<p>Prediction uncertainty is the main culprit. No matter how hard we try, <em>we cannot predict the future</em>. Though we now have conclusions about how shaming impacted voters in the 2006 primary elections, we do not have the confidence to say that what worked or didn’t work then would work now.</p>
+<p>For instance, perhaps the impact of your neighbors knowing your voting history is greater in the midst of a pandemic, where you may be locked inside with few interactions outside of your immediate proximity. Perhaps the opposite is true. These <em>unknown unknowns</em> cannot be accounted for in our models. We cannot predict a pandemic, nor can we predict how this will change the way that people vote or respond to flyers.</p>
+<p>There is also the issue of representitiveness. Do the voters of the 2006 primary election (who have already demonstrated a willingness to vote in the 2004 primary election) truly represent the people voting in <strong>our</strong> gubernatorial election?</p>
+<p>These complications are why we must make inferences with a grain of salt. That is not to say that all data science is unhelpful! On the contrary, acknowledging our deficits will only make our inferences (and the actions we take because of them) stronger.</p>
 </div>
 </div>
 <div id="causal-effects-of-treament" class="section level2">
@@ -1292,16 +1558,16 @@ In words, we would expect the male candidate from Washington to live longer than
 <span class="header-section-number">9.7</span> Causal Effects of <code>treament</code>
 </h2>
 <p>We will now be looking into the causal effect of the treatment variable on the 2006 primary election. To start, let’s build a model using <code>stan_glm()</code> followed by a regression table.</p>
-<div class="sourceCode" id="cb980"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb980-1"><a href="n-parameters.html#cb980-1"></a><span class="co"># obj.1 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb980-2"><a href="n-parameters.html#cb980-2"></a><span class="co">#                 formula = primary_06 ~ treatment - 1, </span></span>
-<span id="cb980-3"><a href="n-parameters.html#cb980-3"></a><span class="co">#                 family = gaussian(), </span></span>
-<span id="cb980-4"><a href="n-parameters.html#cb980-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb1004"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1004-1"><a href="n-parameters.html#cb1004-1"></a><span class="co"># obj.1 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb1004-2"><a href="n-parameters.html#cb1004-2"></a><span class="co">#                 formula = primary_06 ~ treatment - 1, </span></span>
+<span id="cb1004-3"><a href="n-parameters.html#cb1004-3"></a><span class="co">#                 family = gaussian(), </span></span>
+<span id="cb1004-4"><a href="n-parameters.html#cb1004-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
 <p>This table shows us each of the five treatments and their beta coefficients, along with a 95% Confidence Interval for these coefficients. The Control provides us with a baseline.</p>
 <!-- Talk about what these results mean.  Then, create the same model but with a different structure. -->
-<div class="sourceCode" id="cb981"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb981-1"><a href="n-parameters.html#cb981-1"></a><span class="co"># obj.2 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb981-2"><a href="n-parameters.html#cb981-2"></a><span class="co">#                 formula = primary_06 ~ treatment, </span></span>
-<span id="cb981-3"><a href="n-parameters.html#cb981-3"></a><span class="co">#                 family = gaussian(), </span></span>
-<span id="cb981-4"><a href="n-parameters.html#cb981-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb1005"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1005-1"><a href="n-parameters.html#cb1005-1"></a><span class="co"># obj.2 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb1005-2"><a href="n-parameters.html#cb1005-2"></a><span class="co">#                 formula = primary_06 ~ treatment, </span></span>
+<span id="cb1005-3"><a href="n-parameters.html#cb1005-3"></a><span class="co">#                 family = gaussian(), </span></span>
+<span id="cb1005-4"><a href="n-parameters.html#cb1005-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
 <!-- Explain how these two models are the same, except in how they define the parameters. Show us the math like Gelman does. Write down the math. For simple. -->
 <!-- Once we talk about these things --- and, again, this is exactly what we have talked about in chapter 8 --- we can do a bit more. Like discuss how we are using 99%, because there is nothing magical aboyt 95%, other than convention. I also think it would be fun to show a nice graphic of this, highlighting how the estimates for Civic and Hawthorne overlap.  -->
 <div id="interactions" class="section level3">
@@ -1309,10 +1575,10 @@ In words, we would expect the male candidate from Washington to live longer than
 <span class="header-section-number">9.7.1</span> Interactions</h3>
 <!-- This is new. With only two parameters, we can't really look at interaction effects. Need to discuss interaction effects in general. Also, note that heterogenous treatment effects are the same thing as interaction effects that involve a treatment effect as one of the variables.  -->
 <!-- Feel free to build up this code, and other examples, more slowly than I am doing it here. -->
-<div class="sourceCode" id="cb982"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb982-1"><a href="n-parameters.html#cb982-1"></a><span class="co"># obj.3 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb982-2"><a href="n-parameters.html#cb982-2"></a><span class="co">#                 formula = primary_06 ~ sex + treatment + sex:treatment, </span></span>
-<span id="cb982-3"><a href="n-parameters.html#cb982-3"></a><span class="co">#                 family = gaussian(), </span></span>
-<span id="cb982-4"><a href="n-parameters.html#cb982-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb1006"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1006-1"><a href="n-parameters.html#cb1006-1"></a><span class="co"># obj.3 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb1006-2"><a href="n-parameters.html#cb1006-2"></a><span class="co">#                 formula = primary_06 ~ sex + treatment + sex:treatment, </span></span>
+<span id="cb1006-3"><a href="n-parameters.html#cb1006-3"></a><span class="co">#                 family = gaussian(), </span></span>
+<span id="cb1006-4"><a href="n-parameters.html#cb1006-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
 <!-- Takes a while to explain what all this means. -->
 <!-- Two key issues: 1) Interpreting lots of parameters in a model. interactions, heterogenous treatment effects. shaming using lm().  -->
 <!-- Treatment effect is not the same thing as a coefficient. -->
@@ -1333,7 +1599,6 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <!-- We must have left bootstrapping behind by now. No more bootstraps, at least for the purpose of calculating uncertainty. (We will use it later for the purpose of out-of-sample testing and avoiding overfitting.) Key lesson is that overfitting is easy. You can't just estimate a value for each cell. You need to smooth and borrow strength. Of course, the only way to do that is with a Bayesian approach. Right? We don't want to get into hacked likelihood approaches. -->
 <!-- cces looks perfect for this project. There are 400,000 rows, so it seems like you ought to have plenty of data for anything you want, but once you realize there are 51 states and 10 years, things get sparse fast. We only have 15 observations, for example, for Wyoming in 2007. Once you start subsetting by race and education, you have no choice but to start borrowing strength.  -->
 <!-- So, just what will we use? rstanarm(). If so (and if we have not introduced it earlier), we can begin with seeing how it is similar to lm() and then expand. This means that, in one paramter chapter, we should be doing lm( ~ 1). In two parameter, lm( ~ treatment) --- if treatment is zero one --- or, perhaps better, lm( ~ -1 + treatment) if treatment is a factor/character with two levels. We might also have introduced  -->
-<!-- MF: Is basic structure for this chapter meant to be [1] life span section, [2] shame section, and [3] interactions? -->
 
 <!-- Add a couple more of the chapters? Or maybe put them in chapter 11? -->
 <!-- Cut the recipe, bake, stuff? Not really needed for chapters 11 and 12. -->
@@ -1354,7 +1619,7 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-23
+2020-10-25
 </p>
 </div>
 </div>
