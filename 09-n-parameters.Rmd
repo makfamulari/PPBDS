@@ -368,11 +368,13 @@ fit_gov_2a <- stan_glm(data = ch9_gov,
 print(fit_gov_2a, detail = FALSE)
 ```
 
-From this result, we can see that we no longer have a value for female. However we do have an intercept. In this regression our mathematical regression formula is:
+We no longer have a value for female. However we do have an intercept. In this regression our mathematical formula is:
 
 $$ y_i = \beta_0  + \beta_1 x_{m,i} + \epsilon_i$$
 
-$\beta_0$ is our intercept value which here would be around 5,850. This result is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model. Here our slope, or $\beta_1$ value, only shows up when the candidate is male. (If the candidate is female, then $x_{m,i} = 0$. Therefore, the intercept value represents those who are not male, i.e., females.)
+$\beta_0$ is our intercept value which here would be around 5,850. This result is very similar to the female value from before. In this type of model, our intercept represents the characteristic of the variable that is left unrepresented in the model.  $\beta_1$ only affects the outcome when the candidate is male. (If the candidate is female, then $x_{m,i} = 0$. Therefore, the intercept value represents those who are not male, i.e., females.)
+
+<!-- DK: This explanation should be better. -->
 
 When the candidate is a male, we add the coefficient for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding $\beta_0$ and $\beta_1$, this value is the same as what we got for males in the previous model.
 
@@ -395,13 +397,13 @@ fit_gov_2a %>%
 ```
 
 
-The interpretation of this model is the same as we have seen before. There is a true average, across the entire population, of the number of days that male candidates live after the election. We can never know what that true average is. But, it seems highly likely that the true average is somewhere between 10,000 and 10,750 days.
+The interpretation of this parameter is the same as we have seen before. There is a true average, across the entire population, of the number of days that male candidates live after the election. We can never know what that true average is. But, it seems highly likely that the true average is somewhere between 10,000 and 10,750 days.
 
 
 ### alive_pre and sex
 
 
-We are going to transition to working with a model that has more than one explanatory variable, x. Our outcome variable will be alive_post, but now we will have two different explanatory variables: `alive_pre` and `sex`. Note that `sex` is a continuous explanatory variable and `alive_pre` is numerical explanatory variable.
+We are going to transition to working with a model that has more than one explanatory variable. Our outcome variable will be `alive_post`, but now we will have two different explanatory variables: `alive_pre` and `sex`. Note that `sex` is a categorical explanatory variable and `alive_pre` is a continuous explanatory variable.
 
 
 
@@ -409,17 +411,14 @@ Here is the math we will be using:
 
 $$ y_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \epsilon_i $$
 
-Great! Now that we have our model, let's break it down to explain what each part means. 
+* $y_i$ is our outcome variable. In our case, the outcome variable is $alive\_post_i$, the number of days a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidates, this value will be 0. $alive\_pre_i$ is our other explanatory variable. It is the number of days a candidate has lived before the election. 
 
 
-* $ y_i$ is our outcome variable. In our case, the outcome variable is alive_post, the number of days a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidates, this value will be 0. $alive_pre$ is our other explanatory variable that represents the number of days a candidate has lived before the election. 
+* $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $y_i$, if $male_i$ = 0 and $alive\_pre$ = 0. However, we can ignore that for our purposes because no one running for governor would have been alive 0 days before the election!
 
+* $\beta_1$ is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. $\beta_0$ + $\beta_1$). When the two are added together, you get the average number of days lived after the election for men, who on the day of election, have been alive the average number of days for all candidates.
 
-* $\beta_0$ is the avg. number of days lived after the election for women, who on the day of election, have been alive the avg. number of days of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $y_i$, if $male_i$ = 0 and $alive_pre$ = 0. However, we can ignore that for our purposes because no one running for governor would have been alive 0 days before the election!
-
-* $\beta_1$ is insignificant by itself. The only time it has meaning is when its value is connected to our intercept (i.e. $\beta_0$ + $\beta_1$). When the two are added together, you get the avg. number of days lived after the election for men, who on the day of election, have been alive the avg. number of days of all candidates.
-
-* $\beta_2$ is, for the entire population, the avg. difference in $y_i$ between two individuals, one of whom has an alive_pre value of 1 greater than the other. Why is this important? Well, it just serves as a comparison for two otherwise identical people. 
+* $\beta_2$ is, for the entire population, the average difference in $y_i$ between two individuals, one of whom has an `alive_pre` value of 1 greater than the other. 
 
 
 
@@ -436,19 +435,13 @@ print(fit_gov_3, detail = FALSE)
 ```
 
 
-Looking at our results, you can see that our intercept value is 8069. What does this mean? Well, applying what we just discussed above, it means the the average female candidate would be alive 8069 days lived after the election, who on the day of election, has been alive the avg. number of days of all candidates. 
+Looking at our results, you can see that our intercept value is around 8,100. (The exact values for the median of the posterior will vary, because of the random sampling inherent in fitting the model.) This means that the average female candidate, who had been alive the average number of days of all candidates, would live another 8,100 days or so after the election. 
 
 
-Now take a look at the value 2281 next to sexMale. This is our coefficient $\beta_1$. We need to connect this value to our intercept value to get something meaningful. Using our formula $\beta_0$ + $\beta_1$, we find out how many days the average male candidate would be alive after the election would be 10305, who on the day of election, have been alive the avg. number of days of all candidates.  
+Note that `sexMale` is around 2,250. This is our coefficient, $\beta_1$. We need to connect this value to our intercept value to get something meaningful. Using the formula $\beta_0$ + $\beta_1$, we find out that the number of days the average male candidate ---  who, on the day of election, had been alive the average number of days of all candidate --- would live is around 10,300,.  
 
 
-Now take a look at the coefficient for alive_pre, $\beta_2$. The median of the posterior, -0.8, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. It makes sense that this value is negative. Think about it: the more days a candidate has has lived, the fewer days the candidate has left to live. So, for every extra day a candidate is alive before an election, their lifespan after the election will be 0.8 days lower, on average.
-
-
-
-If we applied our results to the model, we would get the following:
-
-$$ y_i =  8052.5 + 2309male_i + -.8 alive\_pre_i+ \epsilon_i $$
+Now take a look at the coefficient for $alive\_pre_i$, $\beta_2$. The median of the posterior, -0.8, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. It makes sense that this value is negative. Think about it: the more days a candidate has lived, the fewer days the candidate has left to live. So, for every extra day a candidate is alive before an election, their lifespan after the election will be 0.8 days lower, on average.
 
 
 Let’s now look at some posteriors.
@@ -472,11 +465,12 @@ fit_gov_3 %>%
     scale_y_continuous(labels=scales::percent_format())
 ```
 
+<!-- DK: Much more to say here, and say it clearly! -->
 
-The graph above displays the alive_post values for males and females. Take a look at both curves. You can clearly see that the two distributions are pretty different; the distribution for males is more spread out than that for females. What this mean? It means men have more precise values for alive_post. A reason for this difference is because there were a greater number of men than women in this data. The more data we have, the more precise we are.
+The graph above displays the posterior probability distributions for $\beta_1$ and $beta|2$. The two distributions are fairly different; the distribution for females is more spread out than that for males. A reason for this difference is because there were a greater number of men than women in the data. The more data we have, the more precise we can be.
 
 
-Let's now take a look at a posterior distribution for $\beta_2$, the coefficient of alive_pre. 
+Let's now take a look at a posterior distribution for $\beta_2$, the coefficient of $alive\_pre_i$. 
 
 ```{r fit_gov3-p1, exercise = TRUE}
 fit_gov_3 %>% 
@@ -509,7 +503,7 @@ fit_gov_3 %>%
 
 ### alive_pre, sex and alive_pre*sex
 
-Let's create another model. This time, however, the numerical outcome variable of alive_post as a function of the two explanatory variables we used above, alive_pre and sex, and of their interaction.
+Let's create another model. This time, however, the numerical outcome variable of alive_post as a function of the two explanatory variables we used above, `alive_pre` and `sex`, and of their interaction.
 
 Here is the math we will be using: 
 
@@ -519,15 +513,15 @@ $$ y_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i+ \beta_3 male_i *  ali
 
 Ok, great! Now that we have our model, let's break it down to explain what each part means. Note that a few of our meanings will be the same as our previous model above.
 
-*  $y_i$, our outcome variable, is still alive_post. We want to know how many days a candidate will live after an election. 
+*  $y_i$, our outcome variable, is still $alive\_post_i$. We want to know how many days a candidate will live after an election. 
 
-* $male_i$ is still one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidate, this value will be 0. $alive_pre$ is still our other explanatory variable that represents the number of days a candidate has lived before the election. 
+* $male_i$ is still one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidate, this value will be 0. $alive\_pre$ is still our other explanatory variable that represents the number of days a candidate has lived before the election. 
 
-* $\beta_0$ is the avg. number of days lived after the election for women, who on the day of election, have been alive the avg. number of days of all female candidates. Note that this is different than our previous example where it was the avg. of all candidates. $\beta_0$ is also the intercept of the equation. 
+* $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all female candidates. Note that this is different than our previous example where it was the average of all candidates. $\beta_0$ is also the intercept of the equation. 
 
-* $\beta_2$ is the coefficient of alive_pre. It it just the slope for women. **Note**: in our last example,  $\beta_2$ wqs the slope for the whole population. Now we are getting more specific. 
+* $\beta_2$ is the coefficient of $alive\_pre_i$. It it just the slope for women. **Note**: in our last example,  $\beta_2$ was the slope for the whole population. Now we are getting more specific. 
 
-* $\beta_3$ is insignificant. However, it gains meaning when it is added to $\beta_2$, which results in the slope for men.
+* $\beta_3$ is difficult to interpret. However, when it is added to $\beta_2$, the result in the slope for men.
 
 ```{r, cache = TRUE}
 fit_gov_4 <- stan_glm(data = ch9_gov,
@@ -541,9 +535,9 @@ print(fit_gov_4, detail = FALSE)
 
 <!-- DK: Take your time explaining what this means! It is not trivial. Note that this is a non-parallel slopes model. -->
 
-In this model, we can see that the intercept for women has increased. $\beta_0$ is 6008.4. This is the intercept for females. It still means he avg. number of days lived after the election for women is 6008.4. Our sexMale coefficient, $\beta_1$ refers to the value that must be added to (Intercept) in order to get the intercept for males. When calculated, i.e. 4332.1 + 6008.4, the result is 10340.5. 
+In this model, we can see that the intercept for women has increased. $\beta_0$ is 6008.4. This is the intercept for females. It still means the average number of days lived after the election for women is 6008.4. Our sexMale coefficient, $\beta_1$ refers to the value that must be added to (Intercept) in order to get the intercept for males. When calculated, i.e. 4332.1 + 6008.4, the result is 10340.5. 
 
-The coefficient for alive_pre, $\beta_2$ is  -.1. What does this mean? It is the slope for only females. So for every extra day a feamle candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now direct your attention below at the coefficient of sexMale:alive_pre, $\beta_3$, which is -.8. This is the value that must be added to the coefficient of alive_pre (recall $\beta_2$ + $\beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is -.9. This means for every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. 
+The coefficient for $alive\_pre_i$, $\beta_2$ is  -.1. What does this mean? It is the slope for only females. So for every extra day a feamle candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now direct your attention below at the coefficient of sexMale:alive_pre, $\beta_3$, which is -.8. This is the value that must be added to the coefficient of $alive\_pre_i$ (recall $\beta_2$ + $\beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is -.9. This means for every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. 
 
 
 
@@ -595,7 +589,7 @@ fit_gov_4 %>%
 
 ```
 
-This posterior distribution shows the avg. slope values for men and women. You can see that men have a steeper slope, while the slop for women is practically 0!
+This posterior distribution shows the average slope values for men and women. You can see that men have a steeper slope, while the slop for women is practically 0!
  
  
 
@@ -629,15 +623,16 @@ Note it takes awhile to run. We are dealing with 55 parameters here.
 print(fit_gov_5, detail = FALSE)
 ```
 
-The (Intercept) refers to the avg. number of days lived after the election for women, who on the day of election, have been alive the avg. number of days of all female candidates in Alabama! That's a mouthful. It really is not different than what we have been doing all along, however. You can see here that (Intercept) value, 4910.4. 
+The (Intercept) refers to the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all female candidates in Alabama! That's a mouthful. It really is not different than what we have been doing all along, however. You can see here that (Intercept) value, 4910.4. 
 
 
 However, we have only talked about women. What about for the men? Well, if you look at the bottom of the list, you will see the sexMale value 4410.1. When you wish to find alive_post for a specific state, you must add this value to the (Intercept), 4910.4, and then add the intercept of the desired state. 
 
-$\beta_51$, our coefficient value for alive_pre, is 0. This means women have a slope of 0.
+$\beta_51$, our coefficient value for $alive\_pre_i$, is 0. This means women have a slope of 0.
 
+<!-- DK: Conflict between $alive\_pre_i$ and `sexMale:alive_pre`. Which is better? Should be consistent. -->
 
-$\beta_51$ +$\beta_52$, our coefficients for alive_pre and sexMale: alive_pre, results in the value -.8. This value is our slope for men.
+$\beta_51$ + $\beta_52$, our coefficients for $alive\_pre_i$ and `sexMale:alive_pre`, results in the value of around -0.8. This value is our slope for men.
 
 
 
@@ -663,7 +658,7 @@ fit_gov_5 %>%
 ```
 
 
-The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You can see here our knowledge of avg. is always more precise than our knowledge of individuals. 
+The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? You can see here our knowledge of average is always more precise than our knowledge of individuals. 
 
 
 
@@ -697,7 +692,7 @@ head(pp, 10)
 ```
 
 If you look above, you will see that we have 2 columns (one for each person).
-The first column shows the posterior predictions for male from South Dakota, whose age is 10x the avg. of all candidates. The second column shows the posterior predictions for male from Washington, whose age is 10x the avg. of all candidates.
+The first column shows the posterior predictions for male from South Dakota, whose age is 10x the average of all candidates. The second column shows the posterior predictions for male from Washington, whose age is 10x the average of all candidates.
 
 
 Now let's plot the individual posteriors.
@@ -755,7 +750,7 @@ head(pp, 10)
 ```
 
 If you look above, you will see that we have 2 columns (one for each person).
-The first column shows the posterior predictions for male from South Dakota, whose age is 10x the avg. of all candidates. The second column shows the posterior predictions for male from Washington, whose age is 10x the avg. of all candidates.
+The first column shows the posterior predictions for male from South Dakota, whose age is 10x the average of all candidates. The second column shows the posterior predictions for male from Washington, whose age is 10x the average of all candidates.
 
 
 Now let's plot the individual posteriors.
