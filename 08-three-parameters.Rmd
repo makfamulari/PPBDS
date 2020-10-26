@@ -247,12 +247,16 @@ fit_obj %>%
                names_to = "parameter",
                values_to = "age") %>% 
   ggplot(aes(x = age, color = parameter)) +
-    geom_density() +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   alpha = 0.5, 
+                   bins = 100, 
+                   position = "identity") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Average age for Boston commuters in 2012",
          x = "Age",
          y = "Probability") +
-    theme_classic() + scale_y_continuous(labels=scales::percent_format())
+    theme_classic() + 
+    scale_y_continuous(labels=scales::percent_format())
 ```
 
 The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican) are still unknown. We can never know the true average age of all Democrats in the population. But we can calculate a posterior probability distribution for the parameters. Comments:
@@ -576,9 +580,7 @@ Up until now, we have used the Bayesian interpretation of "confidence interval."
 
 But, in contemporary academic research, the phrase "confidence interval" is usually given a "Frequentist" interpretation. (The biggest divide in statistics is between Bayesians and Frequentist interpretations. The Frequentist approach, also known as "Classical" statistics, has been dominant for 100 years. Its power is fading, which is why this textbook uses the Bayesian approach.) For a Frequentist, a 95% confidence interval means that, if we were to apply the procedure we used in an infinite number of future situations like this, we would expect the true value to fall within the calculated confidence intervals 95% of the time. In academia, a distinction is sometimes made between confidence intervals (which use the Frequentist interpretation) and credible intervals (which use the Bayesian interpretation). We won't worry about that difference in this book.
 
-<!-- DK: Does using geom_density() really allow us to label the y-axis as "Probability"? Ought to discuss why the percentages go to 120%. Discuss area under the curve. Or should all these be histograms? -->
-
-Let's look at the entire posteriors for both $\beta_1$ and $\beta_2$. Note the use of `geom_density()` in this plot. This function produces a normalized posterior probability density without the confusing use of `after_stat()` as an argument for `geom_histogram()`. It also works more smoothly when, as below, we want to post two posteriors on the same graphic.
+Let's look at the entire posteriors for both $\beta_1$ and $\beta_2$. 
 
 ```{r}
 fit_obj %>% 
@@ -588,7 +590,10 @@ fit_obj %>%
                names_to = "parameter",
                values_to = "attitude") %>% 
   ggplot(aes(x = attitude, color = parameter)) +
-    geom_density() +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   alpha = 0.5, 
+                   bins = 100, 
+                   position = "identity") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Average attitude toward immigration",
          x = "Attitude",
