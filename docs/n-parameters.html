@@ -465,12 +465,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The parameter values:</p>
 <div class="sourceCode" id="cb940"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb940-1"><a href="n-parameters.html#cb940-1"></a><span class="kw">print</span>(fit_gov_<span class="dv">1</span>, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##             Median  MAD_SD 
-## (Intercept) 26532.8   715.2
+## (Intercept) 26510.8   746.4
 ## alive_pre      -0.9     0.0
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4053.7   87.0</code></pre>
+## sigma 4056.9   87.2</code></pre>
 <p>As is almost always the case, <span class="math inline">\(\sigma\)</span> is a nuisance parameter, somethings whose value we are not interested in. This is why <code>stan_glm()</code> refers to it as an “Auxiliary” parameter.</p>
 <p>The posterior distributions of <span class="math inline">\(\beta_0\)</span> (the intercept) and <span class="math inline">\(\beta_1\)</span> (the coefficient of <span class="math inline">\(alive\_pre_i\)</span>), on the other hand, are important. Before looking at the posteriors themselves, let’s examine the fitted values:</p>
 <!-- DK: Use this trick to create parallel and non-parallel line plots later. -->
@@ -519,12 +519,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb945-4"><a href="n-parameters.html#cb945-4"></a></span>
 <span id="cb945-5"><a href="n-parameters.html#cb945-5"></a><span class="kw">print</span>(fit_gov_<span class="fl">1.</span>centered, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##             Median  MAD_SD 
-## (Intercept) 10310.4   120.0
+## (Intercept) 10310.3   120.7
 ## alive_pre      -0.9     0.0
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4054.9   89.0</code></pre>
+## sigma 4053.8   91.2</code></pre>
 <!-- DK: If we are doing centering, then we ought to do it correctly, by showing side-by-side scatterplots with fitted lines, the better to show that we have just slid things over. -->
 <p>We can see that the intercept has decreased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the lifespan of a candidate who was alive for zero days before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of days (about 52 years) before running. If a candidate was alive for about 52 years before running for governor, they are expected to live about 10,300 days (about 28 years) after the election, on average.</p>
 <!-- DK: Really need the ideal and actual Preceptor Table for this example. -->
@@ -540,12 +540,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Note this workflow. Try one model. Interpret it. Try another model. And then another. There is no one “true” model. There is an infinite space of possible models. Good data science involves an intelligent tour of that space.</p>
 <div class="sourceCode" id="cb948"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb948-1"><a href="n-parameters.html#cb948-1"></a><span class="kw">print</span>(fit_gov_<span class="dv">2</span>, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##           Median  MAD_SD 
-## sexFemale  5838.0  1011.9
-## sexMale   10398.5   141.7
+## sexFemale  5816.2  1034.8
+## sexMale   10398.7   143.7
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4849.6  101.2</code></pre>
+## sigma 4850.3  104.3</code></pre>
 <p>In this regression, we use the -1 in the formula to make the output more straightforward, with no intercept to interpret. The math of this model is the same as those we saw in Chapter <a href="three-parameters.html#three-parameters">8</a>:</p>
 <p><span class="math display">\[ alive\_post_i = \beta_1 x_{f,i} + \beta_2 x_{m,i} + \epsilon_i\]</span></p>
 <p>where 
@@ -564,12 +564,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb950-3"><a href="n-parameters.html#cb950-3"></a>                       <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb951"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb951-1"><a href="n-parameters.html#cb951-1"></a><span class="kw">print</span>(fit_gov_2a, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##             Median MAD_SD
-## (Intercept) 5836.7 1062.6
-## sexMale     4558.1 1076.7
+## (Intercept) 5825.6 1052.4
+## sexMale     4557.5 1065.7
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4852.1  109.0</code></pre>
+## sigma 4850.3  103.1</code></pre>
 <p>We no longer have a value for female. However we do have an intercept. In this regression our mathematical formula is:</p>
 <p><span class="math display">\[ alive\_post_i = \beta_0  + \beta_1 x_{m,i} + \epsilon_i\]</span></p>
 <p><span class="math inline">\(\beta_0\)</span> is our intercept, around 5,850. This result is very similar to the female value from before. In this type of model, our intercept represents the the variable which is not nrepresented in the model. <span class="math inline">\(\beta_1\)</span> only affects the outcome when the candidate is male. (If the candidate is female, then <span class="math inline">\(x_{m,i} = 0\)</span>. Therefore, the intercept value represents those who are not male, i.e., females.)</p>
@@ -607,13 +607,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb954-3"><a href="n-parameters.html#cb954-3"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb955"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb955-1"><a href="n-parameters.html#cb955-1"></a><span class="kw">print</span>(fit_gov_<span class="dv">3</span>, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##             Median MAD_SD
-## (Intercept) 8103.0  896.4
-## sexMale     2252.4  888.7
+## (Intercept) 8097.9  910.3
+## sexMale     2253.2  926.2
 ## alive_pre     -0.8    0.0
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4046.8   84.0</code></pre>
+## sigma 4045.9   86.1</code></pre>
 <p>Looking at our results, you can see that our intercept value is around 8,100. (The exact values for the median of the posterior will vary because of the random sampling inherent in fitting the model.) This means that the average female candidate, who had been alive the average number of days of all candidates, would live another 8,100 days or so after the election.</p>
 <p>Note that <code>sexMale</code> is around 2,250. This is our coefficient, <span class="math inline">\(\beta_1\)</span>. We need to connect this value to our intercept value to get something meaningful. Using the formula <span class="math inline">\(\beta_0\)</span> + <span class="math inline">\(\beta_1\)</span>, we find out that the number of days the average male candidate — who, on the day of election, had been alive the average number of days of all candidate — would live is around 10,300,.</p>
 <p>Now take a look at the coefficient for <span class="math inline">\(alive\_pre_i\)</span>, <span class="math inline">\(\beta_2\)</span>. The median of the posterior, -0.8, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. It makes sense that this value is negative. Think about it: the more days a candidate has lived, the fewer days the candidate has left to live. So, for every extra day a candidate is alive before an election, their lifespan after the election will be 0.8 days lower, on average.</p>
@@ -677,14 +677,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb959-3"><a href="n-parameters.html#cb959-3"></a>                      <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb960"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb960-1"><a href="n-parameters.html#cb960-1"></a><span class="kw">print</span>(fit_gov_<span class="dv">4</span>, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##                   Median MAD_SD
-## (Intercept)       5992.1 1335.4
-## sexMale           4372.0 1344.0
-## alive_pre           -0.1    0.4
+## (Intercept)       6005.3 1314.9
+## sexMale           4343.9 1297.3
+## alive_pre            0.0    0.4
 ## sexMale:alive_pre   -0.8    0.4
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 4040.2   85.1</code></pre>
+## sigma 4042.3   86.4</code></pre>
 <!-- DK: Take your time explaining what this means! It is not trivial. Note that this is a non-parallel slopes model. -->
 <p>The intercept has increased. <span class="math inline">\(\beta_0\)</span> is around 6,000. This is the intercept for females. It still means the average number of days lived after the election for women is 6,000 or so. Our <code>sexMale</code> coefficient, <span class="math inline">\(\beta_1\)</span>, refers to the value that must be added to the intercept in order to get the intercept for males. When calculated, the result is 10,000. Keep in mind, however, that these values only apply if <span class="math inline">\(alive\_pre_i = 0\)</span>, if, that is, candidate <span class="math inline">\(i\)</span> is around 52 years old.</p>
 <p>The coefficient for <span class="math inline">\(alive\_pre_i\)</span>, <span class="math inline">\(\beta_2\)</span> is -.1. What does this mean? It is the slope for females. So for every extra day a female candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now direct your attention below at the coefficient of <code>sexMale:alive_pre</code>, <span class="math inline">\(\beta_3\)</span>, which is -.8. This is the value that must be added to the coefficient of <span class="math inline">\(alive\_pre_i\)</span> (recall <span class="math inline">\(\beta_2\)</span> + <span class="math inline">\(\beta_3\)</span>) in order to find the slope for males. When the two are added together, this value, or slope, is about -0.9. For every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average.</p>
@@ -756,63 +756,63 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Note it takes awhile to run. We are dealing with 55 parameters here.</p>
 <div class="sourceCode" id="cb965"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb965-1"><a href="n-parameters.html#cb965-1"></a><span class="kw">print</span>(fit_gov_<span class="dv">5</span>, <span class="dt">detail =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##                     Median  MAD_SD 
-## (Intercept)          4855.9  1511.5
-## stateAlaska          1134.9  1399.6
-## stateArizona         2947.5  1112.5
-## stateArkansas         570.0  1148.2
-## stateCalifornia      2045.8  1216.3
-## stateColorado        1515.9  1190.0
-## stateConnecticut     1068.3  1206.0
-## stateDelaware        3166.9  1273.2
-## stateFlorida        -1514.8  1338.3
-## stateGeorgia         1825.4  1406.4
-## stateHawaii          1624.9  1524.8
-## stateIdaho           1754.0  1212.0
-## stateIllinois        -127.9  1310.2
-## stateIndiana         1297.2  1226.8
-## stateIowa             975.3  1141.4
-## stateKansas          -110.9  1157.5
-## stateKentucky        1514.2  1266.2
-## stateLouisiana       1467.7  1452.9
-## stateMaine           2165.1  1290.6
-## stateMaryland        1698.3  1210.0
-## stateMassachusetts    138.8  1146.2
-## stateMichigan       -1111.2  1174.1
-## stateMinnesota       1682.4  1134.5
-## stateMississippi      826.2  1290.9
-## stateMissouri         528.3  1291.9
-## stateMontana          891.0  1256.6
-## stateNebraska         848.1  1175.4
-## stateNevada          1559.3  1330.0
-## stateNew Hampshire   1343.3  1126.2
-## stateNew Jersey       413.9  1268.8
-## stateNew Mexico      1061.9  1108.2
-## stateNew York         914.8  1189.1
-## stateNorth Carolina -1407.0  1400.1
-## stateNorth Dakota    2197.6  1172.5
-## stateOhio            2234.3  1175.5
-## stateOklahoma        -522.8  1318.2
-## stateOregon           248.5  1240.9
-## statePennsylvania    1304.7  1257.6
-## stateRhode Island    1985.7  1069.4
-## stateSouth Carolina  2503.8  1341.5
-## stateSouth Dakota   -1807.4  1106.6
-## stateTennessee       -408.0  1255.7
-## stateTexas           1226.2  1123.2
-## stateUtah            1239.4  1225.4
-## stateVermont          588.7  1140.1
-## stateVirginia        2611.0  1398.3
-## stateWashington      2791.2  1271.1
-## stateWest Virginia   2425.3  1257.1
-## stateWisconsin       2487.2  1115.5
-## stateWyoming         -501.7  1229.3
-## sexMale              4420.2  1328.4
-## alive_pre              -0.1     0.4
+## (Intercept)          4882.1  1506.2
+## stateAlaska          1093.0  1421.6
+## stateArizona         2919.3  1147.4
+## stateArkansas         510.0  1169.4
+## stateCalifornia      1997.9  1258.7
+## stateColorado        1471.7  1221.4
+## stateConnecticut     1019.4  1270.6
+## stateDelaware        3111.0  1268.4
+## stateFlorida        -1551.3  1319.5
+## stateGeorgia         1803.1  1406.5
+## stateHawaii          1569.4  1549.1
+## stateIdaho           1714.3  1245.9
+## stateIllinois        -172.4  1321.4
+## stateIndiana         1243.1  1231.9
+## stateIowa             935.6  1162.1
+## stateKansas          -157.5  1148.9
+## stateKentucky        1481.4  1297.1
+## stateLouisiana       1422.5  1419.2
+## stateMaine           2117.4  1327.5
+## stateMaryland        1659.1  1239.4
+## stateMassachusetts     92.1  1150.4
+## stateMichigan       -1177.8  1213.3
+## stateMinnesota       1646.3  1182.2
+## stateMississippi      760.2  1307.9
+## stateMissouri         485.9  1345.2
+## stateMontana          831.8  1246.9
+## stateNebraska         801.2  1188.3
+## stateNevada          1516.3  1361.1
+## stateNew Hampshire   1311.1  1175.8
+## stateNew Jersey       371.0  1301.9
+## stateNew Mexico      1016.9  1129.9
+## stateNew York         875.5  1209.7
+## stateNorth Carolina -1438.8  1406.8
+## stateNorth Dakota    2149.2  1220.2
+## stateOhio            2174.7  1195.5
+## stateOklahoma        -570.9  1353.4
+## stateOregon           217.9  1259.3
+## statePennsylvania    1290.8  1259.0
+## stateRhode Island    1944.7  1116.1
+## stateSouth Carolina  2440.2  1367.4
+## stateSouth Dakota   -1844.2  1154.8
+## stateTennessee       -450.5  1283.0
+## stateTexas           1176.8  1157.6
+## stateUtah            1191.5  1262.4
+## stateVermont          554.4  1167.4
+## stateVirginia        2563.8  1418.0
+## stateWashington      2761.3  1291.0
+## stateWest Virginia   2400.5  1286.3
+## stateWisconsin       2455.0  1148.0
+## stateWyoming         -524.2  1273.4
+## sexMale              4435.4  1333.9
+## alive_pre               0.0     0.4
 ## sexMale:alive_pre      -0.8     0.4
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 3959.6   86.2</code></pre>
+## sigma 3960.8   87.6</code></pre>
 <p>The (Intercept) refers to the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all female candidates in Alabama! That’s a mouthful. It really is not different than what we have been doing all along, however. You can see here that (Intercept) value is around 4,900.</p>
 <p>However, we have only talked about women. What about for the men? Well, if you look at the bottom of the list, you will see the <code>sexMale</code> value of around 4,400. When you wish to find alive_post for a specific state, you must add this value to the intercept, about 4,900, and then also add the intercept of the desired state.</p>
 <p><span class="math inline">\(\beta_{51}\)</span>, our coefficient value for <span class="math inline">\(alive\_pre_i\)</span>, is 0. This means women have a slope of 0.</p>
@@ -860,72 +860,94 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>How long will two male political candidates — one from South Dakota and one from Washington, both 10 years older than the average candidate — live after the election? How different will their lifespans be?</li>
 </ul>
 <p>These questions are, purposely, less precise than the ones we tackled in Chapters <a href="two-parameters.html#two-parameters">7</a> and <a href="three-parameters.html#three-parameters">8</a>, written more in a conversational style. This is how normal people talk.</p>
-<p>However, as data scientists, our job is to bring precision to these questions. There are two common sense interpretations. First, we could be curious about the <em>expected values</em> for these questions. If we averaged the data for a thousand candidates like these, what would the answer be? Secnd, we could be curious about two specific individuals. How long will they live? <em>Averages involve questions about parameters. Individuals necessitate questions about predictions.</em> Those are general claims, violated too often to be firm rules. Yet, they highlight a key point: expected values are less variable than individual predictions.</p>
+<p>However, as data scientists, our job is to bring precision to these questions. There are two commonsense interpretations. First, we could be curious about the <em>expected values</em> for these questions. If we averaged the data for a thousand candidates like these, what would the answer be? Second, we could be curious about two specific individuals. How long will they live? <em>Averages involve questions about parameters. The fates of individuals require predictions.</em> Those are general claims, violated too often to be firm rules. Yet, they highlight a key point: expected values are less variable than individual predictions.</p>
 <p>Consider the “on average” interpretation first. The answer lies in the posterior distributions of the parameters in <code>fit_gov_5</code>.</p>
 <div class="sourceCode" id="cb968"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb968-1"><a href="n-parameters.html#cb968-1"></a>fit_gov_<span class="dv">5</span> <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb968-2"><a href="n-parameters.html#cb968-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb968-3"><a href="n-parameters.html#cb968-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">WA =</span> <span class="st">`</span><span class="dt">(Intercept)</span><span class="st">`</span> <span class="op">+</span><span class="st"> </span><span class="fl">2739.1</span> <span class="op">+</span><span class="st"> </span>sexMale) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb968-4"><a href="n-parameters.html#cb968-4"></a><span class="st">  </span><span class="kw">mutate</span> (<span class="dt">SD =</span> <span class="st">`</span><span class="dt">(Intercept)</span><span class="st">`</span> <span class="op">-</span><span class="st"> </span><span class="fl">1842.9</span> <span class="op">+</span><span class="st"> </span>sexMale) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb968-5"><a href="n-parameters.html#cb968-5"></a><span class="st">  </span><span class="kw">select</span>(WA, SD) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb968-6"><a href="n-parameters.html#cb968-6"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> WA<span class="op">:</span>SD, </span>
-<span id="cb968-7"><a href="n-parameters.html#cb968-7"></a>               <span class="dt">names_to =</span> <span class="st">"parameters"</span>,</span>
-<span id="cb968-8"><a href="n-parameters.html#cb968-8"></a>               <span class="dt">values_to =</span> <span class="st">"days"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb968-9"><a href="n-parameters.html#cb968-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">color =</span> parameters)) <span class="op">+</span></span>
-<span id="cb968-10"><a href="n-parameters.html#cb968-10"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
-<span id="cb968-11"><a href="n-parameters.html#cb968-11"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
-<span id="cb968-12"><a href="n-parameters.html#cb968-12"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
-<span id="cb968-13"><a href="n-parameters.html#cb968-13"></a>                   <span class="dt">position =</span> <span class="st">"identity"</span>) <span class="op">+</span></span>
-<span id="cb968-14"><a href="n-parameters.html#cb968-14"></a><span class="st">     </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Predictive Distribution"</span>,</span>
-<span id="cb968-15"><a href="n-parameters.html#cb968-15"></a>         <span class="dt">subtitle =</span> <span class="st">"For 62 years-old male candidates from Washington and South Dakota"</span>,</span>
-<span id="cb968-16"><a href="n-parameters.html#cb968-16"></a>         <span class="dt">x =</span> <span class="st">"Average Days Lived Post Election"</span>,</span>
-<span id="cb968-17"><a href="n-parameters.html#cb968-17"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb968-18"><a href="n-parameters.html#cb968-18"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb968-19"><a href="n-parameters.html#cb968-19"></a><span class="st">    </span><span class="kw">scale_x_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">number_format</span>()) <span class="op">+</span></span>
-<span id="cb968-20"><a href="n-parameters.html#cb968-20"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
+<span id="cb968-3"><a href="n-parameters.html#cb968-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">WA =</span> <span class="st">`</span><span class="dt">(Intercept)</span><span class="st">`</span> <span class="op">+</span><span class="st"> </span>stateWashington <span class="op">+</span><span class="st"> </span>sexMale <span class="op">+</span><span class="st"> </span></span>
+<span id="cb968-4"><a href="n-parameters.html#cb968-4"></a><span class="st">           </span>(<span class="st">`</span><span class="dt">sexMale:alive_pre</span><span class="st">`</span> <span class="op">+</span><span class="st"> </span>alive_pre) <span class="op">*</span><span class="st"> </span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">365</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb968-5"><a href="n-parameters.html#cb968-5"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">SD =</span> <span class="st">`</span><span class="dt">(Intercept)</span><span class="st">`</span> <span class="op">+</span><span class="st"> `</span><span class="dt">stateSouth Dakota</span><span class="st">`</span> <span class="op">+</span><span class="st"> </span>sexMale <span class="op">+</span><span class="st"> </span></span>
+<span id="cb968-6"><a href="n-parameters.html#cb968-6"></a><span class="st">           </span>(<span class="st">`</span><span class="dt">sexMale:alive_pre</span><span class="st">`</span> <span class="op">+</span><span class="st"> </span>alive_pre) <span class="op">*</span><span class="st"> </span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">365</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb968-7"><a href="n-parameters.html#cb968-7"></a><span class="st">  </span><span class="kw">select</span>(WA, SD) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb968-8"><a href="n-parameters.html#cb968-8"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> WA<span class="op">:</span>SD, </span>
+<span id="cb968-9"><a href="n-parameters.html#cb968-9"></a>               <span class="dt">names_to =</span> <span class="st">"Parameter"</span>,</span>
+<span id="cb968-10"><a href="n-parameters.html#cb968-10"></a>               <span class="dt">values_to =</span> <span class="st">"days"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb968-11"><a href="n-parameters.html#cb968-11"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">fill =</span> Parameter)) <span class="op">+</span></span>
+<span id="cb968-12"><a href="n-parameters.html#cb968-12"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
+<span id="cb968-13"><a href="n-parameters.html#cb968-13"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
+<span id="cb968-14"><a href="n-parameters.html#cb968-14"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
+<span id="cb968-15"><a href="n-parameters.html#cb968-15"></a>                   <span class="dt">position =</span> <span class="st">"identity"</span>) <span class="op">+</span></span>
+<span id="cb968-16"><a href="n-parameters.html#cb968-16"></a><span class="st">     </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>,</span>
+<span id="cb968-17"><a href="n-parameters.html#cb968-17"></a>         <span class="dt">subtitle =</span> <span class="st">"For 62 years-old male candidates from South Dakota and Washington"</span>,</span>
+<span id="cb968-18"><a href="n-parameters.html#cb968-18"></a>         <span class="dt">x =</span> <span class="st">"Average Days Lived Post Election"</span>,</span>
+<span id="cb968-19"><a href="n-parameters.html#cb968-19"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb968-20"><a href="n-parameters.html#cb968-20"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb968-21"><a href="n-parameters.html#cb968-21"></a><span class="st">    </span><span class="kw">scale_x_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">number_format</span>()) <span class="op">+</span></span>
+<span id="cb968-22"><a href="n-parameters.html#cb968-22"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-766-1.png" width="672"></p>
-<p>Looking at our posterior above, we can see that the male candidate from Washington is expected to live longer. But how much longer? As in previous chapters, we can manipulate distributions in, more or less, the same way that we manipulate simple numbers. If we want to know the difference between two posterior distributions, we can simply subtract.</p>
-<!-- DK: Should we plot subtraction? Doing so highlights the fact that, on average, Washinton is almost guaranteed to live longer. In the prediction, there is a 30% chance that he won't. -->
-<p>If we interpret the question as asking for a prediction for a small number of individuals, then we need to use <code>posterior_predict()</code>.</p>
-<p>First, we create a tibble with the desired input for our model. In our case the tibble has a variable named <code>sex</code> which contains two observations both with the same value “Male”. There is a <code>state</code> variable with the desired states. There is an <code>alive_pre</code> set to 10 years worth of days.</p>
-<div class="sourceCode" id="cb969"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb969-1"><a href="n-parameters.html#cb969-1"></a>new_obs &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">sex =</span> <span class="kw">c</span>(<span class="st">"Male"</span>, <span class="st">"Male"</span>),</span>
-<span id="cb969-2"><a href="n-parameters.html#cb969-2"></a>                  <span class="dt">state =</span> <span class="kw">c</span>(<span class="st">"South Dakota"</span>, <span class="st">"Washington"</span>),</span>
-<span id="cb969-3"><a href="n-parameters.html#cb969-3"></a>                  <span class="dt">alive_pre =</span> <span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="fl">365.25</span>)</span></code></pre></div>
+<p>Looking at our posterior probability distributions above, we can see that the candidates from Washington are expected to live longer. But how much longer? As in previous chapters, we can manipulate distributions in, more or less, the same way that we manipulate simple numbers. If we want to know the difference between two posterior distributions, we can simply subtract. But before we do, note that, in many ways, looking at the difference is much easier than considering the individual posteriors.</p>
+<p>We don’t really need to calculate <code>WA</code> using all those complex terms. We already know that we are going to subtract <code>SD</code> and that both <code>WA</code> and <code>SD</code> include the <code>(Intercept)</code>, <code>sexMale</code>, and so on. All those terms in common will cancel out when we subtract. So, we can go directly to <code>diff</code> being equal to the difference between <code>stateWashington</code> and <code>stateSouth Dakota</code>.</p>
+<div class="sourceCode" id="cb969"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb969-1"><a href="n-parameters.html#cb969-1"></a>fit_gov_<span class="dv">5</span> <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb969-2"><a href="n-parameters.html#cb969-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb969-3"><a href="n-parameters.html#cb969-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">diff =</span> stateWashington <span class="op">-</span><span class="st"> `</span><span class="dt">stateSouth Dakota</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb969-4"><a href="n-parameters.html#cb969-4"></a><span class="st">  </span><span class="kw">select</span>(diff) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb969-5"><a href="n-parameters.html#cb969-5"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(diff)) <span class="op">+</span></span>
+<span id="cb969-6"><a href="n-parameters.html#cb969-6"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
+<span id="cb969-7"><a href="n-parameters.html#cb969-7"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
+<span id="cb969-8"><a href="n-parameters.html#cb969-8"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
+<span id="cb969-9"><a href="n-parameters.html#cb969-9"></a>                   <span class="dt">position =</span> <span class="st">"identity"</span>) <span class="op">+</span></span>
+<span id="cb969-10"><a href="n-parameters.html#cb969-10"></a><span class="st">     </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>,</span>
+<span id="cb969-11"><a href="n-parameters.html#cb969-11"></a>         <span class="dt">subtitle =</span> <span class="st">"Candidates from Washington live longer than those from South Dakota"</span>,</span>
+<span id="cb969-12"><a href="n-parameters.html#cb969-12"></a>         <span class="dt">x =</span> <span class="st">"Average Additional Days Lived Post Election"</span>,</span>
+<span id="cb969-13"><a href="n-parameters.html#cb969-13"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb969-14"><a href="n-parameters.html#cb969-14"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb969-15"><a href="n-parameters.html#cb969-15"></a><span class="st">    </span><span class="kw">scale_x_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">number_format</span>()) <span class="op">+</span></span>
+<span id="cb969-16"><a href="n-parameters.html#cb969-16"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-767-1.png" width="672"></p>
+<p>The average value of the difference in days-to-live is almost certainly positive, with the most likely value being around 4,500.</p>
+<!-- DK: Should we use posterior_linpred() or posterior_epred() here? We should certainly do more to show how to combine the original math with the model results. -->
+<p>If, instead, we interpret the question as asking for a prediction for a small number of individuals, then we need to use <code>posterior_predict()</code>.</p>
+<p>First, we create a tibble with the desired input for our model. In our case the tibble has a variable named <code>sex</code> which contains two observations both with the value “Male”. There is a <code>state</code> variable with the desired states. There is an <code>alive_pre</code> variable set to 10 years worth of days.</p>
+<div class="sourceCode" id="cb970"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb970-1"><a href="n-parameters.html#cb970-1"></a>new_obs &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">sex =</span> <span class="kw">c</span>(<span class="st">"Male"</span>, <span class="st">"Male"</span>),</span>
+<span id="cb970-2"><a href="n-parameters.html#cb970-2"></a>                  <span class="dt">state =</span> <span class="kw">c</span>(<span class="st">"South Dakota"</span>, <span class="st">"Washington"</span>),</span>
+<span id="cb970-3"><a href="n-parameters.html#cb970-3"></a>                  <span class="dt">alive_pre =</span> <span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">365</span>)</span></code></pre></div>
 <!-- DK: Try again to explain what a posterior prediction is. -->
 <p>Use <code>posterior_predict()</code> to create draws from the posterior probability distribution for our prediction for these cases. <code>posterior_predict()</code> takes two arguments: the model for which the simulations should be run, and a tibble indicating the covariate values for the individual(s) we want to predict. In this case, we are using the <code>fit_gov_5</code> model and the tibble is the one we just created.</p>
-<div class="sourceCode" id="cb970"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb970-1"><a href="n-parameters.html#cb970-1"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_gov_<span class="dv">5</span>, </span>
-<span id="cb970-2"><a href="n-parameters.html#cb970-2"></a>                        <span class="dt">newdata =</span> new_obs) <span class="op">%&gt;%</span></span>
-<span id="cb970-3"><a href="n-parameters.html#cb970-3"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb970-4"><a href="n-parameters.html#cb970-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
-<span id="cb970-5"><a href="n-parameters.html#cb970-5"></a>  </span>
-<span id="cb970-6"><a href="n-parameters.html#cb970-6"></a><span class="kw">head</span>(pp)</span></code></pre></div>
+<div class="sourceCode" id="cb971"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb971-1"><a href="n-parameters.html#cb971-1"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_gov_<span class="dv">5</span>, </span>
+<span id="cb971-2"><a href="n-parameters.html#cb971-2"></a>                        <span class="dt">newdata =</span> new_obs) <span class="op">%&gt;%</span></span>
+<span id="cb971-3"><a href="n-parameters.html#cb971-3"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb971-4"><a href="n-parameters.html#cb971-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
+<span id="cb971-5"><a href="n-parameters.html#cb971-5"></a>  </span>
+<span id="cb971-6"><a href="n-parameters.html#cb971-6"></a><span class="kw">head</span>(pp)</span></code></pre></div>
 <pre><code>## # A tibble: 6 x 2
-##     `1`    `2`
-##   &lt;dbl&gt;  &lt;dbl&gt;
-## 1 3661. 14460.
-## 2  982. 11592.
-## 3 7040. 10201.
-## 4 4074. 11049.
-## 5 1158.  9362.
-## 6 2757.  4197.</code></pre>
+##      `1`    `2`
+##    &lt;dbl&gt;  &lt;dbl&gt;
+## 1 -1549.  3947.
+## 2   860.  3101.
+## 3  9223.  3218.
+## 4   451. 14627.
+## 5 12140.  7812.
+## 6 -4514. 13135.</code></pre>
 <p>The resulting tibble has 2 columns, one for each person. The first column shows the posterior predictions for the candidate from South Dakota. The second column shows the posterior predictions for the candidate from Washington. In both cases, the forecasts depend on the values of all the covariates. That is, we would provide a different forecast if the candidates were female or if they were other ages.</p>
 <!-- DK: More detail, tying this forecast into other forecasts we have created. -->
-<div class="sourceCode" id="cb972"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb972-1"><a href="n-parameters.html#cb972-1"></a>pp <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb972-2"><a href="n-parameters.html#cb972-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">diff =</span> <span class="st">`</span><span class="dt">2</span><span class="st">`</span> <span class="op">-</span><span class="st"> `</span><span class="dt">1</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb972-3"><a href="n-parameters.html#cb972-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(diff)) <span class="op">+</span></span>
-<span id="cb972-4"><a href="n-parameters.html#cb972-4"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
-<span id="cb972-5"><a href="n-parameters.html#cb972-5"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
-<span id="cb972-6"><a href="n-parameters.html#cb972-6"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
-<span id="cb972-7"><a href="n-parameters.html#cb972-7"></a>                   <span class="dt">position =</span> <span class="st">"identity"</span>) <span class="op">+</span></span>
-<span id="cb972-8"><a href="n-parameters.html#cb972-8"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>, </span>
-<span id="cb972-9"><a href="n-parameters.html#cb972-9"></a>         <span class="dt">subtitle =</span> <span class="st">"How much longer will Washingto candidate live?"</span>,</span>
-<span id="cb972-10"><a href="n-parameters.html#cb972-10"></a>         <span class="dt">x =</span> <span class="st">"Days"</span>,</span>
-<span id="cb972-11"><a href="n-parameters.html#cb972-11"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
-<span id="cb972-12"><a href="n-parameters.html#cb972-12"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb972-13"><a href="n-parameters.html#cb972-13"></a><span class="st">    </span><span class="kw">scale_x_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">number_format</span>()) <span class="op">+</span></span>
-<span id="cb972-14"><a href="n-parameters.html#cb972-14"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-769-1.png" width="672">
-In words, we would expect the male candidate from Washington to live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 3,000 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1/3 chance that he does so.</p>
-<!-- DK: Delete this? Also, notice that in this distribution there are `alive_post` values that are negative? Does this make sense? Could a candidate be alive negative days after the election? The answer is no. However, nothing is wrong with the code. The reason for this is because when we assumed epsilon was normally distributed, we allowed numbers to be negative. This is not that important, so let's press on. -->
+<div class="sourceCode" id="cb973"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb973-1"><a href="n-parameters.html#cb973-1"></a>pp <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb973-2"><a href="n-parameters.html#cb973-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">diff =</span> <span class="st">`</span><span class="dt">2</span><span class="st">`</span> <span class="op">-</span><span class="st"> `</span><span class="dt">1</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb973-3"><a href="n-parameters.html#cb973-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(diff)) <span class="op">+</span></span>
+<span id="cb973-4"><a href="n-parameters.html#cb973-4"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
+<span id="cb973-5"><a href="n-parameters.html#cb973-5"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
+<span id="cb973-6"><a href="n-parameters.html#cb973-6"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
+<span id="cb973-7"><a href="n-parameters.html#cb973-7"></a>                   <span class="dt">position =</span> <span class="st">"identity"</span>) <span class="op">+</span></span>
+<span id="cb973-8"><a href="n-parameters.html#cb973-8"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distribution"</span>, </span>
+<span id="cb973-9"><a href="n-parameters.html#cb973-9"></a>         <span class="dt">subtitle =</span> <span class="st">"How much longer will an individual Washington candidate live?"</span>,</span>
+<span id="cb973-10"><a href="n-parameters.html#cb973-10"></a>         <span class="dt">x =</span> <span class="st">"Days"</span>,</span>
+<span id="cb973-11"><a href="n-parameters.html#cb973-11"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
+<span id="cb973-12"><a href="n-parameters.html#cb973-12"></a><span class="st">    </span><span class="kw">theme_classic</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb973-13"><a href="n-parameters.html#cb973-13"></a><span class="st">    </span><span class="kw">scale_x_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">number_format</span>()) <span class="op">+</span></span>
+<span id="cb973-14"><a href="n-parameters.html#cb973-14"></a><span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-770-1.png" width="672"></p>
+<p>In words, we would expect the candidate from Washington to live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 4,500 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1 in 5 chance that he does so.</p>
+<p><em>Note what is the same and what is different when we move from a question about averages to a question about individuals.</em> In both cases, the most likely value is about the same, about 4,500 days. That is, the average behavior is the same as our expected value for any given individual. But the uncertainty is much greater for an individual prediction. The chance of the true average for Washington candidates being less than that for South Dakota candidates is essentially zero. Yet, for any individual pair of candidates, it would not even be slightly surprising for the South Dakota candidate to outlive the Washington candidate. Individuals vary. Averages never tell the whole story.</p>
+<!-- DK: Discuss the substantive issue? How can it be that Washington candidates live longer? Also, compare these estimates to what naive lm() would tell us. -->
 <!-- DK: Finish with Temperance/population/exchangability discussion. -->
 </div>
 <div id="eda-of-shaming" class="section level2">
@@ -939,7 +961,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that “shames” citizens who do not vote. You are considering sending out a “shaming” voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?</p>
 <p>Consider a new data set, <code>shaming</code>, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled “Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment”. This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout.</p>
 <p>Let’s now do another EDA, starting off by running <code>glimpse()</code>.</p>
-<div class="sourceCode" id="cb973"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb973-1"><a href="n-parameters.html#cb973-1"></a><span class="kw">glimpse</span>(shaming)</span></code></pre></div>
+<div class="sourceCode" id="cb974"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb974-1"><a href="n-parameters.html#cb974-1"></a><span class="kw">glimpse</span>(shaming)</span></code></pre></div>
 <pre><code>## Rows: 344,084
 ## Columns: 10
 ## $ sex         &lt;chr&gt; "Male", "Female", "Male", "Female", "Female", "Male", "Fe…
@@ -961,8 +983,8 @@ In words, we would expect the male candidate from Washington to live longer than
 <!-- HV: should I explain why we are not using any of these variables? why they are not of great use to us? -->
 <p>By narrowing down the set of variables we are looking at and investigating, we will find more meaningful relationships among them. However, we have not yet discussed the most important variable of them all: <code>treatment</code>. The <code>treatment</code> variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let’s start off by taking a broad look at the different treatments.
 <!-- HV: Is it okay to say the first sentence of this paragraph? --></p>
-<div class="sourceCode" id="cb975"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb975-1"><a href="n-parameters.html#cb975-1"></a>shaming <span class="op">%&gt;%</span></span>
-<span id="cb975-2"><a href="n-parameters.html#cb975-2"></a><span class="st">  </span><span class="kw">count</span>(treatment)</span></code></pre></div>
+<div class="sourceCode" id="cb976"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb976-1"><a href="n-parameters.html#cb976-1"></a>shaming <span class="op">%&gt;%</span></span>
+<span id="cb976-2"><a href="n-parameters.html#cb976-2"></a><span class="st">  </span><span class="kw">count</span>(treatment)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 2
 ##   treatment       n
 ##   &lt;fct&gt;       &lt;int&gt;
@@ -977,17 +999,17 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>In the third treatment, Self, the mailing includes the recent voting record of each member of the household, placing the word “Voted” next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. In this mailing, the households were also told, “we intend to mail an updated chart” with the voting record of the household members after the 2006 primary. By emphasizing the public nature of voting records, this type of mailing exerts more social pressure on voting than the Hawthorne treatment.</p>
 <p>The fourth treatment, Neighbors, provides the household members’ voting records, as well as the voting records of those who live nearby. This mailing also told recipients, “we intend to mail an updated chart” of who voted in the 2006 election to the entire neighborhood.</p>
 <p>For now, let’s focus on a subset of the data. We will sample just 10,000 rows because otherwise <code>stan_glm()</code> takes an annoyingly large amount of time to work. Nothing substantive changes.</p>
-<div class="sourceCode" id="cb977"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb977-1"><a href="n-parameters.html#cb977-1"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
-<span id="cb977-2"><a href="n-parameters.html#cb977-2"></a>ch9_sham &lt;-<span class="st"> </span>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb977-3"><a href="n-parameters.html#cb977-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">solo =</span> <span class="kw">ifelse</span>(hh_size <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb977-4"><a href="n-parameters.html#cb977-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="dv">2006</span> <span class="op">-</span><span class="st"> </span>birth_year) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb977-5"><a href="n-parameters.html#cb977-5"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, solo, sex, age) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb977-6"><a href="n-parameters.html#cb977-6"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10000</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb978"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb978-1"><a href="n-parameters.html#cb978-1"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
+<span id="cb978-2"><a href="n-parameters.html#cb978-2"></a>ch9_sham &lt;-<span class="st"> </span>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb978-3"><a href="n-parameters.html#cb978-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">solo =</span> <span class="kw">ifelse</span>(hh_size <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb978-4"><a href="n-parameters.html#cb978-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="dv">2006</span> <span class="op">-</span><span class="st"> </span>birth_year) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb978-5"><a href="n-parameters.html#cb978-5"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, solo, sex, age) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb978-6"><a href="n-parameters.html#cb978-6"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10000</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <p>We create the variable <code>solo</code>, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not.</p>
-<div class="sourceCode" id="cb978"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb978-1"><a href="n-parameters.html#cb978-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb978-2"><a href="n-parameters.html#cb978-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb979"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb979-1"><a href="n-parameters.html#cb979-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb979-2"><a href="n-parameters.html#cb979-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-773">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-774">TABLE 9.2: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -1141,8 +1163,8 @@ In words, we would expect the male candidate from Washington to live longer than
 <!-- DK: Add discussion of what you see here. No need to drop missing values since there aren't any. I think this next discussion can be dropped. -->
 <p>To get a better sense of some respondents’ information, let’s use <code>sample_n()</code> to gather a random sample of <em>n</em> observations from the data set.</p>
 <!-- HV: Does this belong here? -->
-<div class="sourceCode" id="cb979"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb979-1"><a href="n-parameters.html#cb979-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb979-2"><a href="n-parameters.html#cb979-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb980"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb980-1"><a href="n-parameters.html#cb980-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb980-2"><a href="n-parameters.html#cb980-2"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 5
 ##    primary_06 treatment solo  sex      age
 ##         &lt;int&gt; &lt;fct&gt;     &lt;lgl&gt; &lt;chr&gt;  &lt;dbl&gt;
@@ -1158,11 +1180,11 @@ In words, we would expect the male candidate from Washington to live longer than
 ## 10          1 Control   FALSE Female    75</code></pre>
 <p>Now we have a table with 5 random observations and the respondents’ information in a regular table output. By taking a few random samples, we may start to see some patterns within the data. Do you notice anything in particular about the variable <code>treatment</code>?</p>
 <p>One other helpful summarizing technique we can use is <code>skim()</code>. To make the information it contains simpler, we will only be looking at three variables: <code>primary_06</code>, <code>treatment</code>, and <code>sex</code>.</p>
-<div class="sourceCode" id="cb981"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb981-1"><a href="n-parameters.html#cb981-1"></a>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb981-2"><a href="n-parameters.html#cb981-2"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb981-3"><a href="n-parameters.html#cb981-3"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb982"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb982-1"><a href="n-parameters.html#cb982-1"></a>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb982-2"><a href="n-parameters.html#cb982-2"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb982-3"><a href="n-parameters.html#cb982-3"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-775">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-776">TABLE 9.3: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -1287,7 +1309,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-776"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-777"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="1280"><!--
 <p class="caption marginnote">-->FIGURE 9.5: Wisdom<!--</p>-->
 <!--</div>--></span>
@@ -1305,7 +1327,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-777"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-778"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.6: Justice<!--</p>-->
 <!--</div>--></span>
@@ -1313,7 +1335,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-778"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-779"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="1024"><!--
 <p class="caption marginnote">-->FIGURE 9.7: Courage<!--</p>-->
 <!--</div>--></span>
@@ -1324,9 +1346,9 @@ In words, we would expect the male candidate from Washington to live longer than
 <span class="header-section-number">9.5.3.1</span> Voting and Sex</h4>
 <!-- MF: I used family = gaussian as I noted it in the lower section drafts, but can't find the purpose online. Also, stan_glm is taking a very long time to run. Is this a concern? Never mention gaussian or the family argument. -->
 <p>Let’s start with a simple model: the effect of voting in the 2006 election and sex. First, let’s look at the results of <code>primary_06</code> after grouping by <code>sex</code> to see the number of females and males who did or did not vote. Recall that a value of 1 for <code>primary_06</code> means that the citizen <em>did</em> vote, while a value of 0 means that they <em>did not</em>.</p>
-<div class="sourceCode" id="cb982"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb982-1"><a href="n-parameters.html#cb982-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb982-2"><a href="n-parameters.html#cb982-2"></a><span class="st">  </span><span class="kw">group_by</span>(sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb982-3"><a href="n-parameters.html#cb982-3"></a><span class="st">  </span><span class="kw">count</span>(primary_<span class="dv">06</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb983"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb983-1"><a href="n-parameters.html#cb983-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb983-2"><a href="n-parameters.html#cb983-2"></a><span class="st">  </span><span class="kw">group_by</span>(sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb983-3"><a href="n-parameters.html#cb983-3"></a><span class="st">  </span><span class="kw">count</span>(primary_<span class="dv">06</span>) </span></code></pre></div>
 <pre><code>## # A tibble: 4 x 3
 ## # Groups:   sex [2]
 ##   sex    primary_06     n
@@ -1336,11 +1358,11 @@ In words, we would expect the male candidate from Washington to live longer than
 ## 3 Male            0  3332
 ## 4 Male            1  1668</code></pre>
 <p>Eyeballing the figures, you may have noticed that slightly more male respondents voted than female respondents. Let’s investigate this using <code>stan_glm</code>.</p>
-<div class="sourceCode" id="cb984"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb984-1"><a href="n-parameters.html#cb984-1"></a>model_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
-<span id="cb984-2"><a href="n-parameters.html#cb984-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex, </span>
-<span id="cb984-3"><a href="n-parameters.html#cb984-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
-<span id="cb984-4"><a href="n-parameters.html#cb984-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb985"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb985-1"><a href="n-parameters.html#cb985-1"></a><span class="kw">print</span>(model_<span class="dv">1</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb985"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb985-1"><a href="n-parameters.html#cb985-1"></a>model_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb985-2"><a href="n-parameters.html#cb985-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex, </span>
+<span id="cb985-3"><a href="n-parameters.html#cb985-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
+<span id="cb985-4"><a href="n-parameters.html#cb985-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb986"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb986-1"><a href="n-parameters.html#cb986-1"></a><span class="kw">print</span>(model_<span class="dv">1</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      primary_06 ~ sex
@@ -1364,11 +1386,11 @@ In words, we would expect the male candidate from Washington to live longer than
 <h4>
 <span class="header-section-number">9.5.3.2</span> Voting and Age</h4>
 <p>Now that we’ve seen the relationship between sex and voting, let’s take a look at age. Begin by grouping our observations by <code>age</code> and counting by <code>primary_06</code>, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category.</p>
-<div class="sourceCode" id="cb987"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb987-1"><a href="n-parameters.html#cb987-1"></a>age &lt;-<span class="st"> </span>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb987-2"><a href="n-parameters.html#cb987-2"></a><span class="st">  </span><span class="kw">group_by</span>(age) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb987-3"><a href="n-parameters.html#cb987-3"></a><span class="st">  </span><span class="kw">count</span>(primary_<span class="dv">06</span>) </span>
-<span id="cb987-4"><a href="n-parameters.html#cb987-4"></a></span>
-<span id="cb987-5"><a href="n-parameters.html#cb987-5"></a>age</span></code></pre></div>
+<div class="sourceCode" id="cb988"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb988-1"><a href="n-parameters.html#cb988-1"></a>age &lt;-<span class="st"> </span>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb988-2"><a href="n-parameters.html#cb988-2"></a><span class="st">  </span><span class="kw">group_by</span>(age) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb988-3"><a href="n-parameters.html#cb988-3"></a><span class="st">  </span><span class="kw">count</span>(primary_<span class="dv">06</span>) </span>
+<span id="cb988-4"><a href="n-parameters.html#cb988-4"></a></span>
+<span id="cb988-5"><a href="n-parameters.html#cb988-5"></a>age</span></code></pre></div>
 <pre><code>## # A tibble: 150 x 3
 ## # Groups:   age [78]
 ##      age primary_06     n
@@ -1385,27 +1407,27 @@ In words, we would expect the male candidate from Washington to live longer than
 ## 10    24          1    16
 ## # … with 140 more rows</code></pre>
 <p>To explore this relationship visually, let’s create a graph. We are coercing <code>primary_06</code> into a character variable as it more closely represents “yes” or “no” as opposed to a numerical value.</p>
-<div class="sourceCode" id="cb989"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb989-1"><a href="n-parameters.html#cb989-1"></a>age <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb989-2"><a href="n-parameters.html#cb989-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">primary_06 =</span> <span class="kw">as.character</span>(primary_<span class="dv">06</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb989-3"><a href="n-parameters.html#cb989-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> age, <span class="dt">y =</span> n, <span class="dt">color =</span> primary_<span class="dv">06</span>)) <span class="op">+</span></span>
-<span id="cb989-4"><a href="n-parameters.html#cb989-4"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
-<span id="cb989-5"><a href="n-parameters.html#cb989-5"></a><span class="st">  </span><span class="kw">labs</span>(</span>
-<span id="cb989-6"><a href="n-parameters.html#cb989-6"></a>    <span class="dt">title =</span> <span class="st">"Relationship Between Age and Voting"</span>,</span>
-<span id="cb989-7"><a href="n-parameters.html#cb989-7"></a>    <span class="dt">subtitle =</span> <span class="st">"In the 2006 Primary Elections"</span>,</span>
-<span id="cb989-8"><a href="n-parameters.html#cb989-8"></a>    <span class="dt">x =</span> <span class="st">"Age"</span>,</span>
-<span id="cb989-9"><a href="n-parameters.html#cb989-9"></a>    <span class="dt">y =</span> <span class="st">"Count"</span></span>
-<span id="cb989-10"><a href="n-parameters.html#cb989-10"></a>  )</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-783-1.png" width="672"></p>
+<div class="sourceCode" id="cb990"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb990-1"><a href="n-parameters.html#cb990-1"></a>age <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb990-2"><a href="n-parameters.html#cb990-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">primary_06 =</span> <span class="kw">as.character</span>(primary_<span class="dv">06</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb990-3"><a href="n-parameters.html#cb990-3"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> age, <span class="dt">y =</span> n, <span class="dt">color =</span> primary_<span class="dv">06</span>)) <span class="op">+</span></span>
+<span id="cb990-4"><a href="n-parameters.html#cb990-4"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb990-5"><a href="n-parameters.html#cb990-5"></a><span class="st">  </span><span class="kw">labs</span>(</span>
+<span id="cb990-6"><a href="n-parameters.html#cb990-6"></a>    <span class="dt">title =</span> <span class="st">"Relationship Between Age and Voting"</span>,</span>
+<span id="cb990-7"><a href="n-parameters.html#cb990-7"></a>    <span class="dt">subtitle =</span> <span class="st">"In the 2006 Primary Elections"</span>,</span>
+<span id="cb990-8"><a href="n-parameters.html#cb990-8"></a>    <span class="dt">x =</span> <span class="st">"Age"</span>,</span>
+<span id="cb990-9"><a href="n-parameters.html#cb990-9"></a>    <span class="dt">y =</span> <span class="st">"Count"</span></span>
+<span id="cb990-10"><a href="n-parameters.html#cb990-10"></a>  )</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-784-1.png" width="672"></p>
 <p>There are some interesting takeaways here.
 - First, in almost every age bracket (other than above 90), the majority participants did <em>not</em> vote.
 - The spike between ages 40 and 60 illustrates that most participants exist in this age bracket.
 - The differences between voters and non-voters narrows greatly after age 60.</p>
 <p>Let’s look at the results of our regression.</p>
 <!-- MF: Age isn't showing unique values (just one intercept and then `age`). Is that a problem? No. Same explanation as model above. -->
-<div class="sourceCode" id="cb990"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb990-1"><a href="n-parameters.html#cb990-1"></a>model_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
-<span id="cb990-2"><a href="n-parameters.html#cb990-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>age, </span>
-<span id="cb990-3"><a href="n-parameters.html#cb990-3"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb991"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb991-1"><a href="n-parameters.html#cb991-1"></a><span class="kw">print</span>(model_<span class="dv">2</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb991"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb991-1"><a href="n-parameters.html#cb991-1"></a>model_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb991-2"><a href="n-parameters.html#cb991-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>age, </span>
+<span id="cb991-3"><a href="n-parameters.html#cb991-3"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb992"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb992-1"><a href="n-parameters.html#cb992-1"></a><span class="kw">print</span>(model_<span class="dv">2</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      primary_06 ~ age
@@ -1428,11 +1450,11 @@ In words, we would expect the male candidate from Washington to live longer than
 <h4>
 <span class="header-section-number">9.5.3.3</span> Voting and Treatment</h4>
 <p>Looking at the relationship between primary voting and treatment.</p>
-<div class="sourceCode" id="cb993"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb993-1"><a href="n-parameters.html#cb993-1"></a>model_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
-<span id="cb993-2"><a href="n-parameters.html#cb993-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, </span>
-<span id="cb993-3"><a href="n-parameters.html#cb993-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
-<span id="cb993-4"><a href="n-parameters.html#cb993-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb994"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb994-1"><a href="n-parameters.html#cb994-1"></a><span class="kw">print</span>(model_<span class="dv">3</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb994"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb994-1"><a href="n-parameters.html#cb994-1"></a>model_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb994-2"><a href="n-parameters.html#cb994-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, </span>
+<span id="cb994-3"><a href="n-parameters.html#cb994-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
+<span id="cb994-4"><a href="n-parameters.html#cb994-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb995"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb995-1"><a href="n-parameters.html#cb995-1"></a><span class="kw">print</span>(model_<span class="dv">3</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      primary_06 ~ treatment - 1
@@ -1467,11 +1489,11 @@ In words, we would expect the male candidate from Washington to live longer than
 <h4>
 <span class="header-section-number">9.5.3.4</span> Voting &amp; (Sex + Solo + Treatment)</h4>
 <p>Looking at the relationship between primary voting, sex, living alone, and treatment.</p>
-<div class="sourceCode" id="cb996"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb996-1"><a href="n-parameters.html#cb996-1"></a>model_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
-<span id="cb996-2"><a href="n-parameters.html#cb996-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>treatment, </span>
-<span id="cb996-3"><a href="n-parameters.html#cb996-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
-<span id="cb996-4"><a href="n-parameters.html#cb996-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb997"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb997-1"><a href="n-parameters.html#cb997-1"></a><span class="kw">print</span>(model_<span class="dv">4</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb997"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb997-1"><a href="n-parameters.html#cb997-1"></a>model_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb997-2"><a href="n-parameters.html#cb997-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>treatment, </span>
+<span id="cb997-3"><a href="n-parameters.html#cb997-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
+<span id="cb997-4"><a href="n-parameters.html#cb997-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb998"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb998-1"><a href="n-parameters.html#cb998-1"></a><span class="kw">print</span>(model_<span class="dv">4</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      primary_06 ~ sex + solo + treatment
@@ -1495,11 +1517,11 @@ In words, we would expect the male candidate from Washington to live longer than
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>INTERACTION MODEL with all of the above plus solo and treatment</p>
-<div class="sourceCode" id="cb999"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb999-1"><a href="n-parameters.html#cb999-1"></a>model_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
-<span id="cb999-2"><a href="n-parameters.html#cb999-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>treatment <span class="op">+</span><span class="st"> </span>solo <span class="op">*</span><span class="st"> </span>treatment, </span>
-<span id="cb999-3"><a href="n-parameters.html#cb999-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
-<span id="cb999-4"><a href="n-parameters.html#cb999-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb1000"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1000-1"><a href="n-parameters.html#cb1000-1"></a><span class="kw">print</span>(model_<span class="dv">5</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1000"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1000-1"><a href="n-parameters.html#cb1000-1"></a>model_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
+<span id="cb1000-2"><a href="n-parameters.html#cb1000-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>treatment <span class="op">+</span><span class="st"> </span>solo <span class="op">*</span><span class="st"> </span>treatment, </span>
+<span id="cb1000-3"><a href="n-parameters.html#cb1000-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
+<span id="cb1000-4"><a href="n-parameters.html#cb1000-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1001"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1001-1"><a href="n-parameters.html#cb1001-1"></a><span class="kw">print</span>(model_<span class="dv">5</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      primary_06 ~ sex + solo + treatment + solo * treatment
@@ -1535,7 +1557,7 @@ In words, we would expect the male candidate from Washington to live longer than
 <p>
 <span class="marginnote shownote">
 <!--
-<div class="figure">--><span id="fig:unnamed-chunk-792"></span>
+<div class="figure">--><span id="fig:unnamed-chunk-793"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="960"><!--
 <p class="caption marginnote">-->FIGURE 9.8: Temperance<!--</p>-->
 <!--</div>--></span>
@@ -1552,16 +1574,16 @@ In words, we would expect the male candidate from Washington to live longer than
 <span class="header-section-number">9.6</span> Causal Effects of <code>treament</code>
 </h2>
 <p>We will now be looking into the causal effect of the treatment variable on the 2006 primary election. To start, let’s build a model using <code>stan_glm()</code> followed by a regression table.</p>
-<div class="sourceCode" id="cb1002"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1002-1"><a href="n-parameters.html#cb1002-1"></a><span class="co"># obj.1 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb1002-2"><a href="n-parameters.html#cb1002-2"></a><span class="co">#                 formula = primary_06 ~ treatment - 1, </span></span>
-<span id="cb1002-3"><a href="n-parameters.html#cb1002-3"></a><span class="co">#                 family = gaussian(), </span></span>
-<span id="cb1002-4"><a href="n-parameters.html#cb1002-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
-<p>This table shows us each of the five treatments and their beta coefficients, along with a 95% Confidence Interval for these coefficients. The Control provides us with a baseline.</p>
-<!-- Talk about what these results mean.  Then, create the same model but with a different structure. -->
-<div class="sourceCode" id="cb1003"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1003-1"><a href="n-parameters.html#cb1003-1"></a><span class="co"># obj.2 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb1003-2"><a href="n-parameters.html#cb1003-2"></a><span class="co">#                 formula = primary_06 ~ treatment, </span></span>
+<div class="sourceCode" id="cb1003"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1003-1"><a href="n-parameters.html#cb1003-1"></a><span class="co"># obj.1 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb1003-2"><a href="n-parameters.html#cb1003-2"></a><span class="co">#                 formula = primary_06 ~ treatment - 1, </span></span>
 <span id="cb1003-3"><a href="n-parameters.html#cb1003-3"></a><span class="co">#                 family = gaussian(), </span></span>
 <span id="cb1003-4"><a href="n-parameters.html#cb1003-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
+<p>This table shows us each of the five treatments and their beta coefficients, along with a 95% Confidence Interval for these coefficients. The Control provides us with a baseline.</p>
+<!-- Talk about what these results mean.  Then, create the same model but with a different structure. -->
+<div class="sourceCode" id="cb1004"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1004-1"><a href="n-parameters.html#cb1004-1"></a><span class="co"># obj.2 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb1004-2"><a href="n-parameters.html#cb1004-2"></a><span class="co">#                 formula = primary_06 ~ treatment, </span></span>
+<span id="cb1004-3"><a href="n-parameters.html#cb1004-3"></a><span class="co">#                 family = gaussian(), </span></span>
+<span id="cb1004-4"><a href="n-parameters.html#cb1004-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
 <!-- Explain how these two models are the same, except in how they define the parameters. Show us the math like Gelman does. Write down the math. For simple. -->
 <!-- Once we talk about these things --- and, again, this is exactly what we have talked about in chapter 8 --- we can do a bit more. Like discuss how we are using 99%, because there is nothing magical aboyt 95%, other than convention. I also think it would be fun to show a nice graphic of this, highlighting how the estimates for Civic and Hawthorne overlap.  -->
 <div id="interactions" class="section level3">
@@ -1569,10 +1591,10 @@ In words, we would expect the male candidate from Washington to live longer than
 <span class="header-section-number">9.6.1</span> Interactions</h3>
 <!-- This is new. With only two parameters, we can't really look at interaction effects. Need to discuss interaction effects in general. Also, note that heterogenous treatment effects are the same thing as interaction effects that involve a treatment effect as one of the variables.  -->
 <!-- Feel free to build up this code, and other examples, more slowly than I am doing it here. -->
-<div class="sourceCode" id="cb1004"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1004-1"><a href="n-parameters.html#cb1004-1"></a><span class="co"># obj.3 &lt;- stan_glm(data = shaming, </span></span>
-<span id="cb1004-2"><a href="n-parameters.html#cb1004-2"></a><span class="co">#                 formula = primary_06 ~ sex + treatment + sex:treatment, </span></span>
-<span id="cb1004-3"><a href="n-parameters.html#cb1004-3"></a><span class="co">#                 family = gaussian(), </span></span>
-<span id="cb1004-4"><a href="n-parameters.html#cb1004-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb1005"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1005-1"><a href="n-parameters.html#cb1005-1"></a><span class="co"># obj.3 &lt;- stan_glm(data = shaming, </span></span>
+<span id="cb1005-2"><a href="n-parameters.html#cb1005-2"></a><span class="co">#                 formula = primary_06 ~ sex + treatment + sex:treatment, </span></span>
+<span id="cb1005-3"><a href="n-parameters.html#cb1005-3"></a><span class="co">#                 family = gaussian(), </span></span>
+<span id="cb1005-4"><a href="n-parameters.html#cb1005-4"></a><span class="co">#                 refresh = 0)</span></span></code></pre></div>
 <!-- Takes a while to explain what all this means. -->
 <!-- Two key issues: 1) Interpreting lots of parameters in a model. interactions, heterogenous treatment effects. shaming using lm().  -->
 <!-- Treatment effect is not the same thing as a coefficient. -->
@@ -1613,7 +1635,7 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-26
+2020-10-27
 </p>
 </div>
 </div>
