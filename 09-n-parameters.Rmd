@@ -278,7 +278,7 @@ fit_gov_1 %>%
   as_tibble() %>% 
   ggplot(aes(alive_pre)) + 
     geom_histogram(aes(y = after_stat(count/sum(count))),
-                   bins = 100, ) +
+                   bins = 100) +
     labs(title = "Posterior Distribution of the Coefficient of `alive_pre`",
          y = "Probability",
          x = "Coefficient of `alive_pre`")
@@ -390,7 +390,7 @@ fit_gov_2a %>%
   mutate(male_intercept = `(Intercept)` + sexMale) %>% 
   ggplot(aes(male_intercept)) + 
     geom_histogram(aes(y = after_stat(count/sum(count))),
-                   bins = 100, ) +
+                   bins = 100) +
     labs(title = "Posterior Distribution of Average Male Candidate Days Left`",
          y = "Probability",
          x = "Male Days To Live After the Election")
@@ -480,7 +480,7 @@ fit_gov_3 %>%
   as_tibble() %>% 
   ggplot(aes(alive_pre)) + 
     geom_histogram(aes(y = after_stat(count/sum(count))),
-                   bins = 100, ) +
+                   bins = 100) +
     labs(title = "Posterior Distribution of the Coefficient of `alive_pre`",
          y = "Probability",
          x = "Coefficient of `alive_pre`")
@@ -749,7 +749,7 @@ fit_gov_5 %>%
     scale_y_continuous(labels = scales::percent_format())
 ```
 
-The average value of the difference in days-to-live is almost certainly positive, with the most likely value being around 4,500.
+The average value of the difference in days-to-live is almost certainly positive, with the most likely value being around 4,500. Notice that there is essentially zero chance that, on average, South Dakota candidates live longer.
 
 
 <!-- DK: Should we use posterior_linpred() or posterior_epred() here? We should certainly do more to show how to combine the original math with the model results. -->
@@ -780,8 +780,35 @@ head(pp)
 
 The resulting tibble has 2 columns, one for each person. The first column shows the posterior predictions for the candidate from South Dakota. The second column shows the posterior predictions for the candidate from Washington. In both cases, the forecasts depend on the values of all the covariates. That is, we would provide a different forecast if the candidates were female or if they were other ages. 
 
-<!-- DK: More detail, tying this forecast into other forecasts we have created. -->
+Let's look at the posterior predictive distribution for each candidate.
 
+
+```{r}
+pp %>% 
+  rename(SD = `1`,
+         WA = `2`) %>% 
+  pivot_longer(cols = SD:WA, 
+               names_to = "State",
+               values_to = "days") %>% 
+  ggplot(aes(days, fill = State)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   alpha = 0.5, 
+                   bins = 100, 
+                   position = "identity") +
+     labs(title = "Posterior Predictive Distribution",
+         subtitle = "For 62 years-old male candidates from South Dakota and Washington",
+         x = "Days Lived Post Election",
+         y = "Probability") + 
+    theme_classic() + 
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format())
+```
+
+
+
+There is a big overlap in the predictions for individuals, even though there is almost no overlap in the averages. Random stuff happens to an individual all the time. Random stuff cancels out when you take the average for many individuals. We can see that by looking at the difference in the posterior predictive distributions for the two individuals.
+
+<!-- DK: Example "Posterior Predictive Distribution" -->
 
 ```{r}
 pp %>% 
@@ -791,7 +818,7 @@ pp %>%
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Probability Distribution", 
+    labs(title = "Posterior Predictive Distribution", 
          subtitle = "How much longer will an individual Washington candidate live?",
          x = "Days",
          y = "Probability") +
@@ -800,7 +827,7 @@ pp %>%
     scale_y_continuous(labels = scales::percent_format())
 ```
 
-In words, we would  expect the candidate from Washington to live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 4,500 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1 in 5 chance that he does so.
+In words, we would predict that the candidate from Washington would live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 4,500 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1 in 5 chance that he does so.
 
 *Note what is the same and what is different when we move from a question about averages to a question about individuals.* In both cases, the most likely value is about the same, about 4,500 days. That is, the average behavior is the same as our expected value for any given individual. But the uncertainty is much greater for an individual prediction. The chance of the true average for Washington candidates being less than that for South Dakota candidates is essentially zero. Yet, for any individual pair of candidates, it would not even be slightly surprising for the South Dakota candidate to outlive the Washington candidate. Individuals vary. Averages never tell the whole story.
 
