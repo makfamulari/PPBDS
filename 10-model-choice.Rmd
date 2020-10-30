@@ -883,7 +883,7 @@ ames_metrics(ames_test_res, truth = Sale_Price, estimate = .pred)
 
 This tidy data format stacks the metrics vertically.
 
-## Resampling for evaluating performance  {#resampling}
+### Resampling for evaluating performance  {#resampling}
 
 We usually need to understand the effectiveness of the model _before using the test set_.  In this section, we describe an approach called resampling that can fill this gap. Resampling estimates of performance can generalize to new data. The next chapter complements this one by demonstrating statistical methods that compare resampling results. 
 
@@ -1352,7 +1352,62 @@ set.seed(130)
 rf_res <- rf_wflow %>% fit_resamples(resamples = ames_folds, control = keep_pred)
 ```
 
+## Comparing models with resampling {#compare}
 
+Once we create two or more models, the next step is to compare them. In some cases, comparisons might be _within-model_, where the same model might be evaluated with different features or preprocessing methods. Alternatively, _between-model_ comparisons, such as when we compared linear regression and random forest models in Section \@ref(resampling), are the more common scenario.
+
+In either case, the result is a collection of resampled summary statistics (e.g. RMSE, accuracy, etc.) for each model. The first section of this chapter discusses important aspects of these statistics. Two additional sections follow describing how to formally compare models.
+
+### Resampled performance statistics {#resampled-stats}
+
+In Chapter \@ref(resampling), a random forest model for the Ames data was resampled with 10-fold cross-validation. These results were saved in the object `rf_res`. 
+
+We'll estimate two additional models with the same resamples. First, the previous linear regression model, using the preprocessing defined in the `ames_rec` recipe, is resampled:
+
+```{r compare-with-spline-rs}
+lm_with_splines_res <-
+  lm_wflow %>%
+  fit_resamples(resamples = ames_folds, 
+                control = control_resamples(save_pred = TRUE))
+```
+
+Secondly, a less complex recipe without the interaction terms is evaluated to determine if the extra complexity is worth it. Once added to a workflow, it is resampled:
+
+```{r compare-no-spline-rs}
+lm_with_inter_res <-
+  lm_wflow %>%
+  fit_resamples(resamples = ames_folds, 
+                control = control_resamples(save_pred = TRUE))
+
+no_inter_rec <- 
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
+           Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>% 
+  step_other(Neighborhood, threshold = 0.01) %>% 
+  step_dummy(all_nominal()) 
+
+lm_no_inter_res <- 
+  lm_wflow %>%
+  remove_recipe() %>% 
+  add_recipe(no_inter_rec) %>% 
+  fit_resamples(resamples = ames_folds, 
+                control = control_resamples(save_pred = TRUE))
+```
+
+The difference in performance appears relatively minor: 
+
+```{r compare-lm-metrics}
+collect_metrics(lm_no_inter_res)
+collect_metrics(lm_with_inter_res)
+```
+
+Considering these results, it appears that the additional terms do not profoundly improve the _mean_ RMSE or R<sup>2</sup> statistics. The difference is small, but it might be larger than the experimental noise in the system. 
+
+
+
+Before making model comparisons or looking at the resampling results, it can be helpful to define a relevant _practical effect size_. Since these analyses focus on the R<sup>2</sup> statistics, the practical effect size is the change in R<sup>2</sup> that we would consider to be a realistic difference that matters. For example, we might think that two models are not practically different if their R<sup>2</sup> values are within $\pm 2$%. If this were the case, differences smaller than 2% are not deemed important even if they are statistically significant. 
+
+Practical significance is subjective; two people can have very different ideas on the threshold for importance. However, this consideration can be very helpful when deciding between models.  
 
 
 ## Conclusion
