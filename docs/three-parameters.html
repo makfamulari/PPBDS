@@ -1348,7 +1348,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb916"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb916-1"><a href="three-parameters.html#cb916-1"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
 <span id="cb916-2"><a href="three-parameters.html#cb916-2"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">newdata =</span> new_obs) <span class="op">%&gt;%</span></span>
 <span id="cb916-3"><a href="three-parameters.html#cb916-3"></a><span class="st">    </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span></span>
-<span id="cb916-4"><a href="three-parameters.html#cb916-4"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
+<span id="cb916-4"><a href="three-parameters.html#cb916-4"></a><span class="st">    </span><span class="kw">mutate_all</span>(as.numeric)</span>
 <span id="cb916-5"><a href="three-parameters.html#cb916-5"></a></span>
 <span id="cb916-6"><a href="three-parameters.html#cb916-6"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 1
@@ -1364,7 +1364,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##  8  41.0
 ##  9  38.2
 ## 10  39.5</code></pre>
-<p>We might expect that we can use <code>as_tibble()</code> directly after the object returned <code>posterior_predict()</code>. Sadly, for obscure technical reasons, that won’t quite work. So, we need the incantation <code>mutate(across(everything(), as.numeric))</code> to make sure that the resulting tibble is well-behaved. This command ensures that every column in the tibble is a simple numeric vector, which is what we want.</p>
+<p>We might expect that we can use <code>as_tibble()</code> directly after the object returned <code>posterior_predict()</code>. Sadly, for obscure technical reasons, that won’t quite work. So, we need the incantation <code>mutate_all(as.numeric)</code> to make sure that the resulting tibble is well-behaved. This command ensures that every column in the tibble is a simple numeric vector, which is what we want.</p>
 <p>A look at the first few observations shows that we simply get ten draws from the model’s posterior distribution of the age of a Democrat. It is important to understand that this is not a concrete person from the <code>trains</code> dataset - the algorithm in <code>posterior_predict()</code> simply uses the existing data from <code>trains</code> to estimate this posterior distribution.</p>
 <div class="sourceCode" id="cb918"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb918-1"><a href="three-parameters.html#cb918-1"></a>pp <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb918-2"><a href="three-parameters.html#cb918-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> <span class="st">`</span><span class="dt">1</span><span class="st">`</span>)) <span class="op">+</span></span>
@@ -1395,7 +1395,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb921-4"><a href="three-parameters.html#cb921-4"></a><span class="kw">set.seed</span>(<span class="dv">27</span>)</span>
 <span id="cb921-5"><a href="three-parameters.html#cb921-5"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, <span class="dt">newdata =</span> new) <span class="op">%&gt;%</span></span>
 <span id="cb921-6"><a href="three-parameters.html#cb921-6"></a><span class="st">    </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span></span>
-<span id="cb921-7"><a href="three-parameters.html#cb921-7"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
+<span id="cb921-7"><a href="three-parameters.html#cb921-7"></a><span class="st">    </span><span class="kw">mutate_all</span>(as.numeric)</span>
 <span id="cb921-8"><a href="three-parameters.html#cb921-8"></a></span>
 <span id="cb921-9"><a href="three-parameters.html#cb921-9"></a><span class="kw">head</span>(pp, <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 6
@@ -1625,7 +1625,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb929"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb929-1"><a href="three-parameters.html#cb929-1"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj, </span>
 <span id="cb929-2"><a href="three-parameters.html#cb929-2"></a>                        <span class="dt">newdata =</span> ate_data) <span class="op">%&gt;%</span></span>
 <span id="cb929-3"><a href="three-parameters.html#cb929-3"></a><span class="st">    </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span></span>
-<span id="cb929-4"><a href="three-parameters.html#cb929-4"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
+<span id="cb929-4"><a href="three-parameters.html#cb929-4"></a><span class="st">    </span><span class="kw">mutate_all</span>(as.numeric)</span>
 <span id="cb929-5"><a href="three-parameters.html#cb929-5"></a></span>
 <span id="cb929-6"><a href="three-parameters.html#cb929-6"></a></span>
 <span id="cb929-7"><a href="three-parameters.html#cb929-7"></a>te &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">Treated =</span> pp<span class="op">$</span><span class="st">`</span><span class="dt">1</span><span class="st">`</span>, <span class="dt">Control =</span> pp<span class="op">$</span><span class="st">`</span><span class="dt">2</span><span class="st">`</span>)  <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -1662,7 +1662,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a href="n-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-29
+2020-10-30
 </p>
 </div>
 </div>

@@ -990,7 +990,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb975"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb975-1"><a href="n-parameters.html#cb975-1"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_gov_<span class="dv">5</span>, </span>
 <span id="cb975-2"><a href="n-parameters.html#cb975-2"></a>                        <span class="dt">newdata =</span> new_obs) <span class="op">%&gt;%</span></span>
 <span id="cb975-3"><a href="n-parameters.html#cb975-3"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb975-4"><a href="n-parameters.html#cb975-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span>
+<span id="cb975-4"><a href="n-parameters.html#cb975-4"></a><span class="st">  </span><span class="kw">mutate_all</span>(as.numeric)</span>
 <span id="cb975-5"><a href="n-parameters.html#cb975-5"></a>  </span>
 <span id="cb975-6"><a href="n-parameters.html#cb975-6"></a><span class="kw">head</span>(pp)</span></code></pre></div>
 <pre><code>## # A tibble: 6 x 2
@@ -1003,7 +1003,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 5  664.  8487.
 ## 6  991.  8201.</code></pre>
 <p>The resulting tibble has 2 columns, one for each person. The first column shows the posterior predictions for the candidate from South Dakota. The second column shows the posterior predictions for the candidate from Washington. In both cases, the forecasts depend on the values of all the covariates. That is, we would provide a different forecast if the candidates were female or if they were other ages.</p>
-<p>Why do we need the weird <code>mutate(across(everything(), as.numeric))</code> incantation? The reason is that <code>posterior_epred()</code> returns a simple matrix, which is easy to transform into a tibble. <code>posterior_predict()</code>, on the other hand, returns a special sort of matrix which is much harder to work with. So, we need a little hackery to make the next steps easier.</p>
+<p>Why do we need the weird <code>mutate_all(as.numeric)</code> incantation? The reason is that <code>posterior_epred()</code> returns a simple matrix, which is easy to transform into a tibble. <code>posterior_predict()</code>, on the other hand, returns a special sort of matrix which is much harder to work with. So, we need a little hackery to make the next steps easier.</p>
 <p>Let’s look at the posterior predictive distribution for each candidate.</p>
 <div class="sourceCode" id="cb977"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb977-1"><a href="n-parameters.html#cb977-1"></a>pp <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb977-2"><a href="n-parameters.html#cb977-2"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">SD =</span> <span class="st">`</span><span class="dt">1</span><span class="st">`</span>,</span>
@@ -1060,7 +1060,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb979-10"><a href="n-parameters.html#cb979-10"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_gov_<span class="dv">5</span>, </span>
 <span id="cb979-11"><a href="n-parameters.html#cb979-11"></a>                        <span class="dt">newdata =</span> new_obs) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb979-12"><a href="n-parameters.html#cb979-12"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb979-13"><a href="n-parameters.html#cb979-13"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb979-13"><a href="n-parameters.html#cb979-13"></a><span class="st">  </span><span class="kw">mutate_all</span>(as.numeric) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb979-14"><a href="n-parameters.html#cb979-14"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">diff =</span> <span class="st">`</span><span class="dt">2</span><span class="st">`</span> <span class="op">-</span><span class="st"> `</span><span class="dt">1</span><span class="st">`</span>)</span>
 <span id="cb979-15"><a href="n-parameters.html#cb979-15"></a></span>
 <span id="cb979-16"><a href="n-parameters.html#cb979-16"></a><span class="kw">tibble</span>(<span class="dt">Expectation =</span> pe<span class="op">$</span>diff,</span>
@@ -1073,7 +1073,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb979-23"><a href="n-parameters.html#cb979-23"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
 <span id="cb979-24"><a href="n-parameters.html#cb979-24"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
 <span id="cb979-25"><a href="n-parameters.html#cb979-25"></a>                   <span class="dt">position =</span> <span class="st">"identity"</span>) <span class="op">+</span></span>
-<span id="cb979-26"><a href="n-parameters.html#cb979-26"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Predictive Distribution"</span>,</span>
+<span id="cb979-26"><a href="n-parameters.html#cb979-26"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Posterior Probability Distributions"</span>,</span>
 <span id="cb979-27"><a href="n-parameters.html#cb979-27"></a>         <span class="dt">subtitle =</span> <span class="st">"For 62 years-old male candidates from South Dakota and Washington"</span>,</span>
 <span id="cb979-28"><a href="n-parameters.html#cb979-28"></a>         <span class="dt">x =</span> <span class="st">"Additional Days Lived Post Election"</span>,</span>
 <span id="cb979-29"><a href="n-parameters.html#cb979-29"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span><span class="st"> </span></span>
@@ -1771,7 +1771,7 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-29
+2020-10-30
 </p>
 </div>
 </div>

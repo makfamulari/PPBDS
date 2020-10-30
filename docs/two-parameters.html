@@ -1278,8 +1278,8 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <div class="sourceCode" id="cb890"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb890-1"><a href="two-parameters.html#cb890-1"></a><span class="kw">set.seed</span>(<span class="dv">11</span>)</span>
 <span id="cb890-2"><a href="two-parameters.html#cb890-2"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj) <span class="op">%&gt;%</span></span>
 <span id="cb890-3"><a href="two-parameters.html#cb890-3"></a><span class="st">    </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span></span>
-<span id="cb890-4"><a href="two-parameters.html#cb890-4"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span></code></pre></div>
-<p>Doing so requires two steps. First, use <code>as_tibble()</code>, just as you might expect. In R, we often transform one thing into another thing with functions which begin with <code>as_</code>. Unfortunately, that does not solve our problem because each column is still of class <code>ppd</code>. So, second, we use an <code>across</code> incantation to transform each column. The resulting object, <code>pp</code>, is still not easy to work with, both because the variable names are all numbers and because of how big it is.</p>
+<span id="cb890-4"><a href="two-parameters.html#cb890-4"></a><span class="st">    </span><span class="kw">mutate_all</span>(as.numeric)</span></code></pre></div>
+<p>Doing so requires two steps. First, use <code>as_tibble()</code>, just as you might expect. In R, we often transform one thing into another thing with functions which begin with <code>as_</code>. Unfortunately, that does not solve our problem because each column is still of class <code>ppd</code>. So, second, we use the <code>mutate_all(as.numeric)</code> incantation to transform each column. The resulting object, <code>pp</code>, is still not easy to work with, both because the variable names are all numbers and because of how big it is.</p>
 <div class="sourceCode" id="cb891"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb891-1"><a href="two-parameters.html#cb891-1"></a><span class="kw">dim</span>(pp)</span></code></pre></div>
 <pre><code>## [1] 4000 1814</code></pre>
 <p>There are 4000 rows because, by default, <code>stan_glm()</code> gives us 4000 draws from the posterior distribution, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There
@@ -1377,7 +1377,7 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 <a href="three-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-29
+2020-10-30
 </p>
 </div>
 </div>
