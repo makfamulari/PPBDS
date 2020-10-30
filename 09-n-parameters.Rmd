@@ -536,22 +536,22 @@ fit_gov_3 %>%
 
 Let's create another model. This time, however, the numeric outcome variable of alive_post as a function of the two explanatory variables we used above, `alive_pre` and `sex`, and of their interaction.
 
-The math:
+Math:
 
-$$ alive\_pre_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i+ \beta_3 male_i *  alive\_pre_i + \epsilon_i$$
-
+$$ alive\_pre_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \\ \beta_3 male_i *  alive\_pre_i + \epsilon_i$$
+<!-- DK: Need to make these interpretations clearer and more consistent across the examples. -->
 
 * Our outcome variable is still $alive\_post_i$. We want to know how many days a candidate will live after an election. 
 
-* $male_i$ is still one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidate, this value will be 0. $alive\_pre$ is still our other explanatory variable that represents the number of days a candidate has lived before the election. 
+* $male_i$ is still one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this will be 1. When we are making this prediction for female candidate, this will be 0. $alive\_pre_i$ is still our other explanatory variable, representing the number of days a candidate has lived before the election, relative to the average value for all candidates. 
 
-* $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all female candidates. Note that this is different than our previous example where it was the average of all candidates. $\beta_0$ is also the intercept of the equation. 
+* $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. Note that this is different than in our previous example where it was the average of all candidates. $\beta_0$ is also the intercept of the equation. 
 
 * $\beta_2$ is the coefficient of $alive\_pre_i$. It it just the slope for women. In our last example,  $\beta_2$ was the slope for the whole population. Now we are getting more specific. 
 
 * $\beta_3$ is difficult to interpret. However, when it is added to $\beta_2$, the result in the slope for men.
 
-The code:
+Code:
 
 ```{r, cache = TRUE}
 fit_gov_4 <- stan_glm(data = ch9_gov,
@@ -723,7 +723,7 @@ Consider:
 
 These questions are, purposely, less precise than the ones we tackled in Chapters \@ref(two-parameters) and \@ref(three-parameters), written more in a conversational style. This is how normal people talk.
 
-However, as data scientists, our job is to bring precision to these questions. There are two commonsense interpretations. First, we could be curious about the *expected values* for these questions. If we averaged the data for a thousand candidates like these, what would the answer be? Second, we could be curious about two specific individuals. How long will they live? *Averages involve questions about parameters. The fates of individuals require predictions.* Those are general claims, violated too often to be firm rules. Yet, they highlight a key point: expected values are less variable than individual predictions.
+However, as data scientists, our job is to bring precision to these questions. There are two commonsense interpretations. First, we could be curious about the *expected values* for these questions. If we averaged the data for a thousand candidates like these, what would the answer be? Second, we could be curious about two specific individuals. How long will they live? *Averages involve questions about parameters. The fates of individuals require predictions.* Those are general claims, violated too often to be firm rules. Yet, they highlight a key point: *expected values are less variable than individual predictions*.
 
 To calculate expected values, use parameters and algebra. To forecast for individuals, use `posterior_predict()`.
 
@@ -784,12 +784,7 @@ fit_gov_5 %>%
 
 The average value of the difference in days-to-live is almost certainly positive, with the most likely value being around 4,500. Notice that there is essentially zero chance that, on average, South Dakota candidates live longer.
 
-
-<!-- DK: Should we use posterior_linpred() or posterior_epred() here? We should certainly do more to show how to combine the original math with the model results. -->
-
-### Individual Predictions
-
-If, instead, we interpret the question as asking for a prediction for a small number of individuals, then we need to use `posterior_predict()`.
+One annoyance of the above approach is that it requires us to do everything "by hand," to recall the mathematical structure of the model, and then to insert the relevant values of the data for the individuals we want to predict. What a bother! Fortunately, **rstanarm** provides the `posterior_epred()` function to make this process simpler.
 
 First, we create a tibble with the desired input for our model. In our case the tibble has a variable named `sex` which contains two observations both with the value "Male". There is a `state` variable with the desired states. There is an `alive_pre` variable set to 10 years worth of days.
 
@@ -799,9 +794,51 @@ new_obs <- tibble(sex = c("Male", "Male"),
                   alive_pre = 10 * 365)
 ```
 
+Second, we pass the fitted model object and this tibble to `posterior_epred()`.
+
+```{r}
+pe <- posterior_epred(fit_gov_5, 
+                      newdata = new_obs) %>%
+  as_tibble() 
+```
+
+The name `pe` stands for **p**osterior **e**xpectation. This is different from the **p**osterior **p**rediction which `posterior_predict()` produces. Transforming the resulting object into a tibble makes later graphing easier. With `pe`, we can now reproduce our last two plots much more easily.
+
+```{r}
+pe %>% 
+  rename(SD = `1`,
+         WA = `2`) %>% 
+  mutate(Difference = WA - SD) %>% 
+  pivot_longer(cols = SD:Difference, 
+               names_to = "Parameter",
+               values_to = "days") %>% 
+  ggplot(aes(days, fill = Parameter)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   alpha = 0.5, 
+                   bins = 100, 
+                   position = "identity") +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "For 62 years-old candidates from South Dakota and Washington",
+         x = "Expected Days Lived Post Election",
+         y = "Probability") + 
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_classic()
+```
+
+
+
+
+<!-- What an interesting plot! -->
+
+### Individual Predictions
+
+If, instead, we interpret the question as asking for a prediction for a small number of individuals, then we need to use `posterior_predict()`.
+
+
 <!-- DK: Try again to explain what a posterior prediction is. -->
 
-Use `posterior_predict()` to create draws from the posterior probability distribution for our prediction for these cases. `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating the covariate values for the individual(s) we want to predict. In this case, we are using the `fit_gov_5` model and the tibble is the one we just created.
+Use `posterior_predict()` to create draws from the posterior probability distribution for our prediction for these cases. `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating the covariate values for the individual(s) we want to predict. In this case, we are using the `fit_gov_5` model and the tibble is the one we just created above. In other words, the inputs for `posterior_predict()` and `posterior_epred()` are identical. 
 
 ```{r}
 pp <- posterior_predict(fit_gov_5, 
@@ -813,6 +850,8 @@ head(pp)
 ```
 
 The resulting tibble has 2 columns, one for each person. The first column shows the posterior predictions for the candidate from South Dakota. The second column shows the posterior predictions for the candidate from Washington. In both cases, the forecasts depend on the values of all the covariates. That is, we would provide a different forecast if the candidates were female or if they were other ages. 
+
+Why do we need the weird `mutate(across(everything(), as.numeric))` incantation? The reason is that `posterior_epred()` returns a simple matrix, which is easy to transform into a tibble. `posterior_predict()`, on the other hand, returns a special sort of matrix which is much harder to work with. So, we need a little hackery to make the next steps easier.
 
 Let's look at the posterior predictive distribution for each candidate.
 
@@ -864,6 +903,48 @@ pp %>%
 In words, we would predict that the candidate from Washington would live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 4,500 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1 in 5 chance that he does so.
 
 *Note what is the same and what is different when we move from a question about averages to a question about individuals.* In both cases, the most likely value is about the same, about 4,500 days. That is, the average behavior is the same as our expected value for any given individual. But the uncertainty is much greater for an individual prediction. The chance of the true average for Washington candidates being less than that for South Dakota candidates is essentially zero. Yet, for any individual pair of candidates, it would not even be slightly surprising for the South Dakota candidate to outlive the Washington candidate. Individuals vary. Averages never tell the whole story.
+
+### Expectation versus individual variation
+
+Let's compare the results from `posterior_epred()` and `posterior_predict()` for this scenario directly. Most of this code is the same as what we have shown you above, but we think it is useful to look at everything together.
+
+
+```{r}
+new_obs <- tibble(sex = c("Male", "Male"),
+                  state = c("South Dakota", "Washington"),
+                  alive_pre = 10 * 365)
+
+pe <- posterior_epred(fit_gov_5, 
+                      newdata = new_obs) %>%
+  as_tibble() %>% 
+  mutate(diff = `2` - `1`)
+
+pp <- posterior_predict(fit_gov_5, 
+                        newdata = new_obs) %>% 
+  as_tibble() %>% 
+  mutate(across(everything(), as.numeric)) %>% 
+  mutate(diff = `2` - `1`)
+
+tibble(Expectation = pe$diff,
+       Prediction = pp$diff) %>% 
+  pivot_longer(cols = Expectation:Prediction, 
+               names_to = "State",
+               values_to = "days") %>% 
+  ggplot(aes(days, fill = State)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   alpha = 0.5, 
+                   bins = 100, 
+                   position = "identity") +
+    labs(title = "Posterior Predictive Distribution",
+         subtitle = "For 62 years-old male candidates from South Dakota and Washington",
+         x = "Additional Days Lived Post Election",
+         y = "Probability") + 
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_classic()
+```
+
+Expected values vary much less than predictions. The above chart makes that easy to see. We can be almost certain that the true underlying average for the numbers of days that Washington candidates live longer than South Dakota candidates is positive. But, for any two individual candidates, there is a good chance that that the South Dakota candidate will live longer. We can not ignore $\epsilon$ when predicting the outcome for individuals. When estimating expected values or long-run averages, the  $\epsilon$'s cancel out. 
 
 <!-- DK: Discuss the substantive issue? How can it be that Washington candidates live longer? Also, compare these estimates to what naive lm() would tell us. -->
 
