@@ -3,14 +3,14 @@ output_yaml:
   - _output.yml
 ---
 
+<!-- DK: Can we get rid of bake()? Seems uncessesary. -->
+
 <!-- Add a couple more of the chapters? Or maybe put them in chapter 11? -->
 
 <!-- Cut the recipe, bake, stuff? Not really needed for chapters 11 and 12. -->
 
 <!-- Replace lm() with stan_glm()? -->
 
-
-<!-- Get rid of multi-category example discussion? No! Hope to do pyTorch at some point. -->
 
 <!-- 2) Each section ends with the code we have done. That seems redundant and confusing. -->
 
@@ -19,28 +19,18 @@ output_yaml:
 <!-- 4) I am concerned about the ames_snippets.R code used in the original but, maybe, not needed here. -->
 
 
-<!-- 6) Many sections begun with a weird code chunk. These should be cleaned up and organized. -->
-
 <!-- 7) Deal with the missing references. Need to add them to the bib. -->
 
 <!-- 8) Maybe follow their example with r pkg(dplyr) instead of **dplyr**. -->
 
 # Model Choice
 
-```{r, echo=FALSE}
-val_list <- function(x){
-  x <- format(table(x), big.mark = ",")
-  x <- paste0("`", names(x), "` ($n = ", unname(x), "$)")
-  knitr::combine_words(x)
-}
-```
+There are many models we could make to explain a given outcome variable. The chapter provides the tools for exploring which model we "ought" to use. We will use these tools in Chapters \@ref(continuous-response) (for continuous outcomes) and \@ref(discrete-response) (for discrete outcomes).
 
-
-Still a draft. Come back in a few weeks.
 
 ## The Ames housing data {#ames}
 
-Start as usual:
+Packages:
 
 ```{r, message = FALSE}
 library(tidyverse)
@@ -84,6 +74,8 @@ While not perfect, this will probably result in better models than using the unt
 The units of the model coefficients might be more difficult to interpret, as will measures of performance. For example, the root mean squared error (RMSE) is a common performance metric that is used in regression models. It uses the difference between the observed and predicted values in its calculations. If the sale price is on the log scale, these differences (i.e. the residuals) are also in log units. For this reason, it can be difficult to understand the quality of a model whose RMSE is 0.15 log units. 
 
 Despite these drawbacks, we will utilize the log transformation for this outcome. _From this point on_, the outcome column is pre-logged in the `ames` data frame: 
+
+<!-- DK: Should we just define this as log in the original data? Would be one less thing for students to deal with. -->
 
 ```{r}
 ames <- ames %>% 
@@ -153,15 +145,10 @@ The primary approach for empirical model validation is to split the existing poo
 The other portion of the observations are placed into the _test set_. This is held in reserve until one or two models are chosen as the methods that are mostly likely to succeed. The test set is then used as the final arbiter to determine the efficacy of the model. It is critical to only look at the test set once; otherwise, it becomes part of the modeling process. 
 
 
-Suppose we allocate 80% of the data to the training set and the remaining 20% for testing.  The most common method is to use simple random sampling. The **rsample** package has tools for making data splits such as this; the function `intial_split()` was created for this purpose. It takes the data frame as an argument as well as the proportion to be placed into training. 
+Suppose we allocate 80% of the data to the training set and the remaining 20% for testing.  The most common method is to use simple random sampling. The **rsample** package has tools for making data splits such as this; the function `intial_split()` was created for this purpose. It takes the data frame as an argument as well as the proportion to be placed into training. We use `set.seed()` so that the results can be reproduced later. Create a data split which we will use throughout this chapter.
 
-```{r, message = FALSE, warning = FALSE}
-# Set the random number stream using `set.seed()` so that the results can be
-# reproduced later.
-
+```{r}
 set.seed(123)
-
-# Save the split information for an 80/20 split of the data
 
 ames_split <- initial_split(ames, prob = 0.80)
 ames_split
@@ -180,7 +167,7 @@ dim(ames_train)
 
 These objects are data frames with the same _columns_ as the original data but only the appropriate _rows_ for each set. 
 
-The amount of data that should be allocated when splitting the data is highly dependent on the context of the problem at hand. Too much data in the training set lowers the quality of the performance estimates. Conversely, too much data in the test set handicaps the model's ability to find appropriate parameter estimates. There are parts of the statistics community that eschew test sets in general because they believe all of the data should be used for parameter estimation. While there is merit to this argument, it is good modeling practice to have an unbiased set of observations as the final arbiter of model quality. A test set should be avoided only when the data are pathologically small.
+The amount of data that should be allocated when splitting the data is highly dependent on the context of the problem at hand. Too much data in the training set lowers the quality of the performance estimates. Conversely, too much data in the test set handicaps the model's ability to find appropriate parameter estimates. There are parts of the statistics community that eschew test sets in general because they believe all of the data should be used for parameter estimation. While there is merit to this argument, it is good modeling practice to have an unbiased set of observations as the final arbiter of model quality. 
 
 
 ## Feature engineering with recipes {#recipes}
@@ -200,7 +187,7 @@ There are many other examples of preprocessing to build better features for mode
 Feature engineering and data preprocessing can also involve reformatting _required_ by the model. Some models use geometric distance metrics and, consequently, numeric predictors should be centered and scaled so that they are all in the same units. Otherwise, the distance values would be biased by the scale of each column. 
 
 
-The **recipes** package combines different feature engineering and preprocessing tasks into a single object and then apply these transformations to different data sets. 
+The **recipes** package combines different feature engineering and preprocessing tasks into a single object and then applies these transformations to different data sets. 
 
 ### A simple recipe for the Ames housing data 
 
@@ -212,7 +199,7 @@ In this section, we will focus on a small subset of the predictors available in 
 
  * The year built (`Year_Built`)
 
- * The type of building (`Bldg_Type` with values `r val_list(ames_train$Bldg_Type)`)
+ * The type of building (`Bldg_Type`)
 
 <!-- DK: Introduce lm here? Or earlier? -->
 
@@ -284,9 +271,9 @@ Note that, after preparing the recipe, the print statement shows the results of 
 
 The third phase of recipe usage is to apply the preprocessing operations to a data set using the `bake()` function. The `bake()` function can apply the recipe to _any_ data set. To use the test set, the syntax would be:
 
-<!--DK: Fix the NULL problem!-->
+<!--DK: Fix the NULL problem! The book uses NULL in place of ames_test. Is that an error? Is using ames_test OK? I am not sure! -->
 
-```{r, eval=FALSE}
+```{r}
 test_ex <- bake(simple_ames, new_data = ames_test)
 names(test_ex) %>% 
   head()
@@ -304,13 +291,10 @@ bake(simple_ames,
 
 To get the processed version of the training set, we use `bake()` and pass in the argument `ames_train`.
 
-<!-- DK: Why doesn't this work? NULL seems unacceptable. -->
+<!-- DK: Same NULL question as above. Or could this just be cut. -->
 
 ```{r}
 bake(simple_ames, new_data = ames_train) %>% 
-  nrow()
-
-ames_train %>% 
   nrow()
 ```
 
@@ -370,7 +354,6 @@ recipe(~Bldg_Type, data = ames_train) %>%
 
 Why not all five? The most basic reason is simplicity; if you know the value for these four columns, you can determine the last value because these are mutually exclusive categories. More technically, the classical justification is that a number of models, including ordinary linear regression, have numerical issues when there are linear dependencies between columns. If all five building type indicator columns are included, they would add up to the intercept column (if there is one). This would cause an issue, or perhaps an outright error, in the underlying matrix algebra.  
 
-The full set of encodings can be used for some models. This is traditionally called the "one-hot" encoding and can be achieved using the `one_hot` argument of `step_dummy()`. 
 
 Different recipe steps can have different effects on columns of the data. For example, `step_log()` modifies a column in-place without changing the name. Other steps, such as `step_dummy()` eliminate the original data column and replace it with one or more columns with different names. This behavior depends on the type of operation being done. 
 
@@ -405,54 +388,6 @@ simple_ames <-
 ```
 
 Additional interactions can be specified in this formula by separating them by `+`. Also note that the recipe will only utilize interactions between different variables; if the formula uses `var_1:var_1`, this term will be ignored. 
-
-<!-- DK: Delete spline discussion and usage? I am torn! -->
-
-### Spline functions
-
-When a predictor has a nonlinear relationship with the outcome, some types of predictive models can adaptively approximate this relationship during training. However, simpler is usually better and it is not uncommon to try to use a simple model, such as a linear fit, and add in specific non-linear features for predictors that may need them. One common method for doing this is to use _spline_ functions to represent the data. Splines replace the existing numeric predictor with a set of columns that allow a model to emulate a flexible, non-linear relationship. As more spline terms are added to the data, the capacity to non-linearly represent the relationship increases. Unfortunately, it may also increase the likelihood of picking up on data trends that occur by chance (i.e., over-fitting). 
-
-If you have ever used `geom_smooth()` within a `ggplot`, you have probably used a spline representation of the data. For example, each panel below uses a different number of smooth splines for the latitude predictor:
-
-<!-- DK: This is a nice plot! Why not show students how to make it? Perhaps the preiminaries for this chapter could explain patchwork? And logs? And splines? -->
-
-```{r}
-library(patchwork)
-library(splines)
-
-plot_smoother <- function(deg_free) {
-  ggplot(ames_train, aes(x = Latitude, y = Sale_Price)) + 
-    geom_point(alpha = .2) + 
-    scale_y_log10() +
-    geom_smooth(
-      method = lm,
-      formula = y ~ ns(x, df = deg_free),
-      col = "red",
-      se = FALSE
-    ) +
-    ggtitle(paste(deg_free, "Spline Terms"))
-}
-
-( plot_smoother(2) + plot_smoother(5) ) / ( plot_smoother(20) + plot_smoother(100) )
-```
-
-The `ns()` function in the **splines** package generates feature columns using functions called _natural splines_.
-
-Some panels clearly fit poorly; two terms _under-fit_ the data while 100 terms _over-fit_. The panels with five and 20 terms seem like reasonably smooth fits that catch the main patterns of the data. This indicates that the proper amount of "non-linear-ness" matters. The number of spline terms could then be considered a _tuning parameter_ for this model. 
-
-In **recipes**, there are multiple steps that can create these types of terms. To add a natural spline representation for this predictor:
-
-```{r, eval = FALSE}
-recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + Latitude,
-         data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_other(Neighborhood, threshold = 0.01) %>% 
-  step_dummy(all_nominal()) %>% 
-  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) %>% 
-  step_ns(Latitude, deg_free = 20)
-```
-
-The user would need to determine if both neighborhood and latitude should be in the model since they both represent the same underlying data in different ways.
 
 
 ### How data are used by the recipe
@@ -495,8 +430,7 @@ ames_rec <-
   step_log(Gr_Liv_Area, base = 10) %>% 
   step_other(Neighborhood, threshold = 0.01) %>% 
   step_dummy(all_nominal()) %>% 
-  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) %>% 
-  step_ns(Latitude, Longitude, deg_free = 20)
+  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) 
 ```
 
 ## Fitting models with parsnip {#models}
@@ -844,8 +778,7 @@ ames_rec <-
   step_log(Gr_Liv_Area, base = 10) %>% 
   step_other(Neighborhood, threshold = 0.01) %>% 
   step_dummy(all_nominal()) %>% 
-  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) %>% 
-  step_ns(Latitude, Longitude, deg_free = 20)
+  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") )
 
 lm_model <- linear_reg() %>% set_engine("lm")
 
@@ -920,7 +853,7 @@ function(data, truth, ...)
 where `data` is a data frame or tibble and `truth` is the column with the observed outcome values. The ellipses or other arguments are used to specify the column(s) containing the predictions. 
 
 
-To illustrate, let's evaluate the model we have constructed for the Ames house price data. Recall that the `lm_fit` object was a linear regression model whose predictor set was supplemented with an interaction and spline functions for longitude and latitude. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
+To illustrate, let's evaluate the model we have constructed for the Ames house price data. Recall that the `lm_fit` object was a linear regression model whose predictor set was supplemented with an interaction term. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
 
 <!-- DK: Is this correct? The pipe within new_data? -->
 
