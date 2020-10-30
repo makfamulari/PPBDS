@@ -377,12 +377,12 @@ Next, we'll use the `posterior_predict()` function to get some draws from the po
 set.seed(9)
 pp <- posterior_predict(fit_obj, newdata = new_obs) %>%
     as_tibble() %>%
-    mutate(across(everything(), as.numeric))
+    mutate_all(as.numeric)
 
 head(pp, 10)
 ```
 
-We might expect that we can use `as_tibble()` directly after the object returned `posterior_predict()`. Sadly, for obscure technical reasons, that won't quite work. So, we need the incantation `mutate(across(everything(), as.numeric))` to make sure that the resulting tibble is well-behaved. This command ensures that every column in the tibble is a simple numeric vector, which is what we want.
+We might expect that we can use `as_tibble()` directly after the object returned `posterior_predict()`. Sadly, for obscure technical reasons, that won't quite work. So, we need the incantation `mutate_all(as.numeric)` to make sure that the resulting tibble is well-behaved. This command ensures that every column in the tibble is a simple numeric vector, which is what we want.
 
 A look at the first few observations shows that we simply get ten draws from the model's posterior distribution of the age of a Democrat. It is important to understand that this is not a concrete person from the `trains` dataset - the algorithm in `posterior_predict()` simply uses the existing data from  `trains` to estimate this posterior distribution. 
 
@@ -423,7 +423,7 @@ new <- tibble(party = c("Democrat", "Democrat", "Democrat",
 set.seed(27)
 pp <- posterior_predict(fit_obj, newdata = new) %>%
     as_tibble() %>%
-    mutate(across(everything(), as.numeric))
+    mutate_all(as.numeric)
 
 head(pp, 10)
 
@@ -688,7 +688,7 @@ Consider the result of posterior_predict() for someone treated and someone in th
 pp <- posterior_predict(fit_obj, 
                         newdata = ate_data) %>%
     as_tibble() %>%
-    mutate(across(everything(), as.numeric))
+    mutate_all(as.numeric)
 
 
 te <- tibble(Treated = pp$`1`, Control = pp$`2`)  %>% 

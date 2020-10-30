@@ -844,14 +844,14 @@ Use `posterior_predict()` to create draws from the posterior probability distrib
 pp <- posterior_predict(fit_gov_5, 
                         newdata = new_obs) %>%
   as_tibble() %>% 
-  mutate(across(everything(), as.numeric))
+  mutate_all(as.numeric)
   
 head(pp)
 ```
 
 The resulting tibble has 2 columns, one for each person. The first column shows the posterior predictions for the candidate from South Dakota. The second column shows the posterior predictions for the candidate from Washington. In both cases, the forecasts depend on the values of all the covariates. That is, we would provide a different forecast if the candidates were female or if they were other ages. 
 
-Why do we need the weird `mutate(across(everything(), as.numeric))` incantation? The reason is that `posterior_epred()` returns a simple matrix, which is easy to transform into a tibble. `posterior_predict()`, on the other hand, returns a special sort of matrix which is much harder to work with. So, we need a little hackery to make the next steps easier.
+Why do we need the weird `mutate_all(as.numeric)` incantation? The reason is that `posterior_epred()` returns a simple matrix, which is easy to transform into a tibble. `posterior_predict()`, on the other hand, returns a special sort of matrix which is much harder to work with. So, we need a little hackery to make the next steps easier.
 
 Let's look at the posterior predictive distribution for each candidate.
 
@@ -922,7 +922,7 @@ pe <- posterior_epred(fit_gov_5,
 pp <- posterior_predict(fit_gov_5, 
                         newdata = new_obs) %>% 
   as_tibble() %>% 
-  mutate(across(everything(), as.numeric)) %>% 
+  mutate_all(as.numeric) %>% 
   mutate(diff = `2` - `1`)
 
 tibble(Expectation = pe$diff,
@@ -935,7 +935,7 @@ tibble(Expectation = pe$diff,
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Predictive Distribution",
+    labs(title = "Posterior Probability Distributions",
          subtitle = "For 62 years-old male candidates from South Dakota and Washington",
          x = "Additional Days Lived Post Election",
          y = "Probability") + 
