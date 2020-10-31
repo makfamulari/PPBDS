@@ -3,8 +3,6 @@ output_yaml:
   - _output.yml
 ---
 
-<!-- DK: Can we get rid of bake()? Seems uncessesary. Just create a recipe and then put it into your workflow. -->
-
 <!-- Add a couple more of the chapters? Or maybe put them in chapter 11? -->
 
 <!-- Cut the recipe, bake, stuff? Not really needed for chapters 11 and 12. -->
@@ -25,7 +23,7 @@ output_yaml:
 
 # Model Choice
 
-There are many models we could make to explain a given outcome variable. The chapter provides the tools for exploring which model we "ought" to use. We will use these tools in Chapters \@ref(continuous-response) (for continuous outcomes) and \@ref(discrete-response) (for discrete outcomes).
+There are many models we could make to explain a given outcome variable. The chapter provides the tools for exploring which model we "ought" to select. We will use these tools in Chapters \@ref(continuous-response) (for continuous outcomes) and \@ref(discrete-response) (for discrete outcomes).
 
 
 ## The Ames housing data {#ames}
@@ -39,9 +37,9 @@ library(ranger)
 data(ames)
 ```
 
-The **tidymodels** library includes all the necessary libraries, in the same way that **tidyverse** includes libraries like **ggplot2** and **dplyr**. The `ames` data lives in the **modeldata** library, which is part of **tidymodels**. The **ranger** package is used for creating *regression trees*, a type of model which we will use in Chapter \@ref(discrete-response).
+The **tidymodels** library includes all the necessary libraries, in the same way that **tidyverse** includes libraries like **ggplot2** and **dplyr**. The `ames` data lives in the **modeldata** library, which is part of **tidymodels**. The **ranger** package is used for creating *regression trees*, a type of model which will feature in Chapter \@ref(discrete-response).
 
-The Ames housing data set is an excellent resource for learning about models. It contains data on `r format(nrow(ames), big.mark = ",")` properties in Ames, Iowa, including columns related to 
+The `ames` housing data set contains data on `r format(nrow(ames), big.mark = ",")` properties in Ames, Iowa, including columns related to 
 
  * house characteristics (bedrooms, garage, fireplace, pool, porch, etc.),
  * location (neighborhood),
@@ -52,29 +50,36 @@ The Ames housing data set is an excellent resource for learning about models. It
 
 It makes sense to start with the outcome we want to predict: the last sale price of the house (in USD): 
 
-<!-- DK: Clean up these plots? Why not? -->
+<!-- DK: Clean up these plots. -->
 
 ```{r}
 ggplot(ames, aes(x = Sale_Price)) + 
-  geom_histogram(bins = 50)
+  geom_histogram(bins = 50) +
+  scale_x_continuous(breaks = c(0, 200000, 400000, 600000),
+                     labels = scales::dollar_format()) +
+  labs(title = "Sales Prices for Homes in Ames, Iowa",
+       subtitle = "Skewed distribution suggests need for a log transformation",
+       x = "Sales Price",
+       y = "Number")
 ```
 
-The data are right-skewed; there are more inexpensive houses than expensive ones. The median sale price was \$`r format(median(ames$Sale_Price), big.mark = ",")` and the most expensive house was \$`r format(max(ames$Sale_Price), big.mark = ",")`. When modeling this outcome, a strong argument can be made that the price should be log-transformed. The advantages of doing this are that no houses would be predicted with negative sale prices and that errors in predicting expensive houses will not have an undue influence on the model. Also, from a statistical perspective, a logarithmic transform may also _stabilize the variance_ in a way that makes inference more legitimate. Let's visualize the transformed data:
+The data are right-skewed; there are more inexpensive houses than expensive ones. The median sale price was \$`r format(median(ames$Sale_Price), big.mark = ",")` and the most expensive house was \$`r format(max(ames$Sale_Price), big.mark = ",")`. When modeling this outcome, a strong argument can be made that the price should be log-transformed. The advantages of doing this are that no houses would be predicted with negative sale prices and that errors in predicting expensive houses will not have an undue influence on the model. 
 
 <!-- DK: Do we need to discuss logs, either here or earlier in the book? -->
 
 ```{r}
 ggplot(ames, aes(x = Sale_Price)) + 
   geom_histogram(bins = 50) +
-  scale_x_log10()
+  scale_x_log10(breaks = c(0, 50000, 100000, 200000, 400000),
+                     labels = scales::dollar_format()) +
+  labs(title = "Sales Prices for Homes in Ames, Iowa",
+       subtitle = "Using logs makes for a more sensible distribution",
+       x = "Sales Price",
+       y = "Number")
+
 ```
 
-While not perfect, this will probably result in better models than using the untransformed data. 
-
-
-The units of the model coefficients might be more difficult to interpret, as will measures of performance. For example, the root mean squared error (RMSE) is a common performance metric that is used in regression models. It uses the difference between the observed and predicted values in its calculations. If the sale price is on the log scale, these differences (i.e. the residuals) are also in log units. For this reason, it can be difficult to understand the quality of a model whose RMSE is 0.15 log units. 
-
-Despite these drawbacks, we will utilize the log transformation for this outcome. _From this point on_, the outcome column is pre-logged in the `ames` data frame: 
+While not perfect, this will probably result in better models than using the untransformed data.  _From this point on_, the outcome column is pre-logged in the `ames` data frame: 
 
 <!-- DK: Should we just define this as log in the original data? Would be one less thing for students to deal with. -->
 
@@ -131,15 +136,28 @@ It is _critical_ to conduct _exploratory data analysis_ prior to beginning any m
 
 Many of these questions will be revisited as these data are used in upcoming examples. 
 
-## Spending our data {#splitting}
 
-There are several steps to create a useful model, including parameter estimation, model selection and tuning, and performance assessment. At the start of a new project, there is usually an initial finite pool of data available for all these tasks. How should the data be applied to these steps? The idea of _data spending_ is an important first consideration when modeling, especially as it relates to empirical validation. 
 
-When there are copious amounts of data available, a smart strategy is to allocate specific subsets of data for different tasks, as opposed to allocating the largest possible amount to the model parameter estimation only. There may be questions about many modeling project steps that must be answered with limited prior knowledge. For example, one possible strategy (when both data and predictors are abundant) is to spend a specific subset of data to determine which predictors are informative, before considering parameter estimation at all. 
+## Feature engineering with recipes {#recipes}
 
-If the initial pool of data available is not huge, there will be some overlap of how and when our data is "spent" or allocated, and a solid methodology for data spending is important. Here, we demonstrate the basics of _splitting_ our initial pool of samples for different purposes. 
+Feature engineering encompasses activities that reformat predictor values to make them easier for a model to use effectively. This includes transformations and encodings of the data to best represent their important characteristics. Imagine that you have two predictors in a data set that can be more effectively represented in your model of interest as a ratio; creating a new predictor from the ratio of the original two is a simple example of feature engineering. 
 
-### Common methods for splitting data {#splitting-methods}
+Take the location of a house in Ames as a more involved example. There are a variety of ways that this spatial information can be exposed to a model, including neighborhood (a qualitative measure), longitude/latitude, distance to the nearest school or Iowa State University, and so on. When choosing how to encode these data in modeling, we might choose an option we believe most associated with the outcome. The original format of the data (e.g., numeric like distance versus categorical like neighborhood) is also a driving factor in feature engineering choices. 
+
+There are many other examples of preprocessing to build better features for modeling: 
+
+ * Correlation between predictors can be reduced via feature extraction or the removal of some predictors. 
+ 
+ * When some predictors have missing values, they can be imputed using a sub-model.
+ 
+ * Models that use variance-type measures may benefit from coercing the distribution of some skewed predictors to be symmetric by estimating a transformation. 
+
+
+The **recipes** package combines different feature engineering and preprocessing tasks into a single object and then applies these transformations to different data sets. 
+
+### Splitting data
+
+Before making a recipe, we should organize our data.
 
 The primary approach for empirical model validation is to split the existing pool of data into two distinct sets. Some observations are used to develop and optimize the model. This _training set_ is usually the majority of the data. These data are a sandbox for model building where different models can be fit, feature engineering strategies are investigated, and so on. We as modeling practitioners spend the vast majority of the modeling process using the training set as the substrate to develop the model.  
 
@@ -168,27 +186,8 @@ dim(ames_train)
 
 These objects are data frames with the same _columns_ as the original data but only the appropriate _rows_ for each set. 
 
-The amount of data that should be allocated when splitting the data is highly dependent on the context of the problem at hand. Too much data in the training set lowers the quality of the performance estimates. Conversely, too much data in the test set handicaps the model's ability to find appropriate parameter estimates. There are parts of the statistics community that eschew test sets in general because they believe all of the data should be used for parameter estimation. While there is merit to this argument, it is good modeling practice to have an unbiased set of observations as the final arbiter of model quality. 
+The amount of data that should be allocated when splitting the data is highly dependent on the context of the problem at hand. Too much data in the training set lowers the quality of the performance estimates. Conversely, too much data in the test set handicaps the model's ability to find appropriate parameter estimates. 
 
-
-## Feature engineering with recipes {#recipes}
-
-Feature engineering encompasses activities that reformat predictor values to make them easier for a model to use effectively. This includes transformations and encodings of the data to best represent their important characteristics. Imagine that you have two predictors in a data set that can be more effectively represented in your model of interest as a ratio; creating a new predictor from the ratio of the original two is a simple example of feature engineering. 
-
-Take the location of a house in Ames as a more involved example. There are a variety of ways that this spatial information can be exposed to a model, including neighborhood (a qualitative measure), longitude/latitude, distance to the nearest school or Iowa State University, and so on. When choosing how to encode these data in modeling, we might choose an option we believe most associated with the outcome. The original format of the data (e.g., numeric like distance versus categorical like neighborhood) is also a driving factor in feature engineering choices. 
-
-There are many other examples of preprocessing to build better features for modeling: 
-
- * Correlation between predictors can be reduced via feature extraction or the removal of some predictors. 
- 
- * When some predictors have missing values, they can be imputed using a sub-model.
- 
- * Models that use variance-type measures may benefit from coercing the distribution of some skewed predictors to be symmetric by estimating a transformation. 
-
-Feature engineering and data preprocessing can also involve reformatting _required_ by the model. Some models use geometric distance metrics and, consequently, numeric predictors should be centered and scaled so that they are all in the same units. Otherwise, the distance values would be biased by the scale of each column. 
-
-
-The **recipes** package combines different feature engineering and preprocessing tasks into a single object and then applies these transformations to different data sets. 
 
 ### A simple recipe for the Ames housing data 
 
@@ -255,55 +254,6 @@ What is the advantage to using a recipe? There are a few, including:
  
  * All data processing can be captured in a single R object instead of in scripts that are repeated, or even spread across different files.  
  
-### Using recipes
- 
-Remember that when invoking the `recipe()` function, the steps are not estimated or executed in any way. The second phase for using a recipe is to estimate any quantities required by the steps using the `prep()` function. For example, we can use `step_normalize()` to center and scale any predictors selected in the step. When we call `prep(recipe, training)`, this function estimates the required means and standard deviations from the data in the `training` argument. The transformations specified by each step are also sequentially executed on the data set. Again using normalization as the example, the means and variances are estimated and then used to standardize the columns. 
-
-
-For our example recipe, we can now `prep()`: 
-
-```{r}
-simple_ames <- prep(simple_ames, 
-                    training = ames_train)
-simple_ames
-``` 
-
-Note that, after preparing the recipe, the print statement shows the results of the selectors (e.g., `Neighborhood` and `Bldg_Type` are listed instead of `all_nominal`). 
-
-The third phase of recipe usage is to apply the preprocessing operations to a data set using the `bake()` function. The `bake()` function can apply the recipe to _any_ data set. To use the test set, the syntax would be:
-
-<!--DK: Fix the NULL problem! The book uses NULL in place of ames_test. Is that an error? Is using ames_test OK? I am not sure! -->
-
-```{r}
-test_ex <- bake(simple_ames, new_data = ames_test)
-names(test_ex) %>% 
-  head()
-```
-
-Note the dummy variable columns starting with `Neighborhood_`. The `bake()` function can also take selectors so that, if we only wanted the neighborhood results, we could use:
-
-<!-- DK: When do we explain starts_with() and friends? Maybe there is a preliminaries section for each chapter which teaches some more cool stuff? -->
-
-```{r, eval = FALSE}
-bake(simple_ames, 
-     ames_test, 
-     starts_with("Neighborhood_"))
-```
-
-To get the processed version of the training set, we use `bake()` and pass in the argument `ames_train`.
-
-<!-- DK: Same NULL question as above. Or could this just be cut. -->
-
-```{r}
-bake(simple_ames, new_data = ames_train) %>% 
-  nrow()
-```
-
-To reiterate, using a recipe is a three phase process summarized as:
-
-```{r, echo = FALSE}
-knitr::include_graphics("10-model-choice/images/recipes-process.svg")
-```
 
 
 ### Encoding qualitative data in a numeric format  {#dummies}
@@ -333,6 +283,8 @@ simple_ames <-
 
 
 There are a few strategies for converting a factor predictor to a numeric format. The most common method is to create "dummy" or indicator variables. Let's take the predictor in the Ames data for the building type, which is a factor variable with five levels. For dummy variables, the single `Bldg_Type` column would be replaced with four numeric columns whose values are either zero or one. These binary variables represent specific factor level values. In R, the convention is to _exclude_ a column for the first factor level (`OneFam`, in this case). The `Bldg_Type` column would be replaced with a column called `TwoFmCon` that is one when the row has that value and zero otherwise. Three other columns are similarly created: 
+
+<!-- DK: The below code, which is not shown, is the only place we use prep() and bake(). Should we get rid of them/this? For now, it does not matter since students can't see the code. -->
 
 ```{r, echo = FALSE}
 show_rows <- 
@@ -389,14 +341,6 @@ simple_ames <-
 ```
 
 Additional interactions can be specified in this formula by separating them by `+`. Also note that the recipe will only utilize interactions between different variables; if the formula uses `var_1:var_1`, this term will be ignored. 
-
-
-### How data are used by the recipe
-
-Data are given to recipes at different stages. When calling `recipe(..., data)`, the data set is used to determine the data types of each column so that selectors such as `all_numeric()` can be used. When preparing the data using `prep(recipe, training)`, the data in `training` are used for all estimation operations, from determining factor levels to computing PCA components and everything in between. It is important to realize that all preprocessing and feature engineering steps only utilize the training data. Otherwise, information leakage can negatively impact the model. 
-
-When using `bake(recipe, new_data)`, no quantities are re-estimated using the values in `new_data`. Take centering and scaling using `step_normalize()` as an example. Using this step, the means and standard deviations from the appropriate columns are determined from the training set; new samples are standardized using these values when `bake()` is invoked. 
-
 
 Our code so far:
 
