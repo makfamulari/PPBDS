@@ -369,7 +369,7 @@ The **parsnip** package provides a fluent and standardized interface for a varie
  
 ### Create a model
 
-Once the data have been encoded in a format ready for a modeling algorithm, such as a numeric matrix, they can be used in the model building process.  
+<!-- DK: We could cut 90% of the material in this section. No need to provide an example. -->
 
 Suppose that a linear regression model was our initial choice for the model. This is equivalent to specifying that the outcome data is numeric and that the predictors are related to the model in terms of simple slopes and intercepts: 
 
@@ -405,7 +405,7 @@ model <- glmnet(x = matrix,
                 family = "gaussian", ...)
 ```
 
-In this case, the predictor data must already be formatted into a numeric matrix; there is only and `x`/`y` method and no formula method. 
+In this case, the predictor data must already be formatted into a numeric matrix; there is only an `x`/`y` method and no formula method. 
 
 Note that these interfaces are heterogeneous in either how the data are passed to the model function or in terms of their arguments. The first issue is that, to fit models across different packages, the data must be formatted in different ways. `lm()` and `stan_glm()` only have formula interfaces while `glmnet()` does not. For other types of models, the interfaces may be even more disparate. For a person trying to do data analysis, these differences require the memorization of each package's syntax and can be very frustrating. 
 
@@ -461,7 +461,7 @@ Not only does **parsnip** enable a consistent model interface for different pack
 
 ### Use the model results
 
-<!-- DK: Delete this section? -->
+<!-- DK: We could cut 90% of the material in this section. No need to provide an example. -->
 
 Once the model is created and fit, we can use the results in a variety of ways; we might want to plot, print, or otherwise examine the model output. Several quantities are stored in a **parsnip** model object, including the fitted model. This can be found in an element called `fit`, which can be returned using the `purrr::pluck()` function:
 
@@ -481,12 +481,12 @@ One issue with some existing methods in base R is that the results are stored in
 tidy(lm_form_fit)
 ```
  
-The column names are standardized across models and do not contain any additional data (such as the type of statistical test). The data previously contained in the row names are now in a column called `terms` and so on. One important principle in the tidymodels ecosystem is that a function should return values that are _predictable, consistent, and unsurprising_. 
+The column names are standardized across models and do not contain any additional data (such as the type of statistical test). The data previously contained in the row names are now in a column called `terms` and so on. 
 
 
 ### Make predictions {#parsnip-predictions}
 
-Another area where **parsnip** diverges from conventional R modeling functions is the format of values returned from `predict()`. For predictions, **parsnip** always conforms to the following rules: 
+For predictions, **parsnip** always conforms to the following rules: 
 
  1. The results are always a tibble.
  2. The column names of the tibble are always predictable. 
@@ -499,7 +499,7 @@ ames_test_small <- ames_test %>% slice(1:5)
 predict(lm_form_fit, new_data = ames_test_small)
 ```
 
-The row order of the predictions are always the same as the original data. Why is there a leading dot in some of the column names? Some tidyverse and tidymodels functions have arguments and return values which contain periods. This is to protect against merging data with duplicate names. There are some data sets that contain predictors named `pred`! 
+The row order of the predictions are always the same as the original data. The leading dot in the variable names protect against merging data with duplicate names. There are some data sets that contain predictors named `pred`! 
 
 
 These three rules make it easier to merge predictions with the original data: 
@@ -530,29 +530,11 @@ For the second tidymodels prediction rule, the predictable column names for diff
 
 The third rule regarding the number of rows in the output is critical. For example, if any rows of the new data contain missing values, the output will be padded with missing results for those rows. 
 
-A main advantage of standardizing the model interface and prediction types in **parsnip** is that, when different models are used, the syntax is identical. Suppose that we used a decision tree to model the Ames data. Outside of the model specification, there are no significant differences in the code pipeline: 
-
-```{r}
-tree_model <- 
-  decision_tree(min_n = 2) %>% 
-  set_engine("rpart") %>% 
-  set_mode("regression")
-
-tree_fit <- 
-  tree_model %>% 
-  fit(Sale_Price ~ Longitude + Latitude, data = ames_train)
-
-ames_test_small %>% 
-  select(Sale_Price) %>% 
-  bind_cols(predict(tree_fit, ames_test_small))
-```
-
-This demonstrates the benefit of homogenizing the data analysis process and syntax across different models. It enables users to spend their time on the results and interpretation rather than having to focus on the syntactical differences between R packages. 
-
+A main advantage of standardizing the model interface and prediction types in **parsnip** is that, when different models are used, the syntax is identical. 
 
 ## A model workflow {#workflows}
 
-In the previous two sections, we discussed the **recipes** and **parsnip** packages. These packages can be used to prepare the data for analysis and fitting the model. This chapter introduces a new object called a _model workflow_. The purpose of this object is to encapsulate the major pieces of the modeling _process_. The workflow is important in two ways. First, using a workflow object encourages good methodology since it is a single point of entry to the estimation components of a data analysis. Second, it enables the user to better organize their projects.  
+In the previous two sections, we discussed the **recipes** and **parsnip** packages. These packages can be used to prepare the data for analysis and fitting the model. This section introduces a new object called a _model workflow_. The purpose of this object is to encapsulate the major pieces of the modeling _process_. The workflow is important in two ways. First, using a workflow object encourages good methodology since it is a single point of entry to the estimation components of a data analysis. Second, it enables users to better organize their projects.  
 
 
 ### Where does the model begin and end? {#begin-model-end}
@@ -571,8 +553,6 @@ For some data sets that are straightforward in nature, fitting the model itself 
 
 * It may be beneficial to transform the scale of a predictor. If there is not _a priori_ information on what the new scale should be, we can estimate the proper scale using a statistical transformation technique, the existing data, and some optimization criterion. Other transformations, such as PCA, take groups of predictors and transform them into new features that are used as the predictors.
 
-While the examples above are related to steps that occur before the model fit, there may also be operations that occur _after_ the model is created. When a classification model is created where the outcome is binary (e.g., `event` and `non-event`), it is customary to use a 50% probability cutoff to create a discrete class prediction, also known as a "hard prediction". For example, a classification model might estimate that the probability of an event was 62%. Using the typical default, the hard prediction would be `event`. However, the model may need to be more focused on reducing false positive results (i.e., where true non-events are classified as events). One way to do this is to raise the cutoff from 50% to some greater value. This increases the level of evidence required to call a new sample an event. While this reduces the true positive rate (which is bad), it may have a more dramatic effect on reducing false positives. The choice of the cutoff value should be optimized using data. This is an example of a _post-processing_ step that has a significant effect on how well the model works, even though it is not contained in the model fitting step. 
-
 It is important to focus on the broader _modeling process_, instead of only fitting the specific model used to estimate parameters. This broader process includes any preprocessing steps, the model fit itself, as well as potential post-processing activities. In this book, we will refer to this broader process as the **model workflow** and include in it any data-driven activities that are used to produce a final model equation. 
 
 
@@ -581,23 +561,7 @@ In other software, such as Python or Spark, similar collections of steps are cal
 
 Binding together the analytical components of a data analysis is important for another reason. We will learn how to accurately measure performance, as well as how to optimize structural parameters (i.e. model tuning). To correctly quantify model performance on the training set, we recommend using _resampling_ methods. To do this properly, no data-driven parts of the analysis should be excluded from validation. To this end, the workflow must include all significant estimation steps.
 
-To illustrate, consider PCA signal extraction. This is a way to replace correlated predictors with new artificial features that are uncorrelated and capture most of the information in the original set. The new features would be used as the predictors and least squares regression could be used to estimate the model parameters. 
-
-There are two ways of thinking about the model workflow. The _incorrect_ method would be to think of the PCA preprocessing step as _not being part of the modeling process_: 
-
-```{r, echo = FALSE}
-knitr::include_graphics("10-model-choice/images/bad-workflow.svg")
-```
-
-The fallacy here is that, although PCA does significant computations to produce the components, its operations are assumed to have no uncertainty associated with them. The PCA components are treated as _known_ and, if not included in the model workflow, the effect of PCA could not be adequately measured. 
-
-An _appropriate_ approach would be: 
-
-```{r, echo = FALSE}
-knitr::include_graphics("10-model-choice/images/proper-workflow.svg")
-```
-
-In this way, the PCA preprocessing is considered part of the modeling process. 
+ 
 
 ### Workflow basics
 
@@ -623,31 +587,6 @@ lm_wflow
 
 Notice that we have not yet specified how this workflow should preprocess the data: `Preprocessor: None`.
 
-If our model were very simple, a standard R formula can be used as a preprocessor: 
-
-```{r workflows-form}
-lm_wflow <- 
-  lm_wflow %>% 
-  add_formula(Sale_Price ~ Longitude + Latitude)
-
-lm_wflow
-```
-
-Workflows have a `fit()` method that can be used to create the model. Using the objects created previously:
-
-```{r}
-lm_fit <- fit(lm_wflow, ames_train)
-lm_fit
-```
-
-We can also `predict()` on the fitted workflow:
-
-```{r}
-predict(lm_fit, ames_test %>% slice(1:3))
-```
-
-The `predict()` method follows all of the same rules and naming conventions that we described for the **parsnip** package. 
-
 
 ### Workflows and recipes
 
@@ -655,19 +594,9 @@ The `predict()` method follows all of the same rules and naming conventions that
 
 Instead of using model formulas, recipe objects can also be used to preprocess data for modeling. Previously, we summarized a recipe that specified several preprocessing and feature engineering steps. These are encapsulated inside the object `ames_rec` and are attached to the workflow:
 
-```{r, error = TRUE}
-lm_wflow %>% 
+```{r}
+lm_wflow <- lm_wflow %>% 
   add_recipe(ames_rec)
-```
-
-That did not work! We can only have one preprocessing method at a time, so we need to remove the formula before adding the recipe. 
-
-```{r workflows-add-recipe}
-lm_wflow <- 
-  lm_wflow %>% 
-  remove_formula() %>% 
-  add_recipe(ames_rec)
-lm_wflow
 ```
 
 Use `fit()` to complete the model and `predict()` to create predictions from the fitted model.
@@ -719,6 +648,8 @@ Once we have a model, we need to know how well it works. A quantitative approach
 
 
 The choice of which metrics to examine can be critical. For example, two common metrics for regression models are the root mean squared error (RMSE) and the coefficient of determination (a.k.a. $R^2$). The former measures _accuracy_ while the latter measures _correlation_. These are not necessarily the same thing. This figure demonstrates the difference between the two: 
+
+<!-- DK: I find this confusing. So, why keep it?  -->
 
 ```{r, echo = FALSE}
 set.seed(234)
@@ -829,7 +760,7 @@ This tidy data format stacks the metrics vertically.
 
 ### Resampling for evaluating performance  {#resampling}
 
-We usually need to understand the effectiveness of the model _before using the test set_.  In this section, we describe an approach called resampling that can fill this gap. Resampling estimates of performance can generalize to new data. The next chapter complements this one by demonstrating statistical methods that compare resampling results. 
+We usually need to understand the effectiveness of the model _before using the test set_.  In this section, we describe an approach called resampling that can fill this gap. Resampling estimates of performance can generalize to new data. The next section complements this one by demonstrating statistical methods that compare resampling results. 
 
 To motivate this chapter, the next section demonstrates how naive performance estimates can often fail. 
 
@@ -998,7 +929,7 @@ There are a variety of variations on cross-validation. The most important is _re
 
 To create _R_ repeats of _V_-fold cross-validation, the same fold generation process is done _R_ times to generate _R_ collections of _V_ partitions. Now, instead of averaging _V_ statistics, $V \times R$ statistics produce the final resampling estimate. Due to the Central Limit Theorem, the summary statistics from each model tend toward a normal distribution. 
 
-Consider the Ames data. On average, 10-fold cross-validation uses assessment sets that contain roughly `r floor(nrow(ames_train) * .1)` properties. If RMSE is the statistic of choice, we can denote that estimate's standard deviation as $\sigma$. With simple 10-fold cross-validation, the standard error of the mean RMSE is $\sigma/\sqrt{10}$. If this is too noisy, repeats reduce the standard error to $\sigma/\sqrt{10R}$. For 10-fold cross-validation with $R$ replicates, the plot below shows how quickly the standard error^[These are _approximate_ standard errors. As will be discussed in the next chapter, there is a within-replicate correlation that is typical of resampled results. By ignoring this extra component of variation, the simple calculations shown in this plot are overestimates of the reduction in noise in the standard errors.] decreases with replicates: 
+Consider the Ames data. On average, 10-fold cross-validation uses assessment sets that contain roughly `r floor(nrow(ames_train) * .1)` properties. If RMSE is the statistic of choice, we can denote that estimate's standard deviation as $\sigma$. With simple 10-fold cross-validation, the standard error of the mean RMSE is $\sigma/\sqrt{10}$. If this is too noisy, repeats reduce the standard error to $\sigma/\sqrt{10R}$. For 10-fold cross-validation with $R$ replicates, the plot below shows how quickly the standard error decreases with replicates: 
 
 ```{r, echo = FALSE}
 cv_info <- 
@@ -1157,6 +1088,8 @@ The control arguments include:
  
 For our example, let's save the predictions in order to visualize the model fit and residuals: 
 
+<!-- DK: I am confused about keep_pred and what it does in this code. Recall that there used to be stand-alone function defined at the top of the Rmd called keep_pred. I deleted it everywhere I found it and replaced it with control_resamples(save_pred = TRUE). Necessary? -->
+
 ```{r resampling-cv-ames}
 keep_pred <- control_resamples(save_pred = TRUE)
 
@@ -1300,11 +1233,11 @@ rf_res <- rf_wflow %>% fit_resamples(resamples = ames_folds, control = keep_pred
 
 Once we create two or more models, the next step is to compare them. In some cases, comparisons might be _within-model_, where the same model might be evaluated with different features or preprocessing methods. Alternatively, _between-model_ comparisons, such as when we compared linear regression and random forest models in Section \@ref(resampling), are the more common scenario.
 
-In either case, the result is a collection of resampled summary statistics (e.g. RMSE, accuracy, etc.) for each model. The first section of this chapter discusses important aspects of these statistics. Two additional sections follow describing how to formally compare models.
+In either case, the result is a collection of resampled summary statistics (e.g. RMSE, accuracy, etc.) for each model. 
 
 ### Resampled performance statistics {#resampled-stats}
 
-In Chapter \@ref(resampling), a random forest model for the Ames data was resampled with 10-fold cross-validation. These results were saved in the object `rf_res`. 
+In Section \@ref(resampling), a random forest model for the Ames data was resampled with 10-fold cross-validation. These results were saved in the object `rf_res`. 
 
 We'll estimate two additional models with the same resamples. First, the previous linear regression model, using the preprocessing defined in the `ames_rec` recipe, is resampled:
 
