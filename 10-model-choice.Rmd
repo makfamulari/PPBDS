@@ -3,9 +3,9 @@ output_yaml:
   - _output.yml
 ---
 
-<!-- Add a couple more of the chapters? Or maybe put them in chapter 11? -->
 
-<!-- Cut the recipe, bake, stuff? Not really needed for chapters 11 and 12. -->
+
+<!-- DK: Drop first fit section and working with fitted objects. Wait for fit_resamples() to discuss fitting? -->
 
 <!-- Replace lm() with stan_glm()? -->
 
@@ -648,7 +648,7 @@ Once we have a model, we need to know how well it works. A quantitative approach
 
 <!-- DK: "generative qualities" is awkward. Truth is that identification issues drive most causal model debate. But is that too much to explain? -->
 
-The effectiveness of any given model depends on how the model will be used. A causal model is used primarily to understand relationships, and typically is discussed with a strong focus on the choice (and validity) of probabilistic distributions and other generative qualities that define the model. For a model used primarily for prediction, by contrast, predictive strength is primary and concerns about underlying statistical qualities may be less important. Predictive strength is usually focused on how close our predictions come to the observed data, i.e., fidelity of the model predictions to the actual results. This section focuses on functions that can be used to measure predictive strength. However, our advice for those developing causal models is to use these techniques _even when the model will not be used with the primary goal of prediction_. 
+The effectiveness of any given model depends on how the model will be used. A causal model is used primarily to understand relationships, and typically is discussed with a strong focus on the choice (and validity) of probabilistic distributions and other generative qualities that define the model. For a model used primarily for prediction, by contrast, predictive strength is key and concerns about underlying statistical qualities are less important. Predictive strength is usually focused on how close our predictions come to the observed data, i.e., fidelity of the model predictions to the actual results. This section focuses on functions that can be used to measure predictive strength. However, our advice for those developing causal models is to use these techniques _even when the model will not be used with the primary goal of prediction_. 
 
 
 **Optimization of statistical characteristics of the model does not imply that the model fits the data well.** Even for purely inferential models, some measure of fidelity to the data should accompany the inferential results. Using this, the consumers of the analyses can calibrate their expectations for the results of the statistical analysis. 
@@ -690,18 +690,20 @@ Note that both the predicted and observed outcomes are in log10 units. It is bes
 
 Let's plot the data before computing metrics: 
 
-<!-- DK: Need to explain/rewrite this ugly code. -->
+<!-- DK: Clean up this plot.  -->
 
 ```{r}
 ggplot(ames_test_res, aes(x = Sale_Price, y = .pred)) + 
-  # Create a diagonal line:
   geom_abline(lty = 2) + 
   geom_point(alpha = 0.5) + 
   labs(y = "Predicted Sale Price (log10)", 
        x = "Sale Price (log10)") +
-  # Scale and size the x- and y-axis uniformly:
   coord_obs_pred()
 ```
+
+<!-- DK: These functions might go in a pre-amble section for the tutorial. -->
+
+`geom_abine()` draws the line at the 45 degree line. `coord_obs_pred()` is a function from **tidymodels** for making comparisons between actual with predicted values.
 
 There is one property that is substantially over-predicted. 
 
@@ -712,6 +714,8 @@ rmse(ames_test_res, truth = Sale_Price, estimate = .pred)
 ```
 
 The output above shows the standard format of the output of **yardstick** functions. Metrics for numeric outcomes usually have a value of "standard" for the `.estimator` column. Examples with different values for this column are shown below.
+
+<!-- DK: Should we give formulas for these metrics? Discuss them? Or maybe only use rmse? -->
 
 To compute multiple metrics at once, we can create a _metric set_. Let's add $R^2$ and the mean absolute error: 
 
@@ -724,7 +728,7 @@ This tidy data format stacks the metrics vertically.
 
 ### Resampling for evaluating performance  {#resampling}
 
-We usually need to understand the effectiveness of the model _before using the test set_.  In this section, we describe an approach called resampling that can fill this gap. Resampling estimates of performance can generalize to new data. The next section complements this one by demonstrating cross-validation, a statistical method that compares resampling results. 
+We usually need to understand the effectiveness of the model _before using the test set_.  In this section, we describe an approach called resampling that can fill this gap. Resampling estimates of performance can generalize to new data. 
 
 ###  Resampling methods
 
@@ -742,7 +746,7 @@ knitr::include_graphics("10-model-choice/images/resampling.svg")
 
 These are somewhat analogous to training and test sets. Our language of _analysis_ and _assessment_ avoids confusion with initial split of the data. These data sets are mutually exclusive. The partitioning scheme used to create the analysis and assessment sets is usually the defining characteristic of the method.
 
-Suppose twenty iterations of resampling are conducted. This means that twenty separate models are fit on the analysis sets and the corresponding assessment sets produce twenty sets of performance statistics. The final estimate of performance for a model is the average of the twenty replicates of the statistics. This average has very good generalization properties and is far better than the resubstituion estimates. The most popular method is cross-validation. 
+Suppose twenty iterations of resampling are conducted. This means that twenty separate models are fit on the analysis sets and the corresponding assessment sets produce twenty sets of performance statistics. The final estimate of performance for a model is the average of the twenty replicates of the statistics. This average has very good generalization properties. The most popular method is cross-validation. 
 
 
 Cross-validation is a well established resampling method. While there are a number of variations, the most common cross-validation method is _V_-fold cross-validation. The data are randomly partitioned into _V_ sets of roughly equal size (called the "folds"). For illustration, _V_ = 3 is shown below for a data set of thirty training set points with random fold allocations. The number inside the symbols is the sample number:
@@ -810,13 +814,13 @@ rf_wflow <-
 ```
 
 
-The `fit_resamples()` function is analogous to `fit()`, but instead of having a `data` argument, `fit_resamples()` has `resamples` which expects an `rset` object like the ones shown above. The possible interfaces to the function are:  
+The `fit_resamples()` function is analogous to `fit()`, but instead of having a `data` argument, `fit_resamples()` has `resamples` which expects an `rset` object like the ones shown above. We typically pipe a wokflow object directly into `fit_resamples()`.  
 
 ```{r resampling-usage, eval = FALSE}
-model_spec %>% fit_resamples(formula,  resamples, ...)
-model_spec %>% fit_resamples(recipe,   resamples, ...)
-workflow   %>% fit_resamples(          resamples, ...)
+workflow %>% fit_resamples(resamples, ...)
 ```
+
+<!-- DK: Do we need to go through of all these? Why not just provide a clear recommendation? -->
 
 There are a number of other optional arguments, such as: 
 
@@ -834,7 +838,7 @@ The control arguments include:
  
 For our example, let's save the predictions in order to visualize the model fit and residuals: 
 
-<!-- DK: I am confused about keep_pred and what it does in this code. Recall that there used to be stand-alone function defined at the top of the Rmd called keep_pred. I deleted it everywhere I found it and replaced it with control_resamples(save_pred = TRUE). Necessary? -->
+<!-- DK: I am confused about keep_pred and what it does in this code. Recall that there used to be stand-alone function defined at the top of the Rmd called keep_pred. I deleted it everywhere I found it and replaced it with control_resamples(save_pred = TRUE). Necessary? Desirable? -->
 
 ```{r resampling-cv-ames}
 keep_pred <- control_resamples(save_pred = TRUE)
@@ -870,8 +874,6 @@ collect_metrics(rf_res)
 ```
 
 These are the resampling estimates averaged over the individual replicates. To get the metrics for each resample, use the option `summarize = FALSE` 
-
-Notice how much more realistic the performance estimates are than the resubstitution estimates from Section \@ref(resampling-resubstition)!
 
 To obtain the assessment set predictions: 
 
@@ -978,8 +980,8 @@ In Section \@ref(resampling), a random forest model for the Ames data was resamp
 
 We'll estimate two additional models with the same resamples. First, the previous linear regression model, using the preprocessing defined in the `ames_rec` recipe, is resampled:
 
-```{r compare-with-spline-rs}
-lm_with_splines_res <-
+```{r compare-with-inter}
+lm_with_inter_res <-
   lm_wflow %>%
   fit_resamples(resamples = ames_folds, 
                 control = control_resamples(save_pred = TRUE))
@@ -987,11 +989,7 @@ lm_with_splines_res <-
 
 Secondly, a less complex recipe without the interaction terms is evaluated to determine if the extra complexity is worth it. Once added to a workflow, it is resampled:
 
-```{r compare-no-spline-rs}
-lm_with_inter_res <-
-  lm_wflow %>%
-  fit_resamples(resamples = ames_folds, 
-                control = control_resamples(save_pred = TRUE))
+```{r compare-no-inter}
 
 no_inter_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
@@ -1015,14 +1013,14 @@ collect_metrics(lm_no_inter_res)
 collect_metrics(lm_with_inter_res)
 ```
 
-Considering these results, it appears that the additional terms do not profoundly improve the _mean_ RMSE or R<sup>2</sup> statistics. The difference is small, but it might be larger than the experimental noise in the system. 
+Considering these results, it appears that the additional terms do not meaningfully improve the _mean_ RMSE or R<sup>2</sup> statistics. 
 
 
+Before making model comparisons or looking at the resampling results, it can be helpful to define a relevant _practical effect size_. Since these analyses focus on the RMSE statistics, the practical effect size is the change in RMSE that we would consider to be a realistic difference that matters. For example, we might think that two models are not practically different if their RMSE values are within $\pm 2$%. If this were the case, differences smaller than 2% are not deemed important. 
 
-Before making model comparisons or looking at the resampling results, it can be helpful to define a relevant _practical effect size_. Since these analyses focus on the R<sup>2</sup> statistics, the practical effect size is the change in R<sup>2</sup> that we would consider to be a realistic difference that matters. For example, we might think that two models are not practically different if their R<sup>2</sup> values are within $\pm 2$%. If this were the case, differences smaller than 2% are not deemed important even if they are statistically significant. 
+Practical significance is subjective; two people can have very different ideas on the threshold for importance. 
 
-Practical significance is subjective; two people can have very different ideas on the threshold for importance. However, this consideration can be very helpful when deciding between models.  
-
+<!-- DK: Outline my philosophy: Transparency and reproducibility. -->
 
 ## Conclusion
 
