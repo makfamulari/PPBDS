@@ -950,6 +950,23 @@ Expected values vary much less than predictions. The above chart makes that easy
 
 <!-- DK: Finish with Temperance/population/exchangability discussion. -->
 
+
+### Testing
+
+In a normal statistics book, we would have already discussed the concept of "testing" extensively. The terminology varies by field. "Tests," "testing," "hypothesis tests," "tests of significance," and "null hypothesis significance testing" all refer to the same concept. We will refer to this collection of approaches as NHST, a common abbreviation derived from the initials of the last phrase. Wikpedia provides an [overview](https://en.wikipedia.org/wiki/Statistical_hypothesis_testing). 
+
+*Our view: Amateurs test. Professionals summarize.*
+
+Consider the question of the expected difference in lifespans for our South Dakato and Washington candidates. Is that difference "significant?" Can we "reject the null hypothesis?" The convential answer is Yes. Anytime that zero is outside of the 95% confidence interval, we can declare the result significant. But why should we? What does that gain us? We already have the full posterior probability distribution. That is knowledge. A Yes/No question throws away too much information to (almost) ever be useful. There is no reason to *test* when you can *summarize* by providing the full posterior probability distribution.
+
+The same arguments apply in the case of "insignificant" results, with "$p > 0.5$, when we can't "reject" the null hypothesis. Instead of expected values, consider the case of two candidates, one from South Dakota and one from Washington. Is there difference in their predicted lifespans "significant?" Who cares!? We have the full posterior probability distribution for that prediction --- also known as the posterior predictive distribution --- as graphed above. The 95% confidence interval includes zero. Does that mean we should throw it away? No! That would be nonsense. Yes, there is a 20% chance that the South Dakota candidate lives longer, so we can hardly be surpised when that happens. But we still think that it is much more likely that the Washington candidate lives longer. Indeed, we would consider 4-to-1 odds as fair. The fact that the difference is not "significant" has no relevance to how we use the posterior to make decisions.
+
+The same reasoning applies to every parameter we estimate, to every prediction we make. Never test --- unless your boss demands a test. *Use your judgment, make your models, summarize your knowledge of the world.*
+
+
+
+
+
 ## EDA of `shaming`
 
 ### GOV 50: STOP HERE! Rest of the chapter is a draft, which we will go over in class. Tutorial 9 only covers material in first part of the chapter.
@@ -957,6 +974,19 @@ Expected values vary much less than predictions. The above chart makes that easy
 <!-- Use print(fit_obj, digits = 4) if you need to see more digits. -->
 
 
+<!-- DK: This plot might be of use. -->
+
+<!-- shaming %>%  -->
+<!--   mutate(age = 2006 - birth_year) %>%  -->
+<!--   ggplot(aes(age, primary_06)) + -->
+<!--     geom_jitter(alpha = 0.005, height = 0.1) + -->
+<!--     geom_smooth(formula = y ~ x, method = "lm", se = FALSE) + -->
+<!--     scale_y_continuous(breaks = c(0, 1), labels = c("Did Not Vote", "Voted")) + -->
+<!--     labs(title = "Age and Voting in 2012 Michigan Primary Election", -->
+<!--          subtitle = "Older people are more likely to vote", -->
+<!--          x = "Age", -->
+<!--          y = NULL, -->
+<!--          caption = "Data from Gerber, Green, and Larimer (2008)") -->
 
 Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?    
 
