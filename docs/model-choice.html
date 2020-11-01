@@ -469,7 +469,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1038-11"><a href="model-choice.html#cb1038-11"></a>lm_form_fit</span></code></pre></div>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  9ms 
+## Fit time:  3ms 
 ## 
 ## Call:
 ## stats::lm(formula = Sale_Price ~ Longitude + Latitude, data = data)
@@ -656,7 +656,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">10.5</span> Judging model effectiveness</h2>
 <p>Once we have a model, we need to know how well it works. A quantitative approach for estimating effectiveness allows us to understand the model, to compare different models, or to tweak the model to improve performance. Our focus in tidymodels is on <em>empirical validation</em>; this usually means using data that were not used to create the model as the substrate on which we measure effectiveness. The choice of which metrics to examine can be critical. This section will largely focus on the <strong>yardstick</strong> package.</p>
 <!-- DK: "generative qualities" is awkward. Truth is that identification issues drive most causal model debate. But is that too much to explain? -->
-<p>The effectiveness of any given model depends on how the model will be used. A causal model is used primarily to understand relationships, and typically is discussed with a strong focus on the choice (and validity) of probabilistic distributions and other generative qualities that define the model. For a model used primarily for prediction, by contrast, predictive strength is primary and concerns about underlying statistical qualities may be less important. Predictive strength is usually focused on how close our predictions come to the observed data, i.e., fidelity of the model predictions to the actual results. This section focuses on functions that can be used to measure predictive strength. However, our advice for those developing causal models is to use these techniques <em>even when the model will not be used with the primary goal of prediction</em>.</p>
+<p>The effectiveness of any given model depends on how the model will be used. A causal model is used primarily to understand relationships, and typically is discussed with a strong focus on the choice (and validity) of probabilistic distributions and other generative qualities that define the model. For a model used primarily for prediction, by contrast, predictive strength is key and concerns about underlying statistical qualities are less important. Predictive strength is usually focused on how close our predictions come to the observed data, i.e., fidelity of the model predictions to the actual results. This section focuses on functions that can be used to measure predictive strength. However, our advice for those developing causal models is to use these techniques <em>even when the model will not be used with the primary goal of prediction</em>.</p>
 <p><strong>Optimization of statistical characteristics of the model does not imply that the model fits the data well.</strong> Even for purely inferential models, some measure of fidelity to the data should accompany the inferential results. Using this, the consumers of the analyses can calibrate their expectations for the results of the statistical analysis.</p>
 <div id="metrics" class="section level3">
 <h3>
@@ -705,16 +705,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## # … with 721 more rows</code></pre>
 <p>Note that both the predicted and observed outcomes are in log10 units. It is best practice to analyze the predictions on the transformed scale (if one were used) even if the predictions are reported using the original units.</p>
 <p>Let’s plot the data before computing metrics:</p>
-<!-- DK: Need to explain/rewrite this ugly code. -->
+<!-- DK: Clean up this plot.  -->
 <div class="sourceCode" id="cb1061"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1061-1"><a href="model-choice.html#cb1061-1"></a><span class="kw">ggplot</span>(ames_test_res, <span class="kw">aes</span>(<span class="dt">x =</span> Sale_Price, <span class="dt">y =</span> .pred)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1061-2"><a href="model-choice.html#cb1061-2"></a><span class="st">  </span><span class="co"># Create a diagonal line:</span></span>
-<span id="cb1061-3"><a href="model-choice.html#cb1061-3"></a><span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1061-4"><a href="model-choice.html#cb1061-4"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1061-5"><a href="model-choice.html#cb1061-5"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">"Predicted Sale Price (log10)"</span>, </span>
-<span id="cb1061-6"><a href="model-choice.html#cb1061-6"></a>       <span class="dt">x =</span> <span class="st">"Sale Price (log10)"</span>) <span class="op">+</span></span>
-<span id="cb1061-7"><a href="model-choice.html#cb1061-7"></a><span class="st">  </span><span class="co"># Scale and size the x- and y-axis uniformly:</span></span>
-<span id="cb1061-8"><a href="model-choice.html#cb1061-8"></a><span class="st">  </span><span class="kw">coord_obs_pred</span>()</span></code></pre></div>
+<span id="cb1061-2"><a href="model-choice.html#cb1061-2"></a><span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1061-3"><a href="model-choice.html#cb1061-3"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1061-4"><a href="model-choice.html#cb1061-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">"Predicted Sale Price (log10)"</span>, </span>
+<span id="cb1061-5"><a href="model-choice.html#cb1061-5"></a>       <span class="dt">x =</span> <span class="st">"Sale Price (log10)"</span>) <span class="op">+</span></span>
+<span id="cb1061-6"><a href="model-choice.html#cb1061-6"></a><span class="st">  </span><span class="kw">coord_obs_pred</span>()</span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-839-1.png" width="672"></p>
+<!-- DK: These functions might go in a pre-amble section for the tutorial. -->
+<p><code>geom_abine()</code> draws the line at the 45 degree line. <code>coord_obs_pred()</code> is a function from <strong>tidymodels</strong> for making comparisons between actual with predicted values.</p>
 <p>There is one property that is substantially over-predicted.</p>
 <p>Let’s compute the root mean squared error for this model using the <code>rmse()</code> function:</p>
 <div class="sourceCode" id="cb1062"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1062-1"><a href="model-choice.html#cb1062-1"></a><span class="kw">rmse</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
@@ -723,6 +723,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 ## 1 rmse    standard      0.0833</code></pre>
 <p>The output above shows the standard format of the output of <strong>yardstick</strong> functions. Metrics for numeric outcomes usually have a value of “standard” for the <code>.estimator</code> column. Examples with different values for this column are shown below.</p>
+<!-- DK: Should we give formulas for these metrics? Discuss them? Or maybe only use rmse? -->
 <p>To compute multiple metrics at once, we can create a <em>metric set</em>. Let’s add <span class="math inline">\(R^2\)</span> and the mean absolute error:</p>
 <div class="sourceCode" id="cb1064"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1064-1"><a href="model-choice.html#cb1064-1"></a>ames_metrics &lt;-<span class="st"> </span><span class="kw">metric_set</span>(rmse, rsq, mae)</span>
 <span id="cb1064-2"><a href="model-choice.html#cb1064-2"></a><span class="kw">ames_metrics</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
@@ -737,7 +738,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="resampling" class="section level3">
 <h3>
 <span class="header-section-number">10.5.2</span> Resampling for evaluating performance</h3>
-<p>We usually need to understand the effectiveness of the model <em>before using the test set</em>. In this section, we describe an approach called resampling that can fill this gap. Resampling estimates of performance can generalize to new data. The next section complements this one by demonstrating cross-validation, a statistical method that compares resampling results.</p>
+<p>We usually need to understand the effectiveness of the model <em>before using the test set</em>. In this section, we describe an approach called resampling that can fill this gap. Resampling estimates of performance can generalize to new data.</p>
 </div>
 <div id="resampling-methods" class="section level3">
 <h3>
@@ -750,7 +751,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>The model is evaluated with the <strong>assessment set</strong>.</p></li>
 </ul>
 <p>These are somewhat analogous to training and test sets. Our language of <em>analysis</em> and <em>assessment</em> avoids confusion with initial split of the data. These data sets are mutually exclusive. The partitioning scheme used to create the analysis and assessment sets is usually the defining characteristic of the method.</p>
-<p>Suppose twenty iterations of resampling are conducted. This means that twenty separate models are fit on the analysis sets and the corresponding assessment sets produce twenty sets of performance statistics. The final estimate of performance for a model is the average of the twenty replicates of the statistics. This average has very good generalization properties and is far better than the resubstituion estimates. The most popular method is cross-validation.</p>
+<p>Suppose twenty iterations of resampling are conducted. This means that twenty separate models are fit on the analysis sets and the corresponding assessment sets produce twenty sets of performance statistics. The final estimate of performance for a model is the average of the twenty replicates of the statistics. This average has very good generalization properties. The most popular method is cross-validation.</p>
 <p>Cross-validation is a well established resampling method. While there are a number of variations, the most common cross-validation method is <em>V</em>-fold cross-validation. The data are randomly partitioned into <em>V</em> sets of roughly equal size (called the “folds”). For illustration, <em>V</em> = 3 is shown below for a data set of thirty training set points with random fold allocations. The number inside the symbols is the sample number:</p>
 <p><img src="10-model-choice/images/three-CV.svg"></p>
 <p>The color of the symbols represent their randomly assigned folds.</p>
@@ -803,10 +804,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1068-8"><a href="model-choice.html#cb1068-8"></a><span class="st">  </span><span class="kw">add_formula</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1068-9"><a href="model-choice.html#cb1068-9"></a><span class="st">                           </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1068-10"><a href="model-choice.html#cb1068-10"></a><span class="st">  </span><span class="kw">add_model</span>(rf_model) </span></code></pre></div>
-<p>The <code>fit_resamples()</code> function is analogous to <code>fit()</code>, but instead of having a <code>data</code> argument, <code>fit_resamples()</code> has <code>resamples</code> which expects an <code>rset</code> object like the ones shown above. The possible interfaces to the function are:</p>
-<div class="sourceCode" id="cb1069"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1069-1"><a href="model-choice.html#cb1069-1"></a>model_spec <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit_resamples</span>(formula,  resamples, ...)</span>
-<span id="cb1069-2"><a href="model-choice.html#cb1069-2"></a>model_spec <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit_resamples</span>(recipe,   resamples, ...)</span>
-<span id="cb1069-3"><a href="model-choice.html#cb1069-3"></a>workflow   <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit_resamples</span>(          resamples, ...)</span></code></pre></div>
+<p>The <code>fit_resamples()</code> function is analogous to <code>fit()</code>, but instead of having a <code>data</code> argument, <code>fit_resamples()</code> has <code>resamples</code> which expects an <code>rset</code> object like the ones shown above. We typically pipe a wokflow object directly into <code>fit_resamples()</code>.</p>
+<div class="sourceCode" id="cb1069"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1069-1"><a href="model-choice.html#cb1069-1"></a>workflow <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit_resamples</span>(resamples, ...)</span></code></pre></div>
+<!-- DK: Do we need to go through of all these? Why not just provide a clear recommendation? -->
 <p>There are a number of other optional arguments, such as:</p>
 <ul>
 <li><p><code>metrics</code>: A metric set of performance statistics to compute. By default, regression models use RMSE and R<sup>2</sup> while classification models compute the area under the ROC curve and overall accuracy. Note that this choice also defines what predictions are produced during the evaluation of the model. For classification, if only accuracy is requested, class probability estimates are not generated for the assessment set (since they are not needed).</p></li>
@@ -819,7 +819,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><code>save_pred</code>: A logical for saving the assessment set predictions.</p></li>
 </ul>
 <p>For our example, let’s save the predictions in order to visualize the model fit and residuals:</p>
-<!-- DK: I am confused about keep_pred and what it does in this code. Recall that there used to be stand-alone function defined at the top of the Rmd called keep_pred. I deleted it everywhere I found it and replaced it with control_resamples(save_pred = TRUE). Necessary? -->
+<!-- DK: I am confused about keep_pred and what it does in this code. Recall that there used to be stand-alone function defined at the top of the Rmd called keep_pred. I deleted it everywhere I found it and replaced it with control_resamples(save_pred = TRUE). Necessary? Desirable? -->
 <div class="sourceCode" id="cb1070"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1070-1"><a href="model-choice.html#cb1070-1"></a>keep_pred &lt;-<span class="st"> </span><span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb1070-2"><a href="model-choice.html#cb1070-2"></a></span>
 <span id="cb1070-3"><a href="model-choice.html#cb1070-3"></a><span class="kw">set.seed</span>(<span class="dv">130</span>)</span>
@@ -857,7 +857,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 1 rmse    standard   0.0754    10 0.00187
 ## 2 rsq     standard   0.816     10 0.0104</code></pre>
 <p>These are the resampling estimates averaged over the individual replicates. To get the metrics for each resample, use the option <code>summarize = FALSE</code></p>
-<p>Notice how much more realistic the performance estimates are than the resubstitution estimates from Section <a href="#resampling-resubstition"><strong>??</strong></a>!</p>
 <p>To obtain the assessment set predictions:</p>
 <div class="sourceCode" id="cb1074"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1074-1"><a href="model-choice.html#cb1074-1"></a>assess_res &lt;-<span class="st"> </span><span class="kw">collect_predictions</span>(rf_res)</span>
 <span id="cb1074-2"><a href="model-choice.html#cb1074-2"></a>assess_res</span></code></pre></div>
@@ -963,29 +962,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">10.6.1</span> Resampled performance statistics</h3>
 <p>In Section <a href="model-choice.html#resampling">10.5.2</a>, a random forest model for the Ames data was resampled with 10-fold cross-validation. These results were saved in the object <code>rf_res</code>.</p>
 <p>We’ll estimate two additional models with the same resamples. First, the previous linear regression model, using the preprocessing defined in the <code>ames_rec</code> recipe, is resampled:</p>
-<div class="sourceCode" id="cb1082"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1082-1"><a href="model-choice.html#cb1082-1"></a>lm_with_splines_res &lt;-</span>
+<div class="sourceCode" id="cb1082"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1082-1"><a href="model-choice.html#cb1082-1"></a>lm_with_inter_res &lt;-</span>
 <span id="cb1082-2"><a href="model-choice.html#cb1082-2"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span></span>
 <span id="cb1082-3"><a href="model-choice.html#cb1082-3"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
 <span id="cb1082-4"><a href="model-choice.html#cb1082-4"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
 <p>Secondly, a less complex recipe without the interaction terms is evaluated to determine if the extra complexity is worth it. Once added to a workflow, it is resampled:</p>
-<div class="sourceCode" id="cb1083"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1083-1"><a href="model-choice.html#cb1083-1"></a>lm_with_inter_res &lt;-</span>
-<span id="cb1083-2"><a href="model-choice.html#cb1083-2"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span></span>
-<span id="cb1083-3"><a href="model-choice.html#cb1083-3"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
-<span id="cb1083-4"><a href="model-choice.html#cb1083-4"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span>
-<span id="cb1083-5"><a href="model-choice.html#cb1083-5"></a></span>
-<span id="cb1083-6"><a href="model-choice.html#cb1083-6"></a>no_inter_rec &lt;-<span class="st"> </span></span>
-<span id="cb1083-7"><a href="model-choice.html#cb1083-7"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1083-8"><a href="model-choice.html#cb1083-8"></a><span class="st">           </span>Latitude <span class="op">+</span><span class="st"> </span>Longitude, <span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span></span>
-<span id="cb1083-9"><a href="model-choice.html#cb1083-9"></a><span class="st">  </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1083-10"><a href="model-choice.html#cb1083-10"></a><span class="st">  </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1083-11"><a href="model-choice.html#cb1083-11"></a><span class="st">  </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()) </span>
-<span id="cb1083-12"><a href="model-choice.html#cb1083-12"></a></span>
-<span id="cb1083-13"><a href="model-choice.html#cb1083-13"></a>lm_no_inter_res &lt;-<span class="st"> </span></span>
-<span id="cb1083-14"><a href="model-choice.html#cb1083-14"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span></span>
-<span id="cb1083-15"><a href="model-choice.html#cb1083-15"></a><span class="st">  </span><span class="kw">remove_recipe</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1083-16"><a href="model-choice.html#cb1083-16"></a><span class="st">  </span><span class="kw">add_recipe</span>(no_inter_rec) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1083-17"><a href="model-choice.html#cb1083-17"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
-<span id="cb1083-18"><a href="model-choice.html#cb1083-18"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb1083"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1083-1"><a href="model-choice.html#cb1083-1"></a>no_inter_rec &lt;-<span class="st"> </span></span>
+<span id="cb1083-2"><a href="model-choice.html#cb1083-2"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1083-3"><a href="model-choice.html#cb1083-3"></a><span class="st">           </span>Latitude <span class="op">+</span><span class="st"> </span>Longitude, <span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span></span>
+<span id="cb1083-4"><a href="model-choice.html#cb1083-4"></a><span class="st">  </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1083-5"><a href="model-choice.html#cb1083-5"></a><span class="st">  </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1083-6"><a href="model-choice.html#cb1083-6"></a><span class="st">  </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()) </span>
+<span id="cb1083-7"><a href="model-choice.html#cb1083-7"></a></span>
+<span id="cb1083-8"><a href="model-choice.html#cb1083-8"></a>lm_no_inter_res &lt;-<span class="st"> </span></span>
+<span id="cb1083-9"><a href="model-choice.html#cb1083-9"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span></span>
+<span id="cb1083-10"><a href="model-choice.html#cb1083-10"></a><span class="st">  </span><span class="kw">remove_recipe</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1083-11"><a href="model-choice.html#cb1083-11"></a><span class="st">  </span><span class="kw">add_recipe</span>(no_inter_rec) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1083-12"><a href="model-choice.html#cb1083-12"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
+<span id="cb1083-13"><a href="model-choice.html#cb1083-13"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
 <p>The difference in performance appears relatively minor:</p>
 <div class="sourceCode" id="cb1084"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1084-1"><a href="model-choice.html#cb1084-1"></a><span class="kw">collect_metrics</span>(lm_no_inter_res)</span></code></pre></div>
 <pre><code>## # A tibble: 2 x 5
@@ -999,9 +993,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
 ## 1 rmse    standard   0.0782    10 0.00192
 ## 2 rsq     standard   0.802     10 0.0113</code></pre>
-<p>Considering these results, it appears that the additional terms do not profoundly improve the <em>mean</em> RMSE or R<sup>2</sup> statistics. The difference is small, but it might be larger than the experimental noise in the system.</p>
-<p>Before making model comparisons or looking at the resampling results, it can be helpful to define a relevant <em>practical effect size</em>. Since these analyses focus on the R<sup>2</sup> statistics, the practical effect size is the change in R<sup>2</sup> that we would consider to be a realistic difference that matters. For example, we might think that two models are not practically different if their R<sup>2</sup> values are within <span class="math inline">\(\pm 2\)</span>%. If this were the case, differences smaller than 2% are not deemed important even if they are statistically significant.</p>
-<p>Practical significance is subjective; two people can have very different ideas on the threshold for importance. However, this consideration can be very helpful when deciding between models.</p>
+<p>Considering these results, it appears that the additional terms do not meaningfully improve the <em>mean</em> RMSE or R<sup>2</sup> statistics.</p>
+<p>Before making model comparisons or looking at the resampling results, it can be helpful to define a relevant <em>practical effect size</em>. Since these analyses focus on the RMSE statistics, the practical effect size is the change in RMSE that we would consider to be a realistic difference that matters. For example, we might think that two models are not practically different if their RMSE values are within <span class="math inline">\(\pm 2\)</span>%. If this were the case, differences smaller than 2% are not deemed important.</p>
+<p>Practical significance is subjective; two people can have very different ideas on the threshold for importance.</p>
+<!-- DK: Outline my philosophy: Transparency and reproducibility. -->
 </div>
 </div>
 <div id="conclusion" class="section level2">
