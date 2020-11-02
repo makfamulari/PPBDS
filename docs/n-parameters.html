@@ -151,6 +151,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="toc"><a href="#wisdom"> Wisdom</a></li>
 <li class="toc"><a href="#justice-and-courage"> Justice and Courage</a></li>
 <li class="toc"><a href="#temperance"> Temperance</a></li>
+<li class="toc"><a href="#testing"> Testing</a></li>
 <li class="toc"><a href="#eda-of-shaming"> EDA of <code>shaming</code></a></li>
 <li class="toc"><a href="#causal-effects-of-treament"> Causal Effects of <code>treament</code></a></li>
 </ul>
@@ -1085,23 +1086,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- DK: Discuss the substantive issue? How can it be that Washington candidates live longer? Also, compare these estimates to what naive lm() would tell us. -->
 <!-- DK: Finish with Temperance/population/exchangability discussion. -->
 </div>
-<div id="testing" class="section level3">
-<h3>
-<span class="header-section-number">9.4.4</span> Testing</h3>
+</div>
+<div id="testing" class="section level2">
+<h2>
+<span class="header-section-number">9.5</span> Testing</h2>
 <p>In a normal statistics book, we would have already discussed the concept of “testing” extensively. The terminology varies by field. “Tests,” “testing,” “hypothesis tests,” “tests of significance,” and “null hypothesis significance testing” all refer to the same concept. We will refer to this collection of approaches as NHST, a common abbreviation derived from the initials of the last phrase. Wikpedia provides an <a href="https://en.wikipedia.org/wiki/Statistical_hypothesis_testing">overview</a>.</p>
 <p><em>Our view: Amateurs test. Professionals summarize.</em></p>
 <p>Consider the question of the expected difference in lifespans for our South Dakato and Washington candidates. Is that difference “significant?” Can we “reject the null hypothesis?” The convential answer is Yes. Anytime that zero is outside of the 95% confidence interval, we can declare the result significant. But why should we? What does that gain us? We already have the full posterior probability distribution. That is knowledge. A Yes/No question throws away too much information to (almost) ever be useful. There is no reason to <em>test</em> when you can <em>summarize</em> by providing the full posterior probability distribution.</p>
 <p>The same arguments apply in the case of “insignificant” results, with “<span class="math inline">\(p &gt; 0.5\)</span>, when we can’t”reject" the null hypothesis. Instead of expected values, consider the case of two candidates, one from South Dakota and one from Washington. Is there difference in their predicted lifespans “significant?” Who cares!? We have the full posterior probability distribution for that prediction — also known as the posterior predictive distribution — as graphed above. The 95% confidence interval includes zero. Does that mean we should throw it away? No! That would be nonsense. Yes, there is a 20% chance that the South Dakota candidate lives longer, so we can hardly be surpised when that happens. But we still think that it is much more likely that the Washington candidate lives longer. Indeed, we would consider 4-to-1 odds as fair. The fact that the difference is not “significant” has no relevance to how we use the posterior to make decisions.</p>
 <p>The same reasoning applies to every parameter we estimate, to every prediction we make. Never test — unless your boss demands a test. <em>Use your judgment, make your models, summarize your knowledge of the world.</em></p>
 </div>
-</div>
 <div id="eda-of-shaming" class="section level2">
 <h2>
-<span class="header-section-number">9.5</span> EDA of <code>shaming</code>
+<span class="header-section-number">9.6</span> EDA of <code>shaming</code>
 </h2>
 <div id="gov-50-stop-here-rest-of-the-chapter-is-a-draft-which-we-will-go-over-in-class.-tutorial-9-only-covers-material-in-first-part-of-the-chapter." class="section level3">
 <h3>
-<span class="header-section-number">9.5.1</span> GOV 50: STOP HERE! Rest of the chapter is a draft, which we will go over in class. Tutorial 9 only covers material in first part of the chapter.</h3>
+<span class="header-section-number">9.6.1</span> GOV 50: STOP HERE! Rest of the chapter is a draft, which we will go over in class. Tutorial 9 only covers material in first part of the chapter.</h3>
 <!-- Use print(fit_obj, digits = 4) if you need to see more digits. -->
 <!-- DK: This plot might be of use. -->
 <!-- shaming %>%  -->
@@ -1158,10 +1159,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>For now, let’s focus on a subset of the data. We will sample just 10,000 rows because otherwise <code>stan_glm()</code> takes an annoyingly large amount of time to work. Nothing substantive changes.</p>
 <div class="sourceCode" id="cb984"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb984-1"><a href="n-parameters.html#cb984-1"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
 <span id="cb984-2"><a href="n-parameters.html#cb984-2"></a>ch9_sham &lt;-<span class="st"> </span>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb984-3"><a href="n-parameters.html#cb984-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">solo =</span> <span class="kw">ifelse</span>(hh_size <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb984-4"><a href="n-parameters.html#cb984-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="dv">2006</span> <span class="op">-</span><span class="st"> </span>birth_year) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb984-5"><a href="n-parameters.html#cb984-5"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, solo, sex, age) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb984-6"><a href="n-parameters.html#cb984-6"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10000</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<span id="cb984-3"><a href="n-parameters.html#cb984-3"></a><span class="st">  </span><span class="kw">filter</span>(treatment <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">"Control"</span>, <span class="st">"Neighbors"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb984-4"><a href="n-parameters.html#cb984-4"></a><span class="st">  </span><span class="kw">droplevels</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb984-5"><a href="n-parameters.html#cb984-5"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">solo =</span> <span class="kw">ifelse</span>(hh_size <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb984-6"><a href="n-parameters.html#cb984-6"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="dv">2006</span> <span class="op">-</span><span class="st"> </span>birth_year) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb984-7"><a href="n-parameters.html#cb984-7"></a><span class="st">  </span><span class="kw">select</span>(primary_<span class="dv">06</span>, treatment, solo, sex, age) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb984-8"><a href="n-parameters.html#cb984-8"></a><span class="st">  </span><span class="kw">sample_n</span>(<span class="dv">10000</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <p>We create the variable <code>solo</code>, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not.</p>
 <div class="sourceCode" id="cb985"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb985-1"><a href="n-parameters.html#cb985-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb985-2"><a href="n-parameters.html#cb985-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
@@ -1251,8 +1254,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="left">FALSE</td>
-<td align="right">5</td>
-<td align="left">Con: 5594, Sel: 1135, Haw: 1110, Civ: 1108</td>
+<td align="right">2</td>
+<td align="left">Con: 8365, Nei: 1635</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: logical</strong></p>
@@ -1268,8 +1271,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td align="left">solo</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.15</td>
-<td align="left">FAL: 8532, TRU: 1468</td>
+<td align="right">0.14</td>
+<td align="left">FAL: 8560, TRU: 1440</td>
 </tr></tbody>
 </table>
 <p><strong>Variable type: numeric</strong></p>
@@ -1292,8 +1295,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td align="left">primary_06</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.32</td>
-<td align="right">0.47</td>
+<td align="right">0.31</td>
+<td align="right">0.46</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -1305,13 +1308,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td align="left">age</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">49.86</td>
-<td align="right">14.54</td>
+<td align="right">49.58</td>
+<td align="right">14.49</td>
 <td align="right">20</td>
 <td align="right">41</td>
 <td align="right">50</td>
 <td align="right">59</td>
-<td align="right">99</td>
+<td align="right">97</td>
 <td align="left">▃▇▇▂▁</td>
 </tr>
 </tbody>
@@ -1325,16 +1328,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>## # A tibble: 10 x 5
 ##    primary_06 treatment solo  sex      age
 ##         &lt;int&gt; &lt;fct&gt;     &lt;lgl&gt; &lt;chr&gt;  &lt;dbl&gt;
-##  1          0 Hawthorne FALSE Male      20
-##  2          0 Neighbors FALSE Male      53
-##  3          0 Control   FALSE Female    45
-##  4          1 Neighbors FALSE Female    44
-##  5          0 Control   FALSE Female    50
-##  6          0 Control   FALSE Female    45
-##  7          0 Neighbors TRUE  Female    41
-##  8          0 Self      FALSE Male      32
-##  9          0 Hawthorne FALSE Female    58
-## 10          1 Control   FALSE Female    75</code></pre>
+##  1          0 Control   FALSE Male      52
+##  2          0 Control   FALSE Female    20
+##  3          1 Control   FALSE Female    76
+##  4          0 Control   FALSE Male      39
+##  5          0 Neighbors FALSE Female    35
+##  6          1 Control   TRUE  Male      84
+##  7          0 Control   FALSE Male      61
+##  8          1 Control   FALSE Male      73
+##  9          1 Neighbors FALSE Male      46
+## 10          0 Neighbors FALSE Male      38</code></pre>
 <p>Now we have a table with 5 random observations and the respondents’ information in a regular table output. By taking a few random samples, we may start to see some patterns within the data. Do you notice anything in particular about the variable <code>treatment</code>?</p>
 <p>One other helpful summarizing technique we can use is <code>skim()</code>. To make the information it contains simpler, we will only be looking at three variables: <code>primary_06</code>, <code>treatment</code>, and <code>sex</code>.</p>
 <div class="sourceCode" id="cb988"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb988-1"><a href="n-parameters.html#cb988-1"></a>shaming <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -1462,7 +1465,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="wisdom-1" class="section level3">
 <h3>
-<span class="header-section-number">9.5.2</span> Wisdom</h3>
+<span class="header-section-number">9.6.2</span> Wisdom</h3>
 <p>
 <span class="marginnote shownote">
 <!--
@@ -1479,8 +1482,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="justice-and-courage-1" class="section level3">
 <h3>
-<span class="header-section-number">9.5.3</span> Justice and Courage</h3>
-<!-- MF: What should the Preceptor tables look like with these models? Like chapter 3. Should each model have its own Preceptor Table? No! Just one preceptor table at the start, with 5 columns under Y, and 4 covariates, where one is treatment assigned. -->
+<span class="header-section-number">9.6.3</span> Justice and Courage</h3>
+<!-- What should the Preceptor tables look like with these models? Like chapter 3. Should each model have its own Preceptor Table? No! Just one preceptor table at the start, with 5 columns under Y, and 4 covariates, where one is treatment assigned. -->
 <p>
 <span class="marginnote shownote">
 <!--
@@ -1500,8 +1503,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let’s model <code>primary_06</code>, which represents whether a citizen voted or not, against sex to see if there is a connection.</p>
 <div id="voting-and-sex" class="section level4">
 <h4>
-<span class="header-section-number">9.5.3.1</span> Voting and Sex</h4>
-<!-- MF: I used family = gaussian as I noted it in the lower section drafts, but can't find the purpose online. Also, stan_glm is taking a very long time to run. Is this a concern? Never mention gaussian or the family argument. -->
+<span class="header-section-number">9.6.3.1</span> Voting and Sex</h4>
 <p>Let’s start with a simple model: the effect of voting in the 2006 election and sex. First, let’s look at the results of <code>primary_06</code> after grouping by <code>sex</code> to see the number of females and males who did or did not vote. Recall that a value of 1 for <code>primary_06</code> means that the citizen <em>did</em> vote, while a value of 0 means that they <em>did not</em>.</p>
 <div class="sourceCode" id="cb989"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb989-1"><a href="n-parameters.html#cb989-1"></a>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb989-2"><a href="n-parameters.html#cb989-2"></a><span class="st">  </span><span class="kw">group_by</span>(sex) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -1510,15 +1512,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## # Groups:   sex [2]
 ##   sex    primary_06     n
 ##   &lt;chr&gt;       &lt;int&gt; &lt;int&gt;
-## 1 Female          0  3437
-## 2 Female          1  1563
-## 3 Male            0  3332
-## 4 Male            1  1668</code></pre>
+## 1 Female          0  3467
+## 2 Female          1  1473
+## 3 Male            0  3432
+## 4 Male            1  1628</code></pre>
 <p>Eyeballing the figures, you may have noticed that slightly more male respondents voted than female respondents. Let’s investigate this using <code>stan_glm</code>.</p>
 <div class="sourceCode" id="cb991"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb991-1"><a href="n-parameters.html#cb991-1"></a>model_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
 <span id="cb991-2"><a href="n-parameters.html#cb991-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex, </span>
-<span id="cb991-3"><a href="n-parameters.html#cb991-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
-<span id="cb991-4"><a href="n-parameters.html#cb991-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<span id="cb991-3"><a href="n-parameters.html#cb991-3"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb992"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb992-1"><a href="n-parameters.html#cb992-1"></a><span class="kw">print</span>(model_<span class="dv">1</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -1527,12 +1528,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##  predictors:   2
 ## ------
 ##             Median MAD_SD
-## (Intercept) 0.313  0.007 
-## sexMale     0.021  0.010 
+## (Intercept) 0.298  0.007 
+## sexMale     0.023  0.009 
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 0.468  0.003 
+## sigma 0.462  0.003 
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
@@ -1541,28 +1542,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="voting-and-age" class="section level4">
 <h4>
-<span class="header-section-number">9.5.3.2</span> Voting and Age</h4>
+<span class="header-section-number">9.6.3.2</span> Voting and Age</h4>
 <p>Now that we’ve seen the relationship between sex and voting, let’s take a look at age. Begin by grouping our observations by <code>age</code> and counting by <code>primary_06</code>, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category.</p>
 <div class="sourceCode" id="cb994"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb994-1"><a href="n-parameters.html#cb994-1"></a>age &lt;-<span class="st"> </span>ch9_sham <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb994-2"><a href="n-parameters.html#cb994-2"></a><span class="st">  </span><span class="kw">group_by</span>(age) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb994-3"><a href="n-parameters.html#cb994-3"></a><span class="st">  </span><span class="kw">count</span>(primary_<span class="dv">06</span>) </span>
 <span id="cb994-4"><a href="n-parameters.html#cb994-4"></a></span>
 <span id="cb994-5"><a href="n-parameters.html#cb994-5"></a>age</span></code></pre></div>
-<pre><code>## # A tibble: 150 x 3
-## # Groups:   age [78]
+<pre><code>## # A tibble: 149 x 3
+## # Groups:   age [77]
 ##      age primary_06     n
 ##    &lt;dbl&gt;      &lt;int&gt; &lt;int&gt;
-##  1    20          0   122
-##  2    20          1    16
-##  3    21          0   137
-##  4    21          1    24
-##  5    22          0   103
-##  6    22          1    19
-##  7    23          0   124
-##  8    23          1    23
-##  9    24          0   106
-## 10    24          1    16
-## # … with 140 more rows</code></pre>
+##  1    20          0   119
+##  2    20          1    15
+##  3    21          0   120
+##  4    21          1    15
+##  5    22          0   150
+##  6    22          1    24
+##  7    23          0   119
+##  8    23          1    19
+##  9    24          0   102
+## 10    24          1    21
+## # … with 139 more rows</code></pre>
 <p>To explore this relationship visually, let’s create a graph. We are coercing <code>primary_06</code> into a character variable as it more closely represents “yes” or “no” as opposed to a numeric value.</p>
 <div class="sourceCode" id="cb996"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb996-1"><a href="n-parameters.html#cb996-1"></a>age <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb996-2"><a href="n-parameters.html#cb996-2"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">primary_06 =</span> <span class="kw">as.character</span>(primary_<span class="dv">06</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -1580,7 +1581,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 - The spike between ages 40 and 60 illustrates that most participants exist in this age bracket.
 - The differences between voters and non-voters narrows greatly after age 60.</p>
 <p>Let’s look at the results of our regression.</p>
-<!-- MF: Age isn't showing unique values (just one intercept and then `age`). Is that a problem? No. Same explanation as model above. -->
 <div class="sourceCode" id="cb997"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb997-1"><a href="n-parameters.html#cb997-1"></a>model_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
 <span id="cb997-2"><a href="n-parameters.html#cb997-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>age, </span>
 <span id="cb997-3"><a href="n-parameters.html#cb997-3"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
@@ -1592,42 +1592,39 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##  predictors:   2
 ## ------
 ##             Median MAD_SD
-## (Intercept) 0.108  0.016 
+## (Intercept) 0.096  0.016 
 ## age         0.004  0.000 
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 0.463  0.003 
+## sigma 0.458  0.003 
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+<p>Note that the median for age is 0.004. Age is therefore positively correlated with voting in the primary election. What does that mean? It means that, for every year that a participant’s age increases, their odds of voting in the primary <em>increases</em> by 0.004. Now, this might not seem like a huge difference. However, think of it like this: for every decade older that a participant is, their odds of voting increase .04 = 4%! This makes sense considering that we just learned that older citizens are more likely to vote.</p>
 </div>
 <div id="voting-and-treatment" class="section level4">
 <h4>
-<span class="header-section-number">9.5.3.3</span> Voting and Treatment</h4>
+<span class="header-section-number">9.6.3.3</span> Voting and Treatment</h4>
 <p>Looking at the relationship between primary voting and treatment.</p>
 <div class="sourceCode" id="cb1000"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1000-1"><a href="n-parameters.html#cb1000-1"></a>model_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
 <span id="cb1000-2"><a href="n-parameters.html#cb1000-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>treatment <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, </span>
-<span id="cb1000-3"><a href="n-parameters.html#cb1000-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
-<span id="cb1000-4"><a href="n-parameters.html#cb1000-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<span id="cb1000-3"><a href="n-parameters.html#cb1000-3"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb1001"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1001-1"><a href="n-parameters.html#cb1001-1"></a><span class="kw">print</span>(model_<span class="dv">3</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      primary_06 ~ treatment - 1
 ##  observations: 10000
-##  predictors:   5
+##  predictors:   2
 ## ------
-##                     Median MAD_SD
-## treatmentCivic Duty 0.325  0.014 
-## treatmentHawthorne  0.323  0.014 
-## treatmentControl    0.312  0.006 
-## treatmentSelf       0.337  0.014 
-## treatmentNeighbors  0.365  0.015 
+##                    Median MAD_SD
+## treatmentControl   0.297  0.005 
+## treatmentNeighbors 0.376  0.011 
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 0.467  0.003 
+## sigma 0.462  0.003 
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
@@ -1642,75 +1639,86 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The Control group had the least active voters with a median of .297 = 29.7% of participants voting. The Civic Duty treatment (least pressure) had slighly more at .314 = 31.4% of participants voting. The Hawthorne group (slightly more pressure) increased upon Civic Duty for a total of .322 = 32.2% voting. The Self group (moderate pressure) increased even still, with .345 = 34.5% of the group voting. Finally, the Neighbors group (with the most social pressure) yielded the highest voting rate of .378 = 37.8%.</p>
 <p>This means that, as we hoped, more social pressure = higher voting turnout. That being said, the percent differences were not large. The biggest leap came from the Neighbors group, suggesting that the pressure of your vote being publicized to your community increases turnout more than a simple encouragement.</p>
 </div>
-<div id="voting-sex-solo-treatment" class="section level4">
+<div id="voting-age-solo-treatment" class="section level4">
 <h4>
-<span class="header-section-number">9.5.3.4</span> Voting &amp; (Sex + Solo + Treatment)</h4>
-<p>Looking at the relationship between primary voting, sex, living alone, and treatment.</p>
+<span class="header-section-number">9.6.3.4</span> Voting &amp; (Age + Solo + Treatment)</h4>
+<p>Now that we have analyzed the impact of our various treatments on voting behavior, let’s turn to three different variables together: sex, solo (living alone), and treatment.</p>
 <div class="sourceCode" id="cb1003"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1003-1"><a href="n-parameters.html#cb1003-1"></a>model_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
-<span id="cb1003-2"><a href="n-parameters.html#cb1003-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>treatment, </span>
-<span id="cb1003-3"><a href="n-parameters.html#cb1003-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
-<span id="cb1003-4"><a href="n-parameters.html#cb1003-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<span id="cb1003-2"><a href="n-parameters.html#cb1003-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>treatment <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>solo<span class="op">:</span>treatment, </span>
+<span id="cb1003-3"><a href="n-parameters.html#cb1003-3"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb1004"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1004-1"><a href="n-parameters.html#cb1004-1"></a><span class="kw">print</span>(model_<span class="dv">4</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
-##  formula:      primary_06 ~ sex + solo + treatment
+##  formula:      primary_06 ~ treatment + age + solo + solo:treatment
 ##  observations: 10000
-##  predictors:   7
+##  predictors:   5
 ## ------
-##                    Median MAD_SD
-## (Intercept)         0.308  0.015
-## sexMale             0.021  0.009
-## soloTRUE            0.044  0.014
-## treatmentHawthorne -0.002  0.021
-## treatmentControl   -0.013  0.016
-## treatmentSelf       0.012  0.019
-## treatmentNeighbors  0.039  0.021
+##                             Median MAD_SD
+## (Intercept)                 0.086  0.016 
+## treatmentNeighbors          0.073  0.014 
+## age                         0.004  0.000 
+## soloTRUE                    0.009  0.014 
+## treatmentNeighbors:soloTRUE 0.039  0.036 
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 0.467  0.003 
+## sigma 0.457  0.003 
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
-<p>INTERACTION MODEL with all of the above plus solo and treatment</p>
+<p>First, let’s look at which variables are included on our left hand side. Besides our (Intercept), we are given sexMALE, soloTRUE, and four out of our five treatments. What does that mean our comparison, or (Intercept), is? Look to what we are not given: sexFEMALE, soloFALSE, and treatmentCivic Duty. Therefore, our baseline for comparison are the female participants who do <em>not</em> live in single person households that we under the Civic Duty treatment. For this group, the percentage voting is .309 = 30.9%. From this figure, we will break down what our variables and their respective medians mean.</p>
+<ul>
+<li>sexMALE, with a median of 0.021: as compared with female participants, males are more likely to vote by a factor of 0.021 = 2.1%. Recall that sexMALE corresponds to the <em>offset</em> in intercept for the male respondents relative to the female respondents.</li>
+<li>soloTRUE, with a median of 0.044: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.044 = 4.4%. Note that this is only true for our baseline group of female participants and does not include an analysis for males.</li>
+<li>treatmentHawthorne, with a median of -0.002: female participants are slightly <em>less</em> likely to vote when under the Hawthorne treatment as compared with the baseline Civic Duty treatment.</li>
+<li>treatmentControl, with a median of -0.014: female participants are <em>less</em> likely to vote when under the Control, as compared with the Civic Duty baseline treatment.</li>
+<li>treatmentSelf, with a median of 0.012: female participants in this group are <em>more</em> likely to vote as compared with the Civic Duty treatment. This makes sense, since we expect that additional social pressure increases voter turnout.</li>
+<li>treatmentNeighbors, with a median of 0.039: female participants in this group are <em>more</em> likely to vote compared with those in the Civic Duty group. As this is the treatment with the most social pressure, it makes sense that the median value is not only positive, but is much higher than all other treatment groups.</li>
+</ul>
+</div>
+<div id="voting-sex-solo-treatment-interactions" class="section level4">
+<h4>
+<span class="header-section-number">9.6.3.5</span> Voting &amp; Sex, Solo, Treatment, + Interactions</h4>
+<p>Since we’ve now studied a model with three different variables, it is time to look at interactions! Here, we will look at <code>primary_06</code> as a function of sex, solo, treatment, and <code>solo*treatment</code>. What does <code>solo*treatment</code> mean for us? It means we are looking at the <code>solo</code> and <code>treatment</code> variables as they correspond to one another. For example, <code>soloTRUE:treatmentHawthorne</code> would be the offset in slope for those who live alone under treatment Hawthorne <em>as compared with our baseline group</em>.</p>
 <div class="sourceCode" id="cb1006"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1006-1"><a href="n-parameters.html#cb1006-1"></a>model_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_sham, </span>
 <span id="cb1006-2"><a href="n-parameters.html#cb1006-2"></a>                 <span class="dt">formula =</span> primary_<span class="dv">06</span> <span class="op">~</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>solo <span class="op">+</span><span class="st"> </span>treatment <span class="op">+</span><span class="st"> </span>solo <span class="op">*</span><span class="st"> </span>treatment, </span>
-<span id="cb1006-3"><a href="n-parameters.html#cb1006-3"></a>                 <span class="dt">family =</span> <span class="kw">gaussian</span>(), </span>
-<span id="cb1006-4"><a href="n-parameters.html#cb1006-4"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
+<span id="cb1006-3"><a href="n-parameters.html#cb1006-3"></a>                 <span class="dt">refresh =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb1007"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1007-1"><a href="n-parameters.html#cb1007-1"></a><span class="kw">print</span>(model_<span class="dv">5</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      primary_06 ~ sex + solo + treatment + solo * treatment
 ##  observations: 10000
-##  predictors:   11
+##  predictors:   5
 ## ------
 ##                             Median MAD_SD
-## (Intercept)                  0.305  0.016
-## sexMale                      0.021  0.009
-## soloTRUE                     0.069  0.040
-## treatmentHawthorne           0.010  0.022
-## treatmentControl            -0.009  0.017
-## treatmentSelf                0.011  0.021
-## treatmentNeighbors           0.038  0.022
-## soloTRUE:treatmentHawthorne -0.089  0.061
-## soloTRUE:treatmentControl   -0.031  0.045
-## soloTRUE:treatmentSelf       0.003  0.057
-## soloTRUE:treatmentNeighbors  0.007  0.057
+## (Intercept)                 0.280  0.007 
+## sexMale                     0.024  0.009 
+## soloTRUE                    0.039  0.014 
+## treatmentNeighbors          0.072  0.014 
+## soloTRUE:treatmentNeighbors 0.046  0.034 
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
-## sigma 0.467  0.003 
+## sigma 0.461  0.003 
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
-<!-- MF: As it stands, I have all five models in this section. Should the interaction model maybe be in a later, separate section? No. -->
+<p>There is lots to look at here. Let’s narrow our focus a bit to highlight some important takeaways. First, our baseline is again: female participants in multi-person households under treatment Civic Duty. For this group, the (Intercept) is 0.304 = 30.4% voting. Every other variable represents an offset from that baseline value. Let’s dig in!</p>
+<p>First, note that (as we saw in the last model) sexMale and soloTRUE both <em>increase</em> the odds of a participant voting. The median values represent an offset from baseline. Therefore, the true value for sexMale would be the (Intercept) + sexMale = 0.304 + 0.022 = 0.326. The true value for soloTRUE is (Intercept) + soloTRUE = 0.304 + 0.068 = 0.372.</p>
+<p>Note that all treatments increase voter turnout in the female, multi-person household group. The Control group observes a <em>decrease</em> in voter turnout.</p>
+<p>Now, we will turn out attention to our interactions.
+- <code>soloTRUE: treatmentHawthorne</code> is showing us the offset in voter turnout (intercept) for female people who live in single voter households under treatmentHawthorne as compared to our baseline of treatment Civic Duty. The median of -0.086 represents an offset from the soloTRUE group. We must take the soloTRUE intercept value previously calculated (0.372) and add this to <code>soloTRUE:treatmentHawthorne</code> to show the difference in values: 0.372 + (-0.086) = .286. This number represents that, within the overall <code>soloTRUE</code> group under, <code>treatmentHawthorne</code> showed <em>less</em> voter turnout than the Civic Duty group itself.
+- <code>soloTRUE:treatmentControl</code> looks at the offset from our baseline in female, single person households under the control treatment. With a median of -0.029, this means that our intercept for this group would be 0.372 (<code>soloTRUE</code>) + -0.029 (<code>soloTRUE:treatmentControl</code>) = 0.343. As compared with the Civic Duty treatment, those participants in single person households voted <em>less</em> under the Control group.
+- <code>soloTRUE:treatmentSelf</code> shows the offset from our baseline under the Self treatment. The intercept for this group would be the soloTRUE intercept + the interaction value = 0.372 + 0.003 = 0.375. This shows that, compared with our baseline of soloTRUE under the Civic Duty treatment, the voter turnout for this group is <em>slightly increased</em>.
+- <code>soloTRUE:treatmentNeighbors</code> shows the offset from our baseline under the Neighbors treatment. Again, to find the true intercept, we must add this interaction value of 0.006 to our calculated soloTRUE intercept: 0.372 + 0.006 = 0.378. Therefore, compared to the solo group under treatment Civic Duty, the solo group under treatment Neighbors <em>voted more</em>.</p>
+<p>What does this tell us? First, we know that (of the various treatments) Neighbors continues to be the most effective, even in those female citizens that are living alone. We also know that, in those females living alone, the control and Hawthorne treatment are less effective as compared with the Civic Duty treatment. And, while the Self and Neighbors treatments <em>did</em> increase voter turnout, the rate of increase was less as compared to the soloFALSE group (showed in the previous model).</p>
 </div>
 </div>
 <div id="temperance-1" class="section level3">
 <h3>
-<span class="header-section-number">9.5.4</span> Temperance</h3>
+<span class="header-section-number">9.6.4</span> Temperance</h3>
 <p>
 <span class="marginnote shownote">
 <!--
@@ -1724,11 +1732,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>For instance, perhaps the impact of your neighbors knowing your voting history is greater in the midst of a pandemic, where you may be locked inside with few interactions outside of your immediate proximity. Perhaps the opposite is true. These <em>unknown unknowns</em> cannot be accounted for in our models. We cannot predict a pandemic, nor can we predict how this will change the way that people vote or respond to flyers.</p>
 <p>There is also the issue of representitiveness. Do the voters of the 2006 primary election (who have already demonstrated a willingness to vote in the 2004 primary election) truly represent the people voting in <strong>our</strong> gubernatorial election?</p>
 <p>These complications are why we must make inferences with a grain of salt. That is not to say that all data science is unhelpful! On the contrary, acknowledging our deficits will only make our inferences (and the actions we take because of them) stronger.</p>
+<!-- MF: Do we need to add any additional sections to drive home the interactions explanation? Should I keep a separate interactions section dedicated to *just* studying interaction effects? DK: Whatever you think best. -->
 </div>
 </div>
 <div id="causal-effects-of-treament" class="section level2">
 <h2>
-<span class="header-section-number">9.6</span> Causal Effects of <code>treament</code>
+<span class="header-section-number">9.7</span> Causal Effects of <code>treament</code>
 </h2>
 <p>We will now be looking into the causal effect of the treatment variable on the 2006 primary election. To start, let’s build a model using <code>stan_glm()</code> followed by a regression table.</p>
 <div class="sourceCode" id="cb1009"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1009-1"><a href="n-parameters.html#cb1009-1"></a><span class="co"># obj.1 &lt;- stan_glm(data = shaming, </span></span>
@@ -1745,7 +1754,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- Once we talk about these things --- and, again, this is exactly what we have talked about in chapter 8 --- we can do a bit more. Like discuss how we are using 99%, because there is nothing magical aboyt 95%, other than convention. I also think it would be fun to show a nice graphic of this, highlighting how the estimates for Civic and Hawthorne overlap.  -->
 <div id="interactions" class="section level3">
 <h3>
-<span class="header-section-number">9.6.1</span> Interactions</h3>
+<span class="header-section-number">9.7.1</span> Interactions</h3>
 <!-- This is new. With only two parameters, we can't really look at interaction effects. Need to discuss interaction effects in general. Also, note that heterogenous treatment effects are the same thing as interaction effects that involve a treatment effect as one of the variables.  -->
 <!-- Feel free to build up this code, and other examples, more slowly than I am doing it here. -->
 <div class="sourceCode" id="cb1011"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1011-1"><a href="n-parameters.html#cb1011-1"></a><span class="co"># obj.3 &lt;- stan_glm(data = shaming, </span></span>
@@ -1789,7 +1798,7 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-11-01
+2020-11-02
 </p>
 </div>
 </div>
