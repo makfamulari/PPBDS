@@ -1115,8 +1115,6 @@ Because we will be going through a series of models in this chapter, it is usefu
 
 #### Voting and Sex
 
-<!-- MF: I used family = gaussian as I noted it in the lower section drafts, but can't find the purpose online. Also, stan_glm is taking a very long time to run. Is this a concern? Never mention gaussian or the family argument. -->
-
 Let's start with a simple model: the effect of voting in the 2006 election and sex. First, let's look at the results of `primary_06` after grouping by `sex` to see the number of females and males who did or did not vote. Recall that a value of 1 for `primary_06` means that the citizen *did* vote, while a value of 0 means that they *did not*. 
 
 ```{r}
@@ -1184,6 +1182,8 @@ model_2 <- stan_glm(data = ch9_sham,
 print(model_2, digits = 3)
 ```
 
+Note that the median for age is 0.004. Age is therefore positively correlated with voting in the primary election. What does that mean? It means that, for every year that a participant's age increases, their odds of voting in the primary *increases* by 0.004. Now, this might not seem like a huge difference. However, think of it like this: for every decade older that a participant is, their odds of voting increase .04 = 4%! This makes sense considering that we just learned that older citizens are more likely to vote. 
+
 #### Voting and Treatment
 
 Looking at the relationship between primary voting and treatment.
@@ -1210,7 +1210,8 @@ The Control group had the least active voters with a median of .297 = 29.7% of p
 This means that, as we hoped, more social pressure = higher voting turnout. That being said, the percent differences were not large. The biggest leap came from the Neighbors group, suggesting that the pressure of your vote being publicized to your community increases turnout more than a simple encouragement. 
 
 #### Voting & (Sex + Solo + Treatment)
-Looking at the relationship between primary voting, sex, living alone, and treatment.
+
+Now that we have analyzed the impact of our various treatments on voting behavior, let's turn to three different variables together: sex, solo (living alone), and treatment.
 
 ```{r, cache=TRUE}
 model_4 <- stan_glm(data = ch9_sham, 
@@ -1222,6 +1223,17 @@ model_4 <- stan_glm(data = ch9_sham,
 print(model_4, digits = 3)
 ```
 
+First, let's look at which variables are included on our left hand side. Besides our (Intercept), we are given sexMALE, soloTRUE, and four out of our five treatments. What does that mean our comparison, or (Intercept), is? Look to what we are not given: sexFEMALE, soloFALSE, and treatmentCivic Duty. Therefore, our baseline for comparison are the female participants who do *not* live in single person households that we under the Civic Duty treatment. From there, we will break down what our variables and their respective medians mean. 
+
+- sexMALE, with a median of 0.21: as compared with female participants, males are more likely to vote by a factor of 0.21.
+- soloTRUE, with a median of 0.044: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.044. 
+- treatmentHawthorne, with a median of -0.002: participants are slightly *less* likely to vote when under the Hawthorne treatment as compared with the baseline Civic Duty treatment.
+- treatmentControl, with a median of -0.014: participants are *less* likely to vote when under the Control, as compared with the Civic Duty baseline treatment.
+- treatmentSelf, with a median of 0.012: participants in this group are *more* likely to vote as compared with the Civic Duty treatment. This makes sense, since we expect that additional social pressure increases voter turnout.
+- treatmentNeighbors, with a median of 0.039: participants in this group are *more* likely to vote compared with those in the Civic Duty group. As this is the treatment with the most social pressure, it makes sense that the median value is not only positive, but is much higher than all other treatment groups. 
+
+
+#### Voting & Sex, Solo, Treatment, + Interactions
 
 INTERACTION MODEL with all of the above plus solo and treatment 
 
