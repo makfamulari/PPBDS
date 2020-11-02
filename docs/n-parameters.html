@@ -1085,6 +1085,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- DK: Discuss the substantive issue? How can it be that Washington candidates live longer? Also, compare these estimates to what naive lm() would tell us. -->
 <!-- DK: Finish with Temperance/population/exchangability discussion. -->
 </div>
+<div id="testing" class="section level3">
+<h3>
+<span class="header-section-number">9.4.4</span> Testing</h3>
+<p>In a normal statistics book, we would have already discussed the concept of “testing” extensively. The terminology varies by field. “Tests,” “testing,” “hypothesis tests,” “tests of significance,” and “null hypothesis significance testing” all refer to the same concept. We will refer to this collection of approaches as NHST, a common abbreviation derived from the initials of the last phrase. Wikpedia provides an <a href="https://en.wikipedia.org/wiki/Statistical_hypothesis_testing">overview</a>.</p>
+<p><em>Our view: Amateurs test. Professionals summarize.</em></p>
+<p>Consider the question of the expected difference in lifespans for our South Dakato and Washington candidates. Is that difference “significant?” Can we “reject the null hypothesis?” The convential answer is Yes. Anytime that zero is outside of the 95% confidence interval, we can declare the result significant. But why should we? What does that gain us? We already have the full posterior probability distribution. That is knowledge. A Yes/No question throws away too much information to (almost) ever be useful. There is no reason to <em>test</em> when you can <em>summarize</em> by providing the full posterior probability distribution.</p>
+<p>The same arguments apply in the case of “insignificant” results, with “<span class="math inline">\(p &gt; 0.5\)</span>, when we can’t”reject" the null hypothesis. Instead of expected values, consider the case of two candidates, one from South Dakota and one from Washington. Is there difference in their predicted lifespans “significant?” Who cares!? We have the full posterior probability distribution for that prediction — also known as the posterior predictive distribution — as graphed above. The 95% confidence interval includes zero. Does that mean we should throw it away? No! That would be nonsense. Yes, there is a 20% chance that the South Dakota candidate lives longer, so we can hardly be surpised when that happens. But we still think that it is much more likely that the Washington candidate lives longer. Indeed, we would consider 4-to-1 odds as fair. The fact that the difference is not “significant” has no relevance to how we use the posterior to make decisions.</p>
+<p>The same reasoning applies to every parameter we estimate, to every prediction we make. Never test — unless your boss demands a test. <em>Use your judgment, make your models, summarize your knowledge of the world.</em></p>
+</div>
 </div>
 <div id="eda-of-shaming" class="section level2">
 <h2>
@@ -1094,6 +1103,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3>
 <span class="header-section-number">9.5.1</span> GOV 50: STOP HERE! Rest of the chapter is a draft, which we will go over in class. Tutorial 9 only covers material in first part of the chapter.</h3>
 <!-- Use print(fit_obj, digits = 4) if you need to see more digits. -->
+<!-- DK: This plot might be of use. -->
+<!-- shaming %>%  -->
+<!--   mutate(age = 2006 - birth_year) %>%  -->
+<!--   ggplot(aes(age, primary_06)) + -->
+<!--     geom_jitter(alpha = 0.005, height = 0.1) + -->
+<!--     geom_smooth(formula = y ~ x, method = "lm", se = FALSE) + -->
+<!--     scale_y_continuous(breaks = c(0, 1), labels = c("Did Not Vote", "Voted")) + -->
+<!--     labs(title = "Age and Voting in 2012 Michigan Primary Election", -->
+<!--          subtitle = "Older people are more likely to vote", -->
+<!--          x = "Age", -->
+<!--          y = NULL, -->
+<!--          caption = "Data from Gerber, Green, and Larimer (2008)") -->
 <p>Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that “shames” citizens who do not vote. You are considering sending out a “shaming” voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?</p>
 <p>Consider a new data set, <code>shaming</code>, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled “Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment”. This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout.</p>
 <p>Let’s now do another EDA, starting off by running <code>glimpse()</code>.</p>
@@ -1768,7 +1789,7 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-31
+2020-11-01
 </p>
 </div>
 </div>
