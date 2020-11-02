@@ -1223,19 +1223,18 @@ model_4 <- stan_glm(data = ch9_sham,
 print(model_4, digits = 3)
 ```
 
-First, let's look at which variables are included on our left hand side. Besides our (Intercept), we are given sexMALE, soloTRUE, and four out of our five treatments. What does that mean our comparison, or (Intercept), is? Look to what we are not given: sexFEMALE, soloFALSE, and treatmentCivic Duty. Therefore, our baseline for comparison are the female participants who do *not* live in single person households that we under the Civic Duty treatment. From there, we will break down what our variables and their respective medians mean. 
+First, let's look at which variables are included on our left hand side. Besides our (Intercept), we are given sexMALE, soloTRUE, and four out of our five treatments. What does that mean our comparison, or (Intercept), is? Look to what we are not given: sexFEMALE, soloFALSE, and treatmentCivic Duty. Therefore, our baseline for comparison are the female participants who do *not* live in single person households that we under the Civic Duty treatment. For this group, the percentage voting is .309 = 30.9%. From this figure, we will break down what our variables and their respective medians mean. 
 
-- sexMALE, with a median of 0.21: as compared with female participants, males are more likely to vote by a factor of 0.21.
-- soloTRUE, with a median of 0.044: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.044. 
-- treatmentHawthorne, with a median of -0.002: participants are slightly *less* likely to vote when under the Hawthorne treatment as compared with the baseline Civic Duty treatment.
-- treatmentControl, with a median of -0.014: participants are *less* likely to vote when under the Control, as compared with the Civic Duty baseline treatment.
-- treatmentSelf, with a median of 0.012: participants in this group are *more* likely to vote as compared with the Civic Duty treatment. This makes sense, since we expect that additional social pressure increases voter turnout.
-- treatmentNeighbors, with a median of 0.039: participants in this group are *more* likely to vote compared with those in the Civic Duty group. As this is the treatment with the most social pressure, it makes sense that the median value is not only positive, but is much higher than all other treatment groups. 
-
+- sexMALE, with a median of 0.021: as compared with female participants, males are more likely to vote by a factor of 0.021 = 2.1%. Recall that sexMALE corresponds to the *offset* in intercept for the male respondents relative to the female respondents.
+- soloTRUE, with a median of 0.044: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.044 = 4.4%. Note that this is only true for our baseline group of female participants and does not include an analysis for males. 
+- treatmentHawthorne, with a median of -0.002: female participants are slightly *less* likely to vote when under the Hawthorne treatment as compared with the baseline Civic Duty treatment.
+- treatmentControl, with a median of -0.014: female participants are *less* likely to vote when under the Control, as compared with the Civic Duty baseline treatment.
+- treatmentSelf, with a median of 0.012: female participants in this group are *more* likely to vote as compared with the Civic Duty treatment. This makes sense, since we expect that additional social pressure increases voter turnout.
+- treatmentNeighbors, with a median of 0.039: female participants in this group are *more* likely to vote compared with those in the Civic Duty group. As this is the treatment with the most social pressure, it makes sense that the median value is not only positive, but is much higher than all other treatment groups. 
 
 #### Voting & Sex, Solo, Treatment, + Interactions
 
-INTERACTION MODEL with all of the above plus solo and treatment 
+Since we've now studied a model with three different variables, it is time to look at interactions! Here, we will look at `primary_06` as a function of sex, solo, treatment, and `solo*treatment`. What does `solo*treatment` mean for us? It means we are looking at the `solo` and `treatment` variables as they correspond to one another. For example, `soloTRUE:treatmentHawthorne` would be the offset in slope for those who live alone under treatment Hawthorne *as compared with our baseline group*. 
 
 ```{r, cache=TRUE}
 model_5 <- stan_glm(data = ch9_sham, 
@@ -1247,7 +1246,16 @@ model_5 <- stan_glm(data = ch9_sham,
 print(model_5, digits = 3)
 ```
 
-<!-- MF: As it stands, I have all five models in this section. Should the interaction model maybe be in a later, separate section? No. -->
+There is lots to look at here. Let's narrow our focus a bit to highlight some important takeaways. First, our baseline is again: female participants in multi-person households under treatment Civic Duty. For this group, the (Intercept) is 0.304 = 30.4% voting. Every other variable represents an offset from that baseline value. Let's dig in!
+
+First, note that (as we saw in the last model) sexMale and soloTRUE both *increase* the odds of a participant voting. The median values represent an offset from baseline. Therefore, the true value for sexMale would be the (Intercept) + sexMale = 0.304 + 0.022 = 0.326. The true value for soloTRUE is (Intercept) + soloTRUE = 0.304 + 0.068 = 0.372. 
+
+Note that all treatments increase voter turnout in the female, multi-person household group. The Control group observes a *decrease* in voter turnout. 
+
+Now, we will turn out attention to our interactions. 
+- `soloTRUE: treatmentHawthorne` is showing us the offset in voter turnout (intercept) for people who live in single voter households under treatmentHawthorne as compared to our baseline of treatment Civic Duty. The median of -0.086 represents an offset from the soloTRUE group. We must take the soloTRUE intercept value previously calculated (0.372) and add this to `soloTRUE:treatmentHawthorne` to show the difference in values: 0.372 + (-0.086) = .286. This number represents that, within the overall `soloTRUE` group under, `treatmentHawthorne` showed *less* voter turnout than the Civic Duty group itself. 
+- `soloTRUE:treatmentControl` looks at the offset from our baseline in single person households under the control treatment. With a median of -0.029, this means that our intercept for this group would be 0.372 (`soloTRUE`) + -0.029 (`soloTRUE:treatmentControl`) = 0.343. As compared with the Civic Duty treatment, those participants in single person households voted *less* under the Control group. 
+
 
 ### Temperance
 
