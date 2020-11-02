@@ -32,11 +32,85 @@ output_yaml:
 
 # Discrete Response {#discrete-response}
 
+Packages:
+
+```{r, message=FALSE}
+library(tidyverse)
+library(broom)
+library(skimr)
+library(PPBDS.data)
+library(tidymodels)
+```
+
+
 **Binary responses** take on only two values: success ($Y=1$) or failure ($Y=0$), yes ($Y=1$) or no ($Y=0$), et cetera. Binary responses are one of the most common types of data that statisticians encounter.  We are often interested in modeling the probability of success, $p$, based on a set of covariates. As with regression, there are two broad categories of problems: *modeling for prediction* and *modeling for causation*. Although terminology varies across fields, "regression" is generally used for situations in which our *dependent variable* is continuous, as in Chapter \@ref(continuous-response). "Classification" applies to cases in which the dependent variable takes on discrete values, the simplest of which is the binary case.
 
-In this chapter, we will look at three common techniques of **classification** of binary data.  First, we will consider logistic regression, which is similar conceptually to the linear regression models we considered in Chapters \@ref(pitfalls) and \@ref(continuous-response).  Second, we will consider classification and regression trees (CART).  Third, we will discuss random forests. We use the **tidymodels** tools for all examples. At the end, we will compare the performances of all three models.
+In this chapter, we will look at three common techniques of **classification** of binary data.  First, we will consider logistic regression, which is similar conceptually to the linear regression models we considered in Chapter \@ref(continuous-response).  Second, we will consider classification and regression trees (CART).  Third, we will discuss random forests. We use the **tidymodels** tools for all examples. At the end, we will compare the performances of all three models.
 
 Which of these models will be the most accurate? Keep this question in mind as you read through this chapter. 
+
+## Binary classification metrics
+
+Recall the discussion in Chapter \@ref(model-choice) about how to measure model accuracy. Classification models require different measures than those we used in Chapter \@ref(continuous-response) when considering continuous outcome measures.
+
+The **modeldata** package contains example predictions from a test data set with two classes ("Class1" and "Class2"):
+
+```{r performance-two-class-example}
+data(two_class_example)
+str(two_class_example)
+```
+
+The second and third columns are the predicted class probabilities for the test set while `predicted` are the discrete predictions. 
+
+For the hard class predictions, there are a variety of **yardstick** functions that are helpful: 
+
+```{r performance-class-metrics}
+# A confusion matrix: 
+conf_mat(two_class_example, truth = truth, estimate = predicted)
+
+accuracy(two_class_example, truth = truth, estimate = predicted)
+
+# Matthews correlation coefficient:
+mcc(two_class_example, truth, predicted)
+
+# F1 metric:
+f_meas(two_class_example, truth, predicted)
+```
+
+For binary classification data sets, these functions have a standard argument called `event_level`. The _default_ is that the **first** level of the outcome factor is the event of interest. 
+
+```{block, type = "rmdnote"}
+There is some heterogeneity in R functions in this regard; some use the first level and others the second to denote the event of interest. We consider it more intuitive that the first level is the most important. The second level logic is borne of encoding the outcome as 0/1 (in which case the second value is the event) and unfortunately remains in some packages. However, tidymodels (along with many other R packages) _require_ a categorical outcome to be encoded as a factor and, for this reason, the legacy justification for the second level as the event becomes irrelevant.  
+```
+
+As an example where the second class is the event: 
+
+```{r}
+f_meas(two_class_example, truth, predicted, event_level = "second")
+```
+
+In the output above, the `.estimator` value of "binary" indicates that the standard formula for binary classes will be used. 
+
+There are numerous classification metrics that use the predicted probabilities as inputs rather than the hard class predictions. For example, the receiver operating characteristic (ROC) curve computes the sensitivity and specificity over a continuum of different event thresholds. The predicted class column is not used. There are two **yardstick** functions for this method: `roc_curve()` computes the data points that make up the ROC curve and `roc_auc()` computes the area under the curve. 
+
+The interfaces to these types of metric functions use the `...` argument placeholder to pass in the appropriate class probability column. For two-class problems, the probability column for the event of interest is passed into the function:
+
+```{r}
+two_class_curve <- roc_curve(two_class_example, truth, Class1)
+two_class_curve
+
+roc_auc(two_class_example, truth, Class1)
+```
+
+The `two_class_curve` object can be used in a `ggplot` call to visualize the curve. There is an `autoplot()` method that will take care of the details:
+
+```{r performance-2class-roc-curve}
+autoplot(two_class_curve)
+```
+
+There are a number of other functions that use probability estimates, including `gain_curve()`, `lift_curve()`, and `pr_curve()`. 
+
+
 
 ## Exploratory Data Analysis (EDA)
 

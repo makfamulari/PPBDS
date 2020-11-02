@@ -573,7 +573,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <span id="cb868-2"><a href="two-parameters.html#cb868-2"></a><span class="st">  </span><span class="kw">select</span>(age, gender, height, survey) <span class="op">%&gt;%</span></span>
 <span id="cb868-3"><a href="two-parameters.html#cb868-3"></a><span class="st">  </span><span class="kw">filter</span>(age <span class="op">&gt;=</span><span class="st"> </span><span class="dv">18</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb868-4"><a href="two-parameters.html#cb868-4"></a><span class="st">  </span><span class="kw">drop_na</span>()</span></code></pre></div>
-<p>Plot your data.</p>
+<p>Plot your data. <code>geom_density()</code> is a smooth version of <code>geom_histogram()</code>. With <code>geom_density()</code>, the y-axis is scaled so that the area under the curve equals 1.</p>
 <div class="sourceCode" id="cb869"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb869-1"><a href="two-parameters.html#cb869-1"></a>ch7 <span class="op">%&gt;%</span></span>
 <span id="cb869-2"><a href="two-parameters.html#cb869-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> height, <span class="dt">color =</span> gender)) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb869-3"><a href="two-parameters.html#cb869-3"></a><span class="st">  </span><span class="kw">geom_density</span>() <span class="op">+</span><span class="st"> </span></span>
@@ -1278,8 +1278,8 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <div class="sourceCode" id="cb890"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb890-1"><a href="two-parameters.html#cb890-1"></a><span class="kw">set.seed</span>(<span class="dv">11</span>)</span>
 <span id="cb890-2"><a href="two-parameters.html#cb890-2"></a>pp &lt;-<span class="st"> </span><span class="kw">posterior_predict</span>(fit_obj) <span class="op">%&gt;%</span></span>
 <span id="cb890-3"><a href="two-parameters.html#cb890-3"></a><span class="st">    </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span></span>
-<span id="cb890-4"><a href="two-parameters.html#cb890-4"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="kw">across</span>(<span class="kw">everything</span>(), as.numeric))</span></code></pre></div>
-<p>Doing so requires two steps. First, use <code>as_tibble()</code>, just as you might expect. In R, we often transform one thing into another thing with functions which begin with <code>as_</code>. Unfortunately, that does not solve our problem because each column is still of class <code>ppd</code>. So, second, we use an <code>across</code> incantation to transform each column. The resulting object, <code>pp</code>, is still not easy to work with, both because the variable names are all numbers and because of how big it is.</p>
+<span id="cb890-4"><a href="two-parameters.html#cb890-4"></a><span class="st">    </span><span class="kw">mutate_all</span>(as.numeric)</span></code></pre></div>
+<p>Doing so requires two steps. First, use <code>as_tibble()</code>, just as you might expect. In R, we often transform one thing into another thing with functions which begin with <code>as_</code>. Unfortunately, that does not solve our problem because each column is still of class <code>ppd</code>. So, second, we use the <code>mutate_all(as.numeric)</code> incantation to transform each column. The resulting object, <code>pp</code>, is still not easy to work with, both because the variable names are all numbers and because of how big it is.</p>
 <div class="sourceCode" id="cb891"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb891-1"><a href="two-parameters.html#cb891-1"></a><span class="kw">dim</span>(pp)</span></code></pre></div>
 <pre><code>## [1] 4000 1814</code></pre>
 <p>There are 4000 rows because, by default, <code>stan_glm()</code> gives us 4000 draws from the posterior distribution, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There
@@ -1364,11 +1364,6 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 <p>Let’s practice this process another dozen or so times.</p>
 
 <!-- Need to add a plot of fittted values and raw data. This will look a bit weird since, for each model, there are only two fitted values. Best is a jittered scatter plot with two columns, and then the fitted values put in the middle in red. -->
-<!-- ```{r, echo=FALSE} -->
-<!-- sex_means <-  -->
-<!--   governors %>%  -->
-<!--   group_by(sex) %>%  -->
-<!--   summarize(avg = mean(alive_post), .groups = "drop") -->
 <!-- governors %>%  -->
 <!--   ggplot(aes(sex, alive_post)) +  -->
 <!--     geom_jitter(width = 0.1, alpha = 0.2) +  -->
@@ -1382,7 +1377,7 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 <a href="three-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-10-23
+2020-11-01
 </p>
 </div>
 </div>
