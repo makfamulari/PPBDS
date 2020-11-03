@@ -441,7 +441,7 @@ $$ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \epsilon_i
 
 * $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $alive\_post_i$, if $male_i = 0$ and $alive\_pre_i = 0$. 
 
-* $\beta_1$ is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. $\beta_0$ + $\beta_1$). When the two are added together, you get the average number of days lived after the election for men, who on the day of election, have been alive the average number of days for all candidates.
+* $\beta_1$ is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. $\beta_0 + \beta_1$). When the two are added together, you get the average number of days lived after the election for men, who on the day of election, have been alive the average number of days for all candidates.
 
 * $\beta_2$ is, for the entire population, the average difference in $alive\_post_i$ between two individuals, one of whom has an $alive\_pre_i$ value of 1 greater than the other. 
 
@@ -480,7 +480,7 @@ fit_gov_3 %>%
   pivot_longer(cols = female_days:male_days, 
                names_to = "parameters",
                values_to = "days") %>% 
-  ggplot(aes(days, color = parameters)) +
+  ggplot(aes(days, fill = parameters)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
@@ -538,18 +538,20 @@ Let's create another model. This time, however, the numeric outcome variable of 
 
 Math:
 
-$$ alive\_pre_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \\ \beta_3 male_i *  alive\_pre_i + \epsilon_i$$
+$$ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \\ \beta_3 male_i *  alive\_pre_i + \epsilon_i$$
 <!-- DK: Need to make these interpretations clearer and more consistent across the examples. -->
 
 * Our outcome variable is still $alive\_post_i$. We want to know how many days a candidate will live after an election. 
 
 * $male_i$ is still one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this will be 1. When we are making this prediction for female candidate, this will be 0. $alive\_pre_i$ is still our other explanatory variable, representing the number of days a candidate has lived before the election, relative to the average value for all candidates. 
 
-* $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. Note that this is different than in our previous example where it was the average of all candidates. $\beta_0$ is also the intercept of the equation. 
+* $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. In a sense, this is the same meaning as in the previous model, without an interaction term. But, always remember that the meaning of a parameter is conditional on the model in which it is embedded. Even if a parameter is called $\beta_0$ in two different regressions does necessitate that it means the same thing in both regressions. Parameter names are arbitrary, or at least simply a matter of convention.
 
-* $\beta_2$ is the coefficient of $alive\_pre_i$. It it just the slope for women. In our last example,  $\beta_2$ was the slope for the whole population. Now we are getting more specific. 
+* $\beta_1$ does not have a simple interpretation as a stand-alone parameter. It is a measure of how different women are from men. However, $\beta_0 + \beta_1$ has a straightforward meaning exactly analogous to the meaning of $\beta_0$. The sum  is the average number of days lived after the election for *men*, who on the day of election, have been alive the average number of days of all candidates.
 
-* $\beta_3$ is difficult to interpret. However, when it is added to $\beta_2$, the result in the slope for men.
+* $\beta_2$ is the coefficient of $alive\_pre_i$. It it just the slope for women. It is the average difference in $alive\_post_i$ between two women, one of whom has an $alive\_pre_i$ value of 1 greater than the other. In our last example,  $\beta_2$ was the slope for the whole population. Now we are different slopes for different genders. 
+
+* $\beta_3$ alone is difficult to interpret. However, when it is added to $\beta_2$, the result in the slope for men.
 
 Code:
 
@@ -584,7 +586,7 @@ fit_gov_4 %>%
   pivot_longer(cols = female_days:male_days, 
                names_to = "parameters",
                values_to = "days") %>% 
-  ggplot(aes(days, color = parameters)) +
+  ggplot(aes(days, fill = parameters)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
@@ -614,7 +616,7 @@ fit_gov_4 %>%
   pivot_longer(cols = slope_women:slope_men, 
                names_to = "parameters",
                values_to = "slope") %>% 
-  ggplot(aes(slope, color = parameters)) +
+  ggplot(aes(slope, fill = parameters)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
@@ -690,7 +692,7 @@ fit_gov_5 %>%
   pivot_longer(cols = Washington_females:SD_females, 
                names_to = "parameters",
                values_to = "days") %>% 
-  ggplot(aes(days, color = parameters)) +
+  ggplot(aes(days, fill = parameters)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
