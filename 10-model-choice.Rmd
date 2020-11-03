@@ -4,6 +4,10 @@ output_yaml:
 ---
 
 
+<!-- DK: Use argument names first time that you use that function. -->
+
+<!-- DK: Shouldn't the last step be to run our final model on ames_test? -->
+
 <!-- DK: Explain control_resample().  -->
 
 <!-- DK: Can we make a simple pipe for tidymodels which we can teach students to do. First, split the data. Second, create the folds. Third, choose the model. Fourth, make the recipe. Fifth, make the workflow. Sixth, apply the workflow to the folds.  -->
@@ -216,6 +220,8 @@ What the formula above does can be decomposed into a series of _steps_:
 The formula method will apply these data manipulations to any data, including new data, that are passed to the `predict()` function. 
 
 A recipe is also an object that defines a series of steps for data processing. Unlike the formula method inside a modeling function, the recipe defines the steps without immediately executing them; it is only a specification of what _should_ be done. Here is a recipe equivalent to the formula above:
+
+<!-- DK: Do we have to give a data value to create a recipe? What happens if we don't? What happens when we pass in a different data set later? -->
 
 ```{r}
 ames_rec <- 
@@ -493,10 +499,12 @@ lm_wflow <- lm_wflow %>%
   add_recipe(ames_rec)
 ```
 
-`add_model()` and  `add_recipe()` are examples of some of the helper functions which are available in **tidymodels**. The goal is to make modeling as easy as basic data analysis, as in the Tidyverse.
+`add_model()` and  `add_recipe()` are examples of some of the helper functions which are available in **tidymodels**. The goal is to make modeling as easy as basic data analysis is in the Tidyverse.
 
 
 We use `fit()` to complete the model and `predict()` to create predictions from the fitted model.
+
+<!-- DK: Why do we need to pass ames_train to fit? Isn't it already in the recipe which was used to create lm_wflow? -->
 
 
 ```{r}
@@ -587,7 +595,7 @@ The effectiveness of any given model depends on how the model will be used. A ca
 
 ### Metrics 
 
-Recall from Section \@ref(parsnip-predictions) that tidymodels prediction functions produce tibbles with columns for the predicted values. These columns have consistent names, and the functions in the **yardstick** package that produce performance metrics have consistent interfaces. The functions are data frame-based, as opposed to vector-based, with the general syntax of: 
+Recall that tidymodels prediction functions produce tibbles with columns for the predicted values. These columns have consistent names, and the functions in the **yardstick** package that produce performance metrics have consistent interfaces. The functions are data frame-based, as opposed to vector-based, with the general syntax of: 
 
 ```r
 function(data, truth, ...)
@@ -598,7 +606,7 @@ where `data` is a data frame or tibble and `truth` is the column with the observ
 
 To illustrate, let's evaluate the model we have constructed for the Ames house price data. Recall that the `lm_fit` object was a linear regression model whose predictor set was supplemented with an interaction term. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
 
-<!-- DK: This seems confusing, using pipes in the argument to a function. Or is it natural and we should teach students about it earlier? Also, why delete Sale_Price? -->
+<!-- DK: This seems confusing, using pipes in the argument to a function. Or is it natural and we should teach students about it earlier? Also, why delete Sale_Price? Figure this out! -->
 
 ```{r}
 ames_test_res <- predict(lm_fit, 
