@@ -4,11 +4,13 @@ output_yaml:
 ---
 
 
+<!-- DK: Explain control_resample().  -->
+
+<!-- DK: Can we make a simple pipe for tidymodels which we can teach students to do. First, split the data. Second, create the folds. Third, choose the model. Fourth, make the recipe. Fifth, make the workflow. Sixth, apply the workflow to the folds.  -->
+
+<!-- DK: metric sets seems like overkill. Defaults values are fine, I think. But I need to explain them! -->
 
 <!-- DK: Could drop recipe section (or just the details beyond the formula), or save those details for chapter 11. -->
-
-<!-- DK: Get rid of remove_recipe(). Deal with keep_pred.  -->
-
 
 
 <!-- DK: Need to make the approach here mesh with the approaches used in chapter 11 and 12. What can we cut from here that is not used? How should we change later chapters to be consistent with this modern approach? -->
@@ -632,7 +634,7 @@ ggplot(ames_test_res, aes(x = Sale_Price, y = .pred)) +
 
 <!-- DK: These functions might go in a pre-amble section for the tutorial. -->
 
-`geom_abine()` draws the line at the 45 degree line. `coord_obs_pred()` is a function from **tidymodels** for making comparisons between actual with predicted values.
+`geom_abine()` draws the line at the 45 degree line. `coord_obs_pred()` is a function from **tidymodels** which provides useful defaults for graphical comparisons of actual values with predicted values.
 
 There is one property that is substantially over-predicted. 
 
@@ -727,7 +729,6 @@ Random forest models are very powerful and they can emulate the underlying data 
 
 Using the same predictor set as the linear model (without the extra preprocessing steps), we can fit a random forest model to the training set using via the ranger package. This model requires no preprocessing so a simple formula can be used directly.
 
-<!-- DK: Revisit this code! Make it like other code. No add_formula(), I think. -->
 
 ```{r}
 rf_model <- 
@@ -737,8 +738,9 @@ rf_model <-
 
 rf_wflow <- 
   workflow() %>% 
-  add_formula(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
-                           Year_Built + Bldg_Type) %>% 
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
+                                 Year_Built + Bldg_Type,
+                    data = ames_train)) %>% 
   add_model(rf_model) 
 ```
 
@@ -767,23 +769,22 @@ The control arguments include:
  
 For our example, let's save the predictions in order to visualize the model fit and residuals: 
 
-<!-- DK: I am confused about keep_pred and what it does in this code. Recall that there used to be stand-alone function defined at the top of the Rmd called keep_pred. I deleted it everywhere I found it and replaced it with control_resamples(save_pred = TRUE). Necessary? Desirable? -->
 
 ```{r resampling-cv-ames}
-keep_pred <- control_resamples(save_pred = TRUE)
-
 set.seed(130)
 rf_res <- 
   rf_wflow %>% 
-  fit_resamples(resamples = ames_folds, control = keep_pred)
+  fit_resamples(resamples = ames_folds, 
+                control = control_resamples(save_pred = TRUE))
 rf_res
 ```
+
+
 ```{r resampling-checkpoint, include = FALSE}
 lm_wflow <- 
   workflow() %>% 
   add_recipe(ames_rec) %>% 
   add_model(linear_reg() %>% set_engine("lm"))
-# save(rf_res, lm_wflow, rf_wflow, file = "RData/resampling.RData", version = 2, compress = "xz")
 ```
 
 <!-- DK: Need to deal with this save() failure. -->
@@ -882,19 +883,20 @@ rf_model <-
 
 rf_wflow <- 
   workflow() %>% 
-  add_formula(
-    Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
-      Latitude + Longitude) %>% 
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
+                                 Year_Built + Bldg_Type,
+                    data = ames_train)) %>% 
   add_model(rf_model) 
+
 
 set.seed(55)
 ames_folds <- vfold_cv(ames_train, v = 10)
 
-keep_pred <- control_resamples(save_pred = TRUE)
 
 set.seed(130)
 rf_res <- rf_wflow %>% 
-  fit_resamples(resamples = ames_folds, control = keep_pred)
+  fit_resamples(resamples = ames_folds, 
+                control = control_resamples(save_pred = TRUE))
 ```
 
 ## Comparing models with resampling {#compare}
@@ -928,8 +930,8 @@ no_inter_rec <-
   step_dummy(all_nominal()) 
 
 lm_no_inter_res <- 
-  lm_wflow %>%
-  remove_recipe() %>% 
+  workflow() %>% 
+  add_model(lm_model) %>% 
   add_recipe(no_inter_rec) %>% 
   fit_resamples(resamples = ames_folds, 
                 control = control_resamples(save_pred = TRUE))
