@@ -296,6 +296,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ol>
 <p>The formula method will apply these data manipulations to any data, including new data, that are passed to the <code>predict()</code> function.</p>
 <p>A recipe is also an object that defines a series of steps for data processing. Unlike the formula method inside a modeling function, the recipe defines the steps without immediately executing them; it is only a specification of what <em>should</em> be done. Here is a recipe equivalent to the formula above:</p>
+<!-- DK: Do we have to give a data value to create a recipe? What happens if we don't? What happens when we pass in a different data set later? -->
 <div class="sourceCode" id="cb1021"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1021-1"><a href="model-choice.html#cb1021-1"></a>ames_rec &lt;-<span class="st"> </span></span>
 <span id="cb1021-2"><a href="model-choice.html#cb1021-2"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1021-3"><a href="model-choice.html#cb1021-3"></a><span class="st">           </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type,</span>
@@ -503,8 +504,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Instead of using model formulas, recipe objects can also be used to preprocess data for modeling. Previously, we summarized a recipe that specified several preprocessing and feature engineering steps. These are encapsulated inside the object <code>ames_rec</code> and are attached to the workflow:</p>
 <div class="sourceCode" id="cb1041"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1041-1"><a href="model-choice.html#cb1041-1"></a>lm_wflow &lt;-<span class="st"> </span>lm_wflow <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1041-2"><a href="model-choice.html#cb1041-2"></a><span class="st">  </span><span class="kw">add_recipe</span>(ames_rec)</span></code></pre></div>
-<p><code>add_model()</code> and <code>add_recipe()</code> are examples of some of the helper functions which are available in <strong>tidymodels</strong>. The goal is to make modeling as easy as basic data analysis, as in the Tidyverse.</p>
+<p><code>add_model()</code> and <code>add_recipe()</code> are examples of some of the helper functions which are available in <strong>tidymodels</strong>. The goal is to make modeling as easy as basic data analysis is in the Tidyverse.</p>
 <p>We use <code>fit()</code> to complete the model and <code>predict()</code> to create predictions from the fitted model.</p>
+<!-- DK: Why do we need to pass ames_train to fit? Isn't it already in the recipe which was used to create lm_wflow? -->
 <div class="sourceCode" id="cb1042"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1042-1"><a href="model-choice.html#cb1042-1"></a>lm_fit &lt;-<span class="st"> </span><span class="kw">fit</span>(lm_wflow, ames_train)</span>
 <span id="cb1042-2"><a href="model-choice.html#cb1042-2"></a></span>
 <span id="cb1042-3"><a href="model-choice.html#cb1042-3"></a><span class="kw">predict</span>(lm_fit, ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>))</span></code></pre></div>
@@ -589,11 +591,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="metrics" class="section level3">
 <h3>
 <span class="header-section-number">10.5.1</span> Metrics</h3>
-<p>Recall from Section <a href="#parsnip-predictions"><strong>??</strong></a> that tidymodels prediction functions produce tibbles with columns for the predicted values. These columns have consistent names, and the functions in the <strong>yardstick</strong> package that produce performance metrics have consistent interfaces. The functions are data frame-based, as opposed to vector-based, with the general syntax of:</p>
+<p>Recall that tidymodels prediction functions produce tibbles with columns for the predicted values. These columns have consistent names, and the functions in the <strong>yardstick</strong> package that produce performance metrics have consistent interfaces. The functions are data frame-based, as opposed to vector-based, with the general syntax of:</p>
 <div class="sourceCode" id="cb1049"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1049-1"><a href="model-choice.html#cb1049-1"></a><span class="cf">function</span>(data, truth, ...)</span></code></pre></div>
 <p>where <code>data</code> is a data frame or tibble and <code>truth</code> is the column with the observed outcome values. Other arguments are used to specify the column(s) containing the predictions.</p>
 <p>To illustrate, let’s evaluate the model we have constructed for the Ames house price data. Recall that the <code>lm_fit</code> object was a linear regression model whose predictor set was supplemented with an interaction term. It was created from a training set (named <code>ames_train</code>). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame <code>ames_test</code> consists of 732 properties. To start, let’s produce predictions:</p>
-<!-- DK: This seems confusing, using pipes in the argument to a function. Or is it natural and we should teach students about it earlier? Also, why delete Sale_Price? -->
+<!-- DK: This seems confusing, using pipes in the argument to a function. Or is it natural and we should teach students about it earlier? Also, why delete Sale_Price? Figure this out! -->
 <div class="sourceCode" id="cb1050"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1050-1"><a href="model-choice.html#cb1050-1"></a>ames_test_res &lt;-<span class="st"> </span><span class="kw">predict</span>(lm_fit, </span>
 <span id="cb1050-2"><a href="model-choice.html#cb1050-2"></a>                         <span class="dt">new_data =</span> ames_test <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1050-3"><a href="model-choice.html#cb1050-3"></a><span class="st">                           </span><span class="kw">select</span>(<span class="op">-</span>Sale_Price))</span>
@@ -939,7 +941,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a href="continuous-response.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-11-02
+2020-11-03
 </p>
 </div>
 </div>

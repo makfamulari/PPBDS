@@ -632,7 +632,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li><p>The outcome variable is <span class="math inline">\(alive\_post_i\)</span>, the number of days a person is alive after the election. <span class="math inline">\(male_i\)</span> is one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidates, this value will be 0. <span class="math inline">\(alive\_pre_i\)</span> is our other explanatory variable. It is the number of days a candidate has lived before the election.</p></li>
 <li><p><span class="math inline">\(\beta_0\)</span> is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates (i.e. both male and female). <span class="math inline">\(\beta_0\)</span> is also the intercept of the equation. In other words, <span class="math inline">\(\beta_0\)</span> is the expected value of <span class="math inline">\(alive\_post_i\)</span>, if <span class="math inline">\(male_i = 0\)</span> and <span class="math inline">\(alive\_pre_i = 0\)</span>.</p></li>
-<li><p><span class="math inline">\(\beta_1\)</span> is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. <span class="math inline">\(\beta_0\)</span> + <span class="math inline">\(\beta_1\)</span>). When the two are added together, you get the average number of days lived after the election for men, who on the day of election, have been alive the average number of days for all candidates.</p></li>
+<li><p><span class="math inline">\(\beta_1\)</span> is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. <span class="math inline">\(\beta_0 + \beta_1\)</span>). When the two are added together, you get the average number of days lived after the election for men, who on the day of election, have been alive the average number of days for all candidates.</p></li>
 <li><p><span class="math inline">\(\beta_2\)</span> is, for the entire population, the average difference in <span class="math inline">\(alive\_post_i\)</span> between two individuals, one of whom has an <span class="math inline">\(alive\_pre_i\)</span> value of 1 greater than the other.</p></li>
 </ul>
 <p>Now that we understand our model, let’s translate the following model into code.</p>
@@ -660,7 +660,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb959-6"><a href="n-parameters.html#cb959-6"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> female_days<span class="op">:</span>male_days, </span>
 <span id="cb959-7"><a href="n-parameters.html#cb959-7"></a>               <span class="dt">names_to =</span> <span class="st">"parameters"</span>,</span>
 <span id="cb959-8"><a href="n-parameters.html#cb959-8"></a>               <span class="dt">values_to =</span> <span class="st">"days"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb959-9"><a href="n-parameters.html#cb959-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">color =</span> parameters)) <span class="op">+</span></span>
+<span id="cb959-9"><a href="n-parameters.html#cb959-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">fill =</span> parameters)) <span class="op">+</span></span>
 <span id="cb959-10"><a href="n-parameters.html#cb959-10"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
 <span id="cb959-11"><a href="n-parameters.html#cb959-11"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
 <span id="cb959-12"><a href="n-parameters.html#cb959-12"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
@@ -700,14 +700,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">9.3.4</span> alive_pre, sex and alive_pre*sex</h3>
 <p>Let’s create another model. This time, however, the numeric outcome variable of alive_post as a function of the two explanatory variables we used above, <code>alive_pre</code> and <code>sex</code>, and of their interaction.</p>
 <p>Math:</p>
-<p><span class="math display">\[ alive\_pre_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \\ \beta_3 male_i *  alive\_pre_i + \epsilon_i\]</span>
+<p><span class="math display">\[ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \\ \beta_3 male_i *  alive\_pre_i + \epsilon_i\]</span>
 <!-- DK: Need to make these interpretations clearer and more consistent across the examples. --></p>
 <ul>
 <li><p>Our outcome variable is still <span class="math inline">\(alive\_post_i\)</span>. We want to know how many days a candidate will live after an election.</p></li>
 <li><p><span class="math inline">\(male_i\)</span> is still one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this will be 1. When we are making this prediction for female candidate, this will be 0. <span class="math inline">\(alive\_pre_i\)</span> is still our other explanatory variable, representing the number of days a candidate has lived before the election, relative to the average value for all candidates.</p></li>
-<li><p><span class="math inline">\(\beta_0\)</span> is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. Note that this is different than in our previous example where it was the average of all candidates. <span class="math inline">\(\beta_0\)</span> is also the intercept of the equation.</p></li>
-<li><p><span class="math inline">\(\beta_2\)</span> is the coefficient of <span class="math inline">\(alive\_pre_i\)</span>. It it just the slope for women. In our last example, <span class="math inline">\(\beta_2\)</span> was the slope for the whole population. Now we are getting more specific.</p></li>
-<li><p><span class="math inline">\(\beta_3\)</span> is difficult to interpret. However, when it is added to <span class="math inline">\(\beta_2\)</span>, the result in the slope for men.</p></li>
+<li><p><span class="math inline">\(\beta_0\)</span> is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. In a sense, this is the same meaning as in the previous model, without an interaction term. But, always remember that the meaning of a parameter is conditional on the model in which it is embedded. Even if a parameter is called <span class="math inline">\(\beta_0\)</span> in two different regressions does necessitate that it means the same thing in both regressions. Parameter names are arbitrary, or at least simply a matter of convention.</p></li>
+<li><p><span class="math inline">\(\beta_1\)</span> does not have a simple interpretation as a stand-alone parameter. It is a measure of how different women are from men. However, <span class="math inline">\(\beta_0 + \beta_1\)</span> has a straightforward meaning exactly analogous to the meaning of <span class="math inline">\(\beta_0\)</span>. The sum is the average number of days lived after the election for <em>men</em>, who on the day of election, have been alive the average number of days of all candidates.</p></li>
+<li><p><span class="math inline">\(\beta_2\)</span> is the coefficient of <span class="math inline">\(alive\_pre_i\)</span>. It it just the slope for women. It is the average difference in <span class="math inline">\(alive\_post_i\)</span> between two women, one of whom has an <span class="math inline">\(alive\_pre_i\)</span> value of 1 greater than the other. In our last example, <span class="math inline">\(\beta_2\)</span> was the slope for the whole population. Now we are different slopes for different genders.</p></li>
+<li><p><span class="math inline">\(\beta_3\)</span> alone is difficult to interpret. However, when it is added to <span class="math inline">\(\beta_2\)</span>, the result in the slope for men.</p></li>
 </ul>
 <p>Code:</p>
 <div class="sourceCode" id="cb961"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb961-1"><a href="n-parameters.html#cb961-1"></a>fit_gov_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">stan_glm</span>(<span class="dt">data =</span> ch9_gov,</span>
@@ -736,7 +737,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb964-6"><a href="n-parameters.html#cb964-6"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> female_days<span class="op">:</span>male_days, </span>
 <span id="cb964-7"><a href="n-parameters.html#cb964-7"></a>               <span class="dt">names_to =</span> <span class="st">"parameters"</span>,</span>
 <span id="cb964-8"><a href="n-parameters.html#cb964-8"></a>               <span class="dt">values_to =</span> <span class="st">"days"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb964-9"><a href="n-parameters.html#cb964-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">color =</span> parameters)) <span class="op">+</span></span>
+<span id="cb964-9"><a href="n-parameters.html#cb964-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">fill =</span> parameters)) <span class="op">+</span></span>
 <span id="cb964-10"><a href="n-parameters.html#cb964-10"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
 <span id="cb964-11"><a href="n-parameters.html#cb964-11"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
 <span id="cb964-12"><a href="n-parameters.html#cb964-12"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
@@ -760,7 +761,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb965-6"><a href="n-parameters.html#cb965-6"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> slope_women<span class="op">:</span>slope_men, </span>
 <span id="cb965-7"><a href="n-parameters.html#cb965-7"></a>               <span class="dt">names_to =</span> <span class="st">"parameters"</span>,</span>
 <span id="cb965-8"><a href="n-parameters.html#cb965-8"></a>               <span class="dt">values_to =</span> <span class="st">"slope"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb965-9"><a href="n-parameters.html#cb965-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(slope, <span class="dt">color =</span> parameters)) <span class="op">+</span></span>
+<span id="cb965-9"><a href="n-parameters.html#cb965-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(slope, <span class="dt">fill =</span> parameters)) <span class="op">+</span></span>
 <span id="cb965-10"><a href="n-parameters.html#cb965-10"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
 <span id="cb965-11"><a href="n-parameters.html#cb965-11"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
 <span id="cb965-12"><a href="n-parameters.html#cb965-12"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
@@ -867,7 +868,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb969-6"><a href="n-parameters.html#cb969-6"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> Washington_females<span class="op">:</span>SD_females, </span>
 <span id="cb969-7"><a href="n-parameters.html#cb969-7"></a>               <span class="dt">names_to =</span> <span class="st">"parameters"</span>,</span>
 <span id="cb969-8"><a href="n-parameters.html#cb969-8"></a>               <span class="dt">values_to =</span> <span class="st">"days"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb969-9"><a href="n-parameters.html#cb969-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">color =</span> parameters)) <span class="op">+</span></span>
+<span id="cb969-9"><a href="n-parameters.html#cb969-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(days, <span class="dt">fill =</span> parameters)) <span class="op">+</span></span>
 <span id="cb969-10"><a href="n-parameters.html#cb969-10"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="kw">after_stat</span>(count<span class="op">/</span><span class="kw">sum</span>(count))),</span>
 <span id="cb969-11"><a href="n-parameters.html#cb969-11"></a>                   <span class="dt">alpha =</span> <span class="fl">0.5</span>, </span>
 <span id="cb969-12"><a href="n-parameters.html#cb969-12"></a>                   <span class="dt">bins =</span> <span class="dv">100</span>, </span>
@@ -1782,6 +1783,8 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <!-- cces looks perfect for this project. There are 400,000 rows, so it seems like you ought to have plenty of data for anything you want, but once you realize there are 51 states and 10 years, things get sparse fast. We only have 15 observations, for example, for Wyoming in 2007. Once you start subsetting by race and education, you have no choice but to start borrowing strength.  -->
 <!-- So, just what will we use? rstanarm(). If so (and if we have not introduced it earlier), we can begin with seeing how it is similar to lm() and then expand. This means that, in one paramter chapter, we should be doing lm( ~ 1). In two parameter, lm( ~ treatment) --- if treatment is zero one --- or, perhaps better, lm( ~ -1 + treatment) if treatment is a factor/character with two levels. We might also have introduced  -->
 
+<!-- DK: Use argument names first time that you use that function. -->
+<!-- DK: Shouldn't the last step be to run our final model on ames_test? -->
 <!-- DK: Explain control_resample().  -->
 <!-- DK: Can we make a simple pipe for tidymodels which we can teach students to do. First, split the data. Second, create the folds. Third, choose the model. Fourth, make the recipe. Fifth, make the workflow. Sixth, apply the workflow to the folds.  -->
 <!-- DK: metric sets seems like overkill. Defaults values are fine, I think. But I need to explain them! -->
@@ -1798,7 +1801,7 @@ What problems do we face? All the things that make modeling difficult. Why is th
 <a href="model-choice.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-11-02
+2020-11-03
 </p>
 </div>
 </div>
