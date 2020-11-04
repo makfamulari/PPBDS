@@ -9,7 +9,9 @@ output_yaml:
 library(tidyverse)
 ```
 
-<!-- Get rid of cardinal virtues. Too early for them.  -->
+<!-- Clean up Cardinal Virtues. -->
+
+<!-- Cut SUTVA as too advanced. Or, replace with a sentence. -->
 
 <!-- Provide a discussion of predicting an individual result. Contrast with predicting the average of lots of people. Set stage for posterior_pred/predict to come later. -->
 
@@ -468,7 +470,7 @@ tibble(subject = c("1", "2", "3", "4", "5"),
   tab_spanner(label = "$$\\text{Estimands}$$", vars(ydiff, yperc))
 ```
 
-An ideal Preceptor Table has no missing data, whereas an actual Preceptor Table has question marks representing missing data. See this lecture from Gov 51 for a thorough discussion.
+An ideal Preceptor Table has no missing data, whereas an actual Preceptor Table has question marks representing missing data. See this lecture for a thorough discussion.
 
 ```{r, echo=FALSE, fig.margin = TRUE}
 knitr::include_app("https://www.youtube.com/embed/gyRZSzCtU_o")
@@ -1464,6 +1466,8 @@ We should always be aware of the "realism" of the model. When we look to extrapo
 
 ### Correlation with Potential Outcomes
 
+<!-- DK: Replace with a shorter statement that causal is only easy to determine with random assignment. Othwerwise, you can't be sure. Second semester course for those interested in learning those techniques. -->
+
 When considering the relationship between a treatment and an outcome, one of the most important assumptions is a lack of correlation between treatment assignment and the potential outcomes. Consider a version of the train experiment. Assume that, if a Republican is not on the platform with Spanish-speakers, they will have an attitude value of X. If they were on a platform where they could hear Spanish, their attitude would have been X + 2. A Democrat would have an attitude X regardless of whether or not they are on the platform with Spanish-speakers. In other words, the causal effect of being in the treatment group is +2 for Republicans, and 0 for Democrats. If we could run an experiment with random assignment, we would discover that the average causal effect is somewhere between 0 and 2, depending on the relative proportion of the Republicans and Democrats.
 
 `r margin_note("Let's say here attitude X is 9.")`
@@ -1525,21 +1529,6 @@ tibble(subject = c("R", "R", "D", "R", "D"),
 ```
 
 Keep in mind that the problem arises when there is a correlation between treatment assignment and *potential* outcome, not simply a correlation between treatment assignment and outcome. In this case, the correlation between treatment assignment and outcome is zero! Everyone has the same salary. Just looking at the outcomes we observe is not enough. We must make assumptions about the outcomes we don't observe, about what would have happened.
-
-### Estimand Validity 
-
-`r margin_note("Think about how Wisdom is relevant throughout this section!")`
-Recall the governor's experiment where we wanted to understand the causal effect of being elected governor on longevity. We so far have discussed that we only care about Americans over 30, because for people younger than that it is impossible to be elected governor, so they only have one potential outcome column. We have also talked about how we cannot randomize the experiment because being elected governor is not a random process. As is often the case in the real world, this experiment has even more complexities we should consider. 
-
-As we decided earlier, it is best to use data from close elections to estimate the causal effect of being elected governor on life length. Now we should think about the relevance of that estimand (average causal effect). Say we find that being elected governor increases life length by 5 years. We have already narrowed down the relevant population we might want to generalize to as Americans over 30. 
-
-Does it then make sense to say that if Preceptor was elected governor he would live for 5 more years? Maybe, but is there any real chance of Preceptor being elected governor? Not really! (Because he's not running, not because he wouldn't have the vote of his Gov 50 students). 
-
-With that in mind, what is the estimand we are truly interested in? We really only care about the causal effect on people elected governor. This estimand is called the causal effect on the treated. 
-
-This brings up a crucial point of the importance of choosing appropriate estimands. This is a relevant concept in real world experiments, like testing the effectiveness of a certain drug. For example, two estimands someone might be interested are the effectiveness of the drug as actually taken (de facto) and the effectiveness of the drug if taken as directed (de jure).^[Mallinckrodt et al. 2017] Choices in estimand could impact big decisions like if a drug is approved or not. 
-
-Choosing a relevant estimand is another example of when Wisdom is very necessary in data science. Although in this chapter we have discussed lots of concepts at the surface level, it is important to keep in mind how these same questions and assumptions can have serious implications in the real world.
 
 
 
