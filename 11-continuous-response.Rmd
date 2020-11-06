@@ -35,28 +35,26 @@ output_yaml:
 
 <!-- In loess section, grab a copy of this xkcd and use it: https://xkcd.com/2048/ -->
 
-In the last two chapters, we covered regressions and common pitfalls. This chapter will be all about applying these concepts using the `tidymodels` framework.
+Chapter \@ref(model-choice) showed us the *tidymodels* framework for model building and testing. In this chapter, we will use it to explore models in which the outcome variable is *continuous*. In Chapter \@ref(discrete-response), we learn about outcome variables which are *discrete*, meaning that they are members of distinct categories like TRUE/FALSE or yes/no. 
 
-The dataset we will be using is `nes` from the `PPBDS.data` package. `nes` contains data from the American National Election Survey, conducted every presidential election cycle. Along with demographic details, such as race, gender, and age, the survey also contains respondents' ideological identification. Because `ideology` is measured on a scale from 1 to 7, we can treat it as our continuous outcome variable.
+We use `nes` from the `PPBDS.data` package. `nes` contains data from the American National Election Survey, conducted every presidential election cycle. Along with demographic details, such as race, gender, and age, the survey also contains respondents' ideological identification. Because `ideology` is measured on a scale from 1 to 7, we can treat it as our continuous outcome variable.
 
-Wouldn't it be interesting to predict `ideology` based off of other variables? This question has wide-reaching consequences for political polling and election outcomes. Throughout this chapter, we seek to answer this question: Which factors influences one's ideology, and how so?
+Throughout this chapter, we seek to answer this question: Which variables are associated with one's ideology, and how so?
 
 ## Exploratory Data Analysis
 
-Load the libraries needed for this chapter. You might notice that ***tidymodels*** and ***rsample*** are new. The ***tidymodels*** framework makes it easy to use functions from various different packages in constructing, fitting, and testing models. Similarly, the ***rsample*** package allows for machine learning by splitting the data into training and testing sets.
+Load the libraries needed for this chapter. The ***tidymodels*** framework makes it easy to use functions from various different packages in constructing, fitting, and testing models. 
 
 ```{r message=FALSE}
 library(PPBDS.data)
 library(skimr)
 library(tidyverse)
 library(tidymodels)
-library(rsample)
 library(broom.mixed)
 library(rstanarm)
-library(gt)
 ```
 
-Now that we have loaded ***PPBDS.data***, let's `glimpse()` the dataset.
+Now that we have loaded **PPBDS.data**, let's `glimpse()` the dataset.
 
 ```{r}
 glimpse(nes)
