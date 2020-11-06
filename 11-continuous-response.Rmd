@@ -138,6 +138,7 @@ It is important to note that **there are an infinite number of comparisons you c
 
 For this chapter, we will seek to answer the following question: How does age affect ideology for residents of the Northeast vs. the South of the U.S.?
 
+<!-- BG: I really like how the question comes write before the data splitting. This  may be useful to include for ch. 10? -->
 ### Justice
 
 ```{r echo=FALSE, fig.margin=TRUE}
@@ -243,6 +244,8 @@ lm_fit <- fit(lm_model, full_form, ch11_training)
 
 Note that we can use `tidy()`, just like we did in previous chapters, to take a look at the results:
 
+<!-- BG: I could not find what chapter this was last used in. Are we now using this/ should be explain more here? -->
+
 ```{r message=FALSE}
 lm_fit %>%
   tidy(conf.int = TRUE) %>%
@@ -277,6 +280,8 @@ We usually try to select a small piece of the dataset so that we have as much da
 Remember, we cannot touch the testing set! One way we can check whether the model we created works is to use cross-validation, which avoids the problem of overtraining by splitting the data into smaller sections. We'll show you how to do using the ***rsample*** package.
 
 The function `vfold_cv()` splits your training set into `v`, a specified number of smaller sections. The most common values for `v` are 5 and 10. To keep things simple, we will be using `v = 5` to keep the individual sections large enough to accurately train the models. The first four folds will be used to train the model, and the last fold is always used to assess the accuracy of the model.
+
+<!-- BG: vfold_cv() was used in the last chapter, but no explanation was given. I think we should put the explanation there because it is where the function is first seen. -->
 
 Below, we will create a new object called `ch11_folds` that contains equally sized sections of `ch11_training`.
 
@@ -512,6 +517,8 @@ Let's dive into the world of machine learning. Neural networks are useful for mi
 
 Let's create the neural network engine.
 
+<!-- BG: maybe say someting about what mlp() does here? -->
+
 ```{r }
 nnet_model <- mlp(hidden_units = 5) %>%
   set_mode("regression") %>%
@@ -663,4 +670,6 @@ nnet_fit %>%
   geom_point()
 ```
 
+
+<!-- BG: Will there be a conclusion here or is "Wrap-Up" serving that role? -->
 
