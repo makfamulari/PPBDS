@@ -170,7 +170,7 @@ The other portion of the observations are placed into the _test set_. This is he
 Suppose we allocate 80% of the data to the training set and the remaining 20% for testing.  The most common method is to use simple random sampling. The `intial_split()` function from the **rsample** package performs this split. It takes the data frame as an argument as well as the proportion to be placed into training. We use `set.seed()` so that the results can be reproduced later. Create a data split which we will use throughout this chapter.
 
 ```{r}
-set.seed(123)
+set.seed(10)
 
 ames_split <- initial_split(ames, prob = 0.80)
 ames_split
@@ -354,7 +354,7 @@ library(tidymodels)
 data(ames)
 ames <- mutate(ames, Sale_Price = log10(Sale_Price))
 
-set.seed(123)
+set.seed(10)
 ames_split <- initial_split(ames, prob = 0.80)
 ames_train <- training(ames_split)
 ames_test  <- testing(ames_split)
@@ -557,7 +557,7 @@ data(ames)
 
 ames <- mutate(ames, Sale_Price = log10(Sale_Price))
 
-set.seed(123)
+set.seed(10)
 ames_split <- initial_split(ames, prob = 0.80)
 ames_train <- training(ames_split)
 ames_test  <-  testing(ames_split)
@@ -907,14 +907,16 @@ Practical significance is subjective; two people can have very different ideas o
 
 <!-- DK: Outline my philosophy: Transparency and reproducibility. -->
 
-## Conclusion
+## Summary
 
-The **tidymodels** package provides the most popular and sophisticated tools for making models in R. This chapter has provided a whirlwind tour. Don't worry if you did not understand every detail! We will spend the last two chapters of the book practicing. Most model projects are structured in a very similar fashion. To review:
+The **tidymodels** package provides the most popular and sophisticated tools for making/testing models in R. This chapter has provided a whirlwind tour. Don't worry if you did not understand every detail! We will spend the last two chapters of the book practicing. Most model projects are structured in a very similar fashion. To review:
 
 First, split up the data into training and test. Then, create cross-validation data sets from the training data. Professionals use `set.seed()` in order to make their analysis reproducible. 
 
-```{r, eval=FALSE}
-set.seed(9)
+<!-- DK: Really annoying that I can't count on ames to have Sale_Price already logged. -->
+
+```{r}
+set.seed(10)
 ames_split <- initial_split(ames, prob = 0.80)
 ames_train <- training(ames_split)
 ames_test  <- testing(ames_split)
@@ -923,14 +925,14 @@ ames_folds <- vfold_cv(ames_train, v = 10)
 
 Second, start a model pipeline with `workflow()` and then add a model object. Note that we are no longer assigning the results of each step to a new object. There is no need for that since we don't really care about the interim steps.
 
-```{r, eval=FALSE}
+```{r}
 workflow() %>%
   add_model(linear_reg() %>% 
               set_engine("lm") %>% 
               set_mode("regression")) 
 ```
 
-Third, add a recipe and any associated `step_*` functions. (Note that we have simplified this slightly from the example above.)
+Third, add a recipe --- which should contain a formula and data --- and then any associated `step_*` functions. (Note that we have simplified this slightly from the example above.)
 
 ```{r, eval=FALSE}
 ...  %>% 
@@ -941,35 +943,10 @@ Third, add a recipe and any associated `step_*` functions. (Note that we have si
     step_dummy(all_nominal())
 ```
 
-Fourth, pipe this workflow object directly into `fit()`.
-
-```{r, eval=FALSE}
-... %>% 
-  fit(data = ames_train)
-```
-
-Fifth, check how well the model performs by using cross-validation.
-
-```{r, eval=FALSE}
-... %>% 
-  fit_resamples(resamples = ames_folds) %>% 
-  collect_metrics()
-```
-
-Let's put all those steps together in a single pipeline:
+Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters `wfl` so as to rememeber that it is a workflow object.
 
 ```{r}
-library(tidymodels)
-data(ames)
-ames <- mutate(ames, Sale_Price = log10(Sale_Price))
-
-set.seed(9)
-ames_split <- initial_split(ames, prob = 0.80)
-ames_train <- training(ames_split)
-ames_test  <- testing(ames_split)
-ames_folds <- vfold_cv(ames_train, v = 10)
-
-workflow() %>%
+my_wfl <- workflow() %>%
   add_model(linear_reg() %>% 
               set_engine("lm") %>% 
               set_mode("regression")) %>% 
@@ -977,11 +954,47 @@ workflow() %>%
                     data = ames_train)) %>%
     step_log(Gr_Liv_Area, base = 10) %>% 
     step_other(Neighborhood, threshold = 0.01) %>% 
-    step_dummy(all_nominal()) %>% 
-  fit(data = ames_train) %>% 
-  fit_resamples(resamples = ames_folds) %>% 
-  collect_metrics()
-
+    step_dummy(all_nominal()) 
 ```
 
-This pipe would form the heart of our analysis. We can try different model types and different formulas easily.  Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole. Then, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. How well our model does with data it has never seen before is a good hint as to how well it will work on new data tomorrow.
+Fifth, see how well the approach works under cross-validation.
+
+```{r}
+my_wfl %>% 
+  fit_resamples(resamples = ames_folds) %>% 
+  collect_metrics()
+```
+
+This is the most important tool for deciding which model we should choose.
+
+This workflow would form the heart of our analysis. We can try different model types and different formulas easily.  Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole. 
+
+```{r}
+my_wfl %>% 
+  fit(data = ames_train) %>% 
+  predict(new_data = ames_train) %>% 
+  bind_cols(ames_train %>% select(Sale_Price))
+```
+
+This examination can also be a part of the process of creating a good workflow. Either way, we certainly want to be sure that, for our final model, the predictions on the training data look reasonable.
+
+Sixth,  as a last step, we can check performance in the test data, which we have not used for any part of the exercise. Do the predictions seem sensible? Make sure to still fit the model with the training data.
+
+```{r}
+my_wfl %>% 
+  fit(data = ames_train) %>% 
+  predict(new_data = ames_test) %>% 
+  bind_cols(ames_test %>% select(Sale_Price))
+```
+
+How well our model does with data it has never seen before is a good guide as to how well it will work on new data tomorrow.
+
+```{r}
+my_wfl %>% 
+  fit(data = ames_train) %>% 
+  predict(new_data = ames_test) %>% 
+  bind_cols(ames_test %>% select(Sale_Price)) %>% 
+  metrics(truth = Sale_Price, estimate = `.pred`)
+```
+
+
