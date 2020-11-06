@@ -46,6 +46,8 @@ if(f.classList.contains('fa-plus-square')) {
 }
 </script>
 <script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
 <link href="libs/str_view-0.1.0/str_view.css" rel="stylesheet" />
 <script src="libs/str_view-binding-1.4.0/str_view.js"></script>
@@ -154,7 +156,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="toc"><a href="#workflows"> A model workflow</a></li>
 <li class="toc"><a href="#performance"> Judging model effectiveness</a></li>
 <li class="toc"><a href="#compare"> Comparing models with resampling</a></li>
-<li class="toc"><a href="#conclusion"> Conclusion</a></li>
+<li class="toc"><a href="#conclusion-6"> Conclusion</a></li>
 </ul>
 <a href="continuous-response.html"><span class="toc-section-number">11</span> Continuous Response</a>
 <a href="discrete-response.html"><span class="toc-section-number">12</span> Discrete Response</a>
@@ -204,7 +206,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1014-6"><a href="model-choice.html#cb1014-6"></a>       <span class="dt">subtitle =</span> <span class="st">"Skewed distribution suggests need for a log transformation"</span>,</span>
 <span id="cb1014-7"><a href="model-choice.html#cb1014-7"></a>       <span class="dt">x =</span> <span class="st">"Sales Price"</span>,</span>
 <span id="cb1014-8"><a href="model-choice.html#cb1014-8"></a>       <span class="dt">y =</span> <span class="st">"Number"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-807-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-801-1.png" width="672"></p>
 <p>The data are right-skewed; there are more inexpensive houses than expensive ones. The median sale price was $160,000 and the most expensive house was $755,000. When modeling this outcome, a strong argument can be made that the price should be log-transformed. The advantages of doing this are that no houses would be predicted with negative sale prices and that errors in predicting expensive houses will not have an undue influence on the model.</p>
 <!-- DK: Do we need to discuss logs, either here or earlier in the book? -->
 <div class="sourceCode" id="cb1015"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1015-1"><a href="model-choice.html#cb1015-1"></a><span class="kw">ggplot</span>(ames, <span class="kw">aes</span>(<span class="dt">x =</span> Sale_Price)) <span class="op">+</span><span class="st"> </span></span>
@@ -215,7 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1015-6"><a href="model-choice.html#cb1015-6"></a>       <span class="dt">subtitle =</span> <span class="st">"Using logs makes for a more sensible distribution"</span>,</span>
 <span id="cb1015-7"><a href="model-choice.html#cb1015-7"></a>       <span class="dt">x =</span> <span class="st">"Sales Price"</span>,</span>
 <span id="cb1015-8"><a href="model-choice.html#cb1015-8"></a>       <span class="dt">y =</span> <span class="st">"Number"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-808-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-802-1.png" width="672"></p>
 <p>While not perfect, this will probably result in better models than using the untransformed data. <em>From this point on</em>, the outcome column is pre-logged in the <code>ames</code> data frame:</p>
 <!-- DK: Should we just define this as log in the original data? Would be one less thing for students to deal with. -->
 <div class="sourceCode" id="cb1016"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1016-1"><a href="model-choice.html#cb1016-1"></a>ames &lt;-<span class="st"> </span>ames <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -341,7 +343,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb1024"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1024-1"><a href="model-choice.html#cb1024-1"></a><span class="kw">ggplot</span>(ames_train, <span class="kw">aes</span>(<span class="dt">y =</span> Neighborhood)) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1024-2"><a href="model-choice.html#cb1024-2"></a><span class="st">  </span><span class="kw">geom_bar</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1024-3"><a href="model-choice.html#cb1024-3"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="ot">NULL</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-820-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-814-1.png" width="672"></p>
 <p>Here there are two neighborhoods that have less than five properties in the training data; in this case, no houses at all in the Landmark neighborhood were included in the training set. For some models, it may be problematic to have dummy variables with a single non-zero entry in the column. At a minimum, it is highly improbable that these features would be important to a model. If we add <code>step_other(Neighborhood, threshold = 0.01)</code> to our recipe, the bottom 1% of the neighborhoods will be lumped into a new level called “other”. In this training set, this will catch 8 neighborhoods.</p>
 <p>For the Ames data, we can amend the recipe to use:</p>
 <div class="sourceCode" id="cb1025"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1025-1"><a href="model-choice.html#cb1025-1"></a>ames_rec &lt;-<span class="st"> </span></span>
@@ -376,7 +378,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1027-5"><a href="model-choice.html#cb1027-5"></a><span class="st">  </span><span class="kw">scale_x_log10</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1027-6"><a href="model-choice.html#cb1027-6"></a><span class="st">  </span><span class="kw">scale_y_log10</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1027-7"><a href="model-choice.html#cb1027-7"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"General Living Area"</span>, <span class="dt">y =</span> <span class="st">"Sale Price (USD)"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-823-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-817-1.png" width="672"></p>
 <p>How are interactions specified? Recipes are explicit and sequential. With the current recipe, <code>step_dummy()</code> has already created dummy variables. How would we combine these for an interaction? The additional step would look like <code>step_interact(~ interaction terms)</code> where the terms on the right-hand side of the tilde are the interactions. These can include selectors, so it would be appropriate to use:</p>
 <div class="sourceCode" id="cb1028"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1028-1"><a href="model-choice.html#cb1028-1"></a>ames_rec &lt;-<span class="st"> </span></span>
 <span id="cb1028-2"><a href="model-choice.html#cb1028-2"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type,</span>
@@ -642,7 +644,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1055-4"><a href="model-choice.html#cb1055-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">"Predicted Sale Price (log10)"</span>, </span>
 <span id="cb1055-5"><a href="model-choice.html#cb1055-5"></a>       <span class="dt">x =</span> <span class="st">"Sale Price (log10)"</span>) <span class="op">+</span></span>
 <span id="cb1055-6"><a href="model-choice.html#cb1055-6"></a><span class="st">  </span><span class="kw">coord_obs_pred</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-836-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-830-1.png" width="672"></p>
 <!-- DK: These functions might go in a pre-amble section for the tutorial. -->
 <p><code>geom_abine()</code> draws the line at the 45 degree line. <code>coord_obs_pred()</code> is a function from <strong>tidymodels</strong> which provides useful defaults for graphical comparisons of actual values with predicted values.</p>
 <p>There is one property that is substantially over-predicted.</p>
@@ -810,7 +812,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1070-4"><a href="model-choice.html#cb1070-4"></a><span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">col =</span> <span class="st">"red"</span>) <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1070-5"><a href="model-choice.html#cb1070-5"></a><span class="st">  </span><span class="kw">coord_obs_pred</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1070-6"><a href="model-choice.html#cb1070-6"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">"Predicted"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-843-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-837-1.png" width="672"></p>
 <p>There was one house in the training set with a low observed sale price that is significantly overpredicted by the model. Which house was that?</p>
 <div class="sourceCode" id="cb1071"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1071-1"><a href="model-choice.html#cb1071-1"></a>over_predicted &lt;-<span class="st"> </span></span>
 <span id="cb1071-2"><a href="model-choice.html#cb1071-2"></a><span class="st">  </span>assess_res <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -830,55 +832,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##         &lt;int&gt; &lt;fct&gt;             &lt;int&gt;         &lt;int&gt;     &lt;int&gt;
 ## 1         832 Old_Town           1923             2         1</code></pre>
 <p>These results can help us investigate why the prediction was poor for this house.</p>
-<p>Code:</p>
-<div class="sourceCode" id="cb1075"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1075-1"><a href="model-choice.html#cb1075-1"></a><span class="kw">library</span>(tidymodels)</span>
-<span id="cb1075-2"><a href="model-choice.html#cb1075-2"></a><span class="kw">data</span>(ames)</span>
-<span id="cb1075-3"><a href="model-choice.html#cb1075-3"></a>ames &lt;-<span class="st"> </span><span class="kw">mutate</span>(ames, <span class="dt">Sale_Price =</span> <span class="kw">log10</span>(Sale_Price))</span>
-<span id="cb1075-4"><a href="model-choice.html#cb1075-4"></a></span>
-<span id="cb1075-5"><a href="model-choice.html#cb1075-5"></a><span class="kw">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb1075-6"><a href="model-choice.html#cb1075-6"></a>ames_split &lt;-<span class="st"> </span><span class="kw">initial_split</span>(ames, <span class="dt">prob =</span> <span class="fl">0.80</span>)</span>
-<span id="cb1075-7"><a href="model-choice.html#cb1075-7"></a>ames_train &lt;-<span class="st"> </span><span class="kw">training</span>(ames_split)</span>
-<span id="cb1075-8"><a href="model-choice.html#cb1075-8"></a>ames_test  &lt;-<span class="st">  </span><span class="kw">testing</span>(ames_split)</span>
-<span id="cb1075-9"><a href="model-choice.html#cb1075-9"></a></span>
-<span id="cb1075-10"><a href="model-choice.html#cb1075-10"></a>ames_rec &lt;-<span class="st"> </span></span>
-<span id="cb1075-11"><a href="model-choice.html#cb1075-11"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1075-12"><a href="model-choice.html#cb1075-12"></a><span class="st">           </span>Latitude <span class="op">+</span><span class="st"> </span>Longitude, <span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span></span>
-<span id="cb1075-13"><a href="model-choice.html#cb1075-13"></a><span class="st">  </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-14"><a href="model-choice.html#cb1075-14"></a><span class="st">  </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-15"><a href="model-choice.html#cb1075-15"></a><span class="st">  </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-16"><a href="model-choice.html#cb1075-16"></a><span class="st">  </span><span class="kw">step_interact</span>( <span class="op">~</span><span class="st"> </span>Gr_Liv_Area<span class="op">:</span><span class="kw">starts_with</span>(<span class="st">"Bldg_Type_"</span>))</span>
-<span id="cb1075-17"><a href="model-choice.html#cb1075-17"></a></span>
-<span id="cb1075-18"><a href="model-choice.html#cb1075-18"></a>lm_model &lt;-<span class="st"> </span><span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-19"><a href="model-choice.html#cb1075-19"></a><span class="st">  </span><span class="kw">set_engine</span>(<span class="st">"lm"</span>)</span>
-<span id="cb1075-20"><a href="model-choice.html#cb1075-20"></a></span>
-<span id="cb1075-21"><a href="model-choice.html#cb1075-21"></a>lm_wflow &lt;-<span class="st"> </span></span>
-<span id="cb1075-22"><a href="model-choice.html#cb1075-22"></a><span class="st">  </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-23"><a href="model-choice.html#cb1075-23"></a><span class="st">  </span><span class="kw">add_model</span>(lm_model) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-24"><a href="model-choice.html#cb1075-24"></a><span class="st">  </span><span class="kw">add_recipe</span>(ames_rec)</span>
-<span id="cb1075-25"><a href="model-choice.html#cb1075-25"></a></span>
-<span id="cb1075-26"><a href="model-choice.html#cb1075-26"></a>lm_fit &lt;-<span class="st"> </span><span class="kw">fit</span>(lm_wflow, ames_train)</span>
-<span id="cb1075-27"><a href="model-choice.html#cb1075-27"></a></span>
-<span id="cb1075-28"><a href="model-choice.html#cb1075-28"></a>rf_model &lt;-<span class="st"> </span></span>
-<span id="cb1075-29"><a href="model-choice.html#cb1075-29"></a><span class="st">  </span><span class="kw">rand_forest</span>(<span class="dt">trees =</span> <span class="dv">1000</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-30"><a href="model-choice.html#cb1075-30"></a><span class="st">  </span><span class="kw">set_engine</span>(<span class="st">"ranger"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-31"><a href="model-choice.html#cb1075-31"></a><span class="st">  </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)</span>
-<span id="cb1075-32"><a href="model-choice.html#cb1075-32"></a></span>
-<span id="cb1075-33"><a href="model-choice.html#cb1075-33"></a>rf_wflow &lt;-<span class="st"> </span></span>
-<span id="cb1075-34"><a href="model-choice.html#cb1075-34"></a><span class="st">  </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-35"><a href="model-choice.html#cb1075-35"></a><span class="st">  </span><span class="kw">add_recipe</span>(<span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1075-36"><a href="model-choice.html#cb1075-36"></a><span class="st">                                 </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type,</span>
-<span id="cb1075-37"><a href="model-choice.html#cb1075-37"></a>                    <span class="dt">data =</span> ames_train)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-38"><a href="model-choice.html#cb1075-38"></a><span class="st">  </span><span class="kw">add_model</span>(rf_model) </span>
-<span id="cb1075-39"><a href="model-choice.html#cb1075-39"></a></span>
-<span id="cb1075-40"><a href="model-choice.html#cb1075-40"></a></span>
-<span id="cb1075-41"><a href="model-choice.html#cb1075-41"></a><span class="kw">set.seed</span>(<span class="dv">55</span>)</span>
-<span id="cb1075-42"><a href="model-choice.html#cb1075-42"></a>ames_folds &lt;-<span class="st"> </span><span class="kw">vfold_cv</span>(ames_train, <span class="dt">v =</span> <span class="dv">10</span>)</span>
-<span id="cb1075-43"><a href="model-choice.html#cb1075-43"></a></span>
-<span id="cb1075-44"><a href="model-choice.html#cb1075-44"></a></span>
-<span id="cb1075-45"><a href="model-choice.html#cb1075-45"></a><span class="kw">set.seed</span>(<span class="dv">130</span>)</span>
-<span id="cb1075-46"><a href="model-choice.html#cb1075-46"></a>rf_res &lt;-<span class="st"> </span>rf_wflow <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1075-47"><a href="model-choice.html#cb1075-47"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
-<span id="cb1075-48"><a href="model-choice.html#cb1075-48"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
 </div>
 </div>
 <div id="compare" class="section level2">
@@ -891,32 +844,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">10.6.1</span> Resampled performance statistics</h3>
 <p>In Section <a href="model-choice.html#resampling">10.5.2</a>, a random forest model for the Ames data was resampled with 10-fold cross-validation. These results were saved in the object <code>rf_res</code>.</p>
 <p>We’ll estimate two additional models with the same resamples. First, the previous linear regression model, using the preprocessing defined in the <code>ames_rec</code> recipe, is resampled:</p>
-<div class="sourceCode" id="cb1076"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1076-1"><a href="model-choice.html#cb1076-1"></a>lm_with_inter_res &lt;-</span>
-<span id="cb1076-2"><a href="model-choice.html#cb1076-2"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span></span>
-<span id="cb1076-3"><a href="model-choice.html#cb1076-3"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
-<span id="cb1076-4"><a href="model-choice.html#cb1076-4"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb1075"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1075-1"><a href="model-choice.html#cb1075-1"></a>lm_with_inter_res &lt;-</span>
+<span id="cb1075-2"><a href="model-choice.html#cb1075-2"></a><span class="st">  </span>lm_wflow <span class="op">%&gt;%</span></span>
+<span id="cb1075-3"><a href="model-choice.html#cb1075-3"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
+<span id="cb1075-4"><a href="model-choice.html#cb1075-4"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
 <p>Secondly, a less complex recipe without the interaction terms is evaluated to determine if the extra complexity is worth it. Once added to a workflow, it is resampled:</p>
-<div class="sourceCode" id="cb1077"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1077-1"><a href="model-choice.html#cb1077-1"></a>no_inter_rec &lt;-<span class="st"> </span></span>
-<span id="cb1077-2"><a href="model-choice.html#cb1077-2"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1077-3"><a href="model-choice.html#cb1077-3"></a><span class="st">           </span>Latitude <span class="op">+</span><span class="st"> </span>Longitude, <span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span></span>
-<span id="cb1077-4"><a href="model-choice.html#cb1077-4"></a><span class="st">  </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1077-5"><a href="model-choice.html#cb1077-5"></a><span class="st">  </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1077-6"><a href="model-choice.html#cb1077-6"></a><span class="st">  </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()) </span>
-<span id="cb1077-7"><a href="model-choice.html#cb1077-7"></a></span>
-<span id="cb1077-8"><a href="model-choice.html#cb1077-8"></a>lm_no_inter_res &lt;-<span class="st"> </span></span>
-<span id="cb1077-9"><a href="model-choice.html#cb1077-9"></a><span class="st">  </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1077-10"><a href="model-choice.html#cb1077-10"></a><span class="st">  </span><span class="kw">add_model</span>(lm_model) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1077-11"><a href="model-choice.html#cb1077-11"></a><span class="st">  </span><span class="kw">add_recipe</span>(no_inter_rec) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1077-12"><a href="model-choice.html#cb1077-12"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
-<span id="cb1077-13"><a href="model-choice.html#cb1077-13"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb1076"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1076-1"><a href="model-choice.html#cb1076-1"></a>no_inter_rec &lt;-<span class="st"> </span></span>
+<span id="cb1076-2"><a href="model-choice.html#cb1076-2"></a><span class="st">  </span><span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built <span class="op">+</span><span class="st"> </span>Bldg_Type <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1076-3"><a href="model-choice.html#cb1076-3"></a><span class="st">           </span>Latitude <span class="op">+</span><span class="st"> </span>Longitude, <span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span></span>
+<span id="cb1076-4"><a href="model-choice.html#cb1076-4"></a><span class="st">  </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1076-5"><a href="model-choice.html#cb1076-5"></a><span class="st">  </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1076-6"><a href="model-choice.html#cb1076-6"></a><span class="st">  </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()) </span>
+<span id="cb1076-7"><a href="model-choice.html#cb1076-7"></a></span>
+<span id="cb1076-8"><a href="model-choice.html#cb1076-8"></a>lm_no_inter_res &lt;-<span class="st"> </span></span>
+<span id="cb1076-9"><a href="model-choice.html#cb1076-9"></a><span class="st">  </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1076-10"><a href="model-choice.html#cb1076-10"></a><span class="st">  </span><span class="kw">add_model</span>(lm_model) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1076-11"><a href="model-choice.html#cb1076-11"></a><span class="st">  </span><span class="kw">add_recipe</span>(no_inter_rec) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1076-12"><a href="model-choice.html#cb1076-12"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds, </span>
+<span id="cb1076-13"><a href="model-choice.html#cb1076-13"></a>                <span class="dt">control =</span> <span class="kw">control_resamples</span>(<span class="dt">save_pred =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
 <p>The difference in performance appears relatively minor:</p>
-<div class="sourceCode" id="cb1078"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1078-1"><a href="model-choice.html#cb1078-1"></a><span class="kw">collect_metrics</span>(lm_no_inter_res)</span></code></pre></div>
+<div class="sourceCode" id="cb1077"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1077-1"><a href="model-choice.html#cb1077-1"></a><span class="kw">collect_metrics</span>(lm_no_inter_res)</span></code></pre></div>
 <pre><code>## # A tibble: 2 x 5
 ##   .metric .estimator   mean     n std_err
 ##   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
 ## 1 rmse    standard   0.0793    10 0.00278
 ## 2 rsq     standard   0.801     10 0.00913</code></pre>
-<div class="sourceCode" id="cb1080"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1080-1"><a href="model-choice.html#cb1080-1"></a><span class="kw">collect_metrics</span>(lm_with_inter_res)</span></code></pre></div>
+<div class="sourceCode" id="cb1079"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1079-1"><a href="model-choice.html#cb1079-1"></a><span class="kw">collect_metrics</span>(lm_with_inter_res)</span></code></pre></div>
 <pre><code>## # A tibble: 2 x 5
 ##   .metric .estimator   mean     n std_err
 ##   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
@@ -928,10 +881,64 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- DK: Outline my philosophy: Transparency and reproducibility. -->
 </div>
 </div>
-<div id="conclusion" class="section level2">
+<div id="conclusion-6" class="section level2">
 <h2>
 <span class="header-section-number">10.7</span> Conclusion</h2>
-<p>The <strong>tidymodels</strong> package provides the most popular and sophisticated tools for making models in R. This chapter has provided a whirlwind tour. Don’t worry if you did not understand every detail! We will spend the last two chapters of the book practicing.</p>
+<p>The <strong>tidymodels</strong> package provides the most popular and sophisticated tools for making models in R. This chapter has provided a whirlwind tour. Don’t worry if you did not understand every detail! We will spend the last two chapters of the book practicing. Most model projects are structured in a very similar fashion. To review:</p>
+<p>First, split up the data into training and test. Then, create cross-validation data sets from the training data. Professionals use <code>set.seed()</code> in order to make their analysis reproducible.</p>
+<div class="sourceCode" id="cb1081"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1081-1"><a href="model-choice.html#cb1081-1"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
+<span id="cb1081-2"><a href="model-choice.html#cb1081-2"></a>ames_split &lt;-<span class="st"> </span><span class="kw">initial_split</span>(ames, <span class="dt">prob =</span> <span class="fl">0.80</span>)</span>
+<span id="cb1081-3"><a href="model-choice.html#cb1081-3"></a>ames_train &lt;-<span class="st"> </span><span class="kw">training</span>(ames_split)</span>
+<span id="cb1081-4"><a href="model-choice.html#cb1081-4"></a>ames_test  &lt;-<span class="st"> </span><span class="kw">testing</span>(ames_split)</span>
+<span id="cb1081-5"><a href="model-choice.html#cb1081-5"></a>ames_folds &lt;-<span class="st"> </span><span class="kw">vfold_cv</span>(ames_train, <span class="dt">v =</span> <span class="dv">10</span>)</span></code></pre></div>
+<p>Second, start a model pipeline with <code>workflow()</code> and then add a model object. Note that we are no longer assigning the results of each step to a new object. There is no need for that since we don’t really care about the interim steps.</p>
+<div class="sourceCode" id="cb1082"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1082-1"><a href="model-choice.html#cb1082-1"></a><span class="kw">workflow</span>() <span class="op">%&gt;%</span></span>
+<span id="cb1082-2"><a href="model-choice.html#cb1082-2"></a><span class="st">  </span><span class="kw">add_model</span>(<span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1082-3"><a href="model-choice.html#cb1082-3"></a><span class="st">              </span><span class="kw">set_engine</span>(<span class="st">"lm"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1082-4"><a href="model-choice.html#cb1082-4"></a><span class="st">              </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)) </span></code></pre></div>
+<p>Third, add a recipe and any associated <code>step_*</code> functions. (Note that we have simplified this slightly from the example above.)</p>
+<div class="sourceCode" id="cb1083"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1083-1"><a href="model-choice.html#cb1083-1"></a>...  <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1083-2"><a href="model-choice.html#cb1083-2"></a><span class="st">  </span><span class="kw">add_recipe</span>(<span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built, </span>
+<span id="cb1083-3"><a href="model-choice.html#cb1083-3"></a>                    <span class="dt">data =</span> ames_train)) <span class="op">%&gt;%</span></span>
+<span id="cb1083-4"><a href="model-choice.html#cb1083-4"></a><span class="st">    </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1083-5"><a href="model-choice.html#cb1083-5"></a><span class="st">    </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1083-6"><a href="model-choice.html#cb1083-6"></a><span class="st">    </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>())</span></code></pre></div>
+<p>Fourth, pipe this workflow object directly into <code>fit()</code>.</p>
+<div class="sourceCode" id="cb1084"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1084-1"><a href="model-choice.html#cb1084-1"></a>... <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1084-2"><a href="model-choice.html#cb1084-2"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ames_train)</span></code></pre></div>
+<p>Fifth, check how well the model performs by using cross-validation.</p>
+<div class="sourceCode" id="cb1085"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1085-1"><a href="model-choice.html#cb1085-1"></a>... <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1085-2"><a href="model-choice.html#cb1085-2"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1085-3"><a href="model-choice.html#cb1085-3"></a><span class="st">  </span><span class="kw">collect_metrics</span>()</span></code></pre></div>
+<p>Let’s put all those steps together in a single pipeline:</p>
+<div class="sourceCode" id="cb1086"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1086-1"><a href="model-choice.html#cb1086-1"></a><span class="kw">library</span>(tidymodels)</span>
+<span id="cb1086-2"><a href="model-choice.html#cb1086-2"></a><span class="kw">data</span>(ames)</span>
+<span id="cb1086-3"><a href="model-choice.html#cb1086-3"></a>ames &lt;-<span class="st"> </span><span class="kw">mutate</span>(ames, <span class="dt">Sale_Price =</span> <span class="kw">log10</span>(Sale_Price))</span>
+<span id="cb1086-4"><a href="model-choice.html#cb1086-4"></a></span>
+<span id="cb1086-5"><a href="model-choice.html#cb1086-5"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
+<span id="cb1086-6"><a href="model-choice.html#cb1086-6"></a>ames_split &lt;-<span class="st"> </span><span class="kw">initial_split</span>(ames, <span class="dt">prob =</span> <span class="fl">0.80</span>)</span>
+<span id="cb1086-7"><a href="model-choice.html#cb1086-7"></a>ames_train &lt;-<span class="st"> </span><span class="kw">training</span>(ames_split)</span>
+<span id="cb1086-8"><a href="model-choice.html#cb1086-8"></a>ames_test  &lt;-<span class="st"> </span><span class="kw">testing</span>(ames_split)</span>
+<span id="cb1086-9"><a href="model-choice.html#cb1086-9"></a>ames_folds &lt;-<span class="st"> </span><span class="kw">vfold_cv</span>(ames_train, <span class="dt">v =</span> <span class="dv">10</span>)</span>
+<span id="cb1086-10"><a href="model-choice.html#cb1086-10"></a></span>
+<span id="cb1086-11"><a href="model-choice.html#cb1086-11"></a><span class="kw">workflow</span>() <span class="op">%&gt;%</span></span>
+<span id="cb1086-12"><a href="model-choice.html#cb1086-12"></a><span class="st">  </span><span class="kw">add_model</span>(<span class="kw">linear_reg</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1086-13"><a href="model-choice.html#cb1086-13"></a><span class="st">              </span><span class="kw">set_engine</span>(<span class="st">"lm"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1086-14"><a href="model-choice.html#cb1086-14"></a><span class="st">              </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1086-15"><a href="model-choice.html#cb1086-15"></a><span class="st">  </span><span class="kw">add_recipe</span>(<span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built, </span>
+<span id="cb1086-16"><a href="model-choice.html#cb1086-16"></a>                    <span class="dt">data =</span> ames_train)) <span class="op">%&gt;%</span></span>
+<span id="cb1086-17"><a href="model-choice.html#cb1086-17"></a><span class="st">    </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1086-18"><a href="model-choice.html#cb1086-18"></a><span class="st">    </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1086-19"><a href="model-choice.html#cb1086-19"></a><span class="st">    </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1086-20"><a href="model-choice.html#cb1086-20"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1086-21"><a href="model-choice.html#cb1086-21"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1086-22"><a href="model-choice.html#cb1086-22"></a><span class="st">  </span><span class="kw">collect_metrics</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   .metric .estimator   mean     n std_err
+##   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
+## 1 rmse    standard   0.0859    10 0.00338
+## 2 rsq     standard   0.769     10 0.0153</code></pre>
+<p>This pipe would form the heart of our analysis. We can try different model types and different formulas easily. Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole. Then, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. How well our model does with data it has never seen before is a good hint as to how well it will work on new data tomorrow.</p>
 
 </div>
 </div></body></html>
@@ -941,7 +948,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a href="continuous-response.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-11-03
+2020-11-05
 </p>
 </div>
 </div>
