@@ -5,35 +5,10 @@ output_yaml:
 
 # Continuous Response {#continuous-response}
 
+<!-- DK: We should focus here on creating model pipes (and so the same in chapters 10 and 12).  -->
 
-<!-- Overview: The main structure of the this chapter is three full scale linear modeling approaches to the same data set, where the response variable is continuous. (Maybe we have two data sets, and apply all three models to each one?) In each case, we use the tidymodels framework. I am not sure what the best dataset would be. I am not sure what the three approaches should be. Presumably lm() and stan_glm() would be included. Maybe gam() also. Or loess(). Or robust_lm(). Could be something fancier like svm(). Or neural network. -->
+<!-- DK: See a full pipe suggestion from chapter 10 comments. -->
 
-
-<!-- 0) Preamble. Plan out to chapter. Nothing more to learn. Just apply. Review themes.Rmd, and the three problems which we confronted in 9 and solved in 10. What specific questions are we going to answer? -->
-
-<!-- 1) EDA of nes. drop na. Talk about Wisdom at the end. It's own ### and with image in the side margin. OK if its only a paragraph or two.  -->
-
-
-<!-- 2) Preview the three models. Justice. Review the Preceptor. Discuss Predictive. Might it be Causal. Show some math.  Courage, which is just code. -->
-
-<!-- $$y_i = f(x_{i1}, x_{i2}, ..., \beta)$$ -->
-
-
-<!-- 2) lm. Use all all variables. Go through the process. Use CV to provide a measure of how well it does. Use new_data. And make some predictions. Not noticing that this is a bad model because of overrfitting. -->
-
-<!-- 3) stan_glm Do the same thing. Notice that CV measures are much better! Oh! Lesson: Be wary of overfitting. Maybe go back and re-estimate lm with fewer variables. Or not. -->
-
-<!-- 4) Neural network. https://www.tidymodels.org/learn/models/parsnip-nnet/ All the same things apply. How well in a CV. predictions with new data.  -->
-
-<!-- 5) How do we select among the models? Temperance -->
-
-<!-- 6) Answer the questions we started with. -->
-
-<!-- 2. Use a different model, like loess, to solve the exact same problem. Go through the same overview, but more quickly. Not everything will work. For example, there are no parameter estimates for loess, or at least none that are easily visible. -->
-
-<!-- 3. How do we decide? lm() or loess() or something? Incorporate (i.e., copy and paste) chapter 14 material. Don't do anything with tidymodel syntax. All that falls to chapter 11. But you are explaining every concept. -->
-
-<!-- In loess section, grab a copy of this xkcd and use it: https://xkcd.com/2048/ -->
 
 Chapter \@ref(model-choice) showed us the *tidymodels* framework for model building and testing. In this chapter, we will use it to explore models in which the outcome variable is *continuous*. In Chapter \@ref(discrete-response), we learn about outcome variables which are *discrete*, meaning that they are members of distinct categories like TRUE/FALSE or yes/no. 
 
@@ -62,15 +37,19 @@ glimpse(nes)
 
 Great! Before we dive in, let's identify the variables available to us in `nes`:
 
-* `year`: the year the study was conducted
-* `gender`: identifies respondents with values "Male" and "Female"
-* `race`: race/ethnicity respondent identification
-* `income`: 5 income groups: 1 as 0-16th percentile, 2 as 17-33rd, 3 as 34 to 67, 4 as 68 to 95, 5 as 96 to 100 
-* `age`: respondents' age ranges
-* `education`: 7 tier delineation of educational achievement
-* `pres_appr`: respondents' self-reported approval of the sitting president
-* `voted`: whether the respondent had voted in the presidential election
-* `ideology` a continuous variable with 1 corresponding to strongly Democrat and 7 corresponding to strongly Republican and 0 if NA.
+<!-- DK: Is voted in previous election or in this one? -->
+
+* `year`: the year the study was conducted.
+* `state`: abbreviation for state of residence.
+* `gender`: identifies respondents with values "Male" and "Female".
+* `race`: race/ethnicity respondent identification.
+* `income`: 5 income groups described with percentile range: 0-16, 17-33, 34 to 67, 68-95, and 96-100. 
+* `age`: ranges for respondents' age.
+* `education`: seven categories of educational achievement.
+* `pres_appr`: respondents' self-reported approval of the sitting president.
+* `voted`: whether the respondent had voted in the presidential election.
+* `ideology` a continuous variable with -3 corresponding to strongly Democrat and 3 corresponding to strongly Republican.
+* `region`: US region: Northeast, Midwest, West, and South. 
 
 If we were given a new person who was not surveyed, and the above variables, our goal is to predict their ideology correctly. 
 
@@ -113,7 +92,11 @@ We may not know someone's ideology right off of the bat outside of the responden
 
 Taking a look again at the variables in `nes_2016`, we might decide against including `pres_appr` and `voted` in our models. Why exclude variables, especially variables that may make your model even better? 
 
+<!-- DK: What should I do with ordered factors? Change them here? Change them in nes itself? If I leave them, will our various models be able to do something with them? -->
+
 From glimpsing `ch11`, we see that there are three data types: factors, characters, and integers. However, `income`, `age`, and `education` are ordered factors. This means that each factor level is considered additively. Ordered factors are dangerous because we do not know how they will interact with our regression models. Therefore, we will use `factor()` and `ordered = FALSE` to remove their level orders.
+
+<!-- DK: Make the data set cleanly, one time. Don't modify in place. Or maybe I should do some of these things with step_() functions in the recipe? -->
 
 ```{r}
 ch11 <- nes_2016 %>%
@@ -134,9 +117,12 @@ Now that we have a left-hand variable to estimate with reasonable predictors, le
 
 It is important to note that **there are an infinite number of comparisons you can make**. Because our model is predictive, we can only say something about the population if one variable is tweaked and all else is kept the same. For example, we could look at how education affects the self-reported ideology of Asian respondents compared to Black respondents, given that both groups of respondents are well-educated, female, middle-aged, and reside in the Northeast. Or, we could look at the interaction between gender and race and its affect on ideology for certain values of the other variables. There is no right answer as to what question is the best one to answer. Indeed, this is another important choice you will have to make as a data scientist.
 
+<!-- DK: Is this a good question?  -->
+
 For this chapter, we will seek to answer the following question: How does age affect ideology for residents of the Northeast vs. the South of the U.S.?
 
 <!-- BG: I really like how the question comes write before the data splitting. This  may be useful to include for ch. 10? -->
+
 ### Justice
 
 ```{r echo=FALSE, fig.margin=TRUE}
@@ -157,7 +143,7 @@ ch11_testing <- ch11_split %>%
 
 *We will not be touching the testing set.* The testing set can be thought of as the final test to analyze the fit of the model. Never will we use the testing set to train the model. After all, that is what the training set is for! And what exactly does training the model mean? Training is simply the process in which we take the components of the given data and create as accurate a predictive machine as possible.
 
-We have mentioned that the following models will be *predictive*, not *causal*. Recall that all we care about in a predictive model is forecasting some value $y_i$ given that we know $x_{i_1}, x_{i_2}, ... x_{i_n}$. The $y_i$ in our case is `ideology`. The $x_{i_1}, x_{i_2}, ... x_{i_n}$ in this case are certain known variables, such as `state`, `age`, and `income`, among others. $\beta$ stands for a vector input. As we will discuss in **Courage**, some of the inputs may not necessarily be linear and additive.
+We have mentioned that the following models will be *predictive*, not *causal*. Recall that all we care about in a predictive model is forecasting some value $y_i$ given that we know $x_{i_1}, x_{i_2}, ... x_{i_n}$. The $y_i$ in our case is `ideology`. The $x_{i_1}, x_{i_2}, ... x_{i_n}$ in this case are certain known variables, such as `state`, `age`, and `income`, among others. $\beta$ stands the list of unknown parameters which must be estimated. As we will discuss in **Courage**, some of the inputs may not necessarily be linear and additive.
 
 The following equation calculates the `ideology` of the *i*th respondent, $y_i$, as a function of certain linear and/or non-linear parameters. 
 
@@ -170,6 +156,8 @@ Keep in mind that our goal is to create the best possible model to predict one's
 Besides the testing set, new out-of-sample data could come from other surveys that collect demographic information, or from website traffic data. These data most likely will not contain information on whether the respondent approves of the president or whether they voted in the presidential election. In order for our model to be relevant to our question, we will assume that new data will *not* provide `pres_appr` and `voted`.  When defining our formula later on, we will keep this in mind.
 
 An example Preceptor Table that would answer our guiding question would look something like this.
+
+<!-- DK: Is this correct? Useful? -->
 
 ```{r echo=FALSE}
 tibble(Name = c("Alex", "Betty", "...", "Carl", "Diane"),
@@ -205,7 +193,7 @@ ch11_training %>%
 ```
 The Northeast, Midwest, and West all skew politically liberal in terms of average ideology per age group. Most notably, not a single age group in the Northeast had a positive average ideology; the most conservative age group is the 55-64 year old group. Meanwhile, in the West and the Midwest, there are clear trends that older age groups tend to have a more conservative average ideology. In contrast, every age group's average ideology skewed politically conservative in the South save for the 35-44 year olds.
 
-Why can't we just stop our analysis here? Well, our main question involves predicting new ideologies, which a visualization cannot tell you. There are many other factors at hand besides age that influence ideology. In order to answer our question for a subset of the population, we need to keep these factors constant among said subset. For example, if we are interested in the effect of age on ideology by region, we must *specifically* look at folks who have the same education, income, race, and gender, with different ages and regions.
+Why can't we just stop our analysis here? Well, our main question involves predicting the ideology of new people, which a visualization cannot tell you. There are many other factors at hand besides age that influence ideology. In order to answer our question for a subset of the population, we need to keep these factors constant among said subset. For example, if we are interested in the effect of age on ideology by region, we must *specifically* look at folks who have the same education, income, race, and gender, with different ages and regions.
 
 ### Courage
 
@@ -228,9 +216,9 @@ lm_model <-
     set_mode("regression")
 ```
 
-Here, we are using the ***parsnip*** package to create an engine that can run this linear regression model easily and repeatedly. `linear_reg()` tells the engine that this is a linear regression. `set_engine("lm")` tells the engine to use the `lm()` function. `set_mode()` has to options, "regression" and "classification". Since our left-hand variable is a continuous one, we will set it to "regression". If it were categorical, we would set the mode to "classification".
+Here, we are using the ***parsnip*** package to create an engine that can run this linear regression model easily and repeatedly. `linear_reg()` tells the engine that this is a linear regression. `set_engine("lm")` tells the engine to use the `lm()` function. `set_mode()` has two options, "regression" and "classification". Since our left-hand variable is a continuous one, we will set it to "regression". If it were categorical, we would set the mode to "classification".
 
-Fit the model to the data. We will first create a regression formula and save it as an R object for future recall. There are a lot of different combinations we could use for the formula, but which will yield the *best* model? In previous chapters, we discussed this dilemma. For now, we will build a full model containing all of the predictor variables and some interactions.
+Fit the model to the data. We will first create a regression formula and save it as an R object. There are a lot of different combinations we could use for the formula, but which will yield the *best* model? In previous chapters, we discussed this dilemma. For now, we will build a full model containing all of the predictor variables and some interactions.
 
 ```{r}
 full_form <- formula(ideology ~ gender + race + region + income + age + education)
@@ -240,24 +228,9 @@ full_form <- formula(ideology ~ gender + race + region + income + age + educatio
 lm_fit <- fit(lm_model, full_form, ch11_training)
 ```
 
-Note that we can use `tidy()`, just like we did in previous chapters, to take a look at the results:
+<!-- DK: Change MSE to RMSE? -->
 
-<!-- BG: I could not find what chapter this was last used in. Are we now using this/ should be explain more here? -->
-
-```{r message=FALSE}
-lm_fit %>%
-  tidy(conf.int = TRUE) %>%
-  select(term, estimate, conf.low, conf.high)
-```
-
-If we want to take a look at the residuals $y-\hat{y}$, we can use the `augment()` function. `augment()` subtracts the fitted value from the actual value. Note that `lm_fit` is actually a parsnip model, so we have to extract the fitted R model with `lm_fit$fit`.
-
-```{r}
-augment(lm_fit$fit) %>%
-  select(ideology, .fitted, .resid, gender, race, region, income, age, education)
-```
-
-How do we know if this is a good model? We can check using cross-validation. Cross-validation seeks to minimizes the MSE (mean squared error) of its predicted and real outcomes. There are two important characteristics of the MSE we should always keep in mind:
+How do we know if this is a good model? We can check using cross-validation. Cross-validation helps us to estimate how well (or poorly) the model will do on new data. There are two important characteristics of the MSE we should always keep in mind:
 
 1. We can think our estimate of the MSE is a random variable. For example, the dataset we have may be a random sample from a larger population. An algorithm may have a lower apparent error than another algorithm due to luck.
 
@@ -352,6 +325,8 @@ What if we create completely new data outside of the testing set? Keep in mind t
 Time to make up some imaginary people. Let's say we have four individuals whose ideology in 2016 we wanted to predict. We can create a tibble with the values of their demographic information, like so:
 
 <!-- Just because you have a variable in this training data today, does not mean you are going to get it in your production data tomorrow. -->
+
+<!-- DK: Do these have to be factors? Or will characters work as well, like they do with posterior_predict? -->
 
 ```{r}
 new_people <- tibble("name" = c("Alice", "Betty", "Chelsea", "Danielle"),
@@ -459,6 +434,8 @@ First, let's create a basic formula that only takes in `age`.
 ```{r}
 age_form <- formula(ideology ~ age)
 ```
+
+<!-- DK: Can't we avoid update()? Seems more complexity than we need. -->
 
 Next, we can use `update()` to create the more complicated formulas.  `update()` takes as its first argument a formula and as its second argument the additions you want to make.  To keep all the predictors from the first formula and add more, you will start with `~ . + ` and then add more predictors, like so:
 

@@ -3,32 +3,7 @@ output_yaml:
   - _output.yml
 ---
 
-<!-- Outline: -->
-
-<!-- 1) Preamble: Intro paragraph to classification in general, both 0/1 and multiple categories. Discuss different approaches, all for solving the same problem. -->
-
-<!-- 2) EDA of cces (meaning just the columns we care about). Start with the usual EDA of the subset of cces data which we are using (only 2018 for now), which will be state, age, gender, race, education.   -->
-
-<!-- 3) Logistic Regression. Go through all our themes. -->
-
-<!-- 4) CART -->
-
-<!-- 5) Random Forest -->
-
-<!-- 6) Comparing the models. Advice. -->
-
-<!-- Other stuff: -->
-
-<!-- * tidymodels always. stan_glm from the start. Cover the highlights on Gelman. Divide by 4. predictions are all matter. don't bother with posterior_linpred().  -->
-
-<!-- * Then CART using tidymodels on exactly this data and this problem. Maybe we go slowly, showing how CART works with one variable (numeric and categorical) first. Or maybe we just go straight to the full model.  -->
-
-<!-- * Then random forests using tidymodels on exactly this data and this problem. -->
-
-<!-- * Do we have time to explore Gelman's magic trick: Showing the values of key coefficients when the model is refit to each year separately? That is, how much is age associated with being conservative over time? I hope so! But maybe not. -->
-
-<!-- * Do we have time to do a model which predicts a category with more than 0/1 possible values? I am not sure. If we were going to, we would want to pick something that is not an ordered category, I think. In this data, only race would meet that criteria. Let's revisit this later. -->
-
+<!-- DK: Sure would be nice to do one mult-category model. Once we get rid of all the logistic regression stuff, we have some extra space/time. -->
 
 # Discrete Response {#discrete-response}
 
@@ -36,7 +11,6 @@ Packages:
 
 ```{r, message=FALSE}
 library(tidyverse)
-library(broom)
 library(skimr)
 library(PPBDS.data)
 library(tidymodels)
@@ -124,7 +98,7 @@ library(PPBDS.data)
 library(tidymodels)
 ```
 
-Before we start modeling, let's perform some exploratory analysis on the dataset we'll be working with, cces. Cces stands for the Cooperative Congressional Election Study, a study regarding the approval rating of individual voters to their sitting president. Each row captures one voter, some of their demographic information, and how highly they approve (or disaprprove) of the president. Let's first look at the raw data values by either looking at `cces` using RStudio's spreadsheet viewer or by using the `glimpse()` function from the **dplyr** package:
+Before we start modeling, let's perform some exploratory analysis on the dataset we'll be working with, cces. Cces stands for the Cooperative Congressional Election Study, a study regarding the approval rating of individual voters to their sitting president. Each row captures one voter, some of their demographic information, and how highly they approve (or disaprprove) of the president. 
 
 ```{r}
 glimpse(cces)
@@ -212,7 +186,7 @@ ch12 %>%
        title = "Presidential Approval in 2018 by Race")
 ```
 
-This segmented bar graph shows us the percentage of each race that approved of the president.We can see that the disapproving majority in the overall data is present across most races.
+This segmented bar graph shows us the percentage of each race that approved of the president. We can see that the disapproving majority in the overall data is present across most races.
 
 Now, let's use our state variable. Let's create a scatterplot with `approval` to see how the rate of approval varied across states.
 
@@ -874,10 +848,6 @@ predict(cart_fit, new_data = newdata)
 
 As you can see, the tree predicted that our first two new voters would disapprove of the President while our second two would approve based on their age and race.
 
-```{r}
-#library(rstanarm)
-#posterior_linpred(cart_fit, newdata)
-```
 
 ## Random forests
 
@@ -962,13 +932,16 @@ forest_recipe <- recipe(approval ~ age + gender + race,
 forest_recipe <- forest_recipe %>%
   step_interact(terms = ~ age:race)
 
-#approval_workflow <- workflow() %>%
-  # add the recipe
-#  add_recipe(approval_recipe) %>%
-  # add the model
-#  add_model(forest_mod)
 
 ```
+
+
+<!-- approval_workflow <- workflow() %>% -->
+<!-- add the recipe -->
+<!--  add_recipe(approval_recipe) %>% -->
+<!-- add the model -->
+<!--  add_model(forest_mod) -->
+
 
 We will also create our folds using `vfold_cv()`.
 
@@ -993,21 +966,21 @@ forest_metrics %>% collect_metrics()
 
 Now that we saw how the training set performed, we'll use our testing set. We do so by applying `forest_test` to `predict()`.
 
-```{r}
-#forest_mod %>%
-#  fit(forest_formula, data = forest_train) %>%
-#  predict(new_data = forest_test)
-```
+
+<!-- forest_mod %>% -->
+<!--  fit(forest_formula, data = forest_train) %>% -->
+<!--  predict(new_data = forest_test) -->
+
 
 To extract the rmse, we again set the "truth" to `approval` so this function can compare our predicted values to the true values.
 
-```{r}
-#forest_mod %>%
-#  fit(forest_formula, data = forest_train) %>%
-#  predict(new_data = forest_test) %>%
-#  bind_cols(forest_test) %>%
-#  rmse(truth = as.numeric(approval), estimate = as.numeric(.pred_class))
-```
+
+<!-- forest_mod %>% -->
+<!--  fit(forest_formula, data = forest_train) %>% -->
+<!--  predict(new_data = forest_test) %>% -->
+<!--  bind_cols(forest_test) %>% -->
+<!--  rmse(truth = as.numeric(approval), estimate = as.numeric(.pred_class)) -->
+
 
 The mean squared error is about 0.619.
 

@@ -11,7 +11,7 @@ output_yaml:
 
 <!-- DK: Explain control_resample().  -->
 
-<!-- DK: Can we make a simple pipe for tidymodels which we can teach students to do. First, split the data. Second, create the folds. Third, choose the model. Fourth, make the recipe. Fifth, make the workflow. Sixth, apply the workflow to the folds. Seventh, fit model to all of training. Eighth, check how this model does on test. Nineth, fit model on all data. -->
+<!-- DK: Can we make a simple pipe for tidymodels which we can teach students to do. First, split the data. Second, create the folds. Third, choose the model. Fourth, make the recipe. Fifth, make the workflow. Sixth, apply the workflow to the folds. Seventh, fit model to all of training. Eighth, check how this model does on test. Nineth, fit model on all data. Use that model tomorrow. -->
 
 <!-- DK: metric sets seems like overkill. Defaults values are fine, I think. But I need to explain them! -->
 
@@ -853,61 +853,6 @@ ames_train %>%
 These results can help us investigate why the prediction was poor for this house. 
 
 
-
-Code:
-
-
-```{r, eval = FALSE}
-library(tidymodels)
-data(ames)
-ames <- mutate(ames, Sale_Price = log10(Sale_Price))
-
-set.seed(123)
-ames_split <- initial_split(ames, prob = 0.80)
-ames_train <- training(ames_split)
-ames_test  <-  testing(ames_split)
-
-ames_rec <- 
-  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
-           Latitude + Longitude, data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_other(Neighborhood, threshold = 0.01) %>% 
-  step_dummy(all_nominal()) %>% 
-  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_"))
-
-lm_model <- linear_reg() %>% 
-  set_engine("lm")
-
-lm_wflow <- 
-  workflow() %>% 
-  add_model(lm_model) %>% 
-  add_recipe(ames_rec)
-
-lm_fit <- fit(lm_wflow, ames_train)
-
-rf_model <- 
-  rand_forest(trees = 1000) %>% 
-  set_engine("ranger") %>% 
-  set_mode("regression")
-
-rf_wflow <- 
-  workflow() %>% 
-  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
-                                 Year_Built + Bldg_Type,
-                    data = ames_train)) %>% 
-  add_model(rf_model) 
-
-
-set.seed(55)
-ames_folds <- vfold_cv(ames_train, v = 10)
-
-
-set.seed(130)
-rf_res <- rf_wflow %>% 
-  fit_resamples(resamples = ames_folds, 
-                control = control_resamples(save_pred = TRUE))
-```
-
 ## Comparing models with resampling {#compare}
 
 Once we create two or more models, the next step is to compare them. In some cases, comparisons might be _within-model_, where the same model might be evaluated with different features or preprocessing methods. Alternatively, _between-model_ comparisons, such as when we compared linear regression and random forest models in Section \@ref(resampling), are the more common scenario.
@@ -964,4 +909,79 @@ Practical significance is subjective; two people can have very different ideas o
 
 ## Conclusion
 
-The **tidymodels** package provides the most popular and sophisticated tools for making models in R. This chapter has provided a whirlwind tour. Don't worry if you did not understand every detail! We will spend the last two chapters of the book practicing.
+The **tidymodels** package provides the most popular and sophisticated tools for making models in R. This chapter has provided a whirlwind tour. Don't worry if you did not understand every detail! We will spend the last two chapters of the book practicing. Most model projects are structured in a very similar fashion. To review:
+
+First, split up the data into training and test. Then, create cross-validation data sets from the training data. Professionals use `set.seed()` in order to make their analysis reproducible. 
+
+```{r, eval=FALSE}
+set.seed(9)
+ames_split <- initial_split(ames, prob = 0.80)
+ames_train <- training(ames_split)
+ames_test  <- testing(ames_split)
+ames_folds <- vfold_cv(ames_train, v = 10)
+```
+
+Second, start a model pipeline with `workflow()` and then add a model object. Note that we are no longer assigning the results of each step to a new object. There is no need for that since we don't really care about the interim steps.
+
+```{r, eval=FALSE}
+workflow() %>%
+  add_model(linear_reg() %>% 
+              set_engine("lm") %>% 
+              set_mode("regression")) 
+```
+
+Third, add a recipe and any associated `step_*` functions. (Note that we have simplified this slightly from the example above.)
+
+```{r, eval=FALSE}
+...  %>% 
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built, 
+                    data = ames_train)) %>%
+    step_log(Gr_Liv_Area, base = 10) %>% 
+    step_other(Neighborhood, threshold = 0.01) %>% 
+    step_dummy(all_nominal())
+```
+
+Fourth, pipe this workflow object directly into `fit()`.
+
+```{r, eval=FALSE}
+... %>% 
+  fit(data = ames_train)
+```
+
+Fifth, check how well the model performs by using cross-validation.
+
+```{r, eval=FALSE}
+... %>% 
+  fit_resamples(resamples = ames_folds) %>% 
+  collect_metrics()
+```
+
+Let's put all those steps together in a single pipeline:
+
+```{r}
+library(tidymodels)
+data(ames)
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+set.seed(9)
+ames_split <- initial_split(ames, prob = 0.80)
+ames_train <- training(ames_split)
+ames_test  <- testing(ames_split)
+ames_folds <- vfold_cv(ames_train, v = 10)
+
+workflow() %>%
+  add_model(linear_reg() %>% 
+              set_engine("lm") %>% 
+              set_mode("regression")) %>% 
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built, 
+                    data = ames_train)) %>%
+    step_log(Gr_Liv_Area, base = 10) %>% 
+    step_other(Neighborhood, threshold = 0.01) %>% 
+    step_dummy(all_nominal()) %>% 
+  fit(data = ames_train) %>% 
+  fit_resamples(resamples = ames_folds) %>% 
+  collect_metrics()
+
+```
+
+This pipe would form the heart of our analysis. We can try different model types and different formulas easily.  Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole. Then, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. How well our model does with data it has never seen before is a good hint as to how well it will work on new data tomorrow.
