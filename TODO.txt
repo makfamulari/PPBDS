@@ -5,13 +5,15 @@
 
 * Perhaps remove chapter 6 and the bootstrap? Go straight from chapter 5 explaining conditional probability to stan_glm().
 
+* Rename all my Conclusions as Summarys.
+
 * Are all the graphics too small? Check out R4DS and change the default settings?
 
 * Perhaps chapter 8 should include two other model discussions. First, leave in intercept. Second, a model with a continuous predictor. In both cases, we would still be doing three parameter models. And that it would allow chapter 9 to focus on more complex models. This might be possible if we were to remove the boostrap in ch 7 and then make sure that chapter 7 covered every complex topic in detail, like fitted(), residuals() and so on.
 
 * Should we show code for every single plot? Why not?
 
-* Is centering too hard a topic for the book?
+* Is centering too hard a topic for the book? No. Do it (and normalization) in chapter 7 and maybe another example in 8 or 9.
 
 * get rid of geom_density() everywhere.
 
@@ -22,7 +24,9 @@ Cut all bootstrap
 
 Basic idea is that, without bootstrapping, we can go through every detail we will need later very slowly. 
 
-Is using height OK? Maybe. But then we should do everything with an initial sample of size 30 so that we have some variation in our estimate of the mean.
+Is using height OK? Maybe. But then we should do everything with an initial sample of size 30 so that we have some variation in our estimate of the mean. Maybe we do two or more examples. Nothing wrong with estimating several models!
+
+
 
 continuous versus categorial variables
 
@@ -48,9 +52,19 @@ tests of predictive accuracy. model comparisons, set stage for chapter 10
 
 in-sample and out-of-sample
 
-objective functions; minimize what? when would median be better than mean.
+objective functions; minimize what? when would median be better than mean? Find a skewed data set and show how guessing the median works better than guessing the mean, if you care about absolute difference. (Can we estimate the median with stan_glm()?) 
+
+Use stan_glm(family = binomial()) to estimate an urn example?
 
 play the prediction game
+
+include nice looking table creation
+
+Maybe use tidybayes as well?
+
+Might chapter 7 include a single variable which actually requires lots of parameters? For example, regress height on state and come up with a different average height for each state. This is cheating in that it is too many paramters. But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage.
+
+Create a nice plot which shows how \pm 2 MAD_SDs covers 95%. Maybe explain better what MAD SD means? Maybe connect it directly to what a standard error is? 
 
 
 ## Next Meeting
@@ -60,22 +74,15 @@ How do we check for math formatting errors, often caused by a $ pair which exten
 
 ## TODO
 
-* Maybe we don't build up p(models, data) after chapter 5. It is both too much a bother and too little used in the real world. Instead, we use the rsample::bootstraps() for Chapter 6 to teach the idea of sampling variability. And, indeed, we go so far as to make a posterior for p with the bootstrap. Then, chapter 7 could only use stan_glm().
 
 * as_tibble_col(), and other things for coercing ppd objects.
 
 * Should "posterior probability distribution"" become "ppd" everywhere?
 
-* Remove all estimand references. To confusing for this book.
+* Remove all estimand references. Too confusing for this book.
 
 0) How do we find all the broken references? (Bibliography from @kane. Or chapter/figure?)
   + No easy solution. Looks like manual clean-up is the only option.
-
-1) Github Action for PPBDS.data produces weird warning.
-  + Fixed. Just had to add rmarkdown as a dependency.
-
-2) Add section to set-up.Rmd to explain (renv::consent()?) how new people need to enable renv for working on the book.
-  + Done.
 
 3) Start section with key summary/links associated with things-that-annoy-us-and-we-will-revisit-someday. First item: videos.
 

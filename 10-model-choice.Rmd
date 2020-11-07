@@ -3,23 +3,26 @@ output_yaml:
   - _output.yml
 ---
 
+<!-- DK: It is really bad, both here and in the chapter, that we just replace both ames and Sale_Price in place. Create a new data set, or at least a new variable, and use that! -->
+
+<!-- DK: Use argument names first time that you use that function. -->
+
+<!-- DK: Shouldn't the last step be to run our final model on ames_test? -->
+
+<!-- DK: Explain control_resample().  -->
+
+<!-- DK: Can we make a simple pipe for tidymodels which we can teach students to do. First, split the data. Second, create the folds. Third, choose the model. Fourth, make the recipe. Fifth, make the workflow. Sixth, apply the workflow to the folds. Seventh, fit model to all of training. Eighth, check how this model does on test. Nineth, fit model on all data. Use that model tomorrow. -->
+
+<!-- DK: metric sets seems like overkill. Defaults values are fine, I think. But I need to explain them! -->
+
+<!-- DK: Could drop recipe section (or just the details beyond the formula), or save those details for chapter 11. -->
 
 
-<!-- DK: Drop first fit section and working with fitted objects. Wait for fit_resamples() to discuss fitting? -->
+<!-- DK: Need to make the approach here mesh with the approaches used in chapter 11 and 12. What can we cut from here that is not used? How should we change later chapters to be consistent with this modern approach? -->
 
-<!-- Replace lm() with stan_glm()? -->
+<!-- Deal with the missing references. Need to add them to the bib. -->
 
-
-<!-- 2) Each section ends with the code we have done. That seems redundant and confusing. -->
-
-<!-- 3) Need to make the approach here mesh with the approaches used in chapter 11 and 12. What can we cut from here that is not used? How should we change later chapters to be consistent with this modern approach? -->
-
-<!-- 4) I am concerned about the ames_snippets.R code used in the original but, maybe, not needed here. -->
-
-
-<!-- 7) Deal with the missing references. Need to add them to the bib. -->
-
-<!-- 8) Maybe follow their example with r pkg(dplyr) instead of **dplyr**. -->
+<!-- Maybe follow their example with r pkg(dplyr) instead of **dplyr**. -->
 
 # Model Choice
 
@@ -37,7 +40,9 @@ library(ranger)
 data(ames)
 ```
 
-The **tidymodels** library includes all the necessary libraries, in the same way that **tidyverse** includes libraries like **ggplot2** and **dplyr**. The `ames` data lives in the **modeldata** library, which is part of **tidymodels**. The **ranger** package is used for creating *regression trees*, a type of model which will feature in Chapter \@ref(discrete-response).
+<!-- DK: It is annoying that the `ames` data is no lazy loaded, like all our PPBDS.data data sets. Maybe we should just include a copy on PPBDS.data, perhaps with both sale price and log price already created? Or, better, let's use a different, more political data set. -->
+
+The **tidymodels** library includes all the necessary libraries, in the same way that **tidyverse** includes libraries like **ggplot2** and **dplyr**. The `ames` data lives in the **modeldata** library, which is part of **tidymodels**. The **ranger** package is used for creating *random forests*, a type of model which will introduce in this chapter and then discuss more extensively in Chapter \@ref(discrete-response).
 
 The `ames` housing data set contains data on `r format(nrow(ames), big.mark = ",")` properties in Ames, Iowa, including columns related to 
 
@@ -49,8 +54,6 @@ The `ames` housing data set contains data on `r format(nrow(ames), big.mark = ",
 
 
 It makes sense to start with the outcome we want to predict: the last sale price of the house (in USD): 
-
-<!-- DK: Clean up these plots. -->
 
 ```{r}
 ggplot(ames, aes(x = Sale_Price)) + 
@@ -126,7 +129,7 @@ Also notable is the "Iowa Department of Transportation (DOT) and Rail Road" neig
 knitr::include_graphics("10-model-choice/images/dot_rr.png")
 ```
 
-It is _critical_ to conduct _exploratory data analysis_ prior to beginning any modeling. These housing data have characteristics that present interesting challenges about how the data should be processed and modeled. We describe many of these in later sections. Some basic questions that could be examined include: 
+It is _critical_ to conduct _exploratory data analysis_ prior to beginning any modeling. These housing data have characteristics that present interesting challenges about how the data should be processed and modeled. Basic questions include: 
 
  * Are there any odd or noticeable things about the distributions of the individual predictors? Is there much skewness or any pathological distributions? 
 
@@ -142,7 +145,7 @@ Many of these questions will be revisited as these data are used in upcoming exa
 
 Feature engineering encompasses activities that reformat predictor values to make them easier for a model to use effectively. This includes transformations and encodings of the data to best represent their important characteristics. Imagine that you have two predictors in a data set that can be more effectively represented in your model of interest as a ratio; creating a new predictor from the ratio of the original two is a simple example of feature engineering. 
 
-Take the location of a house in Ames as a more involved example. There are a variety of ways that this spatial information can be exposed to a model, including neighborhood (a qualitative measure), longitude/latitude, distance to the nearest school or Iowa State University, and so on. When choosing how to encode these data in modeling, we might choose an option we believe most associated with the outcome. The original format of the data (e.g., numeric like distance versus categorical like neighborhood) is also a driving factor in feature engineering choices. 
+Take the location of a house in Ames as a more involved example. There are a variety of ways that this spatial information can be exposed to a model, including neighborhood (a qualitative measure), longitude/latitude, distance to the nearest school or Iowa State University, and so on. When choosing how to encode these data in modeling, we might choose an option we believe most associated with the outcome. The original format of the data --- e.g., numeric (like distance) versus categorical (like neighborhood) --- is also a driving factor in feature engineering choices. 
 
 There are many other examples of preprocessing to build better features for modeling: 
 
@@ -159,15 +162,15 @@ The **recipes** package combines different feature engineering and preprocessing
 
 Before making a recipe, we should organize our data.
 
-The primary approach for empirical model validation is to split the existing pool of data into two distinct sets. Some observations are used to develop and optimize the model. This _training set_ is usually the majority of the data. These data are a sandbox for model building where different models can be fit, feature engineering strategies are investigated, and so on. We as modeling practitioners spend the vast majority of the modeling process using the training set as the substrate to develop the model.  
+The primary approach for empirical model validation is to split the existing pool of data into two distinct sets. Some observations are used to develop and optimize the model. This _training set_ is usually the majority of the data. These data are a sandbox for model building where different models can be fit, feature engineering strategies are investigated, and so on. We, as data scientists, spend the vast majority of the modeling process using the training set to develop the model.  
 
 The other portion of the observations are placed into the _test set_. This is held in reserve until one or two models are chosen as the methods that are mostly likely to succeed. The test set is then used as the final arbiter to determine the efficacy of the model. It is critical to only look at the test set once; otherwise, it becomes part of the modeling process. 
 
 
-Suppose we allocate 80% of the data to the training set and the remaining 20% for testing.  The most common method is to use simple random sampling. The **rsample** package has tools for making data splits such as this; the function `intial_split()` was created for this purpose. It takes the data frame as an argument as well as the proportion to be placed into training. We use `set.seed()` so that the results can be reproduced later. Create a data split which we will use throughout this chapter.
+Suppose we allocate 80% of the data to the training set and the remaining 20% for testing.  The most common method is to use simple random sampling. The `intial_split()` function from the **rsample** package performs this split. It takes the data frame as an argument as well as the proportion to be placed into training. We use `set.seed()` so that the results can be reproduced later. Create a data split which we will use throughout this chapter.
 
 ```{r}
-set.seed(123)
+set.seed(10)
 
 ames_split <- initial_split(ames, prob = 0.80)
 ames_split
@@ -201,12 +204,10 @@ In this section, we will focus on a small subset of the predictors available in 
 
  * The type of building (`Bldg_Type`)
 
-<!-- DK: Introduce lm here? Or earlier? -->
-
-Suppose that an initial ordinary linear regression model were fit to these data. A  standard call to `lm()`, a function similar to `stan_glm()`, might look like:
+Suppose that a Bayesian linear regression model were fit to these data. A  standard call to `stan_glm()` might look like:
 
 ```{r, eval = FALSE}
-lm(Sale_Price ~ Neighborhood + log10(Gr_Liv_Area) + Year_Built + Bldg_Type)
+stan_glm(Sale_Price ~ Neighborhood + log10(Gr_Liv_Area) + Year_Built + Bldg_Type)
 ```
 
 What the formula above does can be decomposed into a series of _steps_:
@@ -215,22 +216,23 @@ What the formula above does can be decomposed into a series of _steps_:
 
 1. A log transformation is applied to the general living area predictor. 
 
-1. The neighborhood and building type columns are converted from a non-numeric format to a numeric format (since least squares requires numeric predictors). 
+1. The neighborhood and building type columns are converted from a non-numeric format to a numeric format. Many R models, like `stan_glm()`, do this automatically, but better safe than sorry. 
 
 The formula method will apply these data manipulations to any data, including new data, that are passed to the `predict()` function. 
 
 A recipe is also an object that defines a series of steps for data processing. Unlike the formula method inside a modeling function, the recipe defines the steps without immediately executing them; it is only a specification of what _should_ be done. Here is a recipe equivalent to the formula above:
 
-```{r}
-library(tidymodels) # Includes the recipes package
+<!-- DK: Do we have to give a data value to create a recipe? What happens if we don't? What happens when we pass in a different data set later? -->
 
-simple_ames <- 
+```{r}
+ames_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
            Year_Built + Bldg_Type,
          data = ames_train) %>%
   step_log(Gr_Liv_Area, base = 10) %>% 
   step_dummy(all_nominal())
-simple_ames
+
+ames_rec
 ```
 
 Let's break this down: 
@@ -258,7 +260,9 @@ What is the advantage to using a recipe? There are a few, including:
 
 ### Encoding qualitative data in a numeric format  {#dummies}
 
-One of the most common feature engineering tasks is transforming nominal or qualitative data (factors or characters) so that they can be encoded or represented numerically. Sometimes we can alter the factor levels of a qualitative column in helpful ways _prior_ to such a transformation. For example, `step_unknown()` can be used to change missing values to a dedicated factor level. Similarly, if we anticipate that a new factor level may be encountered in future data, `step_novel()` can allot a new level for this purpose. 
+<!-- DK: Would be nice to give full discussion of dummies in chapters 7 or 8, so we could cut this section out. -->
+
+One of the most common feature engineering tasks is transforming nominal or qualitative data (factors or characters) so that they can be encoded or represented numerically. Sometimes we can alter the factor levels of a qualitative column in helpful ways _prior_ to such a transformation. For example, `step_unknown()` can be used to change missing values to a dedicated factor level. Similarly, if we anticipate that a new factor level may be encountered in future data, `step_novel()` can allocate a new level for this purpose. 
 
 Additionally, `step_other()` can be used to analyze the frequencies of the factor levels in the training set and convert infrequently occurring values to a catch-all level of "other", with a specific threshold that can be specified. A good example is the `Neighborhood` predictor in our data:
 
@@ -273,7 +277,7 @@ Here there are two neighborhoods that have less than five properties in the trai
 For the Ames data, we can amend the recipe to use:
 
 ```{r}
-simple_ames <- 
+ames_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type,
          data = ames_train) %>%
   step_log(Gr_Liv_Area, base = 10) %>% 
@@ -313,6 +317,8 @@ Different recipe steps can have different effects on columns of the data. For ex
 
 ### Interaction terms
 
+<!-- DK: Couldn't we cut out a lot of this, given the good discussion in chapter 9. Also, the current weird subset interaction terms are not easy to follow. Make this simpler? -->
+
 Interaction effects involve two or more predictors. Such an effect occurs when one predictor has an effect on the outcome that is contingent on one or more other predictors. For example, if you were trying to predict your morning commute time, two potential predictors could be the amount of traffic and the time of day. However, the relationship between commute time and the amount of traffic is different for different times of day. In this case, you could add an interaction term between the two predictors to the model along with the original two predictors (which are called the "main effects"). Numerically, an interaction term between predictors is encoded as their product. Interactions are only defined in terms of their effect on the outcome and can be combinations of different types of data (e.g., numeric, categorical, etc). 
 
 After exploring the Ames training set, we might find that the regression slopes for the general living area differ for different building types: 
@@ -330,13 +336,12 @@ ggplot(ames_train, aes(x = Gr_Liv_Area, y = 10^Sale_Price)) +
 How are interactions specified? Recipes are explicit and sequential. With the current recipe, `step_dummy()` has already created dummy variables. How would we combine these for an interaction? The additional step would look like `step_interact(~ interaction terms)` where the terms on the right-hand side of the tilde are the interactions. These can include selectors, so it would be appropriate to use:
 
 ```{r}
-simple_ames <- 
+ames_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type,
          data = ames_train) %>%
   step_log(Gr_Liv_Area, base = 10) %>% 
   step_other(Neighborhood, threshold = 0.01) %>% 
   step_dummy(all_nominal()) %>% 
-  # Gr_Liv_Area is on the log scale from a previous step
   step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") )
 ```
 
@@ -349,8 +354,8 @@ library(tidymodels)
 data(ames)
 ames <- mutate(ames, Sale_Price = log10(Sale_Price))
 
-set.seed(123)
-ames_split <- initial_split(ames, prob = 0.80, strata = Sale_Price)
+set.seed(10)
+ames_split <- initial_split(ames, prob = 0.80)
 ames_train <- training(ames_split)
 ames_test  <- testing(ames_split)
 
@@ -363,13 +368,10 @@ ames_rec <-
   step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) 
 ```
 
-## Fitting models with parsnip {#models}
+## Creating models with parsnip {#models}
 
-The **parsnip** package provides a fluent and standardized interface for a variety of different models. In this section, we both give some motivation for why a common interface is beneficial and show how to use the package. 
- 
-### Create a model
+The **parsnip** package provides a standardized interface for a variety of different models.
 
-<!-- DK: We could cut 90% of the material in this section. No need to provide an example. -->
 
 Suppose that a linear regression model was our initial choice for the model. This is equivalent to specifying that the outcome data is numeric and that the predictors are related to the model in terms of simple slopes and intercepts: 
 
@@ -419,6 +421,8 @@ For tidymodels, the approach to specifying a model is intended to be more unifie
 
 These specifications are built _without referencing the data_. For example, for the three cases above: 
 
+<!-- DK: Maybe we should specify the mode even though we don't have to? Maybe explain why is it stan and not rstanarm? -->
+
 ```{r}
 linear_reg() %>% 
   set_engine("lm")
@@ -431,26 +435,6 @@ linear_reg() %>%
 ```
 
 
-Once the details of the model have been specified, the model estimation can be done using a formula with the `fit()` function. The **parsnip** package allows the user to be indifferent to the interface of the underlying model. 
-
-
-Let's walk through how to predict the sale price of houses in the Ames data as a function of only longitude and latitude. 
-
-
-```{r}
-lm_model <- 
-  linear_reg() %>% 
-  set_engine("lm")
-
-# Recall that Sale_Price has been pre-logged
-
-lm_form_fit <- 
-  lm_model %>% 
-  fit(Sale_Price ~ Longitude + Latitude, data = ames_train)
-    
-lm_form_fit
-```
-
 
 Not only does **parsnip** enable a consistent model interface for different packages, it also provides consistency in the _model arguments_. Modeling functions in **parsnip** separate model arguments into two categories: 
 
@@ -459,79 +443,6 @@ Not only does **parsnip** enable a consistent model interface for different pack
  * _Engine arguments_ are either specific to a particular engine or used more rarely. 
 
 
-### Use the model results
-
-<!-- DK: We could cut 90% of the material in this section. No need to provide an example. -->
-
-Once the model is created and fit, we can use the results in a variety of ways; we might want to plot, print, or otherwise examine the model output. Several quantities are stored in a **parsnip** model object, including the fitted model. This can be found in an element called `fit`, which can be returned using the `purrr::pluck()` function:
-
-<!-- DK: Investigate pluck nonsense. -->
-
-```{r}
-lm_form_fit %>% 
-  purrr::pluck("fit")
-```
-
-Normal methods can be applied to this object, such as printing, plotting, and so on.
-
-One issue with some existing methods in base R is that the results are stored in a manner that may not be the most useful. As a solution, the **broom** package has methods to convert many types of model objects to a tidy structure. For example, using the `tidy()` method on the linear model produces:
-
-
-```{r}
-tidy(lm_form_fit)
-```
- 
-The column names are standardized across models and do not contain any additional data (such as the type of statistical test). The data previously contained in the row names are now in a column called `terms` and so on. 
-
-
-### Make predictions {#parsnip-predictions}
-
-For predictions, **parsnip** always conforms to the following rules: 
-
- 1. The results are always a tibble.
- 2. The column names of the tibble are always predictable. 
- 3. There are always as many rows in the tibble as there are in the input data set. 
-
-For example, when numeric data are predicted: 
-
-```{r}
-ames_test_small <- ames_test %>% slice(1:5)
-predict(lm_form_fit, new_data = ames_test_small)
-```
-
-The row order of the predictions are always the same as the original data. The leading dot in the variable names protect against merging data with duplicate names. There are some data sets that contain predictors named `pred`! 
-
-
-These three rules make it easier to merge predictions with the original data: 
-
-```{r}
-ames_test_small %>% 
-  select(Sale_Price) %>% 
-  bind_cols(predict(lm_form_fit, ames_test_small)) %>% 
-  
-  # Add 95% prediction intervals to the results:
-  
-  bind_cols(predict(lm_form_fit, ames_test_small, type = "pred_int")) 
-```
-
-
-For the second tidymodels prediction rule, the predictable column names for different types of predictions are: 
-
-```{r, echo = FALSE}
-  tribble(
-    ~ `type value`, ~ `column name(s)`,
-    "`numeric`", "`.pred`",
-    "`class`", "`.pred_class`",
-    "`prob`", "`.pred_{class levels}`",
-    "`conf_int`", "`.pred_lower`, `.pred_upper`",
-    "`pred_int`", "`.pred_lower`, `.pred_upper`"
-  ) 
-```
-
-The third rule regarding the number of rows in the output is critical. For example, if any rows of the new data contain missing values, the output will be padded with missing results for those rows. 
-
-A main advantage of standardizing the model interface and prediction types in **parsnip** is that, when different models are used, the syntax is identical. 
-
 ## A model workflow {#workflows}
 
 In the previous two sections, we discussed the **recipes** and **parsnip** packages. These packages can be used to prepare the data for analysis and fitting the model. This section introduces a new object called a _model workflow_. The purpose of this object is to encapsulate the major pieces of the modeling _process_. The workflow is important in two ways. First, using a workflow object encourages good methodology since it is a single point of entry to the estimation components of a data analysis. Second, it enables users to better organize their projects.  
@@ -539,15 +450,9 @@ In the previous two sections, we discussed the **recipes** and **parsnip** packa
 
 ### Where does the model begin and end? {#begin-model-end}
 
-So far, when we have used the term "the model", we have meant a structural equation that relates some predictors to one or more outcomes. Let's consider again linear regression as an example. The outcome data are denoted as $y_i$, where there are $i = 1 \ldots n$ samples in the training set. Suppose that there are $p$ predictors $x_{i1}, \ldots, x_{ip}$ that are used in the model. Linear regression produces a model equation of 
+So far, when we have used the term "the model", we have meant a structural equation that relates some predictors to one or more outcomes. For some data sets that are straightforward in nature, fitting the model itself may be the entire process. However, there are a variety of choices and additional steps that often occur _before_ the model is fit:
 
-$$ \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1x_{i1} + \ldots + \hat{\beta}_px_{ip} $$
-
-While this is a _linear_ model, it is only linear in the parameters. The predictors could be nonlinear terms like $log(x_i)$. 
-
-For some data sets that are straightforward in nature, fitting the model itself may be the entire process. However, there are a variety of choices and additional steps that often occur _before_ the model is fit:
-
-* While our example model has $p$ predictors, it is common to start with more than $p$ candidate predictors. Through exploratory data analysis or using domain knowledge, some of the predictors may be excluded from the analysis. In other cases, a feature selection algorithm may be used to make a data-driven choice about which predictors to include. 
+* While our example model may have $p$ predictors, it is common to start with more than $p$ candidate predictors. Through exploratory data analysis or using domain knowledge, some of the predictors may be excluded from the analysis. In other cases, a feature selection algorithm may be used to make a data-driven choice about which predictors to include. 
 
 * There are times when the value of an important predictor is missing. Rather than eliminating this sample from the data set, the missing value could be _imputed_ using other values in the data. For example, if $x_1$ were missing but was correlated with predictors $x_2$ and $x_3$, an imputation method could estimate the missing $x_1$ observation from the values of $x_2$ and $x_3$. 
 
@@ -568,8 +473,6 @@ Binding together the analytical components of a data analysis is important for a
 The **workflows** package allows the user to bind modeling and preprocessing objects together. Let's start again with the Ames data and a simple linear model:
 
 ```{r}
-library(tidymodels)  # Includes the workflows package
-
 lm_model <- 
   linear_reg() %>% 
   set_engine("lm")
@@ -590,8 +493,6 @@ Notice that we have not yet specified how this workflow should preprocess the da
 
 ### Workflows and recipes
 
-<!-- DK: Simplify this. No need to teach update() stuff trickery. -->
-
 Instead of using model formulas, recipe objects can also be used to preprocess data for modeling. Previously, we summarized a recipe that specified several preprocessing and feature engineering steps. These are encapsulated inside the object `ames_rec` and are attached to the workflow:
 
 ```{r}
@@ -599,7 +500,12 @@ lm_wflow <- lm_wflow %>%
   add_recipe(ames_rec)
 ```
 
-Use `fit()` to complete the model and `predict()` to create predictions from the fitted model.
+`add_model()` and  `add_recipe()` are examples of some of the helper functions which are available in **tidymodels**. The goal is to make modeling as easy as basic data analysis is in the Tidyverse.
+
+
+We use `fit()` to complete the model and `predict()` to create predictions from the fitted model.
+
+<!-- DK: Why do we need to pass ames_train to fit? Isn't it already in the recipe which was used to create lm_wflow? -->
 
 
 ```{r}
@@ -608,9 +514,42 @@ lm_fit <- fit(lm_wflow, ames_train)
 predict(lm_fit, ames_test %>% slice(1:3))
 ```
 
-We have learned that the modeling process encompasses more than just estimating the parameters of an algorithm that connects predictors to an outcome. This process also includes preprocessing steps and operations taken after a model is fit. We introduced a concept called a **model workflow** that can capture the important components of the modeling process. 
 
-For the Ames data, the updated code:
+Once the model is created and fit, we can use the results in a variety of ways; we might want to plot, print, or otherwise examine the model output. Several quantities are stored in a **parsnip** model object, including the fitted model. Making predictions is the most important task.
+
+<!-- DK: Centering the discussion around these 3 rules is not useful. Should re-edit the whole thing. -->
+
+For predictions, **parsnip** always conforms to the following rules: 
+
+ 1. The results are always a tibble.
+ 2. The column names of the tibble are always predictable. 
+ 3. There are always as many rows in the tibble as there are in the input data set. 
+
+For example, when numeric data are predicted: 
+
+```{r}
+ames_test_small <- ames_test %>% slice(1:5)
+predict(lm_fit, new_data = ames_test_small)
+```
+
+The row order of the predictions are always the same as the original data. The leading dot in the variable names protect against merging data with duplicate names. There are some data sets that contain predictors named `pred`! 
+
+
+These three rules make it easier to merge predictions with the original data: 
+
+```{r}
+ames_test_small %>% 
+  select(Sale_Price) %>% 
+  bind_cols(predict(lm_fit, ames_test_small))
+```
+
+The third rule regarding the number of rows in the output is critical. For example, if any rows of the new data contain missing values, the output will be padded with missing results for those rows. 
+
+A main advantage of standardizing the model interface and prediction types in **parsnip** is that, when different models are used, the syntax is identical. 
+
+<!-- DK: Could delete this code as repetitive given the above and below. -->
+
+Code:
 
 ```{r, message=FALSE}
 library(tidymodels)
@@ -618,8 +557,8 @@ data(ames)
 
 ames <- mutate(ames, Sale_Price = log10(Sale_Price))
 
-set.seed(123)
-ames_split <- initial_split(ames, prob = 0.80, strata = Sale_Price)
+set.seed(10)
+ames_split <- initial_split(ames, prob = 0.80)
 ames_train <- training(ames_split)
 ames_test  <-  testing(ames_split)
 
@@ -631,7 +570,8 @@ ames_rec <-
   step_dummy(all_nominal()) %>% 
   step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") )
 
-lm_model <- linear_reg() %>% set_engine("lm")
+lm_model <- linear_reg() %>% 
+  set_engine("lm")
 
 lm_wflow <- 
   workflow() %>% 
@@ -644,7 +584,7 @@ lm_fit <- fit(lm_wflow, ames_train)
 ## Judging model effectiveness {#performance}
 
 
-Once we have a model, we need to know how well it works. A quantitative approach for estimating effectiveness allows us to understand the model, to compare different models, or to tweak the model to improve performance. Our focus in tidymodels is on _empirical validation_; this usually means using data that were not used to create the model as the substrate on which we measure effectiveness. The choice of which metrics to examine can be critical. This section will largely focus on the **yardstick** package.  
+Once we have a model, we need to know how well it works. A quantitative approach for estimating effectiveness allows us to understand the model, to compare different models, or to tweak the model to improve performance. Our focus in tidymodels is on _empirical validation_; this usually means using data that were not used to create the model as the test bed on which we measure effectiveness. The choice of which metrics to examine can be critical. This section will largely focus on the **yardstick** package.  
 
 <!-- DK: "generative qualities" is awkward. Truth is that identification issues drive most causal model debate. But is that too much to explain? -->
 
@@ -656,7 +596,7 @@ The effectiveness of any given model depends on how the model will be used. A ca
 
 ### Metrics 
 
-Recall from Section \@ref(parsnip-predictions) that tidymodels prediction functions produce tibbles with columns for the predicted values. These columns have consistent names, and the functions in the **yardstick** package that produce performance metrics have consistent interfaces. The functions are data frame-based, as opposed to vector-based, with the general syntax of: 
+Recall that tidymodels prediction functions produce tibbles with columns for the predicted values. These columns have consistent names, and the functions in the **yardstick** package that produce performance metrics have consistent interfaces. The functions are data frame-based, as opposed to vector-based, with the general syntax of: 
 
 ```r
 function(data, truth, ...)
@@ -667,7 +607,7 @@ where `data` is a data frame or tibble and `truth` is the column with the observ
 
 To illustrate, let's evaluate the model we have constructed for the Ames house price data. Recall that the `lm_fit` object was a linear regression model whose predictor set was supplemented with an interaction term. It was created from a training set (named `ames_train`). Although we do not advise using the test set at this juncture of the modeling process, it will be used to illustrate functionality and syntax. The data frame `ames_test` consists of `r nrow(ames_test)` properties. To start, let's produce predictions: 
 
-<!-- DK: This seems confusing, using pipes in the argument to a function. Or is it natural and we should teach students about it earlier? Also, why delete Sale_Price? -->
+<!-- DK: This seems confusing, using pipes in the argument to a function. Or is it natural and we should teach students about it earlier? Also, why delete Sale_Price? Figure this out! -->
 
 ```{r}
 ames_test_res <- predict(lm_fit, 
@@ -703,7 +643,7 @@ ggplot(ames_test_res, aes(x = Sale_Price, y = .pred)) +
 
 <!-- DK: These functions might go in a pre-amble section for the tutorial. -->
 
-`geom_abine()` draws the line at the 45 degree line. `coord_obs_pred()` is a function from **tidymodels** for making comparisons between actual with predicted values.
+`geom_abine()` draws the line at the 45 degree line. `coord_obs_pred()` is a function from **tidymodels** which provides useful defaults for graphical comparisons of actual values with predicted values.
 
 There is one property that is substantially over-predicted. 
 
@@ -798,7 +738,6 @@ Random forest models are very powerful and they can emulate the underlying data 
 
 Using the same predictor set as the linear model (without the extra preprocessing steps), we can fit a random forest model to the training set using via the ranger package. This model requires no preprocessing so a simple formula can be used directly.
 
-<!-- DK: Revisit this code! Make it like other code. No add_formula(), I think. -->
 
 ```{r}
 rf_model <- 
@@ -808,8 +747,9 @@ rf_model <-
 
 rf_wflow <- 
   workflow() %>% 
-  add_formula(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
-                           Year_Built + Bldg_Type) %>% 
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
+                                 Year_Built + Bldg_Type,
+                    data = ames_train)) %>% 
   add_model(rf_model) 
 ```
 
@@ -838,23 +778,22 @@ The control arguments include:
  
 For our example, let's save the predictions in order to visualize the model fit and residuals: 
 
-<!-- DK: I am confused about keep_pred and what it does in this code. Recall that there used to be stand-alone function defined at the top of the Rmd called keep_pred. I deleted it everywhere I found it and replaced it with control_resamples(save_pred = TRUE). Necessary? Desirable? -->
 
 ```{r resampling-cv-ames}
-keep_pred <- control_resamples(save_pred = TRUE)
-
 set.seed(130)
 rf_res <- 
   rf_wflow %>% 
-  fit_resamples(resamples = ames_folds, control = keep_pred)
+  fit_resamples(resamples = ames_folds, 
+                control = control_resamples(save_pred = TRUE))
 rf_res
 ```
+
+
 ```{r resampling-checkpoint, include = FALSE}
 lm_wflow <- 
   workflow() %>% 
   add_recipe(ames_rec) %>% 
   add_model(linear_reg() %>% set_engine("lm"))
-# save(rf_res, lm_wflow, rf_wflow, file = "RData/resampling.RData", version = 2, compress = "xz")
 ```
 
 <!-- DK: Need to deal with this save() failure. -->
@@ -914,60 +853,6 @@ ames_train %>%
 These results can help us investigate why the prediction was poor for this house. 
 
 
-
-Our code so far:
-
-
-```{r, eval = FALSE}
-library(tidymodels)
-data(ames)
-ames <- mutate(ames, Sale_Price = log10(Sale_Price))
-
-set.seed(123)
-ames_split <- initial_split(ames, prob = 0.80, strata = Sale_Price)
-ames_train <- training(ames_split)
-ames_test  <-  testing(ames_split)
-
-ames_rec <- 
-  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
-           Latitude + Longitude, data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_other(Neighborhood, threshold = 0.01) %>% 
-  step_dummy(all_nominal()) %>% 
-  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) %>% 
-  step_ns(Latitude, Longitude, deg_free = 20)
-
-lm_model <- linear_reg() %>% set_engine("lm")
-
-lm_wflow <- 
-  workflow() %>% 
-  add_model(lm_model) %>% 
-  add_recipe(ames_rec)
-
-lm_fit <- fit(lm_wflow, ames_train)
-
-rf_model <- 
-  rand_forest(trees = 1000) %>% 
-  set_engine("ranger") %>% 
-  set_mode("regression")
-
-rf_wflow <- 
-  workflow() %>% 
-  add_formula(
-    Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + 
-      Latitude + Longitude) %>% 
-  add_model(rf_model) 
-
-set.seed(55)
-ames_folds <- vfold_cv(ames_train, v = 10)
-
-keep_pred <- control_resamples(save_pred = TRUE)
-
-set.seed(130)
-rf_res <- rf_wflow %>% 
-  fit_resamples(resamples = ames_folds, control = keep_pred)
-```
-
 ## Comparing models with resampling {#compare}
 
 Once we create two or more models, the next step is to compare them. In some cases, comparisons might be _within-model_, where the same model might be evaluated with different features or preprocessing methods. Alternatively, _between-model_ comparisons, such as when we compared linear regression and random forest models in Section \@ref(resampling), are the more common scenario.
@@ -999,8 +884,8 @@ no_inter_rec <-
   step_dummy(all_nominal()) 
 
 lm_no_inter_res <- 
-  lm_wflow %>%
-  remove_recipe() %>% 
+  workflow() %>% 
+  add_model(lm_model) %>% 
   add_recipe(no_inter_rec) %>% 
   fit_resamples(resamples = ames_folds, 
                 control = control_resamples(save_pred = TRUE))
@@ -1022,6 +907,94 @@ Practical significance is subjective; two people can have very different ideas o
 
 <!-- DK: Outline my philosophy: Transparency and reproducibility. -->
 
-## Conclusion
+## Summary
 
-The **tidymodels** package provides the most popular and sophisticated tools for making models in R. This chapter has provided a whirlwind tour. Don't worry if you did not understand every detail! We will spend the last two chapters of the book practicing.
+The **tidymodels** package provides the most popular and sophisticated tools for making/testing models in R. This chapter has provided a whirlwind tour. Don't worry if you did not understand every detail! We will spend the last two chapters of the book practicing. Most model projects are structured in a very similar fashion. To review:
+
+First, split up the data into training and test. Then, create cross-validation data sets from the training data. Professionals use `set.seed()` in order to make their analysis reproducible. 
+
+<!-- DK: Really annoying that I can't count on ames to have Sale_Price already logged. -->
+
+```{r}
+set.seed(10)
+ames_split <- initial_split(ames, prob = 0.80)
+ames_train <- training(ames_split)
+ames_test  <- testing(ames_split)
+ames_folds <- vfold_cv(ames_train, v = 10)
+```
+
+Second, start a model pipeline with `workflow()` and then add a model object. Note that we are no longer assigning the results of each step to a new object. There is no need for that since we don't really care about the interim steps.
+
+```{r}
+workflow() %>%
+  add_model(linear_reg() %>% 
+              set_engine("lm") %>% 
+              set_mode("regression")) 
+```
+
+Third, add a recipe --- which should contain a formula and data --- and then any associated `step_*` functions. (Note that we have simplified this slightly from the example above.)
+
+```{r, eval=FALSE}
+...  %>% 
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built, 
+                    data = ames_train)) %>%
+    step_log(Gr_Liv_Area, base = 10) %>% 
+    step_other(Neighborhood, threshold = 0.01) %>% 
+    step_dummy(all_nominal())
+```
+
+Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters `wfl` so as to remember that it is a workflow object.
+
+```{r}
+my_wfl <- workflow() %>%
+  add_model(linear_reg() %>% 
+              set_engine("lm") %>% 
+              set_mode("regression")) %>% 
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built, 
+                    data = ames_train)) %>%
+    step_log(Gr_Liv_Area, base = 10) %>% 
+    step_other(Neighborhood, threshold = 0.01) %>% 
+    step_dummy(all_nominal()) 
+```
+
+Fifth, see how well the approach works under cross-validation.
+
+```{r}
+my_wfl %>% 
+  fit_resamples(resamples = ames_folds) %>% 
+  collect_metrics()
+```
+
+This is the most important tool for deciding which model we should choose.
+
+This workflow would form the heart of our analysis. We can try different model types and different formulas easily.  Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole. 
+
+```{r}
+my_wfl %>% 
+  fit(data = ames_train) %>% 
+  predict(new_data = ames_train) %>% 
+  bind_cols(ames_train %>% select(Sale_Price))
+```
+
+This examination can also be a part of the process of creating a good workflow. Either way, we certainly want to be sure that, for our final model, the predictions on the training data look reasonable.
+
+Sixth, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. Do the predictions seem sensible? Make sure to still fit the model with the training data.
+
+```{r}
+my_wfl %>% 
+  fit(data = ames_train) %>% 
+  predict(new_data = ames_test) %>% 
+  bind_cols(ames_test %>% select(Sale_Price))
+```
+
+How well our model does with data it has never seen before is a good guide as to how well it will work on new data tomorrow.
+
+```{r}
+my_wfl %>% 
+  fit(data = ames_train) %>% 
+  predict(new_data = ames_test) %>% 
+  bind_cols(ames_test %>% select(Sale_Price)) %>% 
+  metrics(truth = Sale_Price, estimate = `.pred`)
+```
+
+
