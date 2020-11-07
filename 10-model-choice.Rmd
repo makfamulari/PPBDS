@@ -3,13 +3,15 @@ output_yaml:
   - _output.yml
 ---
 
+<!-- DK: Add discussion of rmse. -->
+
 <!-- DK: It is really bad, both here and in the chapter, that we just replace both ames and Sale_Price in place. Create a new data set, or at least a new variable, and use that! -->
 
 <!-- DK: Use argument names first time that you use that function. -->
 
 <!-- DK: Shouldn't the last step be to run our final model on ames_test? -->
 
-<!-- DK: Explain control_resample().  -->
+<!-- DK: Explain control_resample().  Or drop it! -->
 
 <!-- DK: Can we make a simple pipe for tidymodels which we can teach students to do. First, split the data. Second, create the folds. Third, choose the model. Fourth, make the recipe. Fifth, make the workflow. Sixth, apply the workflow to the folds. Seventh, fit model to all of training. Eighth, check how this model does on test. Nineth, fit model on all data. Use that model tomorrow. -->
 
@@ -947,17 +949,22 @@ Fourth, assign this pipe to a single workflow object. This object can then be us
 
 ```{r}
 my_wfl <- workflow() %>%
-  add_model(linear_reg() %>% 
-              set_engine("lm") %>% 
-              set_mode("regression")) %>% 
-  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built, 
+  add_model(linear_reg() %>%
+              set_engine("lm") %>%
+              set_mode("regression")) %>%
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built,
                     data = ames_train)) %>%
-    step_log(Gr_Liv_Area, base = 10) %>% 
-    step_other(Neighborhood, threshold = 0.01) %>% 
-    step_dummy(all_nominal()) 
+    step_log(Gr_Liv_Area, base = 10) %>%
+    step_other(Neighborhood, threshold = 0.01) %>%
+    step_dummy(all_nominal())
+
 ```
 
 Fifth, see how well the approach works under cross-validation.
+
+<!-- DK: Current problem is that, in splits 2 and 4, a Neighborhood value appears in the assessment which is not in the analysis tibble, causing a warning message. Then, instead of getting 10 samples, we only get 8. Isn't there a trick which deals with this? step_unknown(Neighborhood) does not work. Taking Neighborhood out of the formula solves the problem, as we would expect. step_novel(Neighborhood) does not seem to solve the problem. -->
+
+
 
 ```{r}
 my_wfl %>% 
@@ -965,7 +972,11 @@ my_wfl %>%
   collect_metrics()
 ```
 
-This is the most important tool for deciding which model we should choose.
+Note the two warning messages. By chance, in two of our cross-validation assessments samples there are new levels for Neighborhood (Green_Hills and Landmark) which are not part of their respective analysis samples. This causes a failure because the model does not know how to process factor levels which it has not seen before. Fortunately, the process works fine on the other 8 samples, so we can still use these results.
+
+<!-- DK: What a cop out! Handle this properly! -->
+
+The result from a cross-validation exercise is the most important tool for deciding which model we should choose.
 
 This workflow would form the heart of our analysis. We can try different model types and different formulas easily.  Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole. 
 
