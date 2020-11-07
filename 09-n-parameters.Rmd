@@ -1256,7 +1256,7 @@ Now that we have analyzed the impact of our various treatments on voting behavio
 
 ```{r, cache=TRUE}
 model_4 <- stan_glm(data = ch9_sham, 
-                 formula = primary_06 ~ treatment + age + solo + solo:treatment, 
+                 formula = primary_06 ~ treatment + age + solo, 
                  refresh = 0)
 ```
 
@@ -1264,22 +1264,19 @@ model_4 <- stan_glm(data = ch9_sham,
 print(model_4, digits = 3)
 ```
 
-First, let's look at which variables are included on our left hand side. Besides our (Intercept), we are given sexMALE, soloTRUE, and four out of our five treatments. What does that mean our comparison, or (Intercept), is? Look to what we are not given: sexFEMALE, soloFALSE, and treatmentCivic Duty. Therefore, our baseline for comparison are the female participants who do *not* live in single person households that we under the Civic Duty treatment. For this group, the percentage voting is .309 = 30.9%. From this figure, we will break down what our variables and their respective medians mean. 
+First, let's look at which variables are included on our left hand side. Besides our (Intercept), we are given treatmentNeighbors, age, and soloTRUE. What does that mean our baseline for comparison, or (Intercept), is? Look to what we are not given: treatmentControl and soloFALSE. Therefore, our baseline for comparison are the participants in the Control group who do *not* live in single person households. As we learned before, age calculates starting at age 0 and is therefore unhelpful practially. For this group, the percentage voting is .085 = 8.5%. From this figure, we will break down what our variables and their respective medians mean. 
 
-- sexMALE, with a median of 0.021: as compared with female participants, males are more likely to vote by a factor of 0.021 = 2.1%. Recall that sexMALE corresponds to the *offset* in intercept for the male respondents relative to the female respondents.
-- soloTRUE, with a median of 0.044: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.044 = 4.4%. Note that this is only true for our baseline group of female participants and does not include an analysis for males. 
-- treatmentHawthorne, with a median of -0.002: female participants are slightly *less* likely to vote when under the Hawthorne treatment as compared with the baseline Civic Duty treatment.
-- treatmentControl, with a median of -0.014: female participants are *less* likely to vote when under the Control, as compared with the Civic Duty baseline treatment.
-- treatmentSelf, with a median of 0.012: female participants in this group are *more* likely to vote as compared with the Civic Duty treatment. This makes sense, since we expect that additional social pressure increases voter turnout.
-- treatmentNeighbors, with a median of 0.039: female participants in this group are *more* likely to vote compared with those in the Civic Duty group. As this is the treatment with the most social pressure, it makes sense that the median value is not only positive, but is much higher than all other treatment groups. 
+- treatmentNeighbors, with a median of 0.078: the offset in the Neighbors treatment is 0.078 compared with the control group. The percent voting for this group is then 0.085 (Control) + 0.078 (Neighbors) = .163 = 16.3%. This illustrates that the Neighbors treatment is positively correlated with voting. 
+- age, with a median of 0.004: as before, the age represents the positively correlated increase with voting as someone ages. For every decade older a participant is, their chance of voting increases by 4%. 
+- soloTRUE, with a median of 0.015: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.015 = 1.5%. Note that this is only true for our baseline group of Control participants and does not include an analysis for those in Neighbors. 
 
-#### Voting & Sex, Solo, Treatment, + Interactions
+#### Voting & Age, Solo, Treatment, + Interactions
 
-Since we've now studied a model with three different variables, it is time to look at interactions! Here, we will look at `primary_06` as a function of sex, solo, treatment, and `solo*treatment`. What does `solo*treatment` mean for us? It means we are looking at the `solo` and `treatment` variables as they correspond to one another. For example, `soloTRUE:treatmentHawthorne` would be the offset in slope for those who live alone under treatment Hawthorne *as compared with our baseline group*. 
+Since we've now studied a model with three different variables, it is time to look at interactions! Here, we will look at `primary_06` as a function of age, solo, treatment, and `solo*treatment`. What does `solo*treatment` mean for us? It means we are looking at the `solo` and `treatment` variables as they correspond to one another. 
 
 ```{r, cache=TRUE}
 model_5 <- stan_glm(data = ch9_sham, 
-                 formula = primary_06 ~ sex + solo + treatment + solo * treatment, 
+                 formula = primary_06 ~ age + solo + treatment + solo * treatment, 
                  refresh = 0)
 ```
 
