@@ -1219,6 +1219,7 @@ age
 
 To explore this relationship visually, let's create a graph. We are coercing `primary_06` into a character variable as it more closely represents "yes" or "no" as opposed to a numeric value. 
 
+
 ```{r}
 age %>% 
   mutate(primary_06 = as.character(primary_06)) %>% 
@@ -1235,7 +1236,23 @@ age %>%
 There are some interesting takeaways here. 
 - First, in almost every age bracket (other than above 90), the majority participants did *not* vote. 
 - The spike between ages 40 and 60 illustrates that most participants exist in this age bracket. 
-- The differences between voters and non-voters narrows greatly after age 60. 
+- The differences between voters and non-voters narrows greatly after age 60.
+
+Let's now look at another graph that aims to show the same phenomena, but also includes a formula using `lm`. This more clearly shows the upward trend in voting as a participants age increases. We can also see that the highest concentrations in the "Voted" row exist from ages 45-50, whereas the highest concentrations for the "Did Not Vote" row exist in the 18-25 and 30-60 age groups. Again, we see that, for almost all ages, the partcipants are more likely to not vote than vote. This is illustrated by the darker concentration of dots in the "Did Not Vote" row. The slope of our regression line, however, shows a clear picture: the older you are, the more likely you are to vote. 
+
+```{r}
+shaming %>% 
+  mutate(age = 2006 - birth_year) %>%  
+  ggplot(aes(age, primary_06)) + 
+  geom_jitter(alpha = 0.005, height = 0.1) + 
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+  scale_y_continuous(breaks = c(0, 1), labels = c("Did Not Vote", "Voted")) + 
+  labs(title = "Age and Voting in 2012 Michigan Primary Election", 
+       subtitle = "Older people are more likely to vote", 
+       x = "Age", 
+       y = NULL, 
+       caption = "Data from Gerber, Green, and Larimer (2008)") 
+```
 
 Let's look at the results of our regression. 
 
