@@ -1107,7 +1107,7 @@ ch9_sham <- shaming %>%
   sample_n(10000, replace = FALSE)
 ```
 
-We create the variable `solo`, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not.
+We create the variable `solo`, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not. We have also focused in on only two "treatments": Control and Neighbors. This is for the sake of simplification. We want to know if social pressure impacts voting behavior, so it makes sense to look at the treatment that provides the most social pressure. 
 
 ```{r}
 ch9_sham %>% 
@@ -1178,36 +1178,30 @@ knitr::include_graphics("other/images/Justice.jpg")
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
-Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let's model `primary_06`, which represents whether a citizen voted or not, against sex to see if there is a connection. 
+Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let's model `primary_06`, which represents whether a citizen voted or not, against age and treatment to see if there is a connection. 
 
-#### Voting and Sex
+#### Voting and Treatment + Age
 
-Let's start with a simple model: the effect of voting in the 2006 election and sex. First, let's look at the results of `primary_06` after grouping by `sex` to see the number of females and males who did or did not vote. Recall that a value of 1 for `primary_06` means that the citizen *did* vote, while a value of 0 means that they *did not*. 
+Let's look at the relationship between primary voting and treatment + age. 
 
-```{r}
-ch9_sham %>% 
-  group_by(sex) %>% 
-  count(primary_06) 
-```
-
-Eyeballing the figures, you may have noticed that slightly more male respondents voted than female respondents. Let's investigate this using `stan_glm`.
 
 ```{r, cache=TRUE}
-
-model_1 <- stan_glm(data = ch9_sham, 
-                 formula = primary_06 ~ sex, 
+model_3 <- stan_glm(data = ch9_sham, 
+                 formula = primary_06 ~ treatment + age, 
                  refresh = 0)
 ```
 
 ```{r}
-print(model_1, digits = 3)
+print(model_3, digits = 3)
 ```
 
-Here, the (Intercept) variable represents our "baseline for comparison" female group of voters. The median value is the percentage of the female group that voted in the 2006 election, as the average of 1 (voted) and 0 (didn't vote) gives us the percentage of the group that *did* vote. That is to say-- about 31% of the female group voted in the primary election. The `sexMale` term corresponds to the *offset* in intercept for the male respondents relative to the female respondents. In other words, the female respondents had an average intercept of .31 = 31% while the male respondent intercept of .31 + .012 = .322 = 32% voting rate. Therefore, male participants were *slightly more* likely to vote in the 2006 primary election, as compared to the female participants. 
+The (Intercept) here has two key details. First, since Control comes alphabetically before Neighbors, the Control group is our baseline for comparison. This holds similarly for age. This is the slope for age of *only* those participants in the Control group. 
 
-#### Voting and Age
+Second, remember that for this data, the (Intercept) does have a mathematical interpretation, but it does not have a practical interpretation. Why is this? Because the slope for age starts at zero. This is nonsensical for our purposes, as no voter can be of zero age. 
 
-Now that we've seen the relationship between sex and voting, let's take a look at age. Begin by grouping our observations by `age` and counting by `primary_06`, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category. 
+Therefore, this model shows that, within the control group, the percent voting is 0.084 = 8.4%. How do we then calculate our percent voting in the Neighbors group? Recall that the `treatmentNeighbors` median is not giving a standalone figure for this group, but rather represents the offset between the Control and Neighbors groups. To find the Neighbors value, we must add the offset to the original value: 0.084 + 0.079 = .163 = 16.3%. This is nearly double the rate in the Control group!
+
+Let's turn to our age median. Begin by grouping our observations by `age` and counting by `primary_06`, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category. 
 
 ```{r}
 age <- ch9_sham %>% 
@@ -1218,7 +1212,6 @@ age
 ```
 
 To explore this relationship visually, let's create a graph. We are coercing `primary_06` into a character variable as it more closely represents "yes" or "no" as opposed to a numeric value. 
-
 
 ```{r}
 age %>% 
@@ -1254,44 +1247,8 @@ shaming %>%
        caption = "Data from Gerber, Green, and Larimer (2008)") 
 ```
 
-Let's look at the results of our regression. 
-
-```{r, cache=TRUE}
-model_2 <- stan_glm(data = ch9_sham, 
-                 formula = primary_06 ~ age, 
-                 refresh = 0)
-```
-
-```{r}
-print(model_2, digits = 3)
-```
-
 Note that the median for age is 0.004. Age is therefore positively correlated with voting in the primary election. What does that mean? It means that, for every year that a participant's age increases, their odds of voting in the primary *increases* by 0.004. Now, this might not seem like a huge difference. However, think of it like this: for every decade older that a participant is, their odds of voting increase .04 = 4%! This makes sense considering that we just learned that older citizens are more likely to vote. 
 
-#### Voting and Treatment
-
-Looking at the relationship between primary voting and treatment.
-
-```{r, cache=TRUE}
-model_3 <- stan_glm(data = ch9_sham, 
-                 formula = primary_06 ~ treatment - 1, 
-                 refresh = 0)
-```
-
-```{r}
-print(model_3, digits = 3)
-```
-
-Recall that the four treatments varied in the amount of social shaming involved. While each sent the message, "DO YOUR CIVIC DUTY - VOTE!", there were differences. Briefly:
-
-- The first treatment, Civic Duty, also read, “Remember your rights and responsibilities as a citizen. Remember to vote." (Least pressure)
-- Hawthorne told the voters that they were being studied and their voting behavior would be examined through public records. (Slighly more pressure)
-- Self included the recent voting record of each member of the household, placing the word "Voted" next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. The households were also told, “we intend to mail an updated chart" with the voting record of the household members after the 2006 primary. (Moderate pressure)
-- Neighbors provides the household members' voting records, as well as the voting records of those who live nearby. This mailing also told recipients, "we intend to mail an updated chart" of who voted in the 2006 election to the entire neighborhood. (Most pressure)
-
-The Control group had the least active voters with a median of .297 = 29.7% of participants voting. The Civic Duty treatment (least pressure) had slighly more at .314 = 31.4% of participants voting. The Hawthorne group (slightly more pressure) increased upon Civic Duty for a total of .322 = 32.2% voting. The Self group (moderate pressure) increased even still, with .345 = 34.5% of the group voting. Finally, the Neighbors group (with the most social pressure) yielded the highest voting rate of .378 = 37.8%. 
-
-This means that, as we hoped, more social pressure = higher voting turnout. That being said, the percent differences were not large. The biggest leap came from the Neighbors group, suggesting that the pressure of your vote being publicized to your community increases turnout more than a simple encouragement. 
 
 #### Voting & (Age + Solo + Treatment)
 
@@ -1308,16 +1265,6 @@ print(model_4, digits = 3)
 ```
 
 First, let's look at which variables are included on our left hand side. Besides our (Intercept), we are given sexMALE, soloTRUE, and four out of our five treatments. What does that mean our comparison, or (Intercept), is? Look to what we are not given: sexFEMALE, soloFALSE, and treatmentCivic Duty. Therefore, our baseline for comparison are the female participants who do *not* live in single person households that we under the Civic Duty treatment. For this group, the percentage voting is .309 = 30.9%. From this figure, we will break down what our variables and their respective medians mean. 
-<<<<<<< HEAD
-
-- sexMALE, with a median of 0.021: as compared with female participants, males are more likely to vote by a factor of 0.021 = 2.1%. Recall that sexMALE corresponds to the *offset* in intercept for the male respondents relative to the female respondents.
-- soloTRUE, with a median of 0.044: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.044 = 4.4%. Note that this is only true for our baseline group of female participants and does not include an analysis for males. 
-- treatmentHawthorne, with a median of -0.002: female participants are slightly *less* likely to vote when under the Hawthorne treatment as compared with the baseline Civic Duty treatment.
-- treatmentControl, with a median of -0.014: female participants are *less* likely to vote when under the Control, as compared with the Civic Duty baseline treatment.
-- treatmentSelf, with a median of 0.012: female participants in this group are *more* likely to vote as compared with the Civic Duty treatment. This makes sense, since we expect that additional social pressure increases voter turnout.
-- treatmentNeighbors, with a median of 0.039: female participants in this group are *more* likely to vote compared with those in the Civic Duty group. As this is the treatment with the most social pressure, it makes sense that the median value is not only positive, but is much higher than all other treatment groups. 
-
-=======
 
 - sexMALE, with a median of 0.021: as compared with female participants, males are more likely to vote by a factor of 0.021 = 2.1%. Recall that sexMALE corresponds to the *offset* in intercept for the male respondents relative to the female respondents.
 - soloTRUE, with a median of 0.044: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.044 = 4.4%. Note that this is only true for our baseline group of female participants and does not include an analysis for males. 
