@@ -1252,6 +1252,8 @@ Note that the median for age is 0.004. Age is therefore positively correlated wi
 
 #### Voting & (Age + Solo + Treatment)
 
+<!-- MF: Thinking about graphs/visualizations for this section: are they necessary? I believe they help students visualize concepts, but most graphs won't show up 'pretty' because of the YES/NO as our main variable. --> 
+
 Now that we have analyzed the impact of our various treatments on voting behavior, let's turn to three different variables together: sex, solo (living alone), and treatment.
 
 ```{r, cache=TRUE}
@@ -1272,6 +1274,8 @@ First, let's look at which variables are included on our left hand side. Besides
 
 #### Voting & Age, Solo, Treatment, + Interactions
 
+<!-- MF: Should I be talking about standard deviation here, or just the median values? --> 
+
 Since we've now studied a model with three different variables, it is time to look at interactions! Here, we will look at `primary_06` as a function of age, solo, treatment, and `solo*treatment`. What does `solo*treatment` mean for us? It means we are looking at the `solo` and `treatment` variables as they correspond to one another. 
 
 ```{r, cache=TRUE}
@@ -1284,7 +1288,7 @@ model_5 <- stan_glm(data = ch9_sham,
 print(model_5, digits = 3)
 ```
 
-There is lots to look at here. Let's narrow our focus a bit to highlight some important takeaways. First, our baseline is again: female participants in multi-person households under treatment Civic Duty. For this group, the (Intercept) is 0.304 = 30.4% voting. Every other variable represents an offset from that baseline value. Let's dig in!
+<!-- There is lots to look at here. Let's narrow our focus a bit to highlight some important takeaways. First, our baseline is again: female participants in multi-person households under treatment Civic Duty. For this group, the (Intercept) is 0.304 = 30.4% voting. Every other variable represents an offset from that baseline value. Let's dig in!
 
 First, note that (as we saw in the last model) sexMale and soloTRUE both *increase* the odds of a participant voting. The median values represent an offset from baseline. Therefore, the true value for sexMale would be the (Intercept) + sexMale = 0.304 + 0.022 = 0.326. The true value for soloTRUE is (Intercept) + soloTRUE = 0.304 + 0.068 = 0.372. 
 
@@ -1296,7 +1300,7 @@ Now, we will turn out attention to our interactions.
 - `soloTRUE:treatmentSelf` shows the offset from our baseline under the Self treatment. The intercept for this group would be the soloTRUE intercept + the interaction value = 0.372 + 0.003 = 0.375. This shows that, compared with our baseline of soloTRUE under the Civic Duty treatment, the voter turnout for this group is *slightly increased*. 
 - `soloTRUE:treatmentNeighbors` shows the offset from our baseline under the Neighbors treatment. Again, to find the true intercept, we must add this interaction value of 0.006 to our calculated soloTRUE intercept: 0.372 + 0.006 = 0.378. Therefore, compared to the solo group under treatment Civic Duty, the solo group under treatment Neighbors *voted more*. 
 
-What does this tell us? First, we know that (of the various treatments) Neighbors continues to be the most effective, even in those female citizens that are living alone. We also know that, in those females living alone, the control and Hawthorne treatment are less effective as compared with the Civic Duty treatment. And, while the Self and Neighbors treatments *did* increase voter turnout, the rate of increase was less as compared to the soloFALSE group (showed in the previous model). 
+What does this tell us? First, we know that (of the various treatments) Neighbors continues to be the most effective, even in those female citizens that are living alone. We also know that, in those females living alone, the control and Hawthorne treatment are less effective as compared with the Civic Duty treatment. And, while the Self and Neighbors treatments *did* increase voter turnout, the rate of increase was less as compared to the soloFALSE group (showed in the previous model). -->
 
 ### Temperance
 
@@ -1314,7 +1318,7 @@ There is also the issue of representitiveness. Do the voters of the 2006 primary
 
 These complications are why we must make inferences with a grain of salt. That is not to say that all data science is unhelpful! On the contrary, acknowledging our deficits will only make our inferences (and the actions we take because of them) stronger. 
 
-<!-- MF: Do we need to add any additional sections to drive home the interactions explanation? Should I keep a separate interactions section dedicated to *just* studying interaction effects? DK: Whatever you think best. -->
+<!-- MF: Thinking of overall second half: what other sections should be added? Anything additional from themes? -->
 
 
 ## Causal Effects of `treament`
