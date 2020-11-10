@@ -649,22 +649,32 @@ ggplot(ames_test_res, aes(x = Sale_Price, y = .pred)) +
 
 There is one property that is substantially over-predicted. 
 
-Let's compute the root mean squared error for this model using the `rmse()` function: 
+Let's compute the root mean squared error (RMSE) for this model using the `rmse()` function: 
 
 ```{r}
 rmse(ames_test_res, truth = Sale_Price, estimate = .pred)
 ```
 
+The RMSE for any model is the square root of the average squared residual. Mathematically:
+
+$$ RMSE = \sqrt{ \frac{1}{N}\sum_{i=1}^{N} (f_{i} - y_i)^2}$$
+where $f_i$ is the fitted or predicted value for observation $i$.
+
 The output above shows the standard format of the output of **yardstick** functions. Metrics for numeric outcomes usually have a value of "standard" for the `.estimator` column. Examples with different values for this column are shown below.
 
 <!-- DK: Should we give formulas for these metrics? Discuss them? Or maybe only use rmse? -->
 
-To compute multiple metrics at once, we can create a _metric set_. Let's add $R^2$ and the mean absolute error: 
+To compute multiple metrics at once, we can create a _metric set_. Let's add the mean absolute error (MAE): 
 
 ```{r}
-ames_metrics <- metric_set(rmse, rsq, mae)
+ames_metrics <- metric_set(rmse, mae)
 ames_metrics(ames_test_res, truth = Sale_Price, estimate = .pred)
 ```
+
+Mathematically:
+
+$$ MAE = \frac{1}{N}\sum_{i=1}^{N} \lvert f_{i} - y_i \rvert$$
+
 
 This tidy data format stacks the metrics vertically.
 
