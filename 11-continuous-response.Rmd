@@ -5,17 +5,42 @@ output_yaml:
 
 # Continuous Response {#continuous-response}
 
-**DRAFT: Final version available soon.**
-
 <!-- DK: Error message from running nn fit_resamples. -->
+
+<!-- DK: Should, in each section, "discover" some weirdness in the plot, go back and add a step_function, and discover that the weirdness is "fixed" in the plot. -->
+
+<!-- DK: Should we add more detail in terms of how we work with the fit_samples object? Probably not. Too complex for this class. If anything, we need more time discussing how we should investigate what step_* functions to add and why. -->
+
+<!-- DK: Need to use our chosen model to answer a question of some sort. Let's compare group X with group Y. How do they differ in predicted ideology?  If we have enough members of group X and group Y, we can just compare their real ideology! But, often we won't have enough. So, we need to use the model to make the comparison. -->
+
+<!-- DK: What about code like this for comparing a bunch of models all at once? -->
+
+<!-- ```{r} -->
+<!-- ch11_formulas <- tibble(formula = c(age_form, -->
+<!--                                    race_gender_form, -->
+<!--                                    full_form, -->
+<!--                                    interact_form), -->
+<!--                        group = c("Age only model", -->
+<!--                                  "Race and gender model", -->
+<!--                                  "Full model without interaction", -->
+<!--                                  "Interaction model")) -->
+<!-- ``` -->
+
+<!-- Now, we can use `map_*` to apply all of these models and view their metrics to see which ones have the lowest rmse values. -->
+
+<!-- ```{r cache=TRUE, message=FALSE} -->
+<!-- set.seed(10) -->
+<!-- folds_metrics <- ch11_formulas %>% -->
+<!--   mutate(metrics = map(formula, ~ fit_resamples(object = lm_model, -->
+<!--                                                 preprocessor = ., -->
+<!--                                                 resamples = ch11_folds) %>% -->
+<!--                          collect_metrics())) -->
+<!-- ``` -->
 
 Chapter \@ref(model-choice) showed us the *tidymodels* framework for model building and testing. In this chapter, we will use it to explore models in which the outcome variable is *continuous*. In Chapter \@ref(discrete-response), we learn about outcome variables which are *discrete*, meaning that they are members of distinct categories like TRUE/FALSE or yes/no. 
 
-We use `nes` from the `PPBDS.data` package. `nes` contains data from the American National Election Survey for every presidential election year since 1952. Along with demographic details, such as race, gender, and age, the survey also contains respondents' ideological identification. Because `ideology` is measured on a scale from -3 to 3, we can treat it as a continuous outcome variable.
+We use `nes` from the `PPBDS.data` package. `nes` contains data from the American National Election Survey for every presidential election year since 1952. Along with demographic details, such as race, gender, and age, the survey also includes respondents' ideological identification. Because `ideology` is measured on a scale from -3 to 3, we can treat it as a continuous outcome variable.
 
-<!-- DK: Is this a good question? Maybe save for the end? -->
-
-<!-- Throughout this chapter, we seek to answer this question: Which variables are associated with one's ideology, and how so? -->
 
 ## Exploratory Data Analysis
 
@@ -29,14 +54,14 @@ library(tidymodels)
 library(rstanarm)
 ```
 
-The **tidymodels** framework makes it easy to use functions from different model packages in constructing, fitting, and testing models. 
+Explore `nes`:
 
 
 ```{r}
 glimpse(nes)
 ```
 
-Variables available in `nes`:
+Variables available in `nes`. Note that the full NES has many more variables available.
 
 <!-- DK: Is voted in previous election or in this one? -->
 
@@ -74,7 +99,7 @@ ch11 <- nes %>%
 
 <!-- DK: What should I do with ordered factors? Change them here? Change them in nes itself? If I leave them, will our various models be able to do something with them? Perhaps I will need to use a step_* to fix? Or maybe step_dummy() takes care of that? -->
 
-The first step in data science is to split our data set into training and testing samples, and then to create cross-validations of the training data.
+The first step in a proper data science project is to split our data set into training and testing samples, and then to create cross-validations from the training data.
 
 ```{r}
 set.seed(10)
@@ -112,10 +137,16 @@ lm_wfl <- workflow() %>%
             set_mode("regression")) %>% 
   add_recipe(recipe(ideology ~ gender + race + region + 
                       income + age + education,
-                    data = ch11_train)) %>%
-  step_dummy(all_nominal())
+                    data = ch11_train)) 
   
 ```
+
+<!-- DK: Why don't I need step_dummy(all_nominal())? Especially since age is an ordered factor. How does lm magically handle this? -->
+
+The required parts of the recipe are the model and a data set. The data set does not really matter that much since we are not really using it for anything at this stage of the process. Its purpose is to ensure that tidymodels can process the recipe. To do so, it needs to know if, for example, `gender` is character or factor or numeric. You would get the same result whether you used `ch_11`, `ch_11_train` or `ch_11_test` as the value for `data`. But, it is a good habit to never use the test data until the very end, even if doing so is harmless.
+
+The formula portion of the recipe will, depending in the model, look a lot like the formulas which you have passed to `stan_glm()`. But, in tidymodels, we are not allowed to do any mathematical operations in the receipt itself, beyond addition. Any such operations need to be placed in `step_*` functions. Recall how, in Chapter \@ref(model-choice), we need to use `step_interact()` to add an interaction term. Figuring out which `step_*` functions we want to use and why is the hardest part of tidymodels.
+
 
 Examine performance on the cross-validation samples.
 
@@ -127,7 +158,7 @@ lm_metrics <- lm_wfl %>%
 lm_metrics
 ```
 
-Check the predictions against the actual values.
+Check the predictions against the actual values for the training data.
 
 ```{r}
 lm_wfl %>% 
@@ -145,9 +176,11 @@ lm_wfl %>%
 
 Is this result good or bad? Depends on your point of view! If we predict that someone's ideology is 0, then we don't know that much about their ideology. It could be an anywhere from -3 (strong Democrat) to +3 (strong Republican). 
 
+<!-- DK: We need more instruction. But do we need it here or in an appendix? We should look at this plot, change the workflow, look at the plot again, and so on. -->
+
 ## Bayesian linear model
 
-Create the workflow object with the model engine.
+Create the workflow object with the model engine. Note that every part is the same as the linear model we just completed *except* that the required engine is "stan". 
 
 ```{r}
 stan_wfl <- workflow() %>% 
@@ -165,11 +198,12 @@ stan_wfl <- workflow() %>%
             set_mode("regression")) %>% 
   add_recipe(recipe(ideology ~ gender + race + region + 
                       income + age + education,
-                    data = ch11_train)) %>%
-  step_dummy(all_nominal())
+                    data = ch11_train)) 
 ```
 
 Examine performance on the cross-validation samples.
+
+<!-- DK: Unlike with lm() above, we get different answers depending on whether or not we use step_dummy(all_nominal()). But the differences are very small (4th decimal, at least in the collected metrics), so let's ignore it for now. -->
 
 ```{r}
 stan_metrics <- stan_wfl %>% 
@@ -195,20 +229,32 @@ stan_wfl %>%
          caption = "Source: 2016 CCES")
 ```
 
-
+<!-- DK: Add more discussion. Perhaps discuss the posterior probability distribution for true ideology given predicted ideology. Note that the model never predicts ideology 2 or 3. Is that good or bad? -->
 
 ## Random forest
 
+Random forests are a powerful "non-parametric" approach to forecasting. Recall that, in both lm() and stan_glm() models, there are specified parameters which we are trying to estimate. We "care" about these parameters because they often correspond to real world entities, like the average treatment effect. 
+
+With non-parametric models, there are no parameters which we care about. (That is a loose and not-quite-correct definition.) Instead, the model is a "black box" into which predictors are fed and from which predicted outcomes emerge. 
 
 Create the workflow object with the model engine.
 
 ```{r}
 rf_wfl <- workflow() %>% 
-  add_model(rand_forest('regression') %>%
+  add_model(rand_forest() %>%
+            set_engine("ranger") %>% 
+            set_mode("regression"))
+```
+
+It is possible to pass the model directly as an argument to the model creation function. So, the above would often be written as:
+
+```{r}
+rf_wfl <- workflow() %>% 
+  add_model(rand_forest(mode = "regression") %>%
             set_engine("ranger"))
 ```
 
-Add a recipe.
+The objects are identical. Either way, the next step is to add a recipe.
 
 ```{r}
 rf_wfl <- workflow() %>% 
@@ -216,13 +262,10 @@ rf_wfl <- workflow() %>%
             set_engine("ranger")) %>% 
   add_recipe(recipe(ideology ~ gender + race + region + 
                       income + age + education,
-                    data = ch11_train)) %>%
-  # step_naomit(everything(), skip = FALSE) %>%
-  # step_normalize(all_numeric()) %>% 
-  step_dummy(all_nominal()) 
-
-  
+                    data = ch11_train)) 
 ```
+
+Note that there are improvements we could make to this model. As a rule of thumb, whenever using non-parametric models, you should use `step_normalize(all_numeric())` which, as you might guess, normalizes all numeric variables. We will leave that out here.
 
 Examine performance on the cross-validation samples.
 
@@ -251,6 +294,8 @@ rf_wfl %>%
          caption = "Source: 2016 CCES")
 ```
 
+<!-- DK: The last two graphs are different. Discuss! See how well this model does with low predictions. Every time predicted ideology is below -2.5, the true ideology is -3. The linear models are much more likely to make mistakes when predicting very negative ideology values. -->
+
 
 ## Model comparison
 
@@ -264,7 +309,7 @@ tibble(model = rep(c("Linear Model",
 
 
 ```
-The results for the random forest model are worse than those for either linear model. The results for the imear models are so similar that there is no particular reason, in terms of accuracy, to prefer one model over the others.
+The results for the random forest model are worse than those for either linear model. The results for the two linear models are so similar that there is no particular reason, in terms of accuracy, to prefer one model over the others. 
 
 
 ## Cardinal virtues
@@ -299,7 +344,7 @@ knitr::include_graphics("other/images/Courage.jpg")
 
 *Courage* helps us to fit the models, as we have above, and then to select the one we want to use. We should only favor more complex models (or formulas) if the additional complexity is *warranted*. This is a philosophical principle known as "Occam's Razor." It states that, "all other things being equal, simpler solutions are more likely to be correct than complex ones." When viewed in a modeling framework, Occam's Razor can be restated as, "all other things being equal, simpler models are to be preferred over complex ones." In other words, we should only favor the more complex model/formula if the additional complexity makes the model meaningfully better.
 
-In general, linear models are much simpler than Bayesian models. So, given that these two models did about as well under cross-validation, we should select the linear model.
+In general, linear models are much simpler than Bayesian models. So, given that these two models did about as well under cross-validation, we should select the basic linear model.
 
 
 <!-- Time to make up some imaginary people. Let's say we have four individuals whose ideology in 2016 we wanted to predict. We can create a tibble with the values of their demographic information, like so: -->
@@ -329,92 +374,12 @@ In general, linear models are much simpler than Bayesian models. So, given that 
 <!--   rename("ideology" = ".pred") -->
 <!-- ``` -->
 
-<!-- As you can see, the constant variables are `gender`, `income`, `education`, `age`, and `race`. The most conservative woman was Chelsea, from the South, and the most liberal woman was Betty, from the Northeast. This, of course, can simply be calculated algebraically from the `lm` model. However, we cannot generalize by saying that all young women can be expected to follow this pattern based off of their region. This prediction is only valid for the levels of the variables that we have set. -->
-
-
-
-<!-- ```{r} -->
-<!-- ch11_formulas <- tibble(formula = c(age_form, -->
-<!--                                    race_gender_form, -->
-<!--                                    full_form, -->
-<!--                                    interact_form), -->
-<!--                        group = c("Age only model", -->
-<!--                                  "Race and gender model", -->
-<!--                                  "Full model without interaction", -->
-<!--                                  "Interaction model")) -->
-<!-- ``` -->
-
-<!-- Now, we can use `map_*` to apply all of these models and view their metrics to see which ones have the lowest rmse values. -->
-
-<!-- ```{r cache=TRUE, message=FALSE} -->
-<!-- set.seed(10) -->
-<!-- folds_metrics <- ch11_formulas %>% -->
-<!--   mutate(metrics = map(formula, ~ fit_resamples(object = lm_model, -->
-<!--                                                 preprocessor = ., -->
-<!--                                                 resamples = ch11_folds) %>% -->
-<!--                          collect_metrics())) -->
-<!-- ``` -->
-
-<!-- Let's present the results stored in our `folds_metrics` object. We are simply extracting the `rmse` metric from each formula: -->
-
-<!-- ```{r} -->
-<!-- folds_metrics %>% -->
-<!--   mutate(mean_rmse = map_dbl(metrics, ~ filter(., .metric == "rmse") %>% pull(mean)), -->
-<!--          se_rmse = map_dbl(metrics, ~ filter(., .metric == "rmse") %>% pull(std_err))) %>% -->
-<!--   select(group, mean_rmse, se_rmse) -->
-<!-- ``` -->
-
-<!-- Looking at the results, all of the formulas seem to yield a relatively close mean `rmse`. -->
-
-<!-- The models with the lowest rmse value seems to be the Full model without interaction. The mean squared error is close in value to that of the interaction model. -->
-
-
-
-
 
 ```{r echo=FALSE, fig.margin=TRUE}
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
 *Temperance* reminds us to be suspicious of all models, especially our own. The world is always changing. Our models will rarely work as well in the future as they have using data from the past.
-
-
-
-<!-- However, remember that `rmse` and `rsq` values are not end-all-be-all. There are other ways to to determine the best model: Did it predict low ideologies well? What about high ideologies? Did it do a good job of generally sorting people into the right end of politically liberal or politically conservative? Were there frequent outlandish answers generated, such as a quantity of `ideology` too high to exist? -->
-
-<!-- Indeed, even the `rmse` value's validity can be up for debate, as it takes the mean squared error. Why not take an absolute value so that larger differences do not seem even larger after getting squared? These are questions you should be asking when relying on a metric to compare models. -->
-
-
-<!-- Let's loop back to the original guiding question. How does age affect ideology for respondents from different regions? -->
-
-<!-- Assume that the segment of the population we are interested in is college educated men making an average income. These are vital assumptions to make, as without setting baselines for the other predictor variables, we cannot make any comparisons on region and age. -->
-
-<!-- Say we are specifically interested in the different effects of ages on college-educated men in the Northeast versus the South. Let's use our second model, `stan_model`, to explore this problem. -->
-
-<!-- First, create a tibble in which all respondents are college-educated white men making average income. Half of the group will be from the Northeast, and half from the South. -->
-
-<!-- ```{r} -->
-<!-- wrap_up <- tibble("region" = as.factor(c("Northeast", "South", "Northeast", "South", -->
-<!--                                             "Northeast", "South", "Northeast", "South", -->
-<!--                                             "Northeast", "South", "Northeast", "South", -->
-<!--                                             "Northeast", "South")), -->
-<!--                      "gender" = as.factor(c("Male", "Male", "Male", "Male", -->
-<!--                                             "Male", "Male", "Male", "Male", -->
-<!--                                             "Male", "Male", "Male", "Male", -->
-<!--                                             "Male", "Male")), -->
-<!--                      "income" = as.factor(c("34 - 67", "34 - 67", "34 - 67", "34 - 67", -->
-<!--                                             "34 - 67", "34 - 67", "34 - 67", "34 - 67", -->
-<!--                                             "34 - 67", "34 - 67", "34 - 67", "34 - 67", -->
-<!--                                             "34 - 67", "34 - 67")), -->
-<!--                      "age" = c("17 - 24", "17 - 24", "25 - 34", "25 - 34", -->
-<!--                                "35 - 44", "35 - 44", "45 - 54", "45 - 54", -->
-<!--                                "55 - 64", "55 - 64", "65 - 74", "65 - 74", "75 +", "75 +"), -->
-<!--                      "education" = c("College", "College", "College", "College", "College", "College", "College", "College", "College", "College", "College", "College", "College", "College"), -->
-<!--                      "race" = c("White", "White", "White", "White", "White", "White", "White", "White", "White", "White", "White", "White", "White", "White")) -->
-<!-- ``` -->
-
-<!-- Next, obtain the `ideology` values by fitting like we did before. -->
-
 
 ## Summary
 

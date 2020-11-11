@@ -657,8 +657,8 @@ rmse(ames_test_res, truth = Sale_Price, estimate = .pred)
 
 The RMSE for any model is the square root of the average squared residual. Mathematically:
 
-$$ RMSE = \sqrt{ \frac{1}{N}\sum_{i=1}^{N} (f_{i} - y_i)^2}$$
-where $f_i$ is the fitted or predicted value for observation $i$.
+$$ RMSE = \sqrt{ \frac{1}{N}\sum_{i=1}^{N} \hat{y_i} - y_i)^2}$$
+where $\hat{y_i}$ is the fitted or predicted value for observation $i$.
 
 The output above shows the standard format of the output of **yardstick** functions. Metrics for numeric outcomes usually have a value of "standard" for the `.estimator` column. Examples with different values for this column are shown below.
 
@@ -673,7 +673,7 @@ ames_metrics(ames_test_res, truth = Sale_Price, estimate = .pred)
 
 Mathematically:
 
-$$ MAE = \frac{1}{N}\sum_{i=1}^{N} \lvert f_{i} - y_i \rvert$$
+$$ MAE = \frac{1}{N}\sum_{i=1}^{N} \lvert \hat{y_i} - y_i \rvert$$
 
 
 This tidy data format stacks the metrics vertically.
@@ -944,7 +944,7 @@ workflow() %>%
               set_mode("regression")) 
 ```
 
-Third, add a recipe --- which should contain a formula and data --- and then any associated `step_*` functions. (Note that we have simplified this slightly from the example above.)
+Third, add a recipe --- which should contain a formula and data --- and then any associated `step_*` functions. (Note that we have simplified this slightly from the example used in previous sections.)
 
 ```{r, eval=FALSE}
 ...  %>% 
@@ -955,10 +955,10 @@ Third, add a recipe --- which should contain a formula and data --- and then any
     step_dummy(all_nominal())
 ```
 
-Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters `wfl` so as to remember that it is a workflow object.
+Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters `wfl` as a suffix so as to remember that it is a workflow object.
 
 ```{r}
-my_wfl <- workflow() %>%
+lm_wfl <- workflow() %>%
   add_model(linear_reg() %>%
               set_engine("lm") %>%
               set_mode("regression")) %>%
@@ -972,12 +972,12 @@ my_wfl <- workflow() %>%
 
 Fifth, see how well the approach works under cross-validation.
 
-<!-- DK: Current problem is that, in splits 2 and 4, a Neighborhood value appears in the assessment which is not in the analysis tibble, causing a warning message. Then, instead of getting 10 samples, we only get 8. Isn't there a trick which deals with this? step_unknown(Neighborhood) does not work. Taking Neighborhood out of the formula solves the problem, as we would expect. step_novel(Neighborhood) does not seem to solve the problem. -->
+<!-- DK: Current problem is that, in splits 2 and 4, a Neighborhood value appears in the assessment which is not in the analysis tibble, causing a warning message. Then, instead of getting 10 samples, we only get 8. Isn't there a trick which deals with this? step_unknown(Neighborhood) does not work. Taking Neighborhood out of the formula solves the problem, as we would expect. step_novel(Neighborhood) does not seem to solve the problem. step_naomit()? -->
 
 
 
 ```{r}
-my_wfl %>% 
+lm_wfl %>% 
   fit_resamples(resamples = ames_folds) %>% 
   collect_metrics()
 ```
@@ -991,18 +991,18 @@ The result from a cross-validation exercise is the most important tool for decid
 This workflow would form the heart of our analysis. We can try different model types and different formulas easily.  Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole. 
 
 ```{r}
-my_wfl %>% 
+lm_wfl %>% 
   fit(data = ames_train) %>% 
   predict(new_data = ames_train) %>% 
   bind_cols(ames_train %>% select(Sale_Price))
 ```
 
-This examination can also be a part of the process of creating a good workflow. Either way, we certainly want to be sure that, for our final model, the predictions on the training data look reasonable.
+This examination can also be a part of the process of creating a good workflow. Either way, we certainly want to be sure that, for our final model, the predictions using the training data look reasonable.
 
-Sixth, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. Do the predictions seem sensible? Make sure to still fit the model with the training data.
+Sixth, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. Do the predictions seem sensible? Make sure to still fit the model with the training data. The only think we ever use test data for is the final prediction, and the resulting model performance calculations.
 
 ```{r}
-my_wfl %>% 
+lm_wfl %>% 
   fit(data = ames_train) %>% 
   predict(new_data = ames_test) %>% 
   bind_cols(ames_test %>% select(Sale_Price))
@@ -1011,11 +1011,11 @@ my_wfl %>%
 How well our model does with data it has never seen before is a good guide as to how well it will work on new data tomorrow.
 
 ```{r}
-my_wfl %>% 
+lm_wfl %>% 
   fit(data = ames_train) %>% 
   predict(new_data = ames_test) %>% 
   bind_cols(ames_test %>% select(Sale_Price)) %>% 
-  metrics(truth = Sale_Price, estimate = `.pred`)
+  metrics(truth = Sale_Price, estimate = .pred)
 ```
 
 
