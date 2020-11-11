@@ -230,9 +230,9 @@ A recipe is also an object that defines a series of steps for data processing. U
 ames_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
            Year_Built + Bldg_Type,
-         data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_dummy(all_nominal())
+              data = ames_train) %>%
+         step_log(Gr_Liv_Area, base = 10) %>% 
+         step_dummy(all_nominal())
 
 ames_rec
 ```
@@ -282,9 +282,9 @@ For the Ames data, we can amend the recipe to use:
 ames_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type,
          data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_other(Neighborhood, threshold = 0.01) %>% 
-  step_dummy(all_nominal())
+          step_log(Gr_Liv_Area, base = 10) %>% 
+          step_other(Neighborhood, threshold = 0.01) %>% 
+          step_dummy(all_nominal())
 ```
 
 
@@ -949,10 +949,10 @@ Third, add a recipe --- which should contain a formula and data --- and then any
 ```{r, eval=FALSE}
 ...  %>% 
   add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built, 
-                    data = ames_train)) %>%
-    step_log(Gr_Liv_Area, base = 10) %>% 
-    step_other(Neighborhood, threshold = 0.01) %>% 
-    step_dummy(all_nominal())
+                    data = ames_train) %>%
+             step_log(Gr_Liv_Area, base = 10) %>% 
+             step_other(Neighborhood, threshold = 0.01) %>% 
+             step_dummy(all_nominal()))
 ```
 
 Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters `wfl` as a suffix so as to remember that it is a workflow object.
@@ -963,10 +963,10 @@ lm_wfl <- workflow() %>%
               set_engine("lm") %>%
               set_mode("regression")) %>%
   add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built,
-                    data = ames_train)) %>%
-    step_log(Gr_Liv_Area, base = 10) %>%
-    step_other(Neighborhood, threshold = 0.01) %>%
-    step_dummy(all_nominal())
+                    data = ames_train) %>%
+             step_log(Gr_Liv_Area, base = 10) %>%
+             step_other(Neighborhood, threshold = 0.01) %>%
+             step_dummy(all_nominal()))
 
 ```
 
