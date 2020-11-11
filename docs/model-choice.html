@@ -648,23 +648,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- DK: These functions might go in a pre-amble section for the tutorial. -->
 <p><code>geom_abine()</code> draws the line at the 45 degree line. <code>coord_obs_pred()</code> is a function from <strong>tidymodels</strong> which provides useful defaults for graphical comparisons of actual values with predicted values.</p>
 <p>There is one property that is substantially over-predicted.</p>
-<p>Let’s compute the root mean squared error for this model using the <code>rmse()</code> function:</p>
+<p>Let’s compute the root mean squared error (RMSE) for this model using the <code>rmse()</code> function:</p>
 <div class="sourceCode" id="cb1050"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1050-1"><a href="model-choice.html#cb1050-1"></a><span class="kw">rmse</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 ## 1 rmse    standard      0.0811</code></pre>
+<p>The RMSE for any model is the square root of the average squared residual. Mathematically:</p>
+<p><span class="math display">\[ RMSE = \sqrt{ \frac{1}{N}\sum_{i=1}^{N} \hat{y_i} - y_i)^2}\]</span>
+where <span class="math inline">\(\hat{y_i}\)</span> is the fitted or predicted value for observation <span class="math inline">\(i\)</span>.</p>
 <p>The output above shows the standard format of the output of <strong>yardstick</strong> functions. Metrics for numeric outcomes usually have a value of “standard” for the <code>.estimator</code> column. Examples with different values for this column are shown below.</p>
 <!-- DK: Should we give formulas for these metrics? Discuss them? Or maybe only use rmse? -->
-<p>To compute multiple metrics at once, we can create a <em>metric set</em>. Let’s add <span class="math inline">\(R^2\)</span> and the mean absolute error:</p>
-<div class="sourceCode" id="cb1052"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1052-1"><a href="model-choice.html#cb1052-1"></a>ames_metrics &lt;-<span class="st"> </span><span class="kw">metric_set</span>(rmse, rsq, mae)</span>
+<p>To compute multiple metrics at once, we can create a <em>metric set</em>. Let’s add the mean absolute error (MAE):</p>
+<div class="sourceCode" id="cb1052"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1052-1"><a href="model-choice.html#cb1052-1"></a>ames_metrics &lt;-<span class="st"> </span><span class="kw">metric_set</span>(rmse, mae)</span>
 <span id="cb1052-2"><a href="model-choice.html#cb1052-2"></a><span class="kw">ames_metrics</span>(ames_test_res, <span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
-<pre><code>## # A tibble: 3 x 3
+<pre><code>## # A tibble: 2 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 ## 1 rmse    standard      0.0811
-## 2 rsq     standard      0.800 
-## 3 mae     standard      0.0580</code></pre>
+## 2 mae     standard      0.0580</code></pre>
+<p>Mathematically:</p>
+<p><span class="math display">\[ MAE = \frac{1}{N}\sum_{i=1}^{N} \lvert \hat{y_i} - y_i \rvert\]</span></p>
 <p>This tidy data format stacks the metrics vertically.</p>
 </div>
 <div id="resampling" class="section level3">
@@ -905,15 +909,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Linear Regression Model Specification (regression)
 ## 
 ## Computational engine: lm</code></pre>
-<p>Third, add a recipe — which should contain a formula and data — and then any associated <code>step_*</code> functions. (Note that we have simplified this slightly from the example above.)</p>
+<p>Third, add a recipe — which should contain a formula and data — and then any associated <code>step_*</code> functions. (Note that we have simplified this slightly from the example used in previous sections.)</p>
 <div class="sourceCode" id="cb1078"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1078-1"><a href="model-choice.html#cb1078-1"></a>...  <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1078-2"><a href="model-choice.html#cb1078-2"></a><span class="st">  </span><span class="kw">add_recipe</span>(<span class="kw">recipe</span>(Sale_Price <span class="op">~</span><span class="st"> </span>Neighborhood <span class="op">+</span><span class="st"> </span>Gr_Liv_Area <span class="op">+</span><span class="st"> </span>Year_Built, </span>
 <span id="cb1078-3"><a href="model-choice.html#cb1078-3"></a>                    <span class="dt">data =</span> ames_train)) <span class="op">%&gt;%</span></span>
 <span id="cb1078-4"><a href="model-choice.html#cb1078-4"></a><span class="st">    </span><span class="kw">step_log</span>(Gr_Liv_Area, <span class="dt">base =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1078-5"><a href="model-choice.html#cb1078-5"></a><span class="st">    </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1078-6"><a href="model-choice.html#cb1078-6"></a><span class="st">    </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>())</span></code></pre></div>
-<p>Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters <code>wfl</code> so as to remember that it is a workflow object.</p>
-<div class="sourceCode" id="cb1079"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1079-1"><a href="model-choice.html#cb1079-1"></a>my_wfl &lt;-<span class="st"> </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span></span>
+<p>Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters <code>wfl</code> as a suffix so as to remember that it is a workflow object.</p>
+<div class="sourceCode" id="cb1079"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1079-1"><a href="model-choice.html#cb1079-1"></a>lm_wfl &lt;-<span class="st"> </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span></span>
 <span id="cb1079-2"><a href="model-choice.html#cb1079-2"></a><span class="st">  </span><span class="kw">add_model</span>(<span class="kw">linear_reg</span>() <span class="op">%&gt;%</span></span>
 <span id="cb1079-3"><a href="model-choice.html#cb1079-3"></a><span class="st">              </span><span class="kw">set_engine</span>(<span class="st">"lm"</span>) <span class="op">%&gt;%</span></span>
 <span id="cb1079-4"><a href="model-choice.html#cb1079-4"></a><span class="st">              </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)) <span class="op">%&gt;%</span></span>
@@ -923,8 +927,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1079-8"><a href="model-choice.html#cb1079-8"></a><span class="st">    </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span></span>
 <span id="cb1079-9"><a href="model-choice.html#cb1079-9"></a><span class="st">    </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>())</span></code></pre></div>
 <p>Fifth, see how well the approach works under cross-validation.</p>
-<!-- DK: Current problem is that, in splits 2 and 4, a Neighborhood value appears in the assessment which is not in the analysis tibble, causing a warning message. Then, instead of getting 10 samples, we only get 8. Isn't there a trick which deals with this? step_unknown(Neighborhood) does not work. Taking Neighborhood out of the formula solves the problem, as we would expect. step_novel(Neighborhood) does not seem to solve the problem. -->
-<div class="sourceCode" id="cb1080"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1080-1"><a href="model-choice.html#cb1080-1"></a>my_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
+<!-- DK: Current problem is that, in splits 2 and 4, a Neighborhood value appears in the assessment which is not in the analysis tibble, causing a warning message. Then, instead of getting 10 samples, we only get 8. Isn't there a trick which deals with this? step_unknown(Neighborhood) does not work. Taking Neighborhood out of the formula solves the problem, as we would expect. step_novel(Neighborhood) does not seem to solve the problem. step_naomit()? -->
+<div class="sourceCode" id="cb1080"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1080-1"><a href="model-choice.html#cb1080-1"></a>lm_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1080-2"><a href="model-choice.html#cb1080-2"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1080-3"><a href="model-choice.html#cb1080-3"></a><span class="st">  </span><span class="kw">collect_metrics</span>()</span></code></pre></div>
 <pre><code>## x Fold02: model (predictions): Error in model.frame.default(Terms, newdata, na.act...</code></pre>
@@ -938,7 +942,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- DK: What a cop out! Handle this properly! -->
 <p>The result from a cross-validation exercise is the most important tool for deciding which model we should choose.</p>
 <p>This workflow would form the heart of our analysis. We can try different model types and different formulas easily. Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole.</p>
-<div class="sourceCode" id="cb1084"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1084-1"><a href="model-choice.html#cb1084-1"></a>my_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
+<div class="sourceCode" id="cb1084"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1084-1"><a href="model-choice.html#cb1084-1"></a>lm_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1084-2"><a href="model-choice.html#cb1084-2"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1084-3"><a href="model-choice.html#cb1084-3"></a><span class="st">  </span><span class="kw">predict</span>(<span class="dt">new_data =</span> ames_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1084-4"><a href="model-choice.html#cb1084-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(ames_train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Sale_Price))</span></code></pre></div>
@@ -956,9 +960,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##  9  5.25       5.26
 ## 10  5.21       5.23
 ## # … with 2,188 more rows</code></pre>
-<p>This examination can also be a part of the process of creating a good workflow. Either way, we certainly want to be sure that, for our final model, the predictions on the training data look reasonable.</p>
-<p>Sixth, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. Do the predictions seem sensible? Make sure to still fit the model with the training data.</p>
-<div class="sourceCode" id="cb1086"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1086-1"><a href="model-choice.html#cb1086-1"></a>my_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
+<p>This examination can also be a part of the process of creating a good workflow. Either way, we certainly want to be sure that, for our final model, the predictions using the training data look reasonable.</p>
+<p>Sixth, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. Do the predictions seem sensible? Make sure to still fit the model with the training data. The only think we ever use test data for is the final prediction, and the resulting model performance calculations.</p>
+<div class="sourceCode" id="cb1086"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1086-1"><a href="model-choice.html#cb1086-1"></a>lm_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1086-2"><a href="model-choice.html#cb1086-2"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1086-3"><a href="model-choice.html#cb1086-3"></a><span class="st">  </span><span class="kw">predict</span>(<span class="dt">new_data =</span> ames_test) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1086-4"><a href="model-choice.html#cb1086-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Sale_Price))</span></code></pre></div>
@@ -977,11 +981,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 10  5.42       5.46
 ## # … with 722 more rows</code></pre>
 <p>How well our model does with data it has never seen before is a good guide as to how well it will work on new data tomorrow.</p>
-<div class="sourceCode" id="cb1088"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1088-1"><a href="model-choice.html#cb1088-1"></a>my_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
+<div class="sourceCode" id="cb1088"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1088-1"><a href="model-choice.html#cb1088-1"></a>lm_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1088-2"><a href="model-choice.html#cb1088-2"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ames_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1088-3"><a href="model-choice.html#cb1088-3"></a><span class="st">  </span><span class="kw">predict</span>(<span class="dt">new_data =</span> ames_test) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1088-4"><a href="model-choice.html#cb1088-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(ames_test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Sale_Price)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1088-5"><a href="model-choice.html#cb1088-5"></a><span class="st">  </span><span class="kw">metrics</span>(<span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> <span class="st">`</span><span class="dt">.pred</span><span class="st">`</span>)</span></code></pre></div>
+<span id="cb1088-5"><a href="model-choice.html#cb1088-5"></a><span class="st">  </span><span class="kw">metrics</span>(<span class="dt">truth =</span> Sale_Price, <span class="dt">estimate =</span> .pred)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -997,7 +1001,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a href="continuous-response.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-11-09
+2020-11-10
 </p>
 </div>
 </div>
