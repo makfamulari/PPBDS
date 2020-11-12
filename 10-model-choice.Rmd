@@ -972,8 +972,6 @@ lm_wfl <- workflow() %>%
 
 Fifth, see how well the approach works under cross-validation.
 
-<!-- DK: Current problem is that, in splits 2 and 4, a Neighborhood value appears in the assessment which is not in the analysis tibble, causing a warning message. Then, instead of getting 10 samples, we only get 8. Isn't there a trick which deals with this? step_unknown(Neighborhood) does not work. Taking Neighborhood out of the formula solves the problem, as we would expect. step_novel(Neighborhood) does not seem to solve the problem. step_naomit()? -->
-
 
 
 ```{r}
@@ -981,10 +979,6 @@ lm_wfl %>%
   fit_resamples(resamples = ames_folds) %>% 
   collect_metrics()
 ```
-
-Note the two warning messages. By chance, in two of our cross-validation assessments samples there are new levels for Neighborhood (Green_Hills and Landmark) which are not part of their respective analysis samples. This causes a failure because the model does not know how to process factor levels which it has not seen before. Fortunately, the process works fine on the other 8 samples, so we can still use these results.
-
-<!-- DK: What a cop out! Handle this properly! -->
 
 The result from a cross-validation exercise is the most important tool for deciding which model we should choose.
 
@@ -1018,4 +1012,4 @@ lm_wfl %>%
   metrics(truth = Sale_Price, estimate = .pred)
 ```
 
-
+We will save discussion for how to work with tidymodels, once selected, until the Temperance sections of Chapters \@ref(continuous-response) and \@ref(discrete-response). The basic intuition is, however, just the same our use of `posterior_epred()` and `posterior_predict()` in Chapter \@ref(n-parameters).
