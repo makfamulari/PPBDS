@@ -85,15 +85,12 @@ skim(nes)
 
 There are three data types: factors, characters, and numeric. `income`, `age`, and `education` are ordered factors. This means that each factor level has a relationship with the others. In the `age` variable, for example, `25 - 34` is bigger `17 - 24` and smaller than `35 - 44`. But there is no sense of *how much* bigger or smaller it is. Ordered factors can have weird effects in certain models, so we need to be wary.
 
-`nes` covers 1952 through 2016, but we will narrow our scope to just 2016 because of the changing nature of what makes someone ideologically liberal or ideologically conservative over time. Keep in mind that, when feeding in new data to our model, it is most accurately applied to voters in or around 2016. 
-
 Note that all of the variables are incomplete, meaning they contain `NA` values. While there are methods to impute missing data, we will simply remove these values for now.
 
 
 ```{r message=FALSE}
 ch11 <- nes %>%
   select(year, gender, race, income, age, education, ideology, region) %>%
-  filter(year == 2016) %>% 
   drop_na()
 ```
 
@@ -137,7 +134,9 @@ lm_wfl <- workflow() %>%
             set_mode("regression")) %>% 
   add_recipe(recipe(ideology ~ gender + race + region + 
                       income + age + education,
-                    data = ch11_train)) 
+                    data = ch11_train) %>% 
+             step_dummy(all_nominal())
+             ) 
   
 ```
 
@@ -145,7 +144,7 @@ lm_wfl <- workflow() %>%
 
 The required parts of the recipe are the model and a data set. The data set does not really matter that much since we are not really using it for anything at this stage of the process. Its purpose is to ensure that tidymodels can process the recipe. To do so, it needs to know if, for example, `gender` is character or factor or numeric. You would get the same result whether you used `ch_11`, `ch_11_train` or `ch_11_test` as the value for `data`. But, it is a good habit to never use the test data until the very end, even if doing so is harmless.
 
-The formula portion of the recipe will, depending in the model, look a lot like the formulas which you have passed to `stan_glm()`. But, in tidymodels, we are not allowed to do any mathematical operations in the receipt itself, beyond addition. Any such operations need to be placed in `step_*` functions. Recall how, in Chapter \@ref(model-choice), we need to use `step_interact()` to add an interaction term. Figuring out which `step_*` functions we want to use and why is the hardest part of tidymodels.
+The formula portion of the recipe will, depending in the model, look a lot like the formulas which you have passed to `stan_glm()`. But, in tidymodels, we are not allowed to do any mathematical operations in the recipe itself, beyond addition. Any such operations need to be placed in `step_*` functions. Recall how, in Chapter \@ref(model-choice), we used `step_interact()` to add an interaction term. Figuring out which `step_*` functions we want to use and why is the hardest part of tidymodels.
 
 
 Examine performance on the cross-validation samples.
@@ -166,7 +165,7 @@ lm_wfl %>%
   predict(new_data = ch11_train) %>% 
   bind_cols(ch11_train %>% select(ideology)) %>% 
   ggplot(aes(y = ideology, x = `.pred`)) +
-    geom_jitter(height = 0.2, alpha = 0.1) +
+    geom_jitter(height = 0.2, alpha = 0.01) +
     labs(title = "Predicting Ideology",
          subtitle = "Using a linear model with demographic predictors",
          x = "Predicted Ideology",
@@ -198,7 +197,9 @@ stan_wfl <- workflow() %>%
             set_mode("regression")) %>% 
   add_recipe(recipe(ideology ~ gender + race + region + 
                       income + age + education,
-                    data = ch11_train)) 
+                    data = ch11_train) %>% 
+             step_dummy(all_nominal())
+             ) 
 ```
 
 Examine performance on the cross-validation samples.
@@ -221,7 +222,7 @@ stan_wfl %>%
   predict(new_data = ch11_train) %>% 
   bind_cols(ch11_train %>% select(ideology)) %>% 
   ggplot(aes(y = ideology, x = `.pred`)) +
-    geom_jitter(height = 0.2, alpha = 0.1) +
+    geom_jitter(height = 0.2, alpha = 0.01) +
     labs(title = "Predicting Ideology",
          subtitle = "Using a Bayesian linear model with demographic predictors",
          x = "Predicted Ideology",
@@ -231,64 +232,66 @@ stan_wfl %>%
 
 <!-- DK: Add more discussion. Perhaps discuss the posterior probability distribution for true ideology given predicted ideology. Note that the model never predicts ideology 2 or 3. Is that good or bad? -->
 
-## Random forest
+## Neural networks
 
-Random forests are a powerful "non-parametric" approach to forecasting. Recall that, in both lm() and stan_glm() models, there are specified parameters which we are trying to estimate. We "care" about these parameters because they often correspond to real world entities, like the average treatment effect. 
+<!-- DK: Switch this to neural network. Make it work better than use it with temperance. Show how you can't just use coefficients with serious models. Save random forest for chapter 12. -->
+
+Neural networks are a powerful "non-parametric" approach to forecasting. Recall that, in both `lm()` and `stan_glm()` models, there are specified parameters which we are trying to estimate. We "care" about these parameters because they often correspond to real world entities, like the average treatment effect. 
 
 With non-parametric models, there are no parameters which we care about. (That is a loose and not-quite-correct definition.) Instead, the model is a "black box" into which predictors are fed and from which predicted outcomes emerge. 
 
 Create the workflow object with the model engine.
 
 ```{r}
-rf_wfl <- workflow() %>% 
-  add_model(rand_forest() %>%
-            set_engine("ranger") %>% 
+nn_wfl <- workflow() %>% 
+  add_model(mlp(epochs = 100, 
+                hidden_units = 5, 
+                dropout = 0.1) %>%
+            set_engine("keras", verbose = 0) %>% 
             set_mode("regression"))
 ```
 
-It is possible to pass the model directly as an argument to the model creation function. So, the above would often be written as:
+The next step is to add a recipe.
 
 ```{r}
-rf_wfl <- workflow() %>% 
-  add_model(rand_forest(mode = "regression") %>%
-            set_engine("ranger"))
-```
-
-The objects are identical. Either way, the next step is to add a recipe.
-
-```{r}
-rf_wfl <- workflow() %>% 
-  add_model(rand_forest('regression') %>%
-            set_engine("ranger")) %>% 
+nn_wfl <- workflow() %>% 
+  add_model(mlp(epochs = 100, 
+                hidden_units = 5, 
+                dropout = 0.1) %>%
+            set_engine("nnet") %>% 
+            set_mode("regression")) %>%
   add_recipe(recipe(ideology ~ gender + race + region + 
                       income + age + education,
-                    data = ch11_train)) 
+                    data = ch11_train) %>% 
+             step_dummy(all_nominal())
+             )
+             
 ```
 
-Note that there are improvements we could make to this model. As a rule of thumb, whenever using non-parametric models, you should use `step_normalize(all_numeric())` which, as you might guess, normalizes all numeric variables. We will leave that out here.
+Note that there are improvements we could make to this model. As a rule of thumb, whenever using non-parametric models, you should use `step_normalize(all_numeric())` which, as you might guess, normalizes all numeric variables. 
 
 Examine performance on the cross-validation samples.
 
 
 ```{r}
-rf_metrics <- rf_wfl %>% 
+nn_metrics <- nn_wfl %>% 
   fit_resamples(resamples = ch11_folds) %>% 
   collect_metrics()
 
-rf_metrics 
+nn_metrics 
 ```
 
 Check the predictions against the actual values.
 
 ```{r}
-rf_wfl %>% 
+nn_wfl %>% 
   fit(data = ch11_train) %>% 
   predict(new_data = ch11_train) %>% 
   bind_cols(ch11_train %>% select(ideology)) %>% 
   ggplot(aes(y = ideology, x = `.pred`)) +
-    geom_jitter(width = 0.2, alpha = 0.1) +
+    geom_jitter(width = 0.2, alpha = 0.01) +
     labs(title = "Predicting Ideology",
-         subtitle = "Using a random forest with demographic predictors",
+         subtitle = "Using a neural network with demographic predictors",
          x = "Predicted Ideology",
          y = "Ideology",
          caption = "Source: 2016 CCES")
@@ -304,12 +307,12 @@ The most common method for deciding which model to choose is to look at which on
 ```{r}
 tibble(model = rep(c("Linear Model", 
                      "Bayesian Linear Model", 
-                     "Random Forest"), each = 2)) %>% 
-  bind_cols(bind_rows(lm_metrics, stan_metrics, rf_metrics)) 
+                     "Neural Network"), each = 2)) %>% 
+  bind_cols(bind_rows(lm_metrics, stan_metrics, nn_metrics)) 
 
 
 ```
-The results for the random forest model are worse than those for either linear model. The results for the two linear models are so similar that there is no particular reason, in terms of accuracy, to prefer one model over the others. 
+The results for the neural network model are slightly better than those for either linear model. 
 
 
 ## Cardinal virtues
@@ -344,7 +347,7 @@ knitr::include_graphics("other/images/Courage.jpg")
 
 *Courage* helps us to fit the models, as we have above, and then to select the one we want to use. We should only favor more complex models (or formulas) if the additional complexity is *warranted*. This is a philosophical principle known as "Occam's Razor." It states that, "all other things being equal, simpler solutions are more likely to be correct than complex ones." When viewed in a modeling framework, Occam's Razor can be restated as, "all other things being equal, simpler models are to be preferred over complex ones." In other words, we should only favor the more complex model/formula if the additional complexity makes the model meaningfully better.
 
-In general, linear models are much simpler than Bayesian models. So, given that these two models did about as well under cross-validation, we should select the basic linear model.
+Is the neural network model meaningfully better than the linear models? Perhaps. Average RMSE is lower but, given the standard error associated with that measure, it is close call. Let's use the neural network model.
 
 
 <!-- Time to make up some imaginary people. Let's say we have four individuals whose ideology in 2016 we wanted to predict. We can create a tibble with the values of their demographic information, like so: -->
@@ -380,6 +383,8 @@ knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
 *Temperance* reminds us to be suspicious of all models, especially our own. The world is always changing. Our models will rarely work as well in the future as they have using data from the past.
+
+<!-- DK: Use a plot like this one: https://www.tidymodels.org/start/models/ -->
 
 ## Summary
 
