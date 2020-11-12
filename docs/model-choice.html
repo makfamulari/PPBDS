@@ -927,7 +927,6 @@ where <span class="math inline">\(\hat{y_i}\)</span> is the fitted or predicted 
 <span id="cb1079-8"><a href="model-choice.html#cb1079-8"></a><span class="st">             </span><span class="kw">step_other</span>(Neighborhood, <span class="dt">threshold =</span> <span class="fl">0.01</span>) <span class="op">%&gt;%</span></span>
 <span id="cb1079-9"><a href="model-choice.html#cb1079-9"></a><span class="st">             </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>()))</span></code></pre></div>
 <p>Fifth, see how well the approach works under cross-validation.</p>
-<!-- DK: Current problem is that, in splits 2 and 4, a Neighborhood value appears in the assessment which is not in the analysis tibble, causing a warning message. Then, instead of getting 10 samples, we only get 8. Isn't there a trick which deals with this? step_unknown(Neighborhood) does not work. Taking Neighborhood out of the formula solves the problem, as we would expect. step_novel(Neighborhood) does not seem to solve the problem. step_naomit()? -->
 <div class="sourceCode" id="cb1080"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1080-1"><a href="model-choice.html#cb1080-1"></a>lm_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1080-2"><a href="model-choice.html#cb1080-2"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ames_folds) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1080-3"><a href="model-choice.html#cb1080-3"></a><span class="st">  </span><span class="kw">collect_metrics</span>()</span></code></pre></div>
@@ -936,8 +935,6 @@ where <span class="math inline">\(\hat{y_i}\)</span> is the fitted or predicted 
 ##   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
 ## 1 rmse    standard   0.0828    10 0.00213
 ## 2 rsq     standard   0.778     10 0.00698</code></pre>
-<p>Note the two warning messages. By chance, in two of our cross-validation assessments samples there are new levels for Neighborhood (Green_Hills and Landmark) which are not part of their respective analysis samples. This causes a failure because the model does not know how to process factor levels which it has not seen before. Fortunately, the process works fine on the other 8 samples, so we can still use these results.</p>
-<!-- DK: What a cop out! Handle this properly! -->
 <p>The result from a cross-validation exercise is the most important tool for deciding which model we should choose.</p>
 <p>This workflow would form the heart of our analysis. We can try different model types and different formulas easily. Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole.</p>
 <div class="sourceCode" id="cb1082"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1082-1"><a href="model-choice.html#cb1082-1"></a>lm_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -990,6 +987,7 @@ where <span class="math inline">\(\hat{y_i}\)</span> is the fitted or predicted 
 ## 1 rmse    standard      0.0853
 ## 2 rsq     standard      0.779 
 ## 3 mae     standard      0.0618</code></pre>
+<p>We will save discussion for how to work with tidymodels, once selected, until the Temperance sections of Chapters <a href="continuous-response.html#continuous-response">11</a> and <a href="discrete-response.html#discrete-response">12</a>. The basic intuition is, however, just the same our use of <code>posterior_epred()</code> and <code>posterior_predict()</code> in Chapter <a href="n-parameters.html#n-parameters">9</a>.</p>
 
 </div>
 </div></body></html>
@@ -999,7 +997,7 @@ where <span class="math inline">\(\hat{y_i}\)</span> is the fitted or predicted 
 <a href="continuous-response.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-11-11
+2020-11-12
 </p>
 </div>
 </div>

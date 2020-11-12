@@ -154,7 +154,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="toc"><a href="#exploratory-data-analysis"> Exploratory Data Analysis</a></li>
 <li class="toc"><a href="#linear-model"> Linear model</a></li>
 <li class="toc"><a href="#bayesian-linear-model"> Bayesian linear model</a></li>
-<li class="toc"><a href="#random-forest"> Random forest</a></li>
+<li class="toc"><a href="#neural-networks"> Neural networks</a></li>
 <li class="toc"><a href="#model-comparison"> Model comparison</a></li>
 <li class="toc"><a href="#cardinal-virtues-1"> Cardinal virtues</a></li>
 <li class="toc"><a href="#summary-1"> Summary</a></li>
@@ -455,12 +455,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>There are three data types: factors, characters, and numeric. <code>income</code>, <code>age</code>, and <code>education</code> are ordered factors. This means that each factor level has a relationship with the others. In the <code>age</code> variable, for example, <code>25 - 34</code> is bigger <code>17 - 24</code> and smaller than <code>35 - 44</code>. But there is no sense of <em>how much</em> bigger or smaller it is. Ordered factors can have weird effects in certain models, so we need to be wary.</p>
-<p><code>nes</code> covers 1952 through 2016, but we will narrow our scope to just 2016 because of the changing nature of what makes someone ideologically liberal or ideologically conservative over time. Keep in mind that, when feeding in new data to our model, it is most accurately applied to voters in or around 2016.</p>
 <p>Note that all of the variables are incomplete, meaning they contain <code>NA</code> values. While there are methods to impute missing data, we will simply remove these values for now.</p>
 <div class="sourceCode" id="cb1092"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1092-1"><a href="continuous-response.html#cb1092-1"></a>ch11 &lt;-<span class="st"> </span>nes <span class="op">%&gt;%</span></span>
 <span id="cb1092-2"><a href="continuous-response.html#cb1092-2"></a><span class="st">  </span><span class="kw">select</span>(year, gender, race, income, age, education, ideology, region) <span class="op">%&gt;%</span></span>
-<span id="cb1092-3"><a href="continuous-response.html#cb1092-3"></a><span class="st">  </span><span class="kw">filter</span>(year <span class="op">==</span><span class="st"> </span><span class="dv">2016</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1092-4"><a href="continuous-response.html#cb1092-4"></a><span class="st">  </span><span class="kw">drop_na</span>()</span></code></pre></div>
+<span id="cb1092-3"><a href="continuous-response.html#cb1092-3"></a><span class="st">  </span><span class="kw">drop_na</span>()</span></code></pre></div>
 <!-- DK: What should I do with ordered factors? Change them here? Change them in nes itself? If I leave them, will our various models be able to do something with them? Perhaps I will need to use a step_* to fix? Or maybe step_dummy() takes care of that? -->
 <p>The first step in a proper data science project is to split our data set into training and testing samples, and then to create cross-validations from the training data.</p>
 <div class="sourceCode" id="cb1093"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1093-1"><a href="continuous-response.html#cb1093-1"></a><span class="kw">set.seed</span>(<span class="dv">10</span>)</span>
@@ -487,10 +485,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1095-4"><a href="continuous-response.html#cb1095-4"></a><span class="st">            </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1095-5"><a href="continuous-response.html#cb1095-5"></a><span class="st">  </span><span class="kw">add_recipe</span>(<span class="kw">recipe</span>(ideology <span class="op">~</span><span class="st"> </span>gender <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1095-6"><a href="continuous-response.html#cb1095-6"></a><span class="st">                      </span>income <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>education,</span>
-<span id="cb1095-7"><a href="continuous-response.html#cb1095-7"></a>                    <span class="dt">data =</span> ch11_train)) </span></code></pre></div>
+<span id="cb1095-7"><a href="continuous-response.html#cb1095-7"></a>                    <span class="dt">data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1095-8"><a href="continuous-response.html#cb1095-8"></a><span class="st">             </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>())</span>
+<span id="cb1095-9"><a href="continuous-response.html#cb1095-9"></a>             ) </span></code></pre></div>
 <!-- DK: Why don't I need step_dummy(all_nominal())? Especially since age is an ordered factor. How does lm magically handle this? -->
 <p>The required parts of the recipe are the model and a data set. The data set does not really matter that much since we are not really using it for anything at this stage of the process. Its purpose is to ensure that tidymodels can process the recipe. To do so, it needs to know if, for example, <code>gender</code> is character or factor or numeric. You would get the same result whether you used <code>ch_11</code>, <code>ch_11_train</code> or <code>ch_11_test</code> as the value for <code>data</code>. But, it is a good habit to never use the test data until the very end, even if doing so is harmless.</p>
-<p>The formula portion of the recipe will, depending in the model, look a lot like the formulas which you have passed to <code>stan_glm()</code>. But, in tidymodels, we are not allowed to do any mathematical operations in the receipt itself, beyond addition. Any such operations need to be placed in <code>step_*</code> functions. Recall how, in Chapter <a href="model-choice.html#model-choice">10</a>, we need to use <code>step_interact()</code> to add an interaction term. Figuring out which <code>step_*</code> functions we want to use and why is the hardest part of tidymodels.</p>
+<p>The formula portion of the recipe will, depending in the model, look a lot like the formulas which you have passed to <code>stan_glm()</code>. But, in tidymodels, we are not allowed to do any mathematical operations in the recipe itself, beyond addition. Any such operations need to be placed in <code>step_*</code> functions. Recall how, in Chapter <a href="model-choice.html#model-choice">10</a>, we used <code>step_interact()</code> to add an interaction term. Figuring out which <code>step_*</code> functions we want to use and why is the hardest part of tidymodels.</p>
 <p>Examine performance on the cross-validation samples.</p>
 <div class="sourceCode" id="cb1096"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1096-1"><a href="continuous-response.html#cb1096-1"></a>lm_metrics &lt;-<span class="st"> </span>lm_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1096-2"><a href="continuous-response.html#cb1096-2"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ch11_folds) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -500,20 +500,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>## # A tibble: 2 x 5
 ##   .metric .estimator  mean     n std_err
 ##   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-## 1 rmse    standard   2.01     10 0.0178 
-## 2 rsq     standard   0.138    10 0.00983</code></pre>
+## 1 rmse    standard   1.98     10 0.00632
+## 2 rsq     standard   0.102    10 0.00401</code></pre>
 <p>Check the predictions against the actual values for the training data.</p>
 <div class="sourceCode" id="cb1098"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1098-1"><a href="continuous-response.html#cb1098-1"></a>lm_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1098-2"><a href="continuous-response.html#cb1098-2"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1098-3"><a href="continuous-response.html#cb1098-3"></a><span class="st">  </span><span class="kw">predict</span>(<span class="dt">new_data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1098-4"><a href="continuous-response.html#cb1098-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(ch11_train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(ideology)) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1098-5"><a href="continuous-response.html#cb1098-5"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">y =</span> ideology, <span class="dt">x =</span> <span class="st">`</span><span class="dt">.pred</span><span class="st">`</span>)) <span class="op">+</span></span>
-<span id="cb1098-6"><a href="continuous-response.html#cb1098-6"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">height =</span> <span class="fl">0.2</span>, <span class="dt">alpha =</span> <span class="fl">0.1</span>) <span class="op">+</span></span>
+<span id="cb1098-6"><a href="continuous-response.html#cb1098-6"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">height =</span> <span class="fl">0.2</span>, <span class="dt">alpha =</span> <span class="fl">0.01</span>) <span class="op">+</span></span>
 <span id="cb1098-7"><a href="continuous-response.html#cb1098-7"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Predicting Ideology"</span>,</span>
 <span id="cb1098-8"><a href="continuous-response.html#cb1098-8"></a>         <span class="dt">subtitle =</span> <span class="st">"Using a linear model with demographic predictors"</span>,</span>
 <span id="cb1098-9"><a href="continuous-response.html#cb1098-9"></a>         <span class="dt">x =</span> <span class="st">"Predicted Ideology"</span>,</span>
 <span id="cb1098-10"><a href="continuous-response.html#cb1098-10"></a>         <span class="dt">y =</span> <span class="st">"Ideology"</span>,</span>
-<span id="cb1098-11"><a href="continuous-response.html#cb1098-11"></a>         <span class="dt">caption =</span> <span class="st">"Source: 2016 CCES"</span>) </span></code></pre></div>
+<span id="cb1098-11"><a href="continuous-response.html#cb1098-11"></a>         <span class="dt">caption =</span> <span class="st">"Source: CCES"</span>) </span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-850-1.png" width="672"></p>
 <p>Is this result good or bad? Depends on your point of view! If we predict that someone’s ideology is 0, then we don’t know that much about their ideology. It could be an anywhere from -3 (strong Democrat) to +3 (strong Republican).</p>
 <!-- DK: We need more instruction. But do we need it here or in an appendix? We should look at this plot, change the workflow, look at the plot again, and so on. -->
@@ -533,7 +533,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1100-4"><a href="continuous-response.html#cb1100-4"></a><span class="st">            </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1100-5"><a href="continuous-response.html#cb1100-5"></a><span class="st">  </span><span class="kw">add_recipe</span>(<span class="kw">recipe</span>(ideology <span class="op">~</span><span class="st"> </span>gender <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span></span>
 <span id="cb1100-6"><a href="continuous-response.html#cb1100-6"></a><span class="st">                      </span>income <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>education,</span>
-<span id="cb1100-7"><a href="continuous-response.html#cb1100-7"></a>                    <span class="dt">data =</span> ch11_train)) </span></code></pre></div>
+<span id="cb1100-7"><a href="continuous-response.html#cb1100-7"></a>                    <span class="dt">data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1100-8"><a href="continuous-response.html#cb1100-8"></a><span class="st">             </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>())</span>
+<span id="cb1100-9"><a href="continuous-response.html#cb1100-9"></a>             ) </span></code></pre></div>
 <p>Examine performance on the cross-validation samples.</p>
 <!-- DK: Unlike with lm() above, we get different answers depending on whether or not we use step_dummy(all_nominal()). But the differences are very small (4th decimal, at least in the collected metrics), so let's ignore it for now. -->
 <div class="sourceCode" id="cb1101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1101-1"><a href="continuous-response.html#cb1101-1"></a>stan_metrics &lt;-<span class="st"> </span>stan_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -544,89 +546,93 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>## # A tibble: 2 x 5
 ##   .metric .estimator  mean     n std_err
 ##   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-## 1 rmse    standard   2.01     10 0.0178 
-## 2 rsq     standard   0.138    10 0.00982</code></pre>
+## 1 rmse    standard   1.98     10 0.00632
+## 2 rsq     standard   0.102    10 0.00401</code></pre>
 <p>Check the predictions against the actual values.</p>
 <div class="sourceCode" id="cb1103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1103-1"><a href="continuous-response.html#cb1103-1"></a>stan_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1103-2"><a href="continuous-response.html#cb1103-2"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1103-3"><a href="continuous-response.html#cb1103-3"></a><span class="st">  </span><span class="kw">predict</span>(<span class="dt">new_data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1103-4"><a href="continuous-response.html#cb1103-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(ch11_train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(ideology)) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb1103-5"><a href="continuous-response.html#cb1103-5"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">y =</span> ideology, <span class="dt">x =</span> <span class="st">`</span><span class="dt">.pred</span><span class="st">`</span>)) <span class="op">+</span></span>
-<span id="cb1103-6"><a href="continuous-response.html#cb1103-6"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">height =</span> <span class="fl">0.2</span>, <span class="dt">alpha =</span> <span class="fl">0.1</span>) <span class="op">+</span></span>
+<span id="cb1103-6"><a href="continuous-response.html#cb1103-6"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">height =</span> <span class="fl">0.2</span>, <span class="dt">alpha =</span> <span class="fl">0.01</span>) <span class="op">+</span></span>
 <span id="cb1103-7"><a href="continuous-response.html#cb1103-7"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Predicting Ideology"</span>,</span>
 <span id="cb1103-8"><a href="continuous-response.html#cb1103-8"></a>         <span class="dt">subtitle =</span> <span class="st">"Using a Bayesian linear model with demographic predictors"</span>,</span>
 <span id="cb1103-9"><a href="continuous-response.html#cb1103-9"></a>         <span class="dt">x =</span> <span class="st">"Predicted Ideology"</span>,</span>
 <span id="cb1103-10"><a href="continuous-response.html#cb1103-10"></a>         <span class="dt">y =</span> <span class="st">"Ideology"</span>,</span>
-<span id="cb1103-11"><a href="continuous-response.html#cb1103-11"></a>         <span class="dt">caption =</span> <span class="st">"Source: 2016 CCES"</span>)</span></code></pre></div>
+<span id="cb1103-11"><a href="continuous-response.html#cb1103-11"></a>         <span class="dt">caption =</span> <span class="st">"Source: CCES"</span>)</span></code></pre></div>
 <p><img src="book_temp_files/figure-html/unnamed-chunk-854-1.png" width="672"></p>
 <!-- DK: Add more discussion. Perhaps discuss the posterior probability distribution for true ideology given predicted ideology. Note that the model never predicts ideology 2 or 3. Is that good or bad? -->
 </div>
-<div id="random-forest" class="section level2">
+<div id="neural-networks" class="section level2">
 <h2>
-<span class="header-section-number">11.4</span> Random forest</h2>
-<p>Random forests are a powerful “non-parametric” approach to forecasting. Recall that, in both lm() and stan_glm() models, there are specified parameters which we are trying to estimate. We “care” about these parameters because they often correspond to real world entities, like the average treatment effect.</p>
+<span class="header-section-number">11.4</span> Neural networks</h2>
+<!-- DK: Switch this to neural network. Make it work better than use it with temperance. Show how you can't just use coefficients with serious models. Save random forest for chapter 12. -->
+<p>Neural networks are a powerful “non-parametric” approach to forecasting. Recall that, in both <code>lm()</code> and <code>stan_glm()</code> models, there are specified parameters which we are trying to estimate. We “care” about these parameters because they often correspond to real world entities, like the average treatment effect.</p>
 <p>With non-parametric models, there are no parameters which we care about. (That is a loose and not-quite-correct definition.) Instead, the model is a “black box” into which predictors are fed and from which predicted outcomes emerge.</p>
 <p>Create the workflow object with the model engine.</p>
-<div class="sourceCode" id="cb1104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1104-1"><a href="continuous-response.html#cb1104-1"></a>rf_wfl &lt;-<span class="st"> </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1104-2"><a href="continuous-response.html#cb1104-2"></a><span class="st">  </span><span class="kw">add_model</span>(<span class="kw">rand_forest</span>() <span class="op">%&gt;%</span></span>
-<span id="cb1104-3"><a href="continuous-response.html#cb1104-3"></a><span class="st">            </span><span class="kw">set_engine</span>(<span class="st">"ranger"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1104-4"><a href="continuous-response.html#cb1104-4"></a><span class="st">            </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>))</span></code></pre></div>
-<p>It is possible to pass the model directly as an argument to the model creation function. So, the above would often be written as:</p>
-<div class="sourceCode" id="cb1105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1105-1"><a href="continuous-response.html#cb1105-1"></a>rf_wfl &lt;-<span class="st"> </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1105-2"><a href="continuous-response.html#cb1105-2"></a><span class="st">  </span><span class="kw">add_model</span>(<span class="kw">rand_forest</span>(<span class="dt">mode =</span> <span class="st">"regression"</span>) <span class="op">%&gt;%</span></span>
-<span id="cb1105-3"><a href="continuous-response.html#cb1105-3"></a><span class="st">            </span><span class="kw">set_engine</span>(<span class="st">"ranger"</span>))</span></code></pre></div>
-<p>The objects are identical. Either way, the next step is to add a recipe.</p>
-<div class="sourceCode" id="cb1106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1106-1"><a href="continuous-response.html#cb1106-1"></a>rf_wfl &lt;-<span class="st"> </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1106-2"><a href="continuous-response.html#cb1106-2"></a><span class="st">  </span><span class="kw">add_model</span>(<span class="kw">rand_forest</span>(<span class="st">'regression'</span>) <span class="op">%&gt;%</span></span>
-<span id="cb1106-3"><a href="continuous-response.html#cb1106-3"></a><span class="st">            </span><span class="kw">set_engine</span>(<span class="st">"ranger"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1106-4"><a href="continuous-response.html#cb1106-4"></a><span class="st">  </span><span class="kw">add_recipe</span>(<span class="kw">recipe</span>(ideology <span class="op">~</span><span class="st"> </span>gender <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1106-5"><a href="continuous-response.html#cb1106-5"></a><span class="st">                      </span>income <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>education,</span>
-<span id="cb1106-6"><a href="continuous-response.html#cb1106-6"></a>                    <span class="dt">data =</span> ch11_train)) </span></code></pre></div>
-<p>Note that there are improvements we could make to this model. As a rule of thumb, whenever using non-parametric models, you should use <code>step_normalize(all_numeric())</code> which, as you might guess, normalizes all numeric variables. We will leave that out here.</p>
+<div class="sourceCode" id="cb1104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1104-1"><a href="continuous-response.html#cb1104-1"></a>nn_wfl &lt;-<span class="st"> </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1104-2"><a href="continuous-response.html#cb1104-2"></a><span class="st">  </span><span class="kw">add_model</span>(<span class="kw">mlp</span>(<span class="dt">epochs =</span> <span class="dv">100</span>, </span>
+<span id="cb1104-3"><a href="continuous-response.html#cb1104-3"></a>                <span class="dt">hidden_units =</span> <span class="dv">5</span>, </span>
+<span id="cb1104-4"><a href="continuous-response.html#cb1104-4"></a>                <span class="dt">dropout =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb1104-5"><a href="continuous-response.html#cb1104-5"></a><span class="st">            </span><span class="kw">set_engine</span>(<span class="st">"keras"</span>, <span class="dt">verbose =</span> <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1104-6"><a href="continuous-response.html#cb1104-6"></a><span class="st">            </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>))</span></code></pre></div>
+<p>The next step is to add a recipe.</p>
+<div class="sourceCode" id="cb1105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1105-1"><a href="continuous-response.html#cb1105-1"></a>nn_wfl &lt;-<span class="st"> </span><span class="kw">workflow</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1105-2"><a href="continuous-response.html#cb1105-2"></a><span class="st">  </span><span class="kw">add_model</span>(<span class="kw">mlp</span>(<span class="dt">epochs =</span> <span class="dv">100</span>, </span>
+<span id="cb1105-3"><a href="continuous-response.html#cb1105-3"></a>                <span class="dt">hidden_units =</span> <span class="dv">5</span>, </span>
+<span id="cb1105-4"><a href="continuous-response.html#cb1105-4"></a>                <span class="dt">dropout =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb1105-5"><a href="continuous-response.html#cb1105-5"></a><span class="st">            </span><span class="kw">set_engine</span>(<span class="st">"nnet"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1105-6"><a href="continuous-response.html#cb1105-6"></a><span class="st">            </span><span class="kw">set_mode</span>(<span class="st">"regression"</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb1105-7"><a href="continuous-response.html#cb1105-7"></a><span class="st">  </span><span class="kw">add_recipe</span>(<span class="kw">recipe</span>(ideology <span class="op">~</span><span class="st"> </span>gender <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1105-8"><a href="continuous-response.html#cb1105-8"></a><span class="st">                      </span>income <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>education,</span>
+<span id="cb1105-9"><a href="continuous-response.html#cb1105-9"></a>                    <span class="dt">data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1105-10"><a href="continuous-response.html#cb1105-10"></a><span class="st">             </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>())</span>
+<span id="cb1105-11"><a href="continuous-response.html#cb1105-11"></a>             )</span></code></pre></div>
+<p>Note that there are improvements we could make to this model. As a rule of thumb, whenever using non-parametric models, you should use <code>step_normalize(all_numeric())</code> which, as you might guess, normalizes all numeric variables.</p>
 <p>Examine performance on the cross-validation samples.</p>
-<div class="sourceCode" id="cb1107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1107-1"><a href="continuous-response.html#cb1107-1"></a>rf_metrics &lt;-<span class="st"> </span>rf_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1107-2"><a href="continuous-response.html#cb1107-2"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ch11_folds) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1107-3"><a href="continuous-response.html#cb1107-3"></a><span class="st">  </span><span class="kw">collect_metrics</span>()</span>
-<span id="cb1107-4"><a href="continuous-response.html#cb1107-4"></a></span>
-<span id="cb1107-5"><a href="continuous-response.html#cb1107-5"></a>rf_metrics </span></code></pre></div>
+<div class="sourceCode" id="cb1106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1106-1"><a href="continuous-response.html#cb1106-1"></a>nn_metrics &lt;-<span class="st"> </span>nn_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1106-2"><a href="continuous-response.html#cb1106-2"></a><span class="st">  </span><span class="kw">fit_resamples</span>(<span class="dt">resamples =</span> ch11_folds) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1106-3"><a href="continuous-response.html#cb1106-3"></a><span class="st">  </span><span class="kw">collect_metrics</span>()</span>
+<span id="cb1106-4"><a href="continuous-response.html#cb1106-4"></a></span>
+<span id="cb1106-5"><a href="continuous-response.html#cb1106-5"></a>nn_metrics </span></code></pre></div>
 <pre><code>## # A tibble: 2 x 5
 ##   .metric .estimator  mean     n std_err
 ##   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-## 1 rmse    standard   2.05     10  0.0160
-## 2 rsq     standard   0.113    10  0.0105</code></pre>
+## 1 rmse    standard   1.97     10 0.00575
+## 2 rsq     standard   0.111    10 0.00422</code></pre>
 <p>Check the predictions against the actual values.</p>
-<div class="sourceCode" id="cb1109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1109-1"><a href="continuous-response.html#cb1109-1"></a>rf_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1109-2"><a href="continuous-response.html#cb1109-2"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1109-3"><a href="continuous-response.html#cb1109-3"></a><span class="st">  </span><span class="kw">predict</span>(<span class="dt">new_data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1109-4"><a href="continuous-response.html#cb1109-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(ch11_train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(ideology)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1109-5"><a href="continuous-response.html#cb1109-5"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">y =</span> ideology, <span class="dt">x =</span> <span class="st">`</span><span class="dt">.pred</span><span class="st">`</span>)) <span class="op">+</span></span>
-<span id="cb1109-6"><a href="continuous-response.html#cb1109-6"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.2</span>, <span class="dt">alpha =</span> <span class="fl">0.1</span>) <span class="op">+</span></span>
-<span id="cb1109-7"><a href="continuous-response.html#cb1109-7"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Predicting Ideology"</span>,</span>
-<span id="cb1109-8"><a href="continuous-response.html#cb1109-8"></a>         <span class="dt">subtitle =</span> <span class="st">"Using a random forest with demographic predictors"</span>,</span>
-<span id="cb1109-9"><a href="continuous-response.html#cb1109-9"></a>         <span class="dt">x =</span> <span class="st">"Predicted Ideology"</span>,</span>
-<span id="cb1109-10"><a href="continuous-response.html#cb1109-10"></a>         <span class="dt">y =</span> <span class="st">"Ideology"</span>,</span>
-<span id="cb1109-11"><a href="continuous-response.html#cb1109-11"></a>         <span class="dt">caption =</span> <span class="st">"Source: 2016 CCES"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-859-1.png" width="672"></p>
+<div class="sourceCode" id="cb1108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1108-1"><a href="continuous-response.html#cb1108-1"></a>nn_wfl <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1108-2"><a href="continuous-response.html#cb1108-2"></a><span class="st">  </span><span class="kw">fit</span>(<span class="dt">data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1108-3"><a href="continuous-response.html#cb1108-3"></a><span class="st">  </span><span class="kw">predict</span>(<span class="dt">new_data =</span> ch11_train) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1108-4"><a href="continuous-response.html#cb1108-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(ch11_train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(ideology)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1108-5"><a href="continuous-response.html#cb1108-5"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">y =</span> ideology, <span class="dt">x =</span> <span class="st">`</span><span class="dt">.pred</span><span class="st">`</span>)) <span class="op">+</span></span>
+<span id="cb1108-6"><a href="continuous-response.html#cb1108-6"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">0.2</span>, <span class="dt">alpha =</span> <span class="fl">0.01</span>) <span class="op">+</span></span>
+<span id="cb1108-7"><a href="continuous-response.html#cb1108-7"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Predicting Ideology"</span>,</span>
+<span id="cb1108-8"><a href="continuous-response.html#cb1108-8"></a>         <span class="dt">subtitle =</span> <span class="st">"Using a neural network with demographic predictors"</span>,</span>
+<span id="cb1108-9"><a href="continuous-response.html#cb1108-9"></a>         <span class="dt">x =</span> <span class="st">"Predicted Ideology"</span>,</span>
+<span id="cb1108-10"><a href="continuous-response.html#cb1108-10"></a>         <span class="dt">y =</span> <span class="st">"Ideology"</span>,</span>
+<span id="cb1108-11"><a href="continuous-response.html#cb1108-11"></a>         <span class="dt">caption =</span> <span class="st">"Source: CCES"</span>)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-858-1.png" width="672"></p>
 <!-- DK: The last two graphs are different. Discuss! See how well this model does with low predictions. Every time predicted ideology is below -2.5, the true ideology is -3. The linear models are much more likely to make mistakes when predicting very negative ideology values. -->
 </div>
 <div id="model-comparison" class="section level2">
 <h2>
 <span class="header-section-number">11.5</span> Model comparison</h2>
 <p>The most common method for deciding which model to choose is to look at which one does the best predicting out of sample. As a reminder, here is a summary of how well our three different models performed.</p>
-<div class="sourceCode" id="cb1110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1110-1"><a href="continuous-response.html#cb1110-1"></a><span class="kw">tibble</span>(<span class="dt">model =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">"Linear Model"</span>, </span>
-<span id="cb1110-2"><a href="continuous-response.html#cb1110-2"></a>                     <span class="st">"Bayesian Linear Model"</span>, </span>
-<span id="cb1110-3"><a href="continuous-response.html#cb1110-3"></a>                     <span class="st">"Random Forest"</span>), <span class="dt">each =</span> <span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb1110-4"><a href="continuous-response.html#cb1110-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">bind_rows</span>(lm_metrics, stan_metrics, rf_metrics)) </span></code></pre></div>
+<div class="sourceCode" id="cb1109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1109-1"><a href="continuous-response.html#cb1109-1"></a><span class="kw">tibble</span>(<span class="dt">model =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">"Linear Model"</span>, </span>
+<span id="cb1109-2"><a href="continuous-response.html#cb1109-2"></a>                     <span class="st">"Bayesian Linear Model"</span>, </span>
+<span id="cb1109-3"><a href="continuous-response.html#cb1109-3"></a>                     <span class="st">"Neural Network"</span>), <span class="dt">each =</span> <span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1109-4"><a href="continuous-response.html#cb1109-4"></a><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">bind_rows</span>(lm_metrics, stan_metrics, nn_metrics)) </span></code></pre></div>
 <pre><code>## # A tibble: 6 x 6
 ##   model                 .metric .estimator  mean     n std_err
 ##   &lt;chr&gt;                 &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-## 1 Linear Model          rmse    standard   2.01     10 0.0178 
-## 2 Linear Model          rsq     standard   0.138    10 0.00983
-## 3 Bayesian Linear Model rmse    standard   2.01     10 0.0178 
-## 4 Bayesian Linear Model rsq     standard   0.138    10 0.00982
-## 5 Random Forest         rmse    standard   2.05     10 0.0160 
-## 6 Random Forest         rsq     standard   0.113    10 0.0105</code></pre>
-<p>The results for the random forest model are worse than those for either linear model. The results for the two linear models are so similar that there is no particular reason, in terms of accuracy, to prefer one model over the others.</p>
+## 1 Linear Model          rmse    standard   1.98     10 0.00632
+## 2 Linear Model          rsq     standard   0.102    10 0.00401
+## 3 Bayesian Linear Model rmse    standard   1.98     10 0.00632
+## 4 Bayesian Linear Model rsq     standard   0.102    10 0.00401
+## 5 Neural Network        rmse    standard   1.97     10 0.00575
+## 6 Neural Network        rsq     standard   0.111    10 0.00422</code></pre>
+<p>The results for the neural network model are slightly better than those for either linear model.</p>
 </div>
 <div id="cardinal-virtues-1" class="section level2">
 <h2>
@@ -660,7 +666,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p class="caption marginnote">--><!--</p>--><!--</div>--></span>
 </p>
 <p><em>Courage</em> helps us to fit the models, as we have above, and then to select the one we want to use. We should only favor more complex models (or formulas) if the additional complexity is <em>warranted</em>. This is a philosophical principle known as “Occam’s Razor.” It states that, “all other things being equal, simpler solutions are more likely to be correct than complex ones.” When viewed in a modeling framework, Occam’s Razor can be restated as, “all other things being equal, simpler models are to be preferred over complex ones.” In other words, we should only favor the more complex model/formula if the additional complexity makes the model meaningfully better.</p>
-<p>In general, linear models are much simpler than Bayesian models. So, given that these two models did about as well under cross-validation, we should select the basic linear model.</p>
+<p>Is the neural network model meaningfully better than the linear models? Perhaps. Average RMSE is lower but, given the standard error associated with that measure, it is close call. Let’s use the neural network model.</p>
 <!-- Time to make up some imaginary people. Let's say we have four individuals whose ideology in 2016 we wanted to predict. We can create a tibble with the values of their demographic information, like so: -->
 <!-- Just because you have a variable in this training data today, does not mean you are going to get it in your production data tomorrow. -->
 <!-- DK: Do these have to be factors? Or will characters work as well, like they do with posterior_predict? -->
@@ -689,6 +695,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p class="caption marginnote">--><!--</p>--><!--</div>--></span>
 </p>
 <p><em>Temperance</em> reminds us to be suspicious of all models, especially our own. The world is always changing. Our models will rarely work as well in the future as they have using data from the past.</p>
+<!-- DK: Use a plot like this one: https://www.tidymodels.org/start/models/ -->
 </div>
 <div id="summary-1" class="section level2">
 <h2>
@@ -704,7 +711,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a href="discrete-response.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-11-11
+2020-11-12
 </p>
 </div>
 </div>
