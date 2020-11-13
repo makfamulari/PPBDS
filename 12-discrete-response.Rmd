@@ -311,11 +311,6 @@ glm_wfl %>%
 
 ## Classification and regression trees (CART)
 
-```{r, echo=FALSE}
-img_path <- "images"
-```
-
-### What is CART?
 
 Logistic regression is just one of many methods we can use to model binary responses.  CART is another approach, which we'll learn about in this section.
 
@@ -329,140 +324,15 @@ Classification trees create partitions recursively. We start the algorithm with 
 
 Now, after we define the new partitions $R_1$ and $R_2$, and we decide to stop the partitioning process, we compute predictors by taking the most common category of all the observations $y$ for which the associated $\mathbf{x}$ is in $R_1$ and $R_2$. We refer to these two as $\hat{y}_{R_1}$ and $\hat{y}_{R_2}$ respectively. 
 
-<!--MB: make this a margin note?
-But how do we pick the predictor $j$ and the value $s$? One of the more popular ways for categorical data is the _Gini Index_. In a perfect scenario, the outcomes in each of our partitions are all of the same category since this will permit perfect accuracy. The _Gini Index_ is going to be 0 in this scenario, and become larger the more we deviate from this scenario. To define the Gini Index, we define $\hat{p}_{j,k}$ as the proportion of observations in partition $j$ that are of class $k$. The Gini Index is defined as $\mbox{Gini}(j) = \sum_{k=1}^K \hat{p}_{j,k}(1-\hat{p}_{j,k})$ -->
-<!-- If you study the formula carefully you will see that it is in fact 0 in the perfect scenario described above, since $\hat{p}_{j,k}(1-\hat{p}_{j,k}) = 0$ for all $k$. -->
 
 Once we are done partitioning the predictor space into regions, in each region a prediction is made using the observations in that region. 
 
-<!-- But when do we stop partitioning?  Every time we split and define two new partitions, the Gini Index improves. This is because with more partitions, our model has more flexibility to adapt to our data.  However, our model may therefore perform worse when exposed to new data (this problem is called *overfitting*). This connects to our discussion of validity and models, as the conditions used to create the model will be too specific to accurately extrapolate to new data points. To avoid this, the algorithm sets a minimum for how much the Gini Index must improve for another partition to be added. This parameter is referred to as the _complexity parameter_ ($c_p$). The measure of fit must improve by a factor of $c_p$ for the new partition to be added. Large values of $c_p$ will therefore force the algorithm to stop earlier which results in fewer nodes. -->
 
 Classification trees have certain advantages that make them very useful. They are highly interpretable, even more so than linear models. They are easy to visualize (if small enough).  Finally, they can model human decision processes. However, in terms of accuracy, they are rarely the best performing method since they are not very flexible. Random forests, explained in the next section, improve on some of the shortcomings of classification trees.
 
 One limitation of CART is its lack of fitted values. Unlike a `glm()`, you can't clean predicted probabilities or point estimates from CART. Rather, you simply get a prediction of 0 or 1 for whatever observation you pass through the tree.  
 
-### Multivariate CART
-
-Before creating any model, let's split our data into a training and testing set, just like we did with our multivariate logistical regression.
-
-```{r}
-cart_split <- initial_split(ch12)
-
-cart_training <- cart_split %>% training()
-cart_testing <- cart_split %>% testing()
-```
-
-To create a CART using multiple variables, we'll use the `decision_tree()` model specification and the `"rpart"` engine.  The syntax is very similar to when we used `logistic_reg()`.  Note that our binary response variable has to be a factor, just like with `logistic_reg()`. 
-
-```{r}
-tree_mod <- decision_tree() %>%
-  set_engine("rpart",
-             model = TRUE) %>%
-  set_mode("classification")
-```
-
-Note that we added the argument `model = TRUE` to `set_engine()`.  This saves the model frame, which we will need to avoid a warning when we plot the trees later.
-
-The function `set_mode()` wasn't necessary when we did logistic regression.  Here it clarifies that we want a *classification* tree rather than a *regression* tree.
-
-Next, let's create our formula for this tree. We will use the same formula that we used in the logistical regression.
-
-```{r}
-cart_formula <- formula(approval ~ age + gender + race)
-```
-
-Now that we have the object `tree_mod` and our formula, we can use `fit()` to construct our tree.
-
-```{r}
-cart_fit <- fit(tree_mod,
-                 cart_formula,
-                 cart_training)
-```
-
-As you can see, **tidymodels** has the same workflow for creating a CART as it does for fitting a logistic regression, but with our model specification saved in `tree_mod` rather than the model specification we saved in `logistic_mod`.
-
-What was the result of our tree?
-
-```{r}
-cart_fit
-```
-
-It's not helpful to look at the results of a tree as text.  In order to visualize the tree, we'll use the `prp()` function in the **rpart.plot** package.  Remember that the model object is stored in `cart_fit$fit`.
-
-```{r, message = FALSE}
-library(rpart.plot)
-
-cart_fit$fit %>%
-  prp(extra = 6, varlen = 0, faclen = 0)
-```
-
-The arguments `varlen = 0` and `faclen = 0` ensure that the full variable names and factor levels are printed.  The argument `extra = 6` shows the proportion of "yes" outcomes within a given partition. Since we'll be using these same arguments throughout the chapter, we'll create a new function that calls `prp()` but with these options as defaults:
-
-```{r}
-prp_ch12 <- function(x, ...) prp(x, extra = 6, varlen = 0, faclen = 0, ...)
-
-cart_fit$fit %>%
-  prp_ch12()
-```
-
-So, how do we interpret this tree? We are given two partitions; the first is for race. The observations that identify as any of the named races are classified as disapproving of the President, denoted by the 0 on that node. All other racial identities proceed to the next partition. If these people are younger than 44, they are also classified as disapproving of the president. Voters 44 and older are classsified as approving of the President. 
-
-The decimal numbers within each box identify how many observations in that node approved of the President. This means that only 20% of observations in the first node approved of the President, 38% in the second node, and 54% in the third node.
-
-You may notice that this tree did not factor in gender. 
-<!-- MB: Trees cannot handle interaction terms, -->
-
-### K-Fold Cross-Validation
-
-Once again, we can check whether the model we created is accurate by using cross-validation. 
-
-We'll use `vfold_cv()` to create `v = 5` splits in the training set, using the final fold to asses the model's accuracy.
-
-```{r}
-cart_folds <- cart_training %>%
-  vfold_cv(v = 5)
-```
-
-Then, we'll create our recipe and plug it into `fit_resamples()` along with `tree_mod` and `cart_folds`. We'll use `collect_metrics()` to get our accuracy values.
-
-<!-- MB: Added interaction term here, but not in the tree above -->
-
-```{r, message = FALSE, warning = FALSE}
-cart_recipe <- recipe(approval ~ age + race + gender, data = cart_training) 
-
-cart_recipe <- cart_recipe %>%
-  step_interact(terms = ~ age:race)
-
-fit_resamples(tree_mod,
-              cart_recipe,
-              cart_folds) %>%
-  collect_metrics()
-```
-<!-- Interpret accuracy values -->
-
-Now that we saw how the training set performed, we'll use our testing set. We do so by applying `cart_testing` to `predict()`.
-
-```{r}
-tree_mod %>%
-  fit(cart_formula, data = cart_training) %>%
-  predict(new_data = cart_testing)
-```
-
-Once again, the model predicts whether the observations in testing set would approve or disapprove of the President based on the model created with the training set. 
-
-To extract the rmse, we set the "truth" to `approval` so this function can compare our predicted values to the true values.
-
-```{r}
-tree_mod %>%
-  fit(cart_formula, data = cart_training) %>%
-  predict(new_data = cart_testing) %>%
-  bind_cols(cart_testing) %>%
-  rmse(truth = as.numeric(approval), estimate = as.numeric(.pred_class))
-```
-
-The mean squared error is about 0.616.
-
-## CART Summary
+<!-- DK: Previous version had a nice graphic showing what a tree looks like. Find another example. -->
 
 First create a workflow object with our model engine.
 
@@ -515,23 +385,7 @@ cart_wfl %>%
          )
 ```
 
-
-### Predicting New Data
-
-Let's now use our tree to make some predictions. When used on trees, the `predict()` function takes in the tree object and new observations containing the explanatory variables. In this case, we'll be passing in a 54-year-old Asian voter, a 41-year-old Black voter, a 56-year-old White voter, and a 70-year-old Native American voter.
-
-```{r}
-
-newdata <- tibble(race = c("Asian", "Black", "White", "Native American"),
-                  age = c(54, 41, 56, 70),
-                  gender = c("Male", "Female", "Male", "Female"))
-
-predict(cart_fit, new_data = newdata) 
-
-```
-
-As you can see, the tree predicted that our first two new voters would disapprove of the President while our second two would approve based on their age and race.
-
+<!-- DK: Previous version had a predict example here. Let's save this for end of chapter. -->
 
 ## Random forests
 
