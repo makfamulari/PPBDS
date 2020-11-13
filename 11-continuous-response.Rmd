@@ -5,35 +5,15 @@ output_yaml:
 
 # Continuous Response {#continuous-response}
 
-<!-- DK: Should, in each section, "discover" some weirdness in the plot, go back and add a step_function, and discover that the weirdness is "fixed" in the plot. -->
 
-<!-- DK: Should we add more detail in terms of how we work with the fit_samples object? Probably not. Too complex for this class. If anything, we need more time discussing how we should investigate what step_* functions to add and why. -->
+<!-- Notes for next version: -->
 
-<!-- DK: Need to use our chosen model to answer a question of some sort. Let's compare group X with group Y. How do they differ in predicted ideology?  If we have enough members of group X and group Y, we can just compare their real ideology! But, often we won't have enough. So, we need to use the model to make the comparison. -->
+<!-- * Need nicer write ups of what the different models are. -->
 
-<!-- DK: What about code like this for comparing a bunch of models all at once? -->
+<!-- * Should, in each section, "discover" some weirdness in the plot, go back and add a step_function, and discover that the weirdness is "fixed" in the plot. -->
 
-<!-- ```{r} -->
-<!-- ch11_formulas <- tibble(formula = c(age_form, -->
-<!--                                    race_gender_form, -->
-<!--                                    full_form, -->
-<!--                                    interact_form), -->
-<!--                        group = c("Age only model", -->
-<!--                                  "Race and gender model", -->
-<!--                                  "Full model without interaction", -->
-<!--                                  "Interaction model")) -->
-<!-- ``` -->
+<!-- * Should we add more detail in terms of how we work with the fit_samples object, using tidy() and so on? Probably not. Too complex for this class. If anything, we need more time discussing how we should investigate what step_* functions to add and why. -->
 
-<!-- Now, we can use `map_*` to apply all of these models and view their metrics to see which ones have the lowest rmse values. -->
-
-<!-- ```{r cache=TRUE, message=FALSE} -->
-<!-- set.seed(10) -->
-<!-- folds_metrics <- ch11_formulas %>% -->
-<!--   mutate(metrics = map(formula, ~ fit_resamples(object = lm_model, -->
-<!--                                                 preprocessor = ., -->
-<!--                                                 resamples = ch11_folds) %>% -->
-<!--                          collect_metrics())) -->
-<!-- ``` -->
 
 Chapter \@ref(model-choice) showed us the *tidymodels* framework for model building and testing. In this chapter, we will use it to explore models in which the outcome variable is *continuous*. In Chapter \@ref(discrete-response), we learn about outcome variables which are *discrete*, meaning that they are members of distinct categories like TRUE/FALSE or yes/no. 
 
@@ -531,7 +511,7 @@ ch11 %>%
   arrange(desc(n))
 ```
 
-But many of the individual cells are empty. Without a model, we can't make any estimates for average ideology for those cells. With a model, we can:
+But many of the individual cells are empty. Without a model, we can't make any estimates for average ideology for those cells. With a model, we can fill all the cells:
 
 
 ```{r}
@@ -542,18 +522,31 @@ us_ideology <- predict(nn_fit, new_data = new_obs) %>%
 
 ```
 
+These are expected values. Consider:
+
 
 ```{r}
 us_ideology %>% 
-  ggplot(aes(x = age, y = .pred, color = education)) +
+  ggplot(aes(x = age, y = .pred)) +
     geom_point(alpha = 0.01) +
-    facet_wrap(~ gender*race)
+    facet_wrap(~ gender*race) +
+    labs(x = "Age Group",
+         y = "Ideology",
+         title = "Ideology in the United States",
+         subtitle = "Across ages and genders, Blacks are the most liberal racial group",
+         caption = "National Election Survey")
 
 ```
+
+Recall our question: *How has ideology varied with age in the United States?*
+
+<!-- DK: Bullet points of lessons. -->
 
 
 <!-- DK: Use a plot like this one: https://www.tidymodels.org/start/models/ -->
 
 ## Summary
 
-The purpose of this chapter way to practice using tidymodels tools for model selection. The most important measure of model quality is how well the model does on out-of-sample data. Cross validation is only one of many ways to estimate that performance, but it is probably the most popular. For details on other approaches, read [Chapter 10](https://www.tmwr.org/resampling.html) of *Tidy Modeling with R* by Max Kuhn and Julia Silge.
+The purpose of this chapter way to practice using tidymodels tools for model selection. The most important measure of model quality is how well the model does on out-of-sample data. Cross validation is only one of many ways to estimate that performance, but it is probably the most popular. For details on other approaches, read [Chapter 10](https://www.tmwr.org/resampling.html) of *Tidy Modeling with R* by Max Kuhn and Julia Silge. Once we have selected a model using cross-validation, we use all our data to fit that final model. The fitted object can then be used to answer whatever questions we might have.
+
+
