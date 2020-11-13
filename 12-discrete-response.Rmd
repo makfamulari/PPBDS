@@ -207,6 +207,18 @@ ch12 %>%
        title = "Presidential Approval by State")
 ```
 
+Let's now complete the first step for a proper data science project. We will split our data set into training and testing samples, then create cross-validations from the training data.
+
+```{r}
+set.seed(10)
+ch12_split <- initial_split(ch12, prob = 0.80)
+ch12_train <- training(ch12_split)
+ch12_test  <- testing(ch12_split)
+ch12_folds <- vfold_cv(ch12_train, v = 10)
+```
+
+We can now use the split data to explore different models.
+
 ## The Question
 
 Now that we've seen some EDA for the general dataset, let's narrow our focus. When creating models, it is important to have a specific question in mind that you can use your model to answer. For our chapter, that question will be "How do Blacks and Hispanic voters vary in their support of the President?" At the end of this chapter, we'll use the three models we created to address answer this. Before then, however, we'll do some exploratory data analysis on this part of the data. 
@@ -281,6 +293,8 @@ ch12 <- cces %>%
     approval == 5 ~ 1))) %>% 
   drop_na()
 ```
+
+
 
 ### Themes
 
@@ -680,6 +694,58 @@ The mean squared error is about 0.62.
 
 <!-- MB: interpret this value -->
 
+## Logistic Regression Summary
+
+First create a workflow object with our model engine.
+
+```{r}
+glm_wfl <- workflow() %>% 
+   add_model(logistic_reg() %>%
+            set_engine("glm") %>%
+            set_mode("classification"))
+```
+
+Add a recipe.
+
+```{r}
+glm_wfl <- workflow() %>% 
+  add_model(logistic_reg() %>%
+            set_engine("glm") %>%
+            set_mode("classification")) %>% 
+  add_recipe(recipe(approval ~ age + gender + race,
+                    data = ch12_train) %>% 
+               step_dummy(gender, race) %>% 
+               step_interact(~age:starts_with("race_") )
+             )
+```
+
+Examine performance on the cross-validation samples.
+
+```{r}
+glm_metrics <- glm_wfl %>% 
+  fit_resamples(resamples = ch12_folds) %>% 
+  collect_metrics()
+
+glm_metrics
+```
+
+Check the predictions against the actual values.
+
+```{r}
+glm_wfl %>% 
+  fit(data = ch12_train) %>% 
+  predict(new_data = ch12_train) %>% 
+  bind_cols(ch12_train %>% select(approval)) %>% 
+  ggplot(aes(y = approval, x = `.pred_class`)) +
+    geom_jitter(height = 0.2, alpha = 0.01) +
+    labs(title = "Predicting Approval",
+         subtitle = "Using demographic predictors",
+         x = "Predicted Approval",
+         y = "Approval"
+         )
+```
+
+
 ## Classification and regression trees (CART)
 
 ```{r, echo=FALSE}
@@ -832,6 +898,59 @@ tree_mod %>%
 ```
 
 The mean squared error is about 0.616.
+
+## CART Summary
+
+First create a workflow object with our model engine.
+
+```{r}
+cart_wfl <- workflow() %>% 
+  add_model(decision_tree() %>%
+            set_engine("rpart",
+             model = TRUE) %>%
+            set_mode("classification"))
+```
+
+Add a recipe.
+
+```{r}
+cart_wfl <- workflow() %>% 
+  add_model(decision_tree() %>%
+            set_engine("rpart",
+             model = TRUE) %>%
+            set_mode("classification")) %>% 
+ add_recipe(recipe(approval ~ age + gender + race,
+                    data = ch12_train) %>% 
+               step_dummy(gender, race) %>% 
+               step_interact(~age:starts_with("race_") )
+             )
+```
+
+Examine performance on the cross-validation samples.
+
+```{r}
+cart_metrics <- cart_wfl %>% 
+  fit_resamples(resamples = ch12_folds) %>% 
+  collect_metrics()
+
+cart_metrics
+```
+
+Check the predictions against the actual values.
+
+```{r}
+cart_wfl %>% 
+  fit(data = ch12_train) %>% 
+  predict(new_data = ch12_train) %>% 
+  bind_cols(ch12_train %>% select(approval)) %>% 
+  ggplot(aes(y = approval, x = `.pred_class`)) +
+    geom_jitter(height = 0.2, alpha = 0.01) +
+    labs(title = "Predicting Approval",
+        subtitle = "Using demographic predictors",
+         x = "Predicted Approval",
+         y = "Approval"
+         )
+```
 
 
 ### Predicting New Data
@@ -1009,6 +1128,61 @@ The mean squared error is about 0.619.
 <!-- final_model <- fit(approval_workflow, ch12) -->
 <!-- ``` -->
 
+## Random Forest Summary
+
+First create a workflow object with our model engine.
+
+```{r}
+rf_wfl <-workflow() %>% 
+  add_model(rand_forest() %>%
+            set_engine("randomForest") %>%
+             set_mode("classification"))
+```
+
+Add a recipe.
+
+```{r}
+rf_wfl <- workflow() %>% 
+  add_model(rand_forest() %>%
+            set_engine("randomForest") %>%
+             set_mode("classification")) %>%  
+  add_recipe(recipe(approval ~ age + gender + race,
+                    data = ch12_train) %>% 
+               step_dummy(gender, race) %>% 
+               step_interact(~age:starts_with("race_") )
+             )
+  
+```
+
+Examine performance on the cross-validation samples.
+
+```{r}
+rf_metrics <- rf_wfl %>% 
+  fit_resamples(resamples = ch12_folds) %>% 
+  collect_metrics()
+
+rf_metrics
+```
+
+
+Check the predictions against the actual values.
+
+```{r}
+rf_wfl %>% 
+  fit(data = ch12_train) %>% 
+  predict(new_data = ch12_train) %>% 
+  bind_cols(ch12_train %>% select(approval)) %>% 
+  ggplot(aes(y = approval, x = `.pred_class`)) +
+    geom_jitter(height = 0.2, alpha = 0.01) +
+    labs(title = "Predicting Approval",
+         subtitle = "Using demographic predictors",
+         x = "Predicted Approval",
+         y = "Approval"
+         )
+```
+
+
+
 ### Predicting New Data
 
 Let's use our final forest model to make some predictions. We'll be passing in the same observations as with the CART example: a 54-year-old Asian voter, a 41-year-old Black voter, a 56-year-old White voter, and a 70-year-old Native American voter. However, our forest also includes a gender variable. We'll make the first and third observations female.
@@ -1037,43 +1211,17 @@ Our forest predicted that the first three voters would disaprove of the Presiden
 
 ## Comparing Models
 
-Now that we've modelled the same formula using three different types of models (logistic regression, CART, and random forest), let's compare these models to see which was the most accurate.
-
-Here is the output:
-
-```{r, message = FALSE}
-fit_resamples(logistic_mod, 
-              log_recipe, 
-              log_folds) %>% collect_metrics()
-```
-
-```{r, message = FALSE}
-fit_resamples(tree_mod, 
-              cart_recipe, 
-              cart_folds) %>% collect_metrics()
-```
-
-```{r, message = FALSE}
-fit_resamples(forest_mod, 
-              forest_recipe, 
-              forest_folds) %>% collect_metrics()
-```
-
-Based on `accuracy`, the random forest performed best by a small margin, followed by logistic regression and then CART. `accuracy` is the percentage of observations in the testing set that the model (which was constructed using the training set) was able to successfully predict. All of the models performed within a margin of 0.01 of eachother. However, it makes sense that random forest was the most successful. By generating many prediction trees and averaging them rather than relying on one, random forest is a more precise form of modelling than CART. 
-
-`roc_auc` is similar to `accuracy` in that it is a measure of how good a model is at predicting 0s to be 0 and 1s to be 1 in the dataset. However, it is calculated by taking the area under the ROC curve. `roc_auc` itself is a shortened form of "area under the ROC curve." 
+Recall that the most common method for deciding which model to choose is to look at which one does the best predicting out of sample. Below is a summary of how well our three different models performed.
 
 ```{r}
-knitr::include_graphics("12-discrete-response/images/ROC_AUC.png")
+tibble(model = rep(c("glm Model", 
+                     "CART Model", 
+                     "RF Model"), each = 2)) %>% 
+  bind_cols(bind_rows(glm_metrics, cart_metrics, rf_metrics)) 
 ```
 
-The ROC curve is created by graphing the rate of true positives as the y-axis (those who approved of the President who were labelled as such) against the rate of false positives (those who approved of the President but were labelled as disapproving). The area under this curve comes out to a very similar measure of accuracy. A `roc_auc` of 1 means that the testing set was perfectly predicted, with no false positives, while a 0 means that every observation of the testing set was  falsely predicted.
-
-In the case of the `roc_auc`, our logistic regression performed best, followed by the random forest, and then CART. They were all within 0.05 of eachother, a wider range than `accuracy`. Being a cruder version of random forest, it again makes sense that it placed last. 
-
-<!-- MB: Say something about log being better than RF -->
-
-<!-- MB: bring back discussion of humility -->
+<!-- BG: This code returns an error. -->
+<!-- BG: once code errors are sorted, talk about results here -->
 
 ## The Question Pt. 2
 
