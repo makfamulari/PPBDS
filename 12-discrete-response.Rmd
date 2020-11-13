@@ -3,11 +3,10 @@ output_yaml:
   - _output.yml
 ---
 
-<!-- DK: Sure would be nice to do one mult-category model. Once we get rid of all the logistic regression stuff, we have some extra space/time. -->
+<!-- DK: Sure would be nice to do one multi-category model. Once we get rid of all the logistic regression stuff, we have some extra space/time. -->
 
 # Discrete Response {#discrete-response}
 
-*DRAFT*: Final version coming soon.
 
 Packages:
 
@@ -21,11 +20,13 @@ library(tidymodels)
 
 **Binary responses** take on only two values: success ($Y=1$) or failure ($Y=0$), yes ($Y=1$) or no ($Y=0$), et cetera. Binary responses are one of the most common types of data that statisticians encounter.  We are often interested in modeling the probability of success, $p$, based on a set of covariates. As with regression, there are two broad categories of problems: *modeling for prediction* and *modeling for causation*. Although terminology varies across fields, "regression" is generally used for situations in which our *dependent variable* is continuous, as in Chapter \@ref(continuous-response). "Classification" applies to cases in which the dependent variable takes on discrete values, the simplest of which is the binary case.
 
-In this chapter, we will look at three common techniques of **classification** of binary data.  First, we will consider logistic regression, which is similar conceptually to the linear regression models we considered in Chapter \@ref(continuous-response).  Second, we will consider classification and regression trees (CART).  Third, we will discuss random forests. We use the **tidymodels** tools for all examples. At the end, we will compare the performances of all three models.
+In this chapter, we will look at three common techniques of **classification** of binary data.  First, we will consider logistic regression.  Second, we will consider classification and regression trees (CART).  Third, we will discuss random forests. We use the **tidymodels** tools for all examples. At the end, we will compare the performances of all three models.
 
-Which of these models will be the most accurate? Keep this question in mind as you read through this chapter. 
+<!-- DK: Finish with a question. -->
 
 ## Binary classification metrics
+
+<!-- DK: Get rid of most of this. -->
 
 Recall the discussion in Chapter \@ref(model-choice) about how to measure model accuracy. Classification models require different measures than those we used in Chapter \@ref(continuous-response) when considering continuous outcome measures.
 
@@ -219,141 +220,13 @@ ch12_folds <- vfold_cv(ch12_train, v = 10)
 
 We can now use the split data to explore different models.
 
-## The Question
 
-Now that we've seen some EDA for the general dataset, let's narrow our focus. When creating models, it is important to have a specific question in mind that you can use your model to answer. For our chapter, that question will be "How do Blacks and Hispanic voters vary in their support of the President?" At the end of this chapter, we'll use the three models we created to address answer this. Before then, however, we'll do some exploratory data analysis on this part of the data. 
-
-First, we'll filter `race` to two groups: Black or Hispanic. We'll also code approval to be an integer, which will help when doing the math for our graphs.
-
-```{r}
-ch12 <- ch12 %>% 
-  filter(race == "Black" | race == "Hispanic") %>%
-  mutate(approval = as.integer(approval)) %>%
-  mutate(approval = case_when(
-    approval == 1 ~ 0,
-    approval == 2 ~ 1))
-```
-
-Now, let's look at a basic comparison of their rates of approval. 
-
-```{r}
-ch12 %>%
-  ggplot(aes(x = approval, fill = race)) +
-  geom_bar() + 
-  labs(y = "Count",
-       x = "Presidential Approval",
-       title = "Presidential Approval in 2018 for Black and Hispanic voters") +
-  facet_wrap(~ race)
-```
-
-We can get two important pieces of information from this graph. The first observation is that, although it seems there are a few more black voters, these populations are very similar in size. The second is there is slightly stronger disapproval of the President among Black voters. 
-
-However, we must do further analyses to better understand Black and Hispanic voters. Looking at how different covariates affect approval rate within the group is a great next step. Let's start with age:
-
-```{r, message = FALSE}
-ch12 %>%
-  group_by(age, race) %>%
-  summarise(approval_rate = sum(approval)/n()) %>%
-  ggplot(aes(x = age, y = approval_rate, group = race, color = race)) +
-  geom_point() +
-  geom_line() + 
-  labs(x = "Age",
-       y = "Approval Rate",
-       title = "Presidential Approval Rate by Age")
-```
-
-You can see that the difference in the approval ratings increases with age. Older Hispanic voters approve more strongly of the President while older Black voters approve of the President at even lower rates than younger Black voters. This graph shows us why covariates are important. Even adding just one -- age -- added a new complexity to our understanding of question at hand. 
-
-Now, let's add another variable by throwing gender in the mix.
-
-```{r, message = FALSE}
-ch12 %>%
-  group_by(age, race, gender) %>%
-  summarise(approval_rate = sum(approval)/n()) %>%
-  ggplot(aes(x = age, y = approval_rate, group = race, color = race)) +
-  geom_point() +
-  geom_line() + 
-  facet_wrap(~gender)+
-  labs(x = "Age",
-       y = "Approval Rate",
-       title = "Presidential Approval Rate by Age and Gender")
-```
-
-Now that we've faceted by gender, we can see that the trends from the previous graph don't vary much from male to female. 
-
-```{r, echo = FALSE}
-ch12 <- cces %>%
-  filter(year == 2018) %>%
-  select(state, age, gender, race, education, ideology, approval) %>%
-  mutate(approval = as.factor(case_when(
-    approval == 1 ~ 0,
-    approval == 2 ~ 0,
-    approval == 3 ~ 1,
-    approval == 4 ~ 1,
-    approval == 5 ~ 1))) %>% 
-  drop_na()
-```
-
-
-
-### Themes
-
-As stated at the beginning of the chapter, this chapter will look into three different types of models, all modelling presidential approval against several explanatory variables. Before we do so, let's take a moment to discuss our themes of Wisdom, Courage, Temperance, and Justice.
-
-```{r echo=FALSE, fig.margin=TRUE}
-knitr::include_graphics("other/images/Wisdom.jpg")
-```
-
-*Prudence* addresses the matter of *validity*. Validity is the measure of how well our data captures the concept we are setting out to analyze and the relevance of the estimand for which we are modelling. So, is `approval` a good measure of what we are trying to estimate? The most obvious problem is that the `approval` variable began as a 5-point scale from "Strongly Disapprove" to "Strongly Approve". Converting this to a binary variable of 0 and 1 may not be a valid measure of presidential approval -- think to yourself, would our data be the same if we asked the exact same respondents to respond to a "Yes" or "No" question rather than transforming their data? Finally, does stating your approval or disapproval of the president on a survey capture what we are trying to study? Perhaps so, but in a practical application, it may be true that whether or not an individual donated money to the President's campaign or if they voted for him in 2016 more accurately captures what we are setting out to study. Finally, are our right hand side variables valid? For example, the 5 point scale of `ideology` from "Strongly Liberal" to "Strongly Conservative" seems rather subjective. 
-
-```{r echo=FALSE, fig.margin=TRUE}
-knitr::include_graphics("other/images/Justice.jpg")
-```
-
-*Justice* deals with the theme of *model structure*. When establishing your model structure, there are a few steps. Firstly, will our model be predictive or causal? This chapter deals with passing our data through three different model types to predict presidential approval. We are not trying to measure the causal effect of any specific treatment variable, so these will be predictive models. Next, we must make a mathematical formula for our models. Because we are doing several different model types, our formula can be abstracted to... 
-
-$$y_i = f(x_{1i}, x_{2i}, ... )$$
-
-$f()$ represents the different models we will pass our data into, $x_i$ represents our data points, and $y_i$ represents `approval`. Finally, we will construct a preceptor table for this dataset. 
-
-Finally, as a part of model structure, let's look at a preceptor table of our data. 
-
-```{r, echo = FALSE}
-
-# Using real sampled ages but making my own tibble
-
-tibble(subject = c("1", "2", "...", "10,052", "...", "120,892", "20,400,100", "...", "200,627,000", "...", "N"),
-       approval = c("0", "1", "...", "?", "...", "0", "0",  "...", "?", "...", "1")) %>%
-  gt() %>%
-  cols_label(subject = md("**ID**"),
-             approval = md("**Approval**")) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  tab_header("Preceptor Table of Approval") %>%
-  fmt_markdown(columns = TRUE)
-
-```
-
-The purpose of a Preceptor Table is to capture all of the data such that if the question marks were filled out, one wouldn't need to construct a model. The rows in this Preceptor Table represent the full population of N American voters that the cces sampled from for this dataset. For this reason, some have recorded data while other do not. If all of the "?"s were filled out, we would not need to make a predictive model for approval because we know everyone's value for approval. 
-
-```{r echo=FALSE, fig.margin=TRUE}
-#knitr::include_graphics("other/images/Courage.jpg")
-```
-
-Our discussion of *Courage*, or the *data-generating mechanism*, will be brief, as we will discuss our three model types in-depth throughout the chapter. We will begin with a logistical regression using `glm()`, like in previous chapters. Then we will use a regression tree, which creates partitions based on the right hand side variables and has a prediction of `approval` for each partition. Finally, we will use random forests, which are created by generating and averaging many different regression trees. Each of these models will use the binary variable of `approval` as their left hand variable.
-
-```{r echo=FALSE, fig.margin=TRUE}
-knitr::include_graphics("other/images/Temperance.jpg")
-```
-
-Finally, *Temperance* (or *humility*). Because the world is extremely complex and ever-changing, our models are never as good as they appear. We will hold off on our full discussion of *Temperance* until the end of the chapter when we've completed the models. Until then, keep in mind these questions: Is our model *representative* of the greater world? How accurately does our model predict *unknown unknowns*? What are the flaws in our modelling process?
 
 ## Logistic regression
 
-### What is logistic regression?
 
-Now that we know our dataset a little better, let's begin our first way of modelling binary/discrete data: logistic regressions. 
+
+Now that we know our dataset a little better, let's begin our first way of modeling binary/discrete data: logistic regressions. 
 
 Figure \@ref(fig:OLSlogistic) illustrates a data set with a binary (0 or 1) response ($Y$) and a single continuous predictor ($X$).  The blue line is a linear regression to model the probability of a success ($Y=1$) for a given value of $X$. With a binary response, the linear regression has an obvious problem: it can produce predicted probabilities below 0 and above 1. Probabilities can only range from 0 up to and including 1 as these represent a 0% and 100% chance of an event happening, respectively.
 
@@ -715,7 +588,7 @@ glm_wfl <- workflow() %>%
   add_recipe(recipe(approval ~ age + gender + race,
                     data = ch12_train) %>% 
                step_dummy(gender, race) %>% 
-               step_interact(~age:starts_with("race_") )
+               step_interact(~age:starts_with("race_"))
              )
 ```
 
