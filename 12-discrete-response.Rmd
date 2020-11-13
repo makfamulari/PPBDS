@@ -456,8 +456,11 @@ rf_wfl %>%
          )
 ```
 
+## Cardinal Virtues
 
-## Comparing Models
+<!-- DK: Make this aprt like Chapter 11. Put model comparison under courage. Once we choose a model then, under Temperance, we use all our data to fit it. Then we use the resulting _fit object to answer our question. -->
+
+### Comparing Models
 
 Recall that the most common method for deciding which model to choose is to look at which one does the best predicting out of sample. Below is a summary of how well our three different models performed.
 
@@ -471,65 +474,4 @@ tibble(model = rep(c("glm Model",
 <!-- BG: This code returns an error. -->
 <!-- BG: once code errors are sorted, talk about results here -->
 
-## The Question Pt. 2
-
-There are an infinite numbers of comparisons to be made within this dataset. When creating a model, it's best to have a specific question in mind. At the end, you can answer that question, using your model to learn more about the world.
-
-Let's return to our original question of how Asians and Whites specifically vary in their support of the president. We'll use our logistic regression first, as that model performed with the highest roc_auc. 
-
-<!-- imprtnt: When comparing blacks and hispanics, the approval was predicted to be 0 for every age. So i switched to white and asian here. Need to go back and fix in earlier work (in The Question section) -->
-
-```{r, echo = FALSE}
-
-# Creating dataset
-
-newdata <- tibble(race = c(rep("Asian", 12),
-                           rep("White", 12)),
-                  age = rep(c(24, 24, 36, 36, 48, 48, 65, 65, 73, 73, 84, 84), 2),
-                  gender = rep(c("Female", "Male"), 12))
-
-```
-
-We've created a dataset of 24 new Asian and White voters so that we can use our model to predict if they will vote for the President. Each voter's race, age, and gender have been included as these are the 3 demographic factors our model uses to predict approval. 
-
-```{r}
-newdata
-```
-
-Next, we'll use the `predict()` function to see how our model thinks these voters will regard the President. 
-
-```{r}
-
-x <- predict(logistic_fit, new_data = newdata) 
-x
-
-```
-
-Well, now what? We have our predictions for each of the new voters, but it isn't helpful to answering our question yet. To see greater trends between White and Asian voters, let's visualize our predictions! The new data had an intentionally even spread of age, race, and gender to make our comparisons easier.
-
-Let's use the same strategy from our exploratory data analysis earlier. We can graph age against approval, facet by gender, and color the observations by race. This way, we can view trends across all three variables in one graph.
-
-```{r}
-
-# Cleaning the data 
-
-y <- x %>% 
-  bind_cols(newdata) %>%
-  mutate(approval = .pred_class) %>%
-  select(-.pred_class)
-
-# Graphing the data
-
-y %>%
-  ggplot(aes(x = age, y = approval, color = race)) + 
-  geom_jitter(size = 2, width = 8, height = 0) + # Adding width so that the dots don't block eachother
-  facet_wrap(~gender) + 
-  labs(x = "Age",
-       y = "Predicted Approval",
-       title = "Predicted Approval of President for White and Asian Voters")
-
-```
-
-So, how do White and Asian voters vary in their support of the President in 2018? As we can see, this is a more complex question than one may think. For example, if one were only considering race, they would guess an White voter to be more likely to approve of the President than an Asian voter. However, a 40-year-old White male, according to our model, is not as likely to approve of the President as a 70-year-old Asian man. This is useful information to consider: when using our model to its full extent, we can make predictions based on more than one variable at a time. 
-
-What else can we learn from this graph? Both races follow the trend of older voters being more likely to approve of the President. However, we see that Asian woman were predicted to *disapprove* of the President at any age, while the older Asian men were predicted to approve of him. The margin was much closer for White voters, with both older men and women being predicted to approve.   
+ 
