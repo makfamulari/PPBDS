@@ -389,8 +389,6 @@ cart_wfl %>%
 
 ## Random forests
 
-### What are random forests?
-
 Random forests are a very popular machine learning approach that addresses the shortcomings of decision trees using a clever idea. The goal is to improve prediction performance and reduce instability by _averaging_ multiple decision trees (a forest of trees constructed with randomness). It has two features that help accomplish this.
 
 The first step is _bootstrap aggregation_ or _bagging_. The general idea is to generate many predictors, each using classification trees, and then forming a final prediction based on the average prediction of all these trees. To assure that the individual trees are not the same, we use the bootstrap to induce randomness. These two features combined explain the name: the bootstrap makes the individual trees **randomly** different, and the combination of trees is the **forest**. The specific steps are as follows.
@@ -406,146 +404,6 @@ So how do we get different decision trees from a single training set? For this, 
 4. Create a bootstrap training set by sampling $N$ observations from the training set **with replacement**. This is the first way to induce randomness. 
     
 5. A large number of features is typical in machine learning challenges. Often, many features can be informative but including them all in the model may result in overfitting. The second way random forests induce randomness is by randomly selecting features to be included in the building of each tree. A different random subset is selected for each tree. This reduces correlation between trees in the forest, thereby improving prediction accuracy. 
-
-### Fitting random forests
-
-<!-- MB: http://www.rebeccabarter.com/blog/2020-03-25_machine_learning/#evaluate-the-model-on-the-test-set
-https://s3.amazonaws.com/assets.datacamp.com/production/course_7215/slides/chapter3.pdf
--->
-
-We will demonstrate by fitting a random forest to the House elections data. Before we even write our model formula, we need to split the data to create a *training set* and a *testing set*. The training dataset will be used to create our model and the testing dataset will be used to test our final model’s performance.
-
-```{r}
-forest_split <- initial_split(ch12, 
-                                prop = 3/4)
-
-forest_train <- training(forest_split)
-forest_test <- testing(forest_split)
-```
-
-Next, we will use the `rand_forest()` function to create our model specification, setting the engine to `"randomForest"` and the mode to `"classification"`. 
-
-```{r, message = FALSE}
-library(randomForest)
-
-forest_mod <- 
-  rand_forest() %>%
-  set_engine("randomForest") %>%
-  set_mode("classification") 
-
-```
-
-We will now create the formula for our forest.
-
-```{r}
-forest_formula <- formula(approval ~ age + gender + race + race:age)
-```
-
-Finally, let's fit our model. `fit()` will take in our model specification `logistic_mod`, our formula, and our training set of data. We are reserving our testing set for later.
-
-```{r}
-forest_fit <- fit(forest_mod, forest_formula, forest_train)
-```
-
-If we graph the "OOB estimate of error rate", we can see that this model settles around an error rate of just under 40% (or, looking at it the other way, an accuracy of 60%). We can see how the error rate of our algorithm changes as we add trees by looking at `forest_fit$fit$err.rate[, "OOB"]`.  By default, `randomForest()` (the engine we specified) grows 500 trees. -->
-
-```{r}
-tibble(`Error rate` = forest_fit$fit$err.rate[, "OOB"], Trees = 1:500) %>%
-  ggplot(aes(x = Trees, y = `Error rate`)) +
-  geom_line() + 
-  theme_classic()
-```
-
-We can see that in this case, the accuracy improves as we add more trees until about 50 trees where accuracy stabilizes. Random forests often perform better than other methods. However, a disadvantage of random forests is that we lose interpretability---we don't get anything like the coefficients from a logistic regression or the single tree from CART. 
-
-### K-Fold Cross-Validation
-
-Just like with CART and logistic regression, we will use cross-validation to check the accuracy of our random forest. Once again, we'll create the recipe and add our interaction term seperately.
-
-```{r}
-
-forest_recipe <- recipe(approval ~ age + gender + race, 
-                        data = forest_train)
-
-forest_recipe <- forest_recipe %>%
-  step_interact(terms = ~ age:race)
-
-
-```
-
-
-<!-- approval_workflow <- workflow() %>% -->
-<!-- add the recipe -->
-<!--  add_recipe(approval_recipe) %>% -->
-<!-- add the model -->
-<!--  add_model(forest_mod) -->
-
-
-We will also create our folds using `vfold_cv()`.
-
-```{r}
-forest_folds <- forest_train %>%
-  vfold_cv(v = 5)
-```
-
-Now we use `fit_resamples()` to see how it accurately  the model performed on the fifth and final fold of the training set. We will save the output of `fit_resamples()` in forest_metrics to use later.
-
-```{r, message = FALSE, warning = FALSE}
-
-forest_metrics <- fit_resamples(forest_mod,
-                                forest_recipe,
-                                forest_folds) 
-
-forest_metrics %>% collect_metrics()
-
-```
-
-<!-- MB: Interpret -->
-
-Now that we saw how the training set performed, we'll use our testing set. We do so by applying `forest_test` to `predict()`.
-
-
-<!-- forest_mod %>% -->
-<!--  fit(forest_formula, data = forest_train) %>% -->
-<!--  predict(new_data = forest_test) -->
-
-
-To extract the rmse, we again set the "truth" to `approval` so this function can compare our predicted values to the true values.
-
-
-<!-- forest_mod %>% -->
-<!--  fit(forest_formula, data = forest_train) %>% -->
-<!--  predict(new_data = forest_test) %>% -->
-<!--  bind_cols(forest_test) %>% -->
-<!--  rmse(truth = as.numeric(approval), estimate = as.numeric(.pred_class)) -->
-
-
-The mean squared error is about 0.619.
-
-<!-- We can use `collect_predictions()` to see exactly how many of the predictions on the test set were correct. It appears that `r 7001+2050` were correct (the addition of the (0,0) and (1,1) cells), while `r 4082+1321` were incorrect. -->
-
-<!-- ```{r} -->
-
-<!-- test_predictions <- forest_metrics %>% collect_predictions() -->
-<!-- test_predictions %>%  -->
-<!--   conf_mat(truth = approval, estimate = .pred_class) -->
-
-<!-- ``` -->
-
-<!-- We could also plot distributions of the predicted probability distributions for voter. -->
-
-<!-- ```{r} -->
-<!-- test_predictions %>% -->
-<!--   ggplot() + -->
-<!--   geom_density(aes(x = .pred_1, fill = approval),  -->
-<!--                alpha = 0.5) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- final_model <- fit(approval_workflow, ch12) -->
-<!-- ``` -->
-
-## Random Forest Summary
 
 First create a workflow object with our model engine.
 
@@ -596,33 +454,6 @@ rf_wfl %>%
          x = "Predicted Approval",
          y = "Approval"
          )
-```
-
-
-
-### Predicting New Data
-
-Let's use our final forest model to make some predictions. We'll be passing in the same observations as with the CART example: a 54-year-old Asian voter, a 41-year-old Black voter, a 56-year-old White voter, and a 70-year-old Native American voter. However, our forest also includes a gender variable. We'll make the first and third observations female.
-
-```{r}
-# DK: If the model has been fit with race as a factor, then race in newdata must
-# also be a factor and, subtle point!, must have the same levels as the variable
-# which was used to fit the model, even if there are no observations with those
-# values in the newdata.
-
-
-newdata <- tibble(race = c("Asian", "Black", "White", "Native American"),
-                  age = c(54, 41, 56, 70),
-                 gender = c("Female", "Male", "Female", "Male"))
-
-#predict(forest_fit, new_data = newdata) 
-
-```
-
-Our forest predicted that the first three voters would disaprove of the President and that our final voter would approve. These predictions differ from our CART predictions most likely because of the added variable: gender. Because females disapproved of the President at higher rates, the third voter was predicted to disapprove instead.
-
-```{r}
-#posterior_linpred(forest_fit, newdata)
 ```
 
 
