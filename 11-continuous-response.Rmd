@@ -39,6 +39,11 @@ Chapter \@ref(model-choice) showed us the *tidymodels* framework for model build
 
 We use `nes` from the `PPBDS.data` package. `nes` contains data from the American National Election Survey for every presidential election year since 1952. Along with demographic details, such as race, gender, and age, the survey also includes respondents' ideological identification. Because `ideology` is measured on a scale from -3 to 3, we can treat it as a continuous outcome variable.
 
+Our question:
+
+*How has ideology varied with age in the United States?*
+
+To answer this question, we need to build a model.
 
 ## Exploratory Data Analysis
 
@@ -130,7 +135,7 @@ lm_wfl <- workflow() %>%
   add_model(linear_reg() %>%
             set_engine("lm") %>%
             set_mode("regression")) %>% 
-  add_recipe(recipe(ideology ~ gender + race + region + 
+  add_recipe(recipe(ideology ~  gender + race + region + 
                       income + age + education,
                     data = ch11_train) %>% 
              step_dummy(all_nominal())
@@ -162,7 +167,7 @@ lm_wfl %>%
   fit(data = ch11_train) %>% 
   predict(new_data = ch11_train) %>% 
   bind_cols(ch11_train %>% select(ideology)) %>% 
-  ggplot(aes(y = ideology, x = `.pred`)) +
+  ggplot(aes(y = ideology, x = .pred)) +
     geom_jitter(height = 0.2, alpha = 0.01) +
     labs(title = "Predicting Ideology",
          subtitle = "Using a linear model with demographic predictors",
@@ -193,7 +198,7 @@ stan_wfl <- workflow() %>%
   add_model(linear_reg() %>%
             set_engine("stan") %>%
             set_mode("regression")) %>% 
-  add_recipe(recipe(ideology ~ gender + race + region + 
+  add_recipe(recipe(ideology ~  gender + race + region + 
                       income + age + education,
                     data = ch11_train) %>% 
              step_dummy(all_nominal())
@@ -219,7 +224,7 @@ stan_wfl %>%
   fit(data = ch11_train) %>% 
   predict(new_data = ch11_train) %>% 
   bind_cols(ch11_train %>% select(ideology)) %>% 
-  ggplot(aes(y = ideology, x = `.pred`)) +
+  ggplot(aes(y = ideology, x = .pred)) +
     geom_jitter(height = 0.2, alpha = 0.01) +
     labs(title = "Predicting Ideology",
          subtitle = "Using a Bayesian linear model with demographic predictors",
@@ -251,6 +256,8 @@ nn_wfl <- workflow() %>%
 
 The next step is to add a recipe.
 
+<!-- DK: Why can't we include year here? -->
+
 ```{r}
 nn_wfl <- workflow() %>% 
   add_model(mlp(epochs = 100, 
@@ -258,11 +265,12 @@ nn_wfl <- workflow() %>%
                 dropout = 0.1) %>%
             set_engine("nnet") %>% 
             set_mode("regression")) %>%
-  add_recipe(recipe(ideology ~ gender + race + region + 
+  add_recipe(recipe(ideology ~  gender + race + region + 
                       income + age + education,
                     data = ch11_train) %>% 
              step_dummy(all_nominal())
              )
+
              
 ```
 
@@ -286,7 +294,7 @@ nn_wfl %>%
   fit(data = ch11_train) %>% 
   predict(new_data = ch11_train) %>% 
   bind_cols(ch11_train %>% select(ideology)) %>% 
-  ggplot(aes(y = ideology, x = `.pred`)) +
+  ggplot(aes(y = ideology, x = .pred)) +
     geom_jitter(width = 0.2, alpha = 0.01) +
     labs(title = "Predicting Ideology",
          subtitle = "Using a neural network with demographic predictors",
@@ -345,7 +353,38 @@ knitr::include_graphics("other/images/Courage.jpg")
 
 *Courage* helps us to fit the models, as we have above, and then to select the one we want to use. We should only favor more complex models (or formulas) if the additional complexity is *warranted*. This is a philosophical principle known as "Occam's Razor." It states that, "all other things being equal, simpler solutions are more likely to be correct than complex ones." When viewed in a modeling framework, Occam's Razor can be restated as, "all other things being equal, simpler models are to be preferred over complex ones." In other words, we should only favor the more complex model/formula if the additional complexity makes the model meaningfully better.
 
-Is the neural network model meaningfully better than the linear models? Perhaps. Average RMSE is lower but, given the standard error associated with that measure, it is close call. Let's use the neural network model.
+Is the neural network model meaningfully better than the linear models? Perhaps. Average RMSE is lower but, given the standard error associated with that measure, it is close call. Regardless, let's use the neural network model.
+
+Now that we have chosen a model, we are finally ready to use our test data.
+
+```{r}
+nn_wfl %>% 
+  fit(data = ch11_train) %>% 
+  predict(new_data = ch11_test) %>% 
+  bind_cols(ch11_test %>% select(ideology)) %>% 
+  metrics(truth = ideology, estimate = .pred)
+```
+
+Our best guess for the RMSE we will see in the future is approximately 1.97. 
+
+<!-- DK: Why not use full data below? -->
+
+The full plot is:
+
+```{r}
+nn_wfl %>% 
+  fit(data = ch11_train) %>% 
+  predict(new_data = ch11_test) %>% 
+  bind_cols(ch11_test %>% select(ideology)) %>% 
+  ggplot(aes(y = ideology, x = .pred)) +
+    geom_jitter(height = 0.2, alpha = 0.01) +
+    labs(title = "Predicting Ideology",
+         subtitle = "Using a neural network model with demographic predictors",
+         x = "Predicted Ideology",
+         y = "Ideology",
+         caption = "Source: CCES") 
+```
+
 
 
 <!-- Time to make up some imaginary people. Let's say we have four individuals whose ideology in 2016 we wanted to predict. We can create a tibble with the values of their demographic information, like so: -->
@@ -380,7 +419,138 @@ Is the neural network model meaningfully better than the linear models? Perhaps.
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
-*Temperance* reminds us to be suspicious of all models, especially our own. The world is always changing. Our models will rarely work as well in the future as they have using data from the past.
+*Temperance* reminds us to be suspicious of all models, especially our own. The world is always changing. Our models will rarely work as well in the future as they have using data from the past. But models are better than nothing, so we will use our neural network model to answer the question with which we started this chapter:
+
+*How has ideology varied with age in the United States?*
+
+### Ideology and age without a model
+
+To some extent, we can answer this question without a model. Algebra is a powerful tool.
+
+```{r}
+ch11 %>% 
+  group_by(age) %>% 
+  summarize(avg_ideology = mean(ideology), .groups = "drop") %>% 
+  ggplot(aes(x = age, y = avg_ideology)) +
+    geom_point() +
+    labs(title = "Ideology and Age 1954 -- 2016",
+         subtitle = "Elderly Americans are less liberal on -3 to 3 Scale",
+         caption = "National Election Survey", 
+         y = "Average Ideology",
+         x = "Age Category")
+```
+
+That works fine, but we are not interested in just average ideology for everyone in, say, the 35--44 age group. We want to see how ideology differs by gender, race, region, education, income and so on. For example, how what about Black women in the West with Advanced Degrees?
+
+```{r}
+ch11 %>%
+  filter(gender == "Female",
+         race == "Black",
+         region == "West",
+         education == "Adv. Degree") %>% 
+  group_by(age) %>% 
+  summarize(avg_ideology = mean(ideology), .groups = "drop") %>% 
+  ggplot(aes(x = age, y = avg_ideology)) +
+    geom_point() +
+    scale_x_discrete(drop = FALSE) +
+    labs(title = "Black Women in the West with Advanced Degrees",
+         subtitle = "Only data for 6 people total, in 4 age categories",
+         caption = "National Election Survey", 
+         y = "Average Ideology",
+         x = "Age Category")
+```
+
+<!-- DK: Calculate these numbers live? They wont be right when we add the new NES data. -->
+
+We have zero observations for 3 of the age categories. The other four averages only have a total 6 observations to work with. The technical term for a graphic like this is "garbage."
+
+Does that mean that we know *nothing* about Black women in the West with advanced degrees who are 75+? No! Just because there are no observations for a specific bucket does not mean that we are blind. The ideology of Black women in other regions tells us something about Black women in the West. The ideology of women with advanced degrees in the West tells us something about similar Black women who do not appear in our sample. And so on. *A model allows us to make inferences about places where our data is sparse.*
+
+<!-- DK: Talk about infinite Preceptor Table? -->
+
+### Ideology and age with a model
+
+Now that we have selected our model, it is time to use all the data to fit it. Recall that the purpose of not using all the data up until model selection was to avoid fooling ourselves into thinking that a specific model was better than it actually was. Not looking at the test data was the discipline we needed. With that stage of the modeling complete, we now want to create the best model we can, which means using all the data available to us.
+
+Since this fit might take some time, we just do it once and save the resulting object.
+
+<!-- DK: Annoying that confidence intervals are not built in. But this scatter approach isn't bad . . . I think. -->
+
+```{r}
+nn_fit <- nn_wfl %>% 
+  fit(data = ch11)
+```
+
+Note our use of a "fit" suffix to indicate that this is a fitted object. We can use the fitted object to estimate the expected ideology for a specific category of person. For example:
+
+```{r}
+new_obs <- tibble(gender = "Female", 
+                  race = "Black",
+                  region = "West",
+                  age = "75 +",
+                  education = "Adv. Degree",
+                  income = "68 - 95")
+
+predict(nn_fit, new_data = new_obs)
+```
+
+Again, we have no individuals in our data set, despite having 
+`r scales::comma(nrow(ch11))` rows, with these characteristics. If we were not willing to model, we wouldn't be able to know anything. Does that seem sensible to you? The average ideology for the whole sample is `r mean(ch11$ideology)`. Among subgroups, the average is `r mean(ch11$ideology[ch11$gender == "Female"])` for women, `r mean(ch11$ideology[ch11$education == "Adv. Degree"])` for those with advanced degrees and `r mean(ch11$ideology[ch11$race == "Black"])`. Given that information, would you really think that it is a 50/50 bet whether or not female, Black, advanced degree holders (regardless of their other attributes) are above or below the overall average? Of course not! You would expect them to be below that average.
+
+In addition to looking at specific categories of people, we can look at a range.
+
+
+```{r}
+new_obs <- tibble(gender = "Female", 
+                  race = "Black",
+                  region = "West",
+                  age = "75 +",
+                  education = "Adv. Degree",
+                  income = levels(ch11$income))
+
+predict(nn_fit, new_data = new_obs) %>% 
+  bind_cols(tibble(income = levels(ch11$income)))
+  
+```
+
+Again, these are estimated values for individuals for whom we have not direct data. There is not a single individual in our sample with these characteristics. But, because we have a model, we can estimate what the average ideology is for them. 
+
+The difficulty arises because we have tens of thousands of types of people for whom we would like an estimated average ideology. We certainly don't want to type in all the different types by hand. `expand_grid()` comes to the rescue 
+
+```{r}
+new_obs <- expand_grid(ch11 %>% select(-ideology, -year))
+
+sample_n(new_obs, 5)
+```
+
+`new_obs` has `r scales::comma(nrow(new_obs))` rows, meaning that many unique types of people. For some types of people, we have a fair amount of data:
+
+```{r}
+ch11 %>% 
+  count(gender, race, income, age, education, region) %>% 
+  arrange(desc(n))
+```
+
+But many of the individual cells are empty. Without a model, we can't make any estimates for average ideology for those cells. With a model, we can:
+
+
+```{r}
+us_ideology <- predict(nn_fit, new_data = new_obs) %>% 
+  bind_cols(new_obs) %>% 
+  filter(! gender == "Other") %>% 
+  filter(race %in% c("White", "Black", "Hispanic")) 
+
+```
+
+
+```{r}
+us_ideology %>% 
+  ggplot(aes(x = age, y = .pred, color = education)) +
+    geom_point(alpha = 0.01) +
+    facet_wrap(~ gender*race)
+
+```
+
 
 <!-- DK: Use a plot like this one: https://www.tidymodels.org/start/models/ -->
 
