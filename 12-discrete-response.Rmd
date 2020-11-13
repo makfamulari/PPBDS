@@ -5,6 +5,18 @@ output_yaml:
 
 <!-- DK: Sure would be nice to do one multi-category model. Once we get rid of all the logistic regression stuff, we have some extra space/time. -->
 
+<!-- For Becca: -->
+
+<!--   * Note the use of cache=TRUE at the end. -->
+
+<!--   * Edit anything, in any way. You now own the whole chapter, including, for example the descriptions of the model types at the start of each section. Are they bad? Fix them. -->
+
+  <!-- * The binary classification exercise is 80% too long. I just copy/pasted it from the other book. We don't care about all that detail. Just explain accuracy, and roc_accuracy, since they are the two things that appear by default. You can also mention that there are further details to explore. -->
+
+  <!-- *Let's use the logistic model for doing predictions. Note how it has the best accuracy. -->
+
+
+
 # Discrete Response {#discrete-response}
 
 
@@ -385,7 +397,7 @@ cart_wfl %>%
          )
 ```
 
-<!-- DK: Previous version had a predict example here. Let's save this for end of chapter. -->
+
 
 ## Random forests
 
@@ -431,7 +443,7 @@ rf_wfl <- workflow() %>%
 
 Examine performance on the cross-validation samples.
 
-```{r}
+```{r, cache=TRUE}
 rf_metrics <- rf_wfl %>% 
   fit_resamples(resamples = ch12_folds) %>% 
   collect_metrics()
@@ -442,7 +454,7 @@ rf_metrics
 
 Check the predictions against the actual values.
 
-```{r}
+```{r, cache=TRUE}
 rf_wfl %>% 
   fit(data = ch12_train) %>% 
   predict(new_data = ch12_train) %>% 
@@ -465,9 +477,9 @@ rf_wfl %>%
 Recall that the most common method for deciding which model to choose is to look at which one does the best predicting out of sample. Below is a summary of how well our three different models performed.
 
 ```{r}
-tibble(model = rep(c("glm Model", 
-                     "CART Model", 
-                     "RF Model"), each = 2)) %>% 
+tibble(model = rep(c("Logistic Regression", 
+                     "Classification and Regression Tree", 
+                     "Random Forest"), each = 2)) %>% 
   bind_cols(bind_rows(glm_metrics, cart_metrics, rf_metrics)) 
 ```
 
