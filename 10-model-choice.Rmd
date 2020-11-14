@@ -3,13 +3,15 @@ output_yaml:
   - _output.yml
 ---
 
+<!-- DK: Add discussion of rmse. -->
+
 <!-- DK: It is really bad, both here and in the chapter, that we just replace both ames and Sale_Price in place. Create a new data set, or at least a new variable, and use that! -->
 
 <!-- DK: Use argument names first time that you use that function. -->
 
 <!-- DK: Shouldn't the last step be to run our final model on ames_test? -->
 
-<!-- DK: Explain control_resample().  -->
+<!-- DK: Explain control_resample().  Or drop it! -->
 
 <!-- DK: Can we make a simple pipe for tidymodels which we can teach students to do. First, split the data. Second, create the folds. Third, choose the model. Fourth, make the recipe. Fifth, make the workflow. Sixth, apply the workflow to the folds. Seventh, fit model to all of training. Eighth, check how this model does on test. Nineth, fit model on all data. Use that model tomorrow. -->
 
@@ -228,9 +230,9 @@ A recipe is also an object that defines a series of steps for data processing. U
 ames_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + 
            Year_Built + Bldg_Type,
-         data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_dummy(all_nominal())
+              data = ames_train) %>%
+         step_log(Gr_Liv_Area, base = 10) %>% 
+         step_dummy(all_nominal())
 
 ames_rec
 ```
@@ -280,9 +282,9 @@ For the Ames data, we can amend the recipe to use:
 ames_rec <- 
   recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type,
          data = ames_train) %>%
-  step_log(Gr_Liv_Area, base = 10) %>% 
-  step_other(Neighborhood, threshold = 0.01) %>% 
-  step_dummy(all_nominal())
+          step_log(Gr_Liv_Area, base = 10) %>% 
+          step_other(Neighborhood, threshold = 0.01) %>% 
+          step_dummy(all_nominal())
 ```
 
 
@@ -647,22 +649,32 @@ ggplot(ames_test_res, aes(x = Sale_Price, y = .pred)) +
 
 There is one property that is substantially over-predicted. 
 
-Let's compute the root mean squared error for this model using the `rmse()` function: 
+Let's compute the root mean squared error (RMSE) for this model using the `rmse()` function: 
 
 ```{r}
 rmse(ames_test_res, truth = Sale_Price, estimate = .pred)
 ```
 
+The RMSE for any model is the square root of the average squared residual. Mathematically:
+
+$$ RMSE = \sqrt{ \frac{1}{N}\sum_{i=1}^{N} \hat{y_i} - y_i)^2}$$
+where $\hat{y_i}$ is the fitted or predicted value for observation $i$.
+
 The output above shows the standard format of the output of **yardstick** functions. Metrics for numeric outcomes usually have a value of "standard" for the `.estimator` column. Examples with different values for this column are shown below.
 
 <!-- DK: Should we give formulas for these metrics? Discuss them? Or maybe only use rmse? -->
 
-To compute multiple metrics at once, we can create a _metric set_. Let's add $R^2$ and the mean absolute error: 
+To compute multiple metrics at once, we can create a _metric set_. Let's add the mean absolute error (MAE): 
 
 ```{r}
-ames_metrics <- metric_set(rmse, rsq, mae)
+ames_metrics <- metric_set(rmse, mae)
 ames_metrics(ames_test_res, truth = Sale_Price, estimate = .pred)
 ```
+
+Mathematically:
+
+$$ MAE = \frac{1}{N}\sum_{i=1}^{N} \lvert \hat{y_i} - y_i \rvert$$
+
 
 This tidy data format stacks the metrics vertically.
 
@@ -932,56 +944,59 @@ workflow() %>%
               set_mode("regression")) 
 ```
 
-Third, add a recipe --- which should contain a formula and data --- and then any associated `step_*` functions. (Note that we have simplified this slightly from the example above.)
+Third, add a recipe --- which should contain a formula and data --- and then any associated `step_*` functions. (Note that we have simplified this slightly from the example used in previous sections.)
 
 ```{r, eval=FALSE}
 ...  %>% 
   add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built, 
-                    data = ames_train)) %>%
-    step_log(Gr_Liv_Area, base = 10) %>% 
-    step_other(Neighborhood, threshold = 0.01) %>% 
-    step_dummy(all_nominal())
+                    data = ames_train) %>%
+             step_log(Gr_Liv_Area, base = 10) %>% 
+             step_other(Neighborhood, threshold = 0.01) %>% 
+             step_dummy(all_nominal()))
 ```
 
-Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters `wfl` so as to remember that it is a workflow object.
+Fourth, assign this pipe to a single workflow object. This object can then be used in several different ways. The best way to name this object is to include the letters `wfl` as a suffix so as to remember that it is a workflow object.
 
 ```{r}
-my_wfl <- workflow() %>%
-  add_model(linear_reg() %>% 
-              set_engine("lm") %>% 
-              set_mode("regression")) %>% 
-  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built, 
-                    data = ames_train)) %>%
-    step_log(Gr_Liv_Area, base = 10) %>% 
-    step_other(Neighborhood, threshold = 0.01) %>% 
-    step_dummy(all_nominal()) 
+lm_wfl <- workflow() %>%
+  add_model(linear_reg() %>%
+              set_engine("lm") %>%
+              set_mode("regression")) %>%
+  add_recipe(recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built,
+                    data = ames_train) %>%
+             step_log(Gr_Liv_Area, base = 10) %>%
+             step_other(Neighborhood, threshold = 0.01) %>%
+             step_dummy(all_nominal()))
+
 ```
 
 Fifth, see how well the approach works under cross-validation.
 
+
+
 ```{r}
-my_wfl %>% 
+lm_wfl %>% 
   fit_resamples(resamples = ames_folds) %>% 
   collect_metrics()
 ```
 
-This is the most important tool for deciding which model we should choose.
+The result from a cross-validation exercise is the most important tool for deciding which model we should choose.
 
 This workflow would form the heart of our analysis. We can try different model types and different formulas easily.  Once we decide on a workflow we like, we can look more closely at the predicted values it produces for our training data as a whole. 
 
 ```{r}
-my_wfl %>% 
+lm_wfl %>% 
   fit(data = ames_train) %>% 
   predict(new_data = ames_train) %>% 
   bind_cols(ames_train %>% select(Sale_Price))
 ```
 
-This examination can also be a part of the process of creating a good workflow. Either way, we certainly want to be sure that, for our final model, the predictions on the training data look reasonable.
+This examination can also be a part of the process of creating a good workflow. Either way, we certainly want to be sure that, for our final model, the predictions using the training data look reasonable.
 
-Sixth, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. Do the predictions seem sensible? Make sure to still fit the model with the training data.
+Sixth, as a last step, we can check performance in the test data, which we have not used for any part of the exercise. Do the predictions seem sensible? Make sure to still fit the model with the training data. The only think we ever use test data for is the final prediction, and the resulting model performance calculations.
 
 ```{r}
-my_wfl %>% 
+lm_wfl %>% 
   fit(data = ames_train) %>% 
   predict(new_data = ames_test) %>% 
   bind_cols(ames_test %>% select(Sale_Price))
@@ -990,11 +1005,11 @@ my_wfl %>%
 How well our model does with data it has never seen before is a good guide as to how well it will work on new data tomorrow.
 
 ```{r}
-my_wfl %>% 
+lm_wfl %>% 
   fit(data = ames_train) %>% 
   predict(new_data = ames_test) %>% 
   bind_cols(ames_test %>% select(Sale_Price)) %>% 
-  metrics(truth = Sale_Price, estimate = `.pred`)
+  metrics(truth = Sale_Price, estimate = .pred)
 ```
 
-
+We will save discussion for how to work with tidymodels, once selected, until the Temperance sections of Chapters \@ref(continuous-response) and \@ref(discrete-response). The basic intuition is, however, just the same our use of `posterior_epred()` and `posterior_predict()` in Chapter \@ref(n-parameters).

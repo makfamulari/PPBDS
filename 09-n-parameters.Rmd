@@ -569,7 +569,7 @@ print(fit_gov_4, detail = FALSE)
 
 The intercept has increased. $\beta_0$ is around 6,000. This is the intercept for females. It still means the average number of days lived after the election for women is 6,000 or so. Our `sexMale` coefficient, $\beta_1$, refers to the value that must be added to the intercept in order to get the intercept for males. When calculated, the result is 10,000. Keep in mind, however, that these values only apply if $alive\_pre_i = 0$, if, that is, candidate $i$ is around 52 years old. 
 
-The coefficient for $alive\_pre_i$, $\beta_2$ is  -.1. What does this mean? It is the slope for females. So for every extra day a female candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now direct your attention below at the coefficient of `sexMale:alive_pre`, $\beta_3$, which is -.8. This is the value that must be added to the coefficient of $alive\_pre_i$ (recall $\beta_2$ + $\beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about -0.9. For every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. 
+The coefficient for $alive\_pre_i$, $\beta_2$, is -0.1. What does this mean? It is the slope for females. So for every extra day a female candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now direct your attention below at the coefficient of `sexMale:alive_pre`, $\beta_3$, which is -.8. This is the value that must be added to the coefficient of $alive\_pre_i$ (recall $\beta_2$ + $\beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about -0.9. For every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. 
 
 *Key point*: The interpretation of the intercepts only apply to candidates for whom $alive\_pre_i = 0$. Candidates who are not 52 years-old will have different expected number of days to live. The interpretation of the slope applies to everyone. In other words, the relationship between $alive\_post_i$ and $alive\_pre_i$ is the same, regardless of your gender or how old you are.
 
@@ -748,8 +748,8 @@ Posterior distribution for female candidates in Washington and South Dakota.
 ```{r}
 fit_gov_5 %>% 
   as_tibble() %>% 
-  mutate(Washington_females = `(Intercept)` + 2739.1) %>% 
-  mutate (SD_females = `(Intercept)` - 1869.4) %>% 
+  mutate(Washington_females = `(Intercept)` + stateWashington) %>% 
+  mutate (SD_females = `(Intercept)` + `stateSouth Dakota`) %>% 
   select(Washington_females, SD_females) %>% 
   pivot_longer(cols = Washington_females:SD_females, 
                names_to = "parameters",
@@ -1033,7 +1033,6 @@ The same reasoning applies to every parameter we estimate, to every prediction w
 
 <!-- Use print(fit_obj, digits = 4) if you need to see more digits. -->
 
-
 Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?    
 
 Consider a new data set, `shaming`, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled "Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment". This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout. 
@@ -1268,6 +1267,8 @@ Very few chances that Control votes more (though possible).-->
 
 ## primary_06 & (age + solo + treatment)
 
+<!-- MF: Thinking about graphs/visualizations for this section: are they necessary? I believe they help students visualize concepts, but most graphs won't show up 'pretty' because of the YES/NO as our main variable. --> 
+
 Now that we have analyzed the impact of our various treatments on voting behavior, let's turn to three different variables together: sex, solo (living alone), and treatment.
 
 ```{r, cache=TRUE}
@@ -1331,7 +1332,6 @@ model_5 <- stan_glm(data = ch9_sham,
 print(model_5, digits = 3)
 ```
 
-
 <!-- There is lots to look at here. Let's narrow our focus a bit to highlight some important takeaways. First, our baseline is again: female participants in multi-person households under treatment Civic Duty. For this group, the (Intercept) is 0.304 = 30.4% voting. Every other variable represents an offset from that baseline value. Let's dig in!
 
 First, note that (as we saw in the last model) sexMale and soloTRUE both *increase* the odds of a participant voting. The median values represent an offset from baseline. Therefore, the true value for sexMale would be the (Intercept) + sexMale = 0.304 + 0.022 = 0.326. The true value for soloTRUE is (Intercept) + soloTRUE = 0.304 + 0.068 = 0.372. 
@@ -1363,6 +1363,3 @@ There is also the issue of representitiveness. Do the voters of the 2006 primary
 These complications are why we must make inferences with a grain of salt. That is not to say that all data science is unhelpful! On the contrary, acknowledging our deficits will only make our inferences (and the actions we take because of them) stronger. 
 
 <!-- What we need to add: Preceptor table, causal explanation, math before models, posterior_epred. -->
-
-
-

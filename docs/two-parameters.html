@@ -207,14 +207,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="header-section-number">7.1.2</span> What was the average year of US pennies in 2019?</h3>
 <p>Try to imagine all the pennies used in the United States in 2019. That’s a lot of pennies! Now, say we’re interested in the average year of minting of <em>all</em> these pennies. One way to compute this value would be to gather up all pennies being used in the US, record the year, and compute the average. However, this would be nearly impossible! So instead, let’s collect a <em>sample</em> of 50 pennies from a local bank in downtown Northampton, Massachusetts, USA as seen in the photo below.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-644-1"></span>
+<span id="fig:unnamed-chunk-641-1"></span>
 <p class="caption marginnote shownote">
 FIGURE 7.1: Collecting a sample of 50 US pennies from a local bank.
 </p>
 <img src="07-two-parameters/images/bank.jpg" alt="Collecting a sample of 50 US pennies from a local bank." width="2016">
 </div>
 <div class="figure">
-<span id="fig:unnamed-chunk-644-2"></span>
+<span id="fig:unnamed-chunk-641-2"></span>
 <p class="caption marginnote shownote">
 FIGURE 7.2: Collecting a sample of 50 US pennies from a local bank.
 </p>
@@ -222,7 +222,7 @@ FIGURE 7.2: Collecting a sample of 50 US pennies from a local bank.
 </div>
 <p>An image of these 50 pennies can be seen below. For each of the 50 pennies starting in the top left, progressing row-by-row, and ending in the bottom right, note there is an “ID” identification variable printed in black and the year of minting printed in white.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-645"></span>
+<span id="fig:unnamed-chunk-642"></span>
 <p class="caption marginnote shownote">
 FIGURE 7.3: 50 US pennies labelled.
 </p>
@@ -260,11 +260,11 @@ FIGURE 7.3: 50 US pennies labelled.
 <span id="cb848-2"><a href="two-parameters.html#cb848-2"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year)) <span class="op">+</span></span>
 <span id="cb848-3"><a href="two-parameters.html#cb848-3"></a><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> <span class="dv">10</span>, <span class="dt">color =</span> <span class="st">"white"</span>)</span></code></pre></div>
 <div class="figure">
-<span id="fig:unnamed-chunk-647"></span>
+<span id="fig:unnamed-chunk-644"></span>
 <p class="caption marginnote shownote">
 FIGURE 7.4: Distribution of year on 50 US pennies.
 </p>
-<img src="book_temp_files/figure-html/unnamed-chunk-647-1.png" alt="Distribution of year on 50 US pennies." width="672">
+<img src="book_temp_files/figure-html/unnamed-chunk-644-1.png" alt="Distribution of year on 50 US pennies." width="672">
 </div>
 <p>Observe a slightly left-skewed distribution, since most pennies fall between 1980 and 2010 with only a few pennies older than 1970. What is the average year for the 50 sampled pennies? Eyeballing the histogram, it appears to be around 1990. Let’s now compute this value exactly using our data wrangling tools from Chapter <a href="wrangling.html#wrangling">2</a>.</p>
 <!-- DK: In the book, this shows up as "1994." Why is that? This happens in other chapters. Need to figure out decimal display issues. -->
@@ -280,7 +280,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <p>Going back to our 50 sampled pennies, the point estimate of interest is the sample mean <span class="math inline">\(\overline{x}\)</span> of 1995.44. This quantity is an <em>estimate</em> of the population mean year of <em>all</em> US pennies <span class="math inline">\(\mu\)</span>.</p>
 <p>Recall that we also saw in Chapter <a href="one-parameter.html#one-parameter">6</a> that such estimates are prone to <em>sampling variation</em>. For example, in this particular sample, we observed three pennies with the year 1999. If we sampled another 50 pennies, would we observe exactly three pennies with the year 1999 again? More than likely not. We might observe none, one, two, or maybe even all 50! The same can be said for the other 26 unique years that are represented in our sample of 50 pennies.</p>
 <p>So what do we do about this sampling variation? One solution is that we create bootstrap samples! Bootstrapping repeatedly draws independent samples from our data set with replacement. By sampling with replacement, the same observation can be sampled multiple times and each bootstrap sample will have the same number of observations as the original data set.</p>
-<p><label for="tufte-mn-69" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-69" class="margin-toggle"><span class="marginnote">To conduct bootstraps, make sure you install both the rsample and tidyverse libraries</span></p>
+<p><label for="tufte-mn-66" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-66" class="margin-toggle"><span class="marginnote">To conduct bootstraps, make sure you install both the rsample and tidyverse libraries</span></p>
 <p>The intuition with bootstrapping is that we can model an inference about the population from resampling our sample data and then performing an inference about a sample from each resample. It will look something like this: resampled → sample → population.</p>
 <p>The first thing we want to do when bootstrapping is to create our bootstrap samples. Since we are concerned with the <code>year</code> of pennies in 2019, let’s select <code>year</code> in our data set before we create our bootstraps. Let’s now perform the virtual analog for 1,000 resamples. Using these results, we’ll be able to study the variability in the sample means from 1,000 resamples of size 50. Let’s first add a <code>times = 1000</code> argument to <code>bootstraps()</code> to indicate we would like 1,000 replicates. Remember that we must use the <code>rsample</code> library to use bootstraps.</p>
 <div class="sourceCode" id="cb851"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb851-1"><a href="two-parameters.html#cb851-1"></a><span class="kw">set.seed</span>(<span class="dv">9</span>)</span>
@@ -305,7 +305,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## # … with 990 more rows</code></pre>
 <p>Our bootstrap samples are stored in a tibble-like object, with each bootstrap sample nested in the <code>splits</code> column. Each row is a different bootstrap sample and the <code>id</code> column is used to identify each bootstrap sample.</p>
 <!-- DK: Can we use `id` with the backticks in a margin note? -->
-<p><label for="tufte-mn-70" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-70" class="margin-toggle"><span class="marginnote">It is annoying that bootstraps() requires the use of an id column even though we have used ID in the past to identify specific observations. Here, instead, it is used to mean a specific bootstrapped tibble.</span></p>
+<p><label for="tufte-mn-67" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-67" class="margin-toggle"><span class="marginnote">It is annoying that bootstraps() requires the use of an id column even though we have used ID in the past to identify specific observations. Here, instead, it is used to mean a specific bootstrapped tibble.</span></p>
 <p>To view a specific bootstrap sample, use the <code>analysis()</code> function from the <code>rsample</code> package, which basically allows you to view a specific bootstrap sample as a data frame. Consider the first bootstrap sample:</p>
 <div class="sourceCode" id="cb853"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb853-1"><a href="two-parameters.html#cb853-1"></a><span class="kw">analysis</span>(virtual_resamples<span class="op">$</span>splits[[<span class="dv">1</span>]]) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb853-2"><a href="two-parameters.html#cb853-2"></a><span class="st">  </span><span class="kw">as_tibble</span>()</span></code></pre></div>
@@ -325,7 +325,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## # … with 40 more rows</code></pre>
 <p>Replace <code>1</code> with some other number to see a later bootstrap sample.</p>
 <p>Notice that it has 50 rows, which is the same as the number of rows in our <code>pennies_sample</code>. Now that we know how to create bootstrap samples and view them, we can apply more code to our bootstraps to find our desired statistic, which is the average year of pennies in 2019.</p>
-<p><label for="tufte-mn-71" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-71" class="margin-toggle"><span class="marginnote">In this chapter, bootstrap samples and resamples mean the same thing</span></p>
+<p><label for="tufte-mn-68" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-68" class="margin-toggle"><span class="marginnote">In this chapter, bootstrap samples and resamples mean the same thing</span></p>
 <p>To compute our desired statistics, we now create the column <code>boot</code>.</p>
 <div class="sourceCode" id="cb855"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb855-1"><a href="two-parameters.html#cb855-1"></a>virtual_resamples &lt;-<span class="st"> </span>pennies_sample <span class="op">%&gt;%</span></span>
 <span id="cb855-2"><a href="two-parameters.html#cb855-2"></a><span class="st">  </span><span class="kw">select</span>(year) <span class="op">%&gt;%</span></span>
@@ -381,7 +381,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <span id="cb859-6"><a href="two-parameters.html#cb859-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Mean Year"</span>, </span>
 <span id="cb859-7"><a href="two-parameters.html#cb859-7"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
 <span id="cb859-8"><a href="two-parameters.html#cb859-8"></a>         <span class="dt">title =</span> <span class="st">"Posterior Distribution for the Mean Year of American Pennies in 2019"</span>) </span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-654-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-651-1.png" width="672"></p>
 <p>How did we sneak in the word “posterior” into this discussion? Recall in Chapter <a href="probability.html#probability">5</a> that we defined a posterior distribution as our beliefs about an unknown number: either a number which we don’t know now but which we will know, like Biden’s electoral vote total or a number which we can never know, like the average year for all pennies. In the case of the bootstrap samples we made, the posterior distribution represents our beliefs about <span class="math inline">\(\mu\)</span>, the mean year of American pennies in 2019 after taking into account the information from our bootstrap sample means. As demonstrated in the plot above, we can see that <span class="math inline">\(\mu\)</span> — an unknown parameter, the true value of which we will never know — is most likely between 1992 and 1998.</p>
 <p>Have we proved how the bootstrap, almost magically, can create a reasonable posterior? Not at all! The mathematics of that proof are beyond the scope of this book.</p>
 <!-- In the "resampling with replacement" scenario we are illustrating here, this histogram has a special name: the *bootstrap distribution of the sample mean*. Furthermore, recall it is an approximation to the *sampling distribution* of the sample mean, a concept you saw before. This distribution allows us to study the effect of sampling variation on our estimates of the true population mean, in this case the true mean year for *all* US pennies. However, unlike in Chapter \@ref(one-parameter) where we took multiple samples (something one would never do in practice), bootstrap distributions are constructed by taking multiple resamples from a *single* sample: in this case, the 50 original pennies from the bank.  -->
@@ -451,7 +451,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <div class="sourceCode" id="cb867"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb867-1"><a href="two-parameters.html#cb867-1"></a>ch7 <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb867-2"><a href="two-parameters.html#cb867-2"></a><span class="st">  </span><span class="kw">skim</span>()</span></code></pre></div>
 <p><!--
-<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-659">TABLE 7.1: </span>Data summary</span><!--</caption>--></p>
+<caption>--><span class="marginnote shownote"><span id="tab:unnamed-chunk-656">TABLE 7.1: </span>Data summary</span><!--</caption>--></p>
 <table><tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -581,7 +581,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <span id="cb869-3"><a href="two-parameters.html#cb869-3"></a><span class="st">  </span><span class="kw">geom_density</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb869-4"><a href="two-parameters.html#cb869-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Height"</span>,</span>
 <span id="cb869-5"><a href="two-parameters.html#cb869-5"></a>       <span class="dt">title =</span> <span class="st">"Height by Gender in NHANES Dataset"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-661-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-658-1.png" width="672"></p>
 <p>We can see the the most probable heights for both genders and that men are generally taller than women.</p>
 <!-- ## Using Bootstraps with `nhanes` -->
 <!-- 4. Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.   -->
@@ -631,7 +631,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <span id="cb873-6"><a href="two-parameters.html#cb873-6"></a><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Mean Height"</span>, </span>
 <span id="cb873-7"><a href="two-parameters.html#cb873-7"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>,</span>
 <span id="cb873-8"><a href="two-parameters.html#cb873-8"></a>         <span class="dt">title =</span> <span class="st">"Posterior Distribution for the Mean Height of American Males in 2009"</span>) </span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-664-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-661-1.png" width="672"></p>
 <p>The posterior distribution includes all the information we have about the unknown parameter — mean height of American males — which we have used our data to estimate. But we don’t always want the entire object. Instead, we might want to know the:</p>
 <ul>
 <li><p>Mean: 175.97</p></li>
@@ -643,7 +643,7 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <div id="probability-to-bootstrap-to-bayesian-models" class="section level2">
 <h2>
 <span class="header-section-number">7.4</span> Probability to bootstrap to Bayesian models</h2>
-<p><label for="tufte-mn-72" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-72" class="margin-toggle"><span class="marginnote"> In this sense, the bootstrap distribution represents an (approximate) nonparametric, noninformative posterior distribution for our parameter. But this bootstrap distribution is obtained painlessly — without having to formally specify a prior and without having to sample from the posterior distribution. Hence we might think of the bootstrap distribution as a “poor man’s” Bayes posterior. By perturbing the data, the bootstrap approximates the Bayesian effect of perturbing the parameters, and is typically much simpler to carry out. — Elements of Statistical Learning, 2nd edition, by Hastie et al, page 271.</span></p>
+<p><label for="tufte-mn-69" class="margin-toggle">⊕</label><input type="checkbox" id="tufte-mn-69" class="margin-toggle"><span class="marginnote"> In this sense, the bootstrap distribution represents an (approximate) nonparametric, noninformative posterior distribution for our parameter. But this bootstrap distribution is obtained painlessly — without having to formally specify a prior and without having to sample from the posterior distribution. Hence we might think of the bootstrap distribution as a “poor man’s” Bayes posterior. By perturbing the data, the bootstrap approximates the Bayesian effect of perturbing the parameters, and is typically much simpler to carry out. — Elements of Statistical Learning, 2nd edition, by Hastie et al, page 271.</span></p>
 <p>Most textbooks would, at this stage, provide a more mathematical explanation of the transition we are making from Chapter <a href="probability.html#probability">5</a> to this chapter. In both Chapters <a href="probability.html#probability">5</a> and <a href="one-parameter.html#one-parameter">6</a> we dealt with a discrete set of possible models. We began with examples in which there were only two or three possible “true” states of the world. You were either infected or not infected. There were either zero, one or two white marbles in the bag. These examples grew more and more complex, both by increasing the number of models under consideration and by increasing the number of possible outcomes of the experiment. In the case of the urn, there were 2,401 possible models: either zero or one or two or . . . 2,400 red beads in the urn.</p>
 <p>The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values since height is continuous. Yet, almost miraculously, the same intuition applies.</p>
 <p>Let’s use <span class="math inline">\(\mu\)</span> as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter <span class="math inline">\(p\)</span> from Chapter <a href="one-parameter.html#one-parameter">6</a>, the proportion of red beans in the urn. The only difference is that there are an infinite number of values which <span class="math inline">\(\mu\)</span> might take. We restricted <span class="math inline">\(p\)</span> to only 2,401 possible values: <span class="math inline">\(0\)</span>, <span class="math inline">\(1/2400\)</span>, <span class="math inline">\(2/2400\)</span>, …, <span class="math inline">\(2399/2400\)</span>, <span class="math inline">\(1\)</span>.</p>
@@ -1205,7 +1205,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <span id="cb881-9"><a href="two-parameters.html#cb881-9"></a>         <span class="dt">x =</span> <span class="st">"Height in Centimeters"</span>,</span>
 <span id="cb881-10"><a href="two-parameters.html#cb881-10"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
 <span id="cb881-11"><a href="two-parameters.html#cb881-11"></a><span class="st">    </span><span class="kw">theme_classic</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-673-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-670-1.png" width="672"></p>
 <p>Although it is possible to have variable names like “(Intercept)”, it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Even better, rename them, as we do above.</p>
 <div class="sourceCode" id="cb882"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb882-1"><a href="two-parameters.html#cb882-1"></a>fit_obj <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb882-2"><a href="two-parameters.html#cb882-2"></a><span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -1217,7 +1217,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <span id="cb882-8"><a href="two-parameters.html#cb882-8"></a>         <span class="dt">x =</span> <span class="st">"Sigma in Centimeters"</span>,</span>
 <span id="cb882-9"><a href="two-parameters.html#cb882-9"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>) <span class="op">+</span></span>
 <span id="cb882-10"><a href="two-parameters.html#cb882-10"></a><span class="st">    </span><span class="kw">theme_classic</span>()</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-674-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-671-1.png" width="672"></p>
 <p>Again, <span class="math inline">\(\sigma\)</span> is usually a nuisance parameter. We don’t really care what its value us, so we rarely plot it.</p>
 <!-- DK: Discuss the meaning in more detail. -->
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
@@ -1240,7 +1240,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## 4   168.         176.    -8.08
 ## 5   164.         176.   -12.1</code></pre>
 <p>The fitted value represents the model’s best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, we already know what the actual value is. The residual is the difference between the outcome and the fitted value. These definitions lead to a natural decomposition of the outcome data:</p>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-676-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-673-1.png" width="672"></p>
 <!-- DK: More details. And don't forget to compare this confidence interval to the bootstrapped one. And do a posterior predictive check! -->
 </div>
 </div>
@@ -1351,7 +1351,7 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 <span id="cb899-8"><a href="two-parameters.html#cb899-8"></a>         <span class="dt">subtitle =</span> <span class="st">"of the 3rd Tallest from One Hundred Random Men"</span>,</span>
 <span id="cb899-9"><a href="two-parameters.html#cb899-9"></a>         <span class="dt">x =</span> <span class="st">"Height (cm)"</span>,</span>
 <span id="cb899-10"><a href="two-parameters.html#cb899-10"></a>         <span class="dt">y =</span> <span class="st">"Probability"</span>)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-686-1.png" width="672"></p>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-683-1.png" width="672"></p>
 <!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
 </div>
 </div>
@@ -1380,7 +1380,7 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 <a href="three-parameters.html"><button class="btn btn-default">Next</button></a>
 </p>
 <p class="build-date">Page built: 
-2020-11-06
+2020-11-13
 </p>
 </div>
 </div>
