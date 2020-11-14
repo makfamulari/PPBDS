@@ -1339,7 +1339,7 @@ Now, we will turn out attention to our interactions.
 
 What does this tell us? First, we know that (of the various treatments) Neighbors continues to be the most effective, even in those female citizens that are living alone. We also know that, in those females living alone, the control and Hawthorne treatment are less effective as compared with the Civic Duty treatment. And, while the Self and Neighbors treatments *did* increase voter turnout, the rate of increase was less as compared to the soloFALSE group (showed in the previous model). -->
 
-### Temperance
+## Temperance
 
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Temperance"}
 knitr::include_graphics("other/images/Temperance.jpg")
@@ -1355,86 +1355,6 @@ There is also the issue of representitiveness. Do the voters of the 2006 primary
 
 These complications are why we must make inferences with a grain of salt. That is not to say that all data science is unhelpful! On the contrary, acknowledging our deficits will only make our inferences (and the actions we take because of them) stronger. 
 
-<!-- MF: Thinking of overall second half: what other sections should be added? Anything additional from themes? -->
 
-
-## Causal Effects of `treament`
-
-We will now be looking into the causal effect of the treatment variable on the 2006 primary election. To start, let's build a model using `stan_glm()` followed by a regression table. 
-
-```{r, cache=TRUE}
-# obj.1 <- stan_glm(data = shaming, 
-#                 formula = primary_06 ~ treatment - 1, 
-#                 family = gaussian(), 
-#                 refresh = 0)
-```
-
-
-This table shows us each of the five treatments and their beta coefficients, along with a 95% Confidence Interval for these coefficients. The Control provides us with a baseline.
-
-
-
-<!-- Talk about what these results mean.  Then, create the same model but with a different structure. -->
-
-
-```{r, cache=TRUE}
-# obj.2 <- stan_glm(data = shaming, 
-#                 formula = primary_06 ~ treatment, 
-#                 family = gaussian(), 
-#                 refresh = 0)
-```
-
-
-<!-- Explain how these two models are the same, except in how they define the parameters. Show us the math like Gelman does. Write down the math. For simple. -->
-
-
-
-<!-- Once we talk about these things --- and, again, this is exactly what we have talked about in chapter 8 --- we can do a bit more. Like discuss how we are using 99%, because there is nothing magical aboyt 95%, other than convention. I also think it would be fun to show a nice graphic of this, highlighting how the estimates for Civic and Hawthorne overlap.  -->
-
-
-### Interactions
-
-<!-- This is new. With only two parameters, we can't really look at interaction effects. Need to discuss interaction effects in general. Also, note that heterogenous treatment effects are the same thing as interaction effects that involve a treatment effect as one of the variables.  -->
-
-<!-- Feel free to build up this code, and other examples, more slowly than I am doing it here. -->
-
-```{r, cache=TRUE}
-# obj.3 <- stan_glm(data = shaming, 
-#                 formula = primary_06 ~ sex + treatment + sex:treatment, 
-#                 family = gaussian(), 
-#                 refresh = 0)
-```
-
-
-<!-- Takes a while to explain what all this means. -->
-
-<!-- Two key issues: 1) Interpreting lots of parameters in a model. interactions, heterogenous treatment effects. shaming using lm().  -->
-
-<!-- Treatment effect is not the same thing as a coefficient. -->
-
-<!-- 
-intercept
-
-Interactions --- use: income ~ party*something
-
-heterogeneous treatment effects --- use:  att_start ~ treatment*something 
-just a fancy way of saying interaction effects, but with a variable which us causal
-
-
-What problems do we face? All the things that make modeling difficult. Why is this so hard? -->
-
-<!-- Centering. -->
-
-<!-- Might naively just take the value for each bucket. But that overfits! Need to put down some structure, like ordering. -->
-
-<!-- income category, party id, pooling, age, -->
-
-<!-- overfitting/underfitting bias/variance -->
-
-<!-- We must have left bootstrapping behind by now. No more bootstraps, at least for the purpose of calculating uncertainty. (We will use it later for the purpose of out-of-sample testing and avoiding overfitting.) Key lesson is that overfitting is easy. You can't just estimate a value for each cell. You need to smooth and borrow strength. Of course, the only way to do that is with a Bayesian approach. Right? We don't want to get into hacked likelihood approaches. -->
-
-<!-- cces looks perfect for this project. There are 400,000 rows, so it seems like you ought to have plenty of data for anything you want, but once you realize there are 51 states and 10 years, things get sparse fast. We only have 15 observations, for example, for Wyoming in 2007. Once you start subsetting by race and education, you have no choice but to start borrowing strength.  -->
-
-<!-- So, just what will we use? rstanarm(). If so (and if we have not introduced it earlier), we can begin with seeing how it is similar to lm() and then expand. This means that, in one paramter chapter, we should be doing lm( ~ 1). In two parameter, lm( ~ treatment) --- if treatment is zero one --- or, perhaps better, lm( ~ -1 + treatment) if treatment is a factor/character with two levels. We might also have introduced  -->
 
 
