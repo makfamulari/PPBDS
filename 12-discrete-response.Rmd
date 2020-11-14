@@ -32,7 +32,13 @@ library(tidymodels)
 
 **Binary responses** take on only two values: success ($Y=1$) or failure ($Y=0$), yes ($Y=1$) or no ($Y=0$), et cetera. Binary responses are one of the most common types of data that statisticians encounter.  We are often interested in modeling the probability of success, $p$, based on a set of covariates. As with regression, there are two broad categories of problems: *modeling for prediction* and *modeling for causation*. Although terminology varies across fields, "regression" is generally used for situations in which our *dependent variable* is continuous, as in Chapter \@ref(continuous-response). "Classification" applies to cases in which the dependent variable takes on discrete values, the simplest of which is the binary case.
 
-In this chapter, we will look at three common techniques of **classification** of binary data.  First, we will consider logistic regression.  Second, we will consider classification and regression trees (CART).  Third, we will discuss random forests. We use the **tidymodels** tools for all examples. At the end, we will compare the performances of all three models.
+In this chapter, we will look at three common techniques of **classification** of binary data.We use the **tidymodels** tools for all examples. At the end, we will compare the performances of all three models.
+
+* logistic regression
+* classification and regression trees (CART)
+* random forests
+
+
 
 <!-- DK: Finish with a question. -->
 
@@ -103,7 +109,7 @@ There are a number of other functions that use probability estimates, including 
 
 ## Exploratory Data Analysis (EDA)
 
-Begin with our usual libraries:
+We begin with our usual libraries:
 
 ```{r, message=FALSE}
 library(tidyverse)
@@ -113,7 +119,7 @@ library(PPBDS.data)
 library(tidymodels)
 ```
 
-Before we start modeling, let's perform some exploratory analysis on the dataset we'll be working with, cces. Cces stands for the Cooperative Congressional Election Study, a study regarding the approval rating of individual voters to their sitting president. Each row captures one voter, some of their demographic information, and how highly they approve (or disaprprove) of the president. 
+It's always a good idea to perform some exploratory analysis on the dataset before we start modeling. In this chapter, we'll be working with, cces. cces stands for the Cooperative Congressional Election Study, a study regarding the approval rating of individual voters to their sitting president. Each row captures one voter, some of their demographic information, and how highly they approve (or disapprove) of the president. 
 
 ```{r}
 glimpse(cces)
@@ -177,7 +183,7 @@ ch12 %>%
          title = "Presidential Approval in 2018") 
 ```
 
-According to this graph, there are roughly 10,000 more voters who disapprove of Trump. To make things more interesting, let's look at `approval` across gender and then race.
+According to this graph, there are roughly 10,000 more voters who disapprove of Trump. To make things more interesting, let's look at `approval` across gender.
 
 ```{r}
 ch12 %>%
@@ -201,7 +207,7 @@ ch12 %>%
        title = "Presidential Approval in 2018 by Race")
 ```
 
-This segmented bar graph shows us the percentage of each race that approved of the president. We can see that the disapproving majority in the overall data is present across most races.
+Let's add race into the mix. This segmented bar graph shows us the percentage of each race that approved of the president. We can see that the disapproving majority in the overall data is present across most races.
 
 Now, let's use our state variable. Let's create a scatterplot with `approval` to see how the rate of approval varied across states.
 
@@ -220,7 +226,7 @@ ch12 %>%
        title = "Presidential Approval by State")
 ```
 
-Let's now complete the first step for a proper data science project. We will split our data set into training and testing samples, then create cross-validations from the training data.
+We are now ready to complete the first step for a proper data science project. Just as we have done in previous chapters, we will split our data set into training and testing samples, then create cross-validations from the training data.
 
 ```{r}
 set.seed(10)
@@ -230,15 +236,12 @@ ch12_test  <- testing(ch12_split)
 ch12_folds <- vfold_cv(ch12_train, v = 10)
 ```
 
-We can now use the split data to explore different models.
-
+Now let's use the split data to explore three different models.
 
 
 ## Logistic regression
 
-
-
-Now that we know our dataset a little better, let's begin our first way of modeling binary/discrete data: logistic regressions. 
+Our first way of modeling binary/discrete data: logistic regressions. 
 
 Figure \@ref(fig:OLSlogistic) illustrates a data set with a binary (0 or 1) response ($Y$) and a single continuous predictor ($X$).  The blue line is a linear regression to model the probability of a success ($Y=1$) for a given value of $X$. With a binary response, the linear regression has an obvious problem: it can produce predicted probabilities below 0 and above 1. Probabilities can only range from 0 up to and including 1 as these represent a 0% and 100% chance of an event happening, respectively.
 
@@ -323,8 +326,7 @@ glm_wfl %>%
 
 ## Classification and regression trees (CART)
 
-
-Logistic regression is just one of many methods we can use to model binary responses.  CART is another approach, which we'll learn about in this section.
+CART is another approach to model binary responses, which we'll learn about in this section.
 
 A **tree** is basically a flow chart of yes or no questions. The general idea of the methods we are describing is to define an algorithm that uses data to create these trees with predictions at the ends, referred to as _nodes_. Decision trees predict an outcome variable $Y$ by *partitioning* the predictors.
 
@@ -332,7 +334,7 @@ A **tree** is basically a flow chart of yes or no questions. The general idea of
 
 But how do we decide on which partitions to make  ($R_1, R_2, \ldots, R_J$) and how do we choose $J$, the total number of partitions? Here is where the algorithm gets a bit complicated.
 
-Classification trees create partitions recursively. We start the algorithm with one partition in which every observation is classified as either 0 or 1. But after the first step we will have two partitions. After the second step we will split one of these partitions into two and will have three partitions, then four, then five, and so on.
+Classification trees create partitions recursively. We start the algorithm with one partition in which every observation is classified as either 0 or 1. But after the first step we will have two partitions. After the second step, we will split one of these partitions into two and will have three partitions, then four, then five, and so on.
 
 Now, after we define the new partitions $R_1$ and $R_2$, and we decide to stop the partitioning process, we compute predictors by taking the most common category of all the observations $y$ for which the associated $\mathbf{x}$ is in $R_1$ and $R_2$. We refer to these two as $\hat{y}_{R_1}$ and $\hat{y}_{R_2}$ respectively. 
 
@@ -403,7 +405,9 @@ cart_wfl %>%
 
 Random forests are a very popular machine learning approach that addresses the shortcomings of decision trees using a clever idea. The goal is to improve prediction performance and reduce instability by _averaging_ multiple decision trees (a forest of trees constructed with randomness). It has two features that help accomplish this.
 
-The first step is _bootstrap aggregation_ or _bagging_. The general idea is to generate many predictors, each using classification trees, and then forming a final prediction based on the average prediction of all these trees. To assure that the individual trees are not the same, we use the bootstrap to induce randomness. These two features combined explain the name: the bootstrap makes the individual trees **randomly** different, and the combination of trees is the **forest**. The specific steps are as follows.
+The first step is _bootstrap aggregation_ or _bagging_. The general idea is to generate many predictors, each using classification trees, and then forming a final prediction based on the average prediction of all these trees. To assure that the individual trees are not the same, we use the bootstrap to induce randomness. These two features combined explain the name: the bootstrap makes the individual trees **randomly** different, and the combination of trees is the **forest**. 
+
+Our steps.
 
 1. Build decision trees using a portion of the data called the training set. We refer to the fitted models as $T_1, T_2, \dots, T_B$. We later explain how we ensure they are different.
 
@@ -469,8 +473,13 @@ rf_wfl %>%
 ```
 
 ## Cardinal Virtues
-
 <!-- DK: Make this aprt like Chapter 11. Put model comparison under courage. Once we choose a model then, under Temperance, we use all our data to fit it. Then we use the resulting _fit object to answer our question. -->
+
+_Wisdom_ tells us not to use the data if the data won’t help. Why build a model that is not relevant to the problem you face? The answer is, we don't. However, we also want to consider that it is impossible to account for all the variables we care about. A perfect world does not exist, so we must use caution when drawing conclusions.
+
+_Justice_ checks in with us to make sure the models we are building are as unbiased as possible. We determine whether the model is predictive or causal. Then, we proceed to describe the math of the model, but in the simplest possible way.
+
+_Courage_ is what we need to implement our model into code. By doing so, we can fit models and then choose which model is the most meaningful for our purposes. Recall that we should only select the more complex models or formulas if the additional complexity is justified. Does the linear model have better accuracy than the logistic regression model? Well, let's find out in the section below.
 
 ### Comparing Models
 
@@ -483,7 +492,55 @@ tibble(model = rep(c("Logistic Regression",
   bind_cols(bind_rows(glm_metrics, cart_metrics, rf_metrics)) 
 ```
 
-<!-- BG: This code returns an error. -->
-<!-- BG: once code errors are sorted, talk about results here -->
+As you can see, the logistic model has the best accuracy. Therefore, we choose it as our model. The next step is to check performance using the test data. Recall we never use the test data until the final prediction and the resulting model performance calculations. Do the predictions seem sensible? Reminder that we still use the training data to fit the model.
 
+
+```{r}
+glm_wfl %>% 
+  fit(data = ch12_train) %>% 
+  predict(new_data = ch12_test) %>% 
+  bind_cols(ch12_test %>% select(approval)) %>% 
+  metrics(truth = approval, estimate = .pred_class)
+```
  
+What does this tell us? Well, going forward, the accuracy of our model would be 62% accurate with data it has never seen. 
+ 
+ 
+_Temperance_ guides us to the finish line. Now that we have chosen our model and tested out of sample, we once again use caution. it is difficult to apply any model to the real world because the world is constantly changing around us. 
+
+
+Let's answer the following question.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
