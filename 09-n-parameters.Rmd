@@ -1149,7 +1149,7 @@ Having created models with one parameter in Chapter \@ref(one-parameter) and two
 
 <!-- DK: Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 5 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
 
-### Wisdom
+## Wisdom
 
 ```{r echo=FALSE, fig.margin=TRUE, fig.cap="Wisdom"}
 knitr::include_graphics("other/images/Wisdom.jpg")
@@ -1165,8 +1165,7 @@ Does this mean our data is unhelpful? Of course not! With four treatments (and t
 
 That being said, the map from our question to our data is almost never perfect. In data science, we often have to look at our data, understand its limitations, and try our best to make inferences that help our cause.
 
-### Justice and Courage
-
+## Voting and Treatment + Age
 
 <!-- What should the Preceptor tables look like with these models? Like chapter 3. Should each model have its own Preceptor Table? No! Just one preceptor table at the start, with 5 columns under Y, and 4 covariates, where one is treatment assigned. -->
 
@@ -1179,8 +1178,6 @@ knitr::include_graphics("other/images/Courage.jpg")
 ```
 
 Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let's model `primary_06`, which represents whether a citizen voted or not, against age and treatment to see if there is a connection. 
-
-#### Voting and Treatment + Age
 
 Let's look at the relationship between primary voting and treatment + age. 
 
@@ -1250,7 +1247,7 @@ shaming %>%
 Note that the median for age is 0.004. Age is therefore positively correlated with voting in the primary election. What does that mean? It means that, for every year that a participant's age increases, their odds of voting in the primary *increases* by 0.004. Now, this might not seem like a huge difference. However, think of it like this: for every decade older that a participant is, their odds of voting increase .04 = 4%! This makes sense considering that we just learned that older citizens are more likely to vote. 
 
 
-#### Voting & (Age + Solo + Treatment)
+## Voting & (Age + Solo + Treatment)
 
 <!-- MF: Thinking about graphs/visualizations for this section: are they necessary? I believe they help students visualize concepts, but most graphs won't show up 'pretty' because of the YES/NO as our main variable. --> 
 
@@ -1272,7 +1269,7 @@ First, let's look at which variables are included on our left hand side. Besides
 - age, with a median of 0.004: as before, the age represents the positively correlated increase with voting as someone ages. For every decade older a participant is, their chance of voting increases by 4%. 
 - soloTRUE, with a median of 0.015: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.015 = 1.5%. Note that this is only true for our baseline group of Control participants and does not include an analysis for those in Neighbors. 
 
-#### Voting & Age, Solo, Treatment, + Interactions
+## Voting & Age, Solo, Treatment, + Interactions
 
 <!-- MF: Should I be talking about standard deviation here, or just the median values? --> 
 
@@ -1287,6 +1284,7 @@ model_5 <- stan_glm(data = ch9_sham,
 ```{r}
 print(model_5, digits = 3)
 ```
+
 
 <!-- There is lots to look at here. Let's narrow our focus a bit to highlight some important takeaways. First, our baseline is again: female participants in multi-person households under treatment Civic Duty. For this group, the (Intercept) is 0.304 = 30.4% voting. Every other variable represents an offset from that baseline value. Let's dig in!
 
